@@ -1,0 +1,103 @@
+// Copyright Samuel Reitich 2022.
+
+#pragma once
+
+#include "UserDefinedData/Match_UserDefinedData.h"
+
+#include "CoreMinimal.h"
+#include "GameFramework/GameStateBase.h"
+#include "Match_GameStateBase.generated.h"
+
+class ABoardManager;
+
+/**
+ * 
+ */
+UCLASS()
+class KINGDOMS_API AMatch_GameStateBase : public AGameStateBase
+{
+	GENERATED_BODY()
+
+/* Public functions. */
+public:
+
+	/* Sets default values for this actor's properties. */
+	AMatch_GameStateBase();
+
+	/* Replicates variables. */
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	/* Lets players start placing their pieces. */
+	UFUNCTION()
+	void SetUpMatch();
+
+	/* Checks if both players have placed all of their pieces and are ready to start the match. */
+	UFUNCTION()
+	bool CheckReadyToStart();
+
+	/* Initiates the game for all clients and begins the match on the server once both players have set up their pieces. */
+	UFUNCTION()
+	void StartMatch();
+
+	/* Getter for CurrentMatchStatus. */
+	UFUNCTION(BlueprintPure, Category="Match Status")
+	FORCEINLINE EMatchStatus GetCurrentMatchStatus() const { return CurrentMatchStatus; }
+
+	/* Server-side setter for CurrentMatchStatus. */
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Match Status")
+	void SetMatchStatus(EMatchStatus NewMatchStatus);
+
+
+/* Public variables. */
+public:
+
+	/* A global pointer to this level's tile manager. */
+	UPROPERTY(Replicated)
+	ABoardManager* BoardManager;
+	
+	/* Tracks the official time of the match. */
+	UPROPERTY(Replicated)
+	int32 MatchTime;
+
+	/* Tracks the official time of the current player's turn. */
+	UPROPERTY(Replicated)
+	int32 TurnTime;
+
+	/* Name of map, displayed in each player base widget. */
+	FName MapName = "Clockwork";
+
+
+/* Protected functions. */
+protected:
+
+	/* Called when the game starts or when spawned */
+	virtual void BeginPlay() override;
+
+	/* Match progresses with the match status. */
+	UFUNCTION()
+	void OnRep_CurrentMatchStatus();
+
+
+/* Protected variables */
+protected:
+
+	/* Determines the state of the current match. */
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentMatchStatus)
+	TEnumAsByte<EMatchStatus> CurrentMatchStatus;
+
+
+/* Private functions. */
+private:
+
+	// Increments the match time every second.
+	UFUNCTION(Server, Reliable)
+	void Count();
+
+
+/* Private variables. */
+private:
+
+	/* Handles the match timer. */
+	FTimerHandle MatchTimeTimerHandle;
+
+};
