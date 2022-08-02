@@ -8,6 +8,8 @@
 
 struct FPieceDataStruct;
 
+class AParentPiece;
+
 /**
  * 
  */
@@ -21,7 +23,7 @@ public:
 
 	/* Updates all displayed piece information by retrieving data from the piece data table. */
 	UFUNCTION()
-	void UpdatePieceInfoWidget(class AParentPiece* NewPiece, bool bIsFriendly, bool bEnableButtons);
+	void UpdatePieceInfoWidget(AParentPiece* NewPiece, bool bIsFriendly, bool bEnableButtons);
 
 	/* Allows the base widget to play this widget's animations. */
 	UFUNCTION()

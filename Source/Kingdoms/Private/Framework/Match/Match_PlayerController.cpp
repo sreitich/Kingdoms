@@ -302,7 +302,8 @@ void AMatch_PlayerController::UpdateAttackGraphicWidget(bool bDestroy, AParentPi
         else if (!bDestroy)
         {
             /* Create the widget. */
-            Match_AttackGraphic = CreateWidget<UMatch_AttackGraphic>(GetWorld(), Match_AttackGraphicClass, FName("Attack Graphic Widget"));
+            Match_AttackGraphic = CreateWidget<UMatch_AttackGraphic>(GetWorld(), Match_AttackGraphicClass,
+                FName("Attack Graphic Widget"));
 
             /* If the attack graphic widget was successfully created... */
             if (Match_AttackGraphic)

@@ -148,7 +148,7 @@ protected:
 	FName PieceID = "0-00";
 
 	/* The material used for this piece's skeletal meshes, including the parent mesh. Used to edit the fresnel during runtime. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Materials")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Materials")
 	UMaterialInstanceDynamic* DynamicMaterial;
 
 	/* The color that friendly pieces will be highlighted in. */
@@ -164,11 +164,12 @@ protected:
 protected:
 
 	/* Pointer to the piece currently on this tile. */
-	UPROPERTY(Replicated, EditAnywhere, Category="Piece Info")
+	UPROPERTY(Replicated, EditInstanceOnly, BlueprintReadOnly, Category="Piece Info")
 	ABoardTile* CurrentTile;
 
 
-	/* EditAnywhere enabled for playtesting. */
+	/* EditAnywhere enabled for playtesting. These will be changed to Replicated, EditInstanceOnly, BlueprintReadOnly
+	 * later. */
 
 	/* This piece's current strength with modifiers. */
 	UPROPERTY(Replicated, EditAnywhere, Category="Piece Stats")

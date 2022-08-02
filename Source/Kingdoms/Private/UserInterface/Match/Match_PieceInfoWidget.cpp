@@ -9,6 +9,8 @@
 #include "UserDefinedData/PieceData_UserDefinedData.h"
 #include "UserInterface/Match/Match_AbilityInfo.h"
 #include "Board/BoardTile.h"
+#include "Pieces/Mages/Pyromancer.h"
+#include "Pieces/Soldiers/Knight.h"
 
 #include "Runtime/UMG/Public/UMG.h"
 

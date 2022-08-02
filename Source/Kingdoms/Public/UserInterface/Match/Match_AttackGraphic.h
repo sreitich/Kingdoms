@@ -8,11 +8,12 @@
 
 enum EAttackGraphicAnimation;
 
+class AParentPiece;
+class UDataTable;
+class UImage;
 class UMediaPlayer;
 class UMediaSource;
-class UImage;
 class UTextBlock;
-class AParentPiece;
 
 /**
  * 
@@ -36,28 +37,32 @@ public:
 /* Protected assets. */
 protected:
 
-	// /* Used to play animations on the screen. */
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Media")
-	// UMediaPlayer* AnimationPlayer;
+	/* Pointer to the piece data table, used to retrieve information to display. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data")
+	const UDataTable* PieceDataTable;
+	
+	/* Used to play animations on the screen. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Media")
+	UMediaPlayer* AnimationPlayer;
 
-	// /* Video files to play on the attack graphic. */
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
-	// UMediaSource* NeutralFightInitiationAnim;
-	//
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
-	// UMediaSource* AttackerFightInitiationAnim;
-	//
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
-	// UMediaSource* AttackerDeathAnim;
-	//
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
-	// UMediaSource* DefenderDeathAnim;
-	//
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
-	// UMediaSource* AttackerDeadlockAnim;
-	//
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
-	// UMediaSource* DefenderDeadlockAnim;
+	/* Video files to play on the attack graphic. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UMediaSource* NeutralFightInitiationAnim;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UMediaSource* AttackerFightInitiationAnim;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UMediaSource* AttackerDeathAnim;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UMediaSource* DefenderDeathAnim;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UMediaSource* AttackerDeadlockAnim;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UMediaSource* DefenderDeadlockAnim;
 
 
 /* Protected widgets. */

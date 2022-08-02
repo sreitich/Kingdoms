@@ -462,10 +462,10 @@ void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo)
 
 void AMatch_PlayerPawn::Client_SetUpAttack_Implementation()
 {
-	if (GetController()->IsA(APlayerController::StaticClass()))
+	if (APlayerController* ControllerPtr = Cast<APlayerController>(GetController()))
 	{
 		/* Disable input for both players. */
-		DisableInput(Cast<APlayerController>(GetController()));
+		DisableInput(ControllerPtr);
 	}
 }
 
@@ -478,9 +478,11 @@ void AMatch_PlayerPawn::Client_InitiateAttack_Implementation(FAttackInfo InInfo)
 	InInfo.Defender->FlashHighlight(FLinearColor(1.0f, 1.0f, 1.0f, 1.0f), 15.0f, 1.0f);
 	InInfo.Attacker->FlashHighlight(FLinearColor(1.0f, 1.0f, 1.0f, 1.0f), 15.0f, 1.0f);
 
-	/* Create an attack graphic. */
-	GetController<AMatch_PlayerController>()->UpdateAttackGraphicWidget(false, InInfo.Attacker, InInfo.Defender);
-	// Update graphic info
+	/* Create an attack graphic and update its display information with these pieces' data. */
+	if (AMatch_PlayerController* ControllerPtr = Cast<AMatch_PlayerController>(GetController()))
+	{
+		ControllerPtr->UpdateAttackGraphicWidget(false, InInfo.Attacker, InInfo.Defender);
+	}
 }
 
 void AMatch_PlayerPawn::MovePlayerCamera(AParentPiece* Attacker, AParentPiece* Defender)

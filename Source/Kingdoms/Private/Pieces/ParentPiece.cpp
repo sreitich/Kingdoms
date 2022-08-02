@@ -5,9 +5,7 @@
 
 #include "Animations/AnimInstance_Parent.h"
 #include "Board/BoardTile.h"
-// #include "Chaos/Private/Chaos/CollisionOneShotManifolds.h"
 #include "Components/CapsuleComponent.h"
-// #include "Components/SlateWrapperTypes.h"
 #include "Board/BoardManager.h"
 #include "Framework/Match/Match_GameStateBase.h"
 #include "Framework/Match/Match_PlayerPawn.h"
@@ -15,8 +13,6 @@
 #include "UserDefinedData/PieceData_UserDefinedData.h"
 
 #include "Kismet/GameplayStatics.h"
-
-// const FName AParentPiece::PieceID = "0-00";
 
 AParentPiece::AParentPiece()
 {
