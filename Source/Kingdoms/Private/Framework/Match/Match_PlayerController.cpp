@@ -2,17 +2,18 @@
 
 #include "Framework/Match/Match_PlayerController.h"
 
-#include "UserInterface/MatchSetup/MatchSetup_SelectArmy.h"
-#include "UserInterface/MatchSetup/MatchSetup_PlacePieces.h"
-#include "UserInterface/Match/Match_BaseWidget.h"
-#include "UserInterface/Match/Match_PieceInfoWidget.h"
-#include "UserInterface/Match/Match_MoveConfirmation.h"
 #include "UserInterface/Match/Match_AttackConfirmation.h"
+#include "UserInterface/Match/Match_AttackGraphic.h"
+#include "UserInterface/Match/Match_BaseWidget.h"
+#include "UserInterface/Match/Match_MoveConfirmation.h"
+#include "UserInterface/Match/Match_PieceInfoWidget.h"
+#include "UserInterface/MatchSetup/MatchSetup_PlacePieces.h"
+#include "UserInterface/MatchSetup/MatchSetup_SelectArmy.h"
 
-#include "Framework/Match/Match_GameStateBase.h"
-#include "Pieces/ParentPiece.h"
 #include "Board/BoardTile.h"
 #include "Components/ServerCommunicationComponent.h"
+#include "Framework/Match/Match_GameStateBase.h"
+#include "Pieces/ParentPiece.h"
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
@@ -285,12 +286,47 @@ void AMatch_PlayerController::UpdateAttackConfirmationWidget(bool bDestroy, APar
     }
 }
 
-void AMatch_PlayerController::UpdateAttackGraphicWidget(bool bDestroy, AParentPiece* FriendlyPiece,
-    AParentPiece* EnemyPiece)
+void AMatch_PlayerController::UpdateAttackGraphicWidget(bool bDestroy, AParentPiece* Attacker,
+    AParentPiece* Defender)
 {
+    /* Only execute on local client. */
+    if (IsLocalPlayerController())
+    {
+        /* If the attack graphic widget needs to be destroyed and it's already been created... */
+        if (bDestroy && Match_AttackGraphic)
+        {
+            /* Remove the widget, destructing it. */
+            Match_AttackGraphic->RemoveFromParent();
+        }
+        /* If the widget needs to be created... */
+        else if (!bDestroy)
+        {
+            /* Create the widget. */
+            Match_AttackGraphic = CreateWidget<UMatch_AttackGraphic>(GetWorld(), Match_AttackGraphicClass, FName("Attack Graphic Widget"));
+
+            /* If the attack graphic widget was successfully created... */
+            if (Match_AttackGraphic)
+            {
+                /* Update the widget's displayed information using the given pieces. */
+                Match_AttackGraphic->UpdateAttackGraphicInfo(Attacker, Defender);
+
+                /* Add the widget to the player's viewport. */
+                Match_AttackGraphic->AddToViewport(0);
+            }
+        }
+    }
 }
 
 void AMatch_PlayerController::PlayAttackGraphicAnimation(EAttackGraphicAnimation AttackGraphicAnim)
 {
-    
+    /* Only execute on local client. */
+    if (IsLocalPlayerController())
+    {
+        /* If the attack graphic widget currently exists (i.e. is on the screen). */
+        if (Match_AttackGraphic)
+        {
+            /* Play the given animation on the widget. */
+            Match_AttackGraphic->PlayAttackGraphicAnimation(AttackGraphicAnim);
+        }
+    }
 }

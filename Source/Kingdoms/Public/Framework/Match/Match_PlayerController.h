@@ -69,7 +69,7 @@ public:
 
 	/* Creates or destroys an attack graphic. */
 	UFUNCTION(Category="User Interface")
-	void UpdateAttackGraphicWidget(bool bDestroy, AParentPiece* FriendlyPiece, AParentPiece* EnemyPiece);
+	void UpdateAttackGraphicWidget(bool bDestroy, AParentPiece* Attacker, AParentPiece* Defender);
 
 	/* Plays a given animation on the attack graphic. */
 	UFUNCTION(Category="User Interface")

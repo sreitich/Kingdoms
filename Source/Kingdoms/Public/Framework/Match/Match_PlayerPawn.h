@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UserDefinedData/Match_UserDefinedData.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Match_PlayerPawn.generated.h"
@@ -15,7 +17,6 @@ class UCameraComponent;
 class UPieceDragWidget;
 class AParentPiece;
 class ABoardTile;
-struct FAttackInfo;
 
 UCLASS()
 class KINGDOMS_API AMatch_PlayerPawn : public APawn

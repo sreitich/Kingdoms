@@ -252,16 +252,16 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 	ABoardTile* InteractedTile = nullptr;
 
 	/* If a piece was clicked... */
-	if (Cast<AParentPiece>(InteractionHit.Actor))
+	if (AParentPiece* PiecePtr = Cast<AParentPiece>(InteractionHit.Actor))
 	{
 		/* Interact with the piece's tile. */
-		InteractedTile = Cast<AParentPiece>(InteractionHit.Actor)->GetCurrentTile();
+		InteractedTile = PiecePtr->GetCurrentTile();
 	}
 	/* If a board tile was clicked... */
-	else if (Cast<ABoardTile>(InteractionHit.Actor))
+	else if (ABoardTile* TilePtr = Cast<ABoardTile>(InteractionHit.Actor))
 	{
 		/* Interact with the clicked tile. */
-		InteractedTile = Cast<ABoardTile>(InteractionHit.Actor);
+		InteractedTile = TilePtr;
 	}
 	/* If anything else was clicked... */
 	else
@@ -285,10 +285,10 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 			else
 			{
 				/* If this player has a valid player controller... */
-				if (GetController<AMatch_PlayerController>())
+				if (AMatch_PlayerController* ControllerPtr = GetController<AMatch_PlayerController>())
 				{
 					/* Create and update the attack confirmation pop-up. */
-					GetController<AMatch_PlayerController>()->UpdateAttackConfirmationWidget(false, SelectedPiece, InteractedTile->GetOccupyingPiece());
+					ControllerPtr->UpdateAttackConfirmationWidget(false, SelectedPiece, InteractedTile->GetOccupyingPiece());
 
 					/* Highlight the pending tile. */
 					InteractedTile->Highlight->SetMaterial(0, InteractedTile->Highlight_Target);
@@ -299,10 +299,10 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 		else
 		{
 			/* Make sure that this pawn's controller is valid. */
-			if (GetController<AMatch_PlayerController>())
+			if (AMatch_PlayerController* ControllerPtr = GetController<AMatch_PlayerController>())
 			{
 				/* Create and update the move confirmation pop-up. */
-				GetController<AMatch_PlayerController>()->UpdateMoveConfirmationWidget(false, InteractedTile, SelectedPiece);
+				ControllerPtr->UpdateMoveConfirmationWidget(false, InteractedTile, SelectedPiece);
 
 				/* Highlight the pending tile. */
 				InteractedTile->Highlight->SetMaterial(0, InteractedTile->Highlight_Target);
@@ -479,7 +479,8 @@ void AMatch_PlayerPawn::Client_InitiateAttack_Implementation(FAttackInfo InInfo)
 	InInfo.Attacker->FlashHighlight(FLinearColor(1.0f, 1.0f, 1.0f, 1.0f), 15.0f, 1.0f);
 
 	/* Create an attack graphic. */
-	
+	GetController<AMatch_PlayerController>()->UpdateAttackGraphicWidget(false, InInfo.Attacker, InInfo.Defender);
+	// Update graphic info
 }
 
 void AMatch_PlayerPawn::MovePlayerCamera(AParentPiece* Attacker, AParentPiece* Defender)
