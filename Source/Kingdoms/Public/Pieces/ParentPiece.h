@@ -42,9 +42,10 @@ public:
 /* Public functions: accessors and modifiers. */
 public:
 
-	/* Getter for PieceID. */
-	UFUNCTION(BlueprintPure, Category="Data")
-	FORCEINLINE FName GetPieceID() const { return PieceID; }
+	/* Retrieves this piece's piece ID. This function is overridden by each piece with an ID that is unique to that
+	 * piece. This is used in place of a member variable and has complete control over this piece's ID. */
+	// UFUNCTION(BlueprintPure, Category="Data")
+	virtual FName GetPieceID();
 
 	/* Getter for CurrentTile. */
 	UFUNCTION(BlueprintPure, Category="Current Tile")
@@ -142,10 +143,6 @@ protected:
 
 /* Protected constant variables. */
 protected:
-
-	/* Used to retrieve relevant data from the piece data table. Each piece has its own ID which is set in their constructor. */
-	UPROPERTY(BlueprintReadOnly)
-	FName PieceID = "0-00";
 
 	/* The material used for this piece's skeletal meshes, including the parent mesh. Used to edit the fresnel during runtime. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Materials")

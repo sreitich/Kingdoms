@@ -3,8 +3,11 @@
 
 #include "Pieces/Soldiers/Knight.h"
 
+FName AKnight::GetPieceID()
+{
+	return "S-01";
+}
+
 AKnight::AKnight()
 {
-	/* Set this piece's piece ID. */
-	PieceID = "S-01";
 }

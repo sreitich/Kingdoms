@@ -51,6 +51,8 @@ void UMatch_PieceInfoWidget::ClosingAnimFinished()
 
 void UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool bIsFriendly, bool bEnableButtons)
 {
+    UE_LOG(LogTemp, Error, TEXT("Piece ID: %s"), *NewPiece->GetPieceID().ToString());
+    
     /* Set the displayed piece pointer to be the passed piece for use in other functions. */
     DisplayedPiece = NewPiece;
 

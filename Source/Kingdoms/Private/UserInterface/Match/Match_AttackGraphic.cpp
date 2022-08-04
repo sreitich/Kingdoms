@@ -49,27 +49,27 @@ void UMatch_AttackGraphic::UpdateAttackGraphicInfo(AParentPiece* Attacker, APare
 	}
 }
 
-void UMatch_AttackGraphic::PlayAttackGraphicAnimation(EAttackGraphicAnimation AttackGraphicAnim)
+void UMatch_AttackGraphic::PlayAttackGraphicAnimation(EAttackGraphicAnimation AttackGraphicAnim) const
 {
 	switch (AttackGraphicAnim)
 	{
 	case E_NeutralFightInitiation:
-		AnimationPlayer->OpenSource(NeutralFightInitiationAnim);
+		CenterAnimPlayer->OpenSource(NeutralFightInitiationAnim);
 		break;
 	case E_AttackerFightInitiation:
-		AnimationPlayer->OpenSource(AttackerFightInitiationAnim);
+		CenterAnimPlayer->OpenSource(AttackerFightInitiationAnim);
 		break;
 	case E_AttackerDeath:
-		AnimationPlayer->OpenSource(AttackerDeathAnim);
+		AttackerAnimPlayer->OpenSource(AttackerDeathAnim);
 		break;
 	case E_DefenderDeath:
-		AnimationPlayer->OpenSource(DefenderDeathAnim);
+		DefenderAnimPlayer->OpenSource(DefenderDeathAnim);
 		break;
 	case E_AttackerDeadlock:
-		AnimationPlayer->OpenSource(AttackerDeadlockAnim);
+		AttackerAnimPlayer->OpenSource(AttackerDeadlockAnim);
 		break;
 	case E_DefenderDeadlock:
-		AnimationPlayer->OpenSource(DefenderDeadlockAnim);
+		DefenderAnimPlayer->OpenSource(DefenderDeadlockAnim);
 		break;
 	default:
 		/* This should never happen. */

@@ -65,6 +65,15 @@ void AMatch_PlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AMatch_PlayerPawn::Interact()
 {
+/* Debugging for piece ID system.
+	TArray<AActor*> AllPieces;
+	UGameplayStatics::GetAllActorsOfClass(this, AParentPiece::StaticClass(), AllPieces);
+	for (AActor* Piece : AllPieces)
+	{
+		AParentPiece* Pointer = Cast<AParentPiece>(Piece);
+		UE_LOG(LogTemp, Error, TEXT("Piece ID: %s"), *Pointer->GetPieceID().ToString());
+	}
+*/
 	/* Stores the location and direction of the player's click. */
 	FVector WorldLocation;
 	FVector WorldDirection;
@@ -482,6 +491,8 @@ void AMatch_PlayerPawn::Client_InitiateAttack_Implementation(FAttackInfo InInfo)
 	if (AMatch_PlayerController* ControllerPtr = Cast<AMatch_PlayerController>(GetController()))
 	{
 		ControllerPtr->UpdateAttackGraphicWidget(false, InInfo.Attacker, InInfo.Defender);
+		ControllerPtr->PlayAttackGraphicAnimation(InInfo.bDefenderFights ? E_NeutralFightInitiation :
+			E_AttackerFightInitiation);
 	}
 }
 

@@ -14,6 +14,11 @@
 
 #include "Kismet/GameplayStatics.h"
 
+FName AParentPiece::GetPieceID()
+{
+	return "0-00";
+}
+
 AParentPiece::AParentPiece()
 {
  	/* Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it. */
@@ -114,7 +119,7 @@ void AParentPiece::BeginPlay()
     {
         /* Get this piece's row from the piece data. */
         static const FString ContextString(TEXT("Piece Data Struct"));
-        FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(PieceID, ContextString, true);
+        FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(GetPieceID(), ContextString, true);
 
 		/* If the data table row was found... */
         if (PieceData)

@@ -31,7 +31,7 @@ public:
 	
 	/* Plays a given animation on the widget. */
 	UFUNCTION()
-	void PlayAttackGraphicAnimation(EAttackGraphicAnimation AttackGraphicAnim);
+	void PlayAttackGraphicAnimation(EAttackGraphicAnimation AttackGraphicAnim) const;
 
 
 /* Protected assets. */
@@ -41,9 +41,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data")
 	const UDataTable* PieceDataTable;
 	
-	/* Used to play animations on the screen. */
+	/* Used to play animations on each part of the screen. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Media")
-	UMediaPlayer* AnimationPlayer;
+	UMediaPlayer* AttackerAnimPlayer;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Media")
+	UMediaPlayer* DefenderAnimPlayer;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Media")
+	UMediaPlayer* CenterAnimPlayer;
 
 	/* Video files to play on the attack graphic. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
