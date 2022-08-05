@@ -43,6 +43,17 @@ enum EAttackGraphicAnimation
 	E_DefenderDeadlock			UMETA(DisplayName="Defender-Side Deadlock")
 };
 
+/* Textures that can be displayed in a billboard attack pop-up. */
+UENUM(BlueprintType)
+enum EAttackBillboardPopUpTexture
+{
+	E_AttackerIndicator		UMETA(DisplayName="Attacker Indicator"),
+	E_DefenderIndicator		UMETA(DisplayName="Defender Indicator"),
+	E_DeathIndicator 		UMETA(DisplayName="Death Indicator"),
+	E_VictoryIndicator		UMETA(DisplayName="Victory Indicator"),
+	E_DeadlockIndicator 	UMETA(DisplayName="Deadlock Indicator")
+};
+
 /* Coordinates for board tiles and pieces. */
 USTRUCT(BlueprintType)
 struct FTileCoordinates

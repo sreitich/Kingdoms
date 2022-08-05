@@ -5,7 +5,6 @@
 
 #include "Components/BillboardComponent.h"
 
-// Sets default values
 ATextureBoardPopup::ATextureBoardPopup()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -20,14 +19,12 @@ ATextureBoardPopup::ATextureBoardPopup()
 
 }
 
-// Called every frame
 void ATextureBoardPopup::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-// Called when the game starts or when spawned
 void ATextureBoardPopup::BeginPlay()
 {
 	Super::BeginPlay();

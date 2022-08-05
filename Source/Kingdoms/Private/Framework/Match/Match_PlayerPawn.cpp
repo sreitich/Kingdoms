@@ -16,6 +16,8 @@
 #include "UserInterface/MatchSetup/Dragging/PieceDragWidget.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/PopUpLocationComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -486,14 +488,19 @@ void AMatch_PlayerPawn::Client_InitiateAttack_Implementation(FAttackInfo InInfo)
 	/* A white highlight glazes over the fighting pieces. */
 	InInfo.Defender->FlashHighlight(FLinearColor(1.0f, 1.0f, 1.0f, 1.0f), 15.0f, 1.0f);
 	InInfo.Attacker->FlashHighlight(FLinearColor(1.0f, 1.0f, 1.0f, 1.0f), 15.0f, 1.0f);
-
-	/* Create an attack graphic and update its display information with these pieces' data. */
+	
 	if (AMatch_PlayerController* ControllerPtr = Cast<AMatch_PlayerController>(GetController()))
 	{
+		/* Create an attack graphic and update its display information with these pieces' data. */
 		ControllerPtr->UpdateAttackGraphicWidget(false, InInfo.Attacker, InInfo.Defender);
-		ControllerPtr->PlayAttackGraphicAnimation(InInfo.bDefenderFights ? E_NeutralFightInitiation :
-			E_AttackerFightInitiation);
+		/* Play the appropriate "fight initiation" animation. */
+		ControllerPtr->PlayAttackGraphicAnimation(InInfo.bDefenderFights ? E_NeutralFightInitiation : E_AttackerFightInitiation);
 	}
+	
+	/* Pop-up an "attacker" indicator over the attacker. */
+	SpawnTempBillboardPopup(E_AttackerIndicator, InInfo.Attacker->PopUpLocationComponent->GetComponentLocation(), 2.0f);
+	/* Pop-up an "attacker" indicator over the defender if they will fight back. Otherwise, use a "defender" indicator. */
+	SpawnTempBillboardPopup(InInfo.bDefenderFights ? E_AttackerIndicator : E_DefenderIndicator, InInfo.Defender->PopUpLocationComponent->GetComponentLocation(), 2.0f);
 }
 
 void AMatch_PlayerPawn::MovePlayerCamera(AParentPiece* Attacker, AParentPiece* Defender)
@@ -505,8 +512,8 @@ void AMatch_PlayerPawn::MovePlayerCamera(AParentPiece* Attacker, AParentPiece* D
     FVector DefenderLoc = Defender->GetActorLocation();
 
 	/* The horizontal distance we want the camera to be from the pieces and the distance we want it to be above them. */
-	float HorizontalDistance = FVector::Dist(AttackerLoc, DefenderLoc) * 2.0f;
-	float VerticalDistance = 300.0f;
+	float HorizontalDistance = FVector::Dist(AttackerLoc, DefenderLoc) * 3.0f; // Change this back to "* 2.0f" if we move the graphic to the bottom
+	float VerticalDistance = 500.0f; // Change this back to "300.0f" if we move the graphic to the bottom
 
  	/* Get the midpoint between the attacker and defender. */
     FVector Midpoint = (AttackerLoc + DefenderLoc) / 2;
@@ -532,29 +539,45 @@ void AMatch_PlayerPawn::MovePlayerCamera(AParentPiece* Attacker, AParentPiece* D
 	InterpolateCamera(StartLoc, EndLoc, StartRot, EndRot, SpringArm->TargetArmLength, 0.0f, false);
 }
 
-void AMatch_PlayerPawn::SpawnPopup(UTexture2D* DisplayedTexture, FVector Location)
+void AMatch_PlayerPawn::SpawnTempBillboardPopup(EAttackBillboardPopUpTexture DisplayedTexture, FVector Location, float Duration) const
 {
-	/* If a valid texture to display was passed. */
-	if (DisplayedTexture)
+	/* Define some simple spawn parameters. */
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	const FRotator Rotation = { 0.0f, 0.0f, 0.0f };
+	
+	/* Spawn a texture board popup on this client at the given location. */
+	ATextureBoardPopup* PopUp = Cast<ATextureBoardPopup>(GetWorld()->SpawnActor(TextureBoardPopupClass,
+		&Location, &Rotation, SpawnParams));
+	
+	/* If the popup actor was successfully spawned... */
+	if (IsValid(PopUp))
 	{
-		/* Define spawn parameters. */
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-		/* The spawn rotation of the actor isn't relevant because the billboard orients towards the player's view. */
-		const FRotator Rotation = FRotator(0.0f, 0.0f, 0.0f);
-
-		/* If the correct popup class has been set... */
-		if (TextureBoardPopupClass)
+		/* Get the appropriate texture to display. */
+		UTexture2D* DisplayedTexturePtr;
+		switch (DisplayedTexture)
 		{
-			/* Spawn a texture board popup on this client at the given location. */
-			ATextureBoardPopup* Popup = Cast<ATextureBoardPopup>(GetWorld()->SpawnActor(TextureBoardPopupClass, &Location, &Rotation, SpawnParams));
-
-			/* If the popup actor was successfully spawned, activate it, setting its displayed texture and triggering its animation. */
-			if (Popup)
-			{
-				Popup->ActivatePopup(DisplayedTexture);
-			}
+		case E_AttackerIndicator:
+			DisplayedTexturePtr = PopUp->AttackerIndicator;
+			break;
+		case E_DefenderIndicator:
+			DisplayedTexturePtr = PopUp->DefenderIndicator;
+			break;
+		case E_DeathIndicator:
+			DisplayedTexturePtr = PopUp->DeathIndicator;
+			break;
+		case E_VictoryIndicator:
+			DisplayedTexturePtr = PopUp->VictoryIndicator;
+			break;
+		case E_DeadlockIndicator:
+			DisplayedTexturePtr = PopUp->DeadlockIndicator;
+			break;
+		default:
+			DisplayedTexturePtr = PopUp->AttackerIndicator;
+			break;
 		}
+		
+		/* Update the displayed texture and activate the pop-up. */
+		PopUp->ActivatePopup(DisplayedTexturePtr, Duration);
 	}
 }

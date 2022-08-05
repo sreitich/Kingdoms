@@ -70,17 +70,13 @@ public:
 				UFUNCTION(BlueprintImplementableEvent)
 				void InterpolateCamera(FVector StartingLocation, FVector EndingLocation, FRotator StartingRotation, FRotator EndingRotation, float StartingArmLength, float EndingArmLength, bool bReverse);
 
-				/* Spawns a billboard popup at the given location. */
-				UFUNCTION()
-				void SpawnPopup(UTexture2D* DisplayedTexture, FVector Location);
+			/* Spawns a billboard popup at the given location. */
+			UFUNCTION()
+			void SpawnTempBillboardPopup(EAttackBillboardPopUpTexture DisplayedTexture, FVector Location, float Duration) const;
 
 
 /* Public variables. */
 public:
-
-	/* Get a reference to the blueprint of the piece to spawn for playtesting. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Debug")
-	TSubclassOf<AParentPiece> PieceToSpawn;
 
 	/* Used to give a reference to a spawned piece to a drag widget in order to drag the piece around. */
 	UPROPERTY()
@@ -152,7 +148,7 @@ protected:
 	ABoardTile* SelectedTile = nullptr;
 
 
-/* Protected class types. */
+/* Protected class types to access blueprint classes. */
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Class Types")

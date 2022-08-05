@@ -4,9 +4,10 @@
 #include "Pieces/ParentPiece.h"
 
 #include "Animations/AnimInstance_Parent.h"
+#include "Board/BoardManager.h"
 #include "Board/BoardTile.h"
 #include "Components/CapsuleComponent.h"
-#include "Board/BoardManager.h"
+#include "Components/PopUpLocationComponent.h"
 #include "Framework/Match/Match_GameStateBase.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Pieces/PieceAIController.h"
@@ -29,22 +30,14 @@ AParentPiece::AParentPiece()
 	bAlwaysRelevant = true;
 	SetReplicateMovement(true);
 
+	/* This determines the location where overhead pop-ups will spawn, and can be changed for each piece. */
+	PopUpLocationComponent = CreateDefaultSubobject<UPopUpLocationComponent>(TEXT("Pop-Up Location Component"));
+	PopUpLocationComponent->SetupAttachment(GetRootComponent());
+
 	/* Set some class defaults that we want for every piece. */
 	bUseControllerRotationYaw = false;
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	static ConstructorHelpers::FClassFinder<APieceAIController> AIControllerAsset(TEXT("/Game/Blueprints/Pieces/BP_PieceAIController"));
-	if (AIControllerAsset.Succeeded())
-	{
-		AIControllerClass = AIControllerAsset.Class;
-	}
-
-	UDataTable* PieceData = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/PieceData.PieceData"));
-	if (PieceData)
-	{
-		PieceDataTable = PieceData;
-	}
-	
 	/* Increase the size of the capsule to fit the entire character mesh. */
 	GetCapsuleComponent()->SetCapsuleRadius(44.0f);
 

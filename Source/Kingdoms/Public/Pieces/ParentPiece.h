@@ -10,12 +10,13 @@
 
 class ABoardTile;
 class UCurveFloat;
+class UPopUpLocationComponent;
 
 UCLASS()
 class KINGDOMS_API AParentPiece : public ACharacter
 {
 	GENERATED_BODY()
-
+	
 /* Public functions. */
 public:
 
@@ -132,6 +133,10 @@ public:
 	/* Root of the actor. Character already comes with capsule and skeletal mesh. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	USceneComponent* SceneRoot;
+
+	/* Root of the actor. Character already comes with capsule and skeletal mesh. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
+	UPopUpLocationComponent* PopUpLocationComponent;
 
 
 /* Protected functions. */
