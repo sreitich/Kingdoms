@@ -109,7 +109,7 @@ public:
 
 	/* Pure function that tests if the given tile's coordinates match any of this piece's movement patterns. Overridden by each piece. */
 	virtual bool TileIsInMoveRange(ABoardTile* Tile);
-
+	
 
 /* Public assets. */
 public:
@@ -125,6 +125,22 @@ public:
 	/* Played when this piece attacks. This needs to have an "EndAttack" animation notify. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
 	UAnimSequenceBase* AttackAnimation;
+
+	/* Played when this piece takes damage without fighting back. This needs to have an "EndTakeDamage" animation notify. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UAnimSequenceBase* TakingDamageAnimation;
+
+	/* Played when this piece dies. This needs to have an "EndDeath" animation notify. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UAnimSequenceBase* DeathAnimation;
+
+	/* Played when this piece wins a fight and survives. This needs to have an "EndCelebration" animation notify. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UAnimSequenceBase* CelebrationAnimation;
+
+	/* Played when a fight ends in a deadlock. This needs to have an "EndDeadlockAnim" animation notify. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UAnimSequenceBase* DeadlockAnimation;
 
 
 /* Public components. */

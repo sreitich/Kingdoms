@@ -31,7 +31,7 @@ public:
 
 	/* Called every frame. */
 	virtual void Tick(float DeltaTime) override;
-
+	
 	/* Called to bind functionality to input. */
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
@@ -62,17 +62,27 @@ public:
 		UFUNCTION(Client, Reliable, BlueprintCallable)
 		void Client_InitiateAttack(FAttackInfo InInfo);
 	
-			/* Calculates a target location and rotation and smoothly interpolates the player's camera to that location and rotation. */
+			/* Calculates a target location and rotation and smoothly interpolates the player's camera to that location
+			 * and rotation. Calls Server_AnimateAttack after a brief duration when the camera finishes moving. */
 			UFUNCTION()
-			void MovePlayerCamera(AParentPiece* Attacker, AParentPiece* Defender);
+			void MovePlayerCamera(FAttackInfo InInfo);
 
 				/* Interpolates the camera between two locations. */
 				UFUNCTION(BlueprintImplementableEvent)
-				void InterpolateCamera(FVector StartingLocation, FVector EndingLocation, FRotator StartingRotation, FRotator EndingRotation, float StartingArmLength, float EndingArmLength, bool bReverse);
+				void InterpolateCamera(FVector StartingLocation, FVector EndingLocation, FRotator StartingRotation, FRotator EndingRotation, float StartingArmLength, float EndingArmLength, bool bReverse, FAttackInfo InInfo);
 
 			/* Spawns a billboard popup at the given location. */
 			UFUNCTION()
 			void SpawnTempBillboardPopup(EAttackBillboardPopUpTexture DisplayedTexture, FVector Location, float Duration) const;
+
+		/* Attacking Phase 3. Animates both pieces' attacks for both players. Animations need to be replicated because
+		 * server-side events are triggered via animation notifies. */
+		UFUNCTION(Server, Reliable, BlueprintCallable)
+		void Server_AnimateAttack(FAttackInfo InInfo);
+
+			/* Triggers the attacking animation of the given pieces on each client. */
+			UFUNCTION(NetMulticast, Reliable)
+			void Multicast_AnimateAttack(FAttackInfo InInfo);
 
 
 /* Public variables. */

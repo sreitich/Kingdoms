@@ -14,25 +14,52 @@ class KINGDOMS_API UAnimInstance_Parent : public UAnimInstance
 {
 	GENERATED_BODY()
 
-/* Public animations. */
+/* Public animations. These are just variables that are plugged into the piece's locomotion system. Each piece sets the
+ * animations for their animation instance at runtime using their static animation references. */
 public:
-	
-	/* The blend space to use in this animation's idle and walk animations. Each piece has a unique blend space for
-	 * their unique idle and walk animations that they set this to. */
+
+	/* Composed of idle and walking animation. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
 	UBlendSpaceBase* IdleWalkBS;
 
-	/* The animation played when this piece attacks, set by each piece. */
 	UPROPERTY(BlueprintReadWrite, Category="Animations")
 	UAnimSequenceBase* AttackAnimation;
 
+	UPROPERTY(BlueprintReadWrite, BlueprintReadWrite, Category="Animations")
+	UAnimSequenceBase* TakingDamageAnimation;
 
-/* Public animation triggers. */
+	UPROPERTY(BlueprintReadWrite, BlueprintReadWrite, Category="Animations")
+	UAnimSequenceBase* DeathAnimation;
+
+	UPROPERTY(BlueprintReadWrite, BlueprintReadWrite, Category="Animations")
+	UAnimSequenceBase* CelebrationAnimation;
+
+	UPROPERTY(BlueprintReadWrite, BlueprintReadWrite, Category="Animations")
+	UAnimSequenceBase* DeadlockAnimation;
+
+
+/* Public animation triggers. Setting these to "true" triggers the corresponding animation. */
 public:
 
-	/* Setting this to true triggers the attack animation. */
+	/* Attack animation. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation Triggers")
-	bool bAttack = false;
+	bool bAttacking = false;
+
+	/* Taking damage animation. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation Triggers")
+	bool bTakingDamage = false;
+
+	/* Death animation. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation Triggers")
+	bool bDying = false;
+
+	/* Celebration animation. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation Triggers")
+	bool bCelebrating = false;
+
+	/* Deadlock animation. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation Triggers")
+	bool bDeadlocking = false;
 	
 	
 };

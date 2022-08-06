@@ -35,6 +35,7 @@ void AMatch_GameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
     DOREPLIFETIME(AMatch_GameStateBase, CurrentMatchStatus);
     DOREPLIFETIME(AMatch_GameStateBase, MatchTime);
     DOREPLIFETIME(AMatch_GameStateBase, TurnTime);
+    DOREPLIFETIME(AMatch_GameStateBase, bAnimatedPiece);
 }
 
 void AMatch_GameStateBase::SetUpMatch()

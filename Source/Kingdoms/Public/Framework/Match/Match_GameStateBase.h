@@ -66,6 +66,10 @@ public:
 	/* Name of map, displayed in each player base widget. */
 	FName MapName = "Clockwork";
 
+	/* Used to ensure that only one player asks the server to animate pieces. */
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	bool bAnimatedPiece;
+
 
 /* Protected functions. */
 protected:

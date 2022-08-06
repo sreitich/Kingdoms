@@ -483,7 +483,7 @@ void AMatch_PlayerPawn::Client_SetUpAttack_Implementation()
 void AMatch_PlayerPawn::Client_InitiateAttack_Implementation(FAttackInfo InInfo)
 {
 	/* Zoom into the fight. */
-	MovePlayerCamera(InInfo.Attacker, InInfo.Defender);
+	MovePlayerCamera(InInfo);
 
 	/* A white highlight glazes over the fighting pieces. */
 	InInfo.Defender->FlashHighlight(FLinearColor(1.0f, 1.0f, 1.0f, 1.0f), 15.0f, 1.0f);
@@ -496,24 +496,26 @@ void AMatch_PlayerPawn::Client_InitiateAttack_Implementation(FAttackInfo InInfo)
 		/* Play the appropriate "fight initiation" animation. */
 		ControllerPtr->PlayAttackGraphicAnimation(InInfo.bDefenderFights ? E_NeutralFightInitiation : E_AttackerFightInitiation);
 	}
-	
-	/* Pop-up an "attacker" indicator over the attacker. */
+
+	/* Deprecated: Billboard pop-ups have been removed.
+	/* Pop-up an "attacker" indicator over the attacker. #1#
 	SpawnTempBillboardPopup(E_AttackerIndicator, InInfo.Attacker->PopUpLocationComponent->GetComponentLocation(), 2.0f);
-	/* Pop-up an "attacker" indicator over the defender if they will fight back. Otherwise, use a "defender" indicator. */
+	/* Pop-up an "attacker" indicator over the defender if they will fight back. Otherwise, use a "defender" indicator. #1#
 	SpawnTempBillboardPopup(InInfo.bDefenderFights ? E_AttackerIndicator : E_DefenderIndicator, InInfo.Defender->PopUpLocationComponent->GetComponentLocation(), 2.0f);
+	*/
 }
 
-void AMatch_PlayerPawn::MovePlayerCamera(AParentPiece* Attacker, AParentPiece* Defender)
+void AMatch_PlayerPawn::MovePlayerCamera(FAttackInfo InInfo)
 {
 	/* Initialize the vectors we'll need to calculate where to move and rotate the player's camera. */
     FVector StartLoc = SpringArm->GetComponentLocation();
 	FRotator StartRot = SpringArm->GetRelativeRotation();
-    FVector AttackerLoc = Attacker->GetActorLocation();
-    FVector DefenderLoc = Defender->GetActorLocation();
+    FVector AttackerLoc = InInfo.Attacker->GetActorLocation();
+    FVector DefenderLoc = InInfo.Defender->GetActorLocation();
 
 	/* The horizontal distance we want the camera to be from the pieces and the distance we want it to be above them. */
-	float HorizontalDistance = FVector::Dist(AttackerLoc, DefenderLoc) * 3.0f; // Change this back to "* 2.0f" if we move the graphic to the bottom
-	float VerticalDistance = 500.0f; // Change this back to "300.0f" if we move the graphic to the bottom
+	float HorizontalDistance = FVector::Dist(AttackerLoc, DefenderLoc) * 2.0f;
+	float VerticalDistance = 300.0f;
 
  	/* Get the midpoint between the attacker and defender. */
     FVector Midpoint = (AttackerLoc + DefenderLoc) / 2;
@@ -536,7 +538,7 @@ void AMatch_PlayerPawn::MovePlayerCamera(AParentPiece* Attacker, AParentPiece* D
 	FRotator EndRot = UKismetMathLibrary::FindLookAtRotation(EndLoc, Midpoint);
 
 	/* Interpolate the camera to the target location and target rotation. This actually works by interpolating the spring arm to a length of 0, then moving and rotating the spring arm, not just the camera attached to it. */
-	InterpolateCamera(StartLoc, EndLoc, StartRot, EndRot, SpringArm->TargetArmLength, 0.0f, false);
+	InterpolateCamera(StartLoc, EndLoc, StartRot, EndRot, SpringArm->TargetArmLength, 0.0f, false, InInfo);
 }
 
 void AMatch_PlayerPawn::SpawnTempBillboardPopup(EAttackBillboardPopUpTexture DisplayedTexture, FVector Location, float Duration) const
@@ -579,5 +581,33 @@ void AMatch_PlayerPawn::SpawnTempBillboardPopup(EAttackBillboardPopUpTexture Dis
 		
 		/* Update the displayed texture and activate the pop-up. */
 		PopUp->ActivatePopup(DisplayedTexturePtr, Duration);
+	}
+}
+
+void AMatch_PlayerPawn::Server_AnimateAttack_Implementation(FAttackInfo InInfo)
+{
+	/* Only do this once. */
+	if (!Cast<AMatch_GameStateBase>(GetWorld()->GetGameState())->bAnimatedPiece)
+	{
+		Cast<AMatch_GameStateBase>(GetWorld()->GetGameState())->bAnimatedPiece = true;
+
+		/* Trigger the animations everywhere. */
+		Multicast_AnimateAttack(InInfo);
+	}
+}
+
+void AMatch_PlayerPawn::Multicast_AnimateAttack_Implementation(FAttackInfo InInfo)
+{
+	/* Trigger the attacker animation. */
+	Cast<UAnimInstance_Parent>(InInfo.Attacker->GetMesh()->GetAnimInstance())->bAttacking = true;
+
+	/* If the defender fights back, then trigger an attack animation. Otherwise, trigger a "damage-taken" animation. */
+	if (InInfo.bDefenderFights)
+	{
+		Cast<UAnimInstance_Parent>(InInfo.Defender->GetMesh()->GetAnimInstance())->bAttacking = true;
+	}
+	else
+	{
+		Cast<UAnimInstance_Parent>(InInfo.Defender->GetMesh()->GetAnimInstance())->bTakingDamage = true;
 	}
 }

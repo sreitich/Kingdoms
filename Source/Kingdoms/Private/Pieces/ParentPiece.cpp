@@ -75,6 +75,10 @@ void AParentPiece::BeginPlay()
 	{
 		AnimInstance->IdleWalkBS = IdleWalkBS;
 		AnimInstance->AttackAnimation = AttackAnimation;
+		AnimInstance->TakingDamageAnimation = TakingDamageAnimation;
+		AnimInstance->DeathAnimation = DeathAnimation;
+		AnimInstance->CelebrationAnimation = CelebrationAnimation;
+		AnimInstance->DeadlockAnimation = DeadlockAnimation;
 	}
 	
 	/* If the player spawned this piece (during the piece setup phase). */
