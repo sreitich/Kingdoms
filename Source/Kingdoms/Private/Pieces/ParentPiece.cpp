@@ -149,12 +149,81 @@ void AParentPiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
     /* Replicate these variables. */
     DOREPLIFETIME(AParentPiece, CurrentTile);
+	
 	DOREPLIFETIME(AParentPiece, CurrentStrength);
 	DOREPLIFETIME(AParentPiece, CurrentArmor);
 	DOREPLIFETIME(AParentPiece, PassiveCD);
 	DOREPLIFETIME(AParentPiece, PassiveUses);
 	DOREPLIFETIME(AParentPiece, ActiveCD);
 	DOREPLIFETIME(AParentPiece, ActiveUses);
+	
+	DOREPLIFETIME(AParentPiece, bIsAttacking);
+}
+
+TArray<class ABoardTile*> AParentPiece::GetValidTiles()
+{
+	/* This array of valid tiles is going to be returned. */
+	TArray<ABoardTile*> ValidTiles;
+
+	/* Get the board manager's array of every tile on the board. */
+	for (ABoardTile* Tile : GetWorld()->GetGameState<AMatch_GameStateBase>()->BoardManager->AllTiles)
+	{
+		/* If the tile's coordinates match with one of this piece's move patterns... */
+		if (TileIsInMoveRange(Tile))
+		{
+			/* Add the tile to the array of valid tiles. */
+			ValidTiles.Add(Tile);
+		}
+	}
+
+	return ValidTiles;
+}
+
+bool AParentPiece::TileIsInMoveRange(ABoardTile* Tile)
+{
+	/* Make sure that a valid tile was passed. */
+	if (IsValid(Tile))
+	{
+		/* Store the given tile and current tile's coordinates in variables for readability. */
+		int NewX = Tile->Coordinates.X, NewY = Tile->Coordinates.Y;
+		int OldX = CurrentTile->Coordinates.X, OldY = CurrentTile->Coordinates.Y;
+	
+		/* Test if the tile's coordinates match with any of this piece's move patterns. */
+		if
+		(
+			/* Forward 1 */
+			(NewX == OldX && NewY == OldY + 1) ||
+			/* Right 1 */
+			(NewX == OldX + 1 && NewY == OldY) ||
+			/* Backward 1 */
+			(NewX == OldX && NewY == OldY - 1) ||
+			/* Left 1 */
+			(NewX == OldX - 1 && NewY == OldY) ||
+	
+			/* Forward 2 */
+			(NewX == OldX && NewY == OldY + 2) ||
+			/* Right 2 */
+			(NewX == OldX + 2 && NewY == OldY) ||
+			/* Backward 2 */
+			(NewX == OldX && NewY == OldY - 2) ||
+			/* Left 2 */
+			(NewX == OldX - 2 && NewY == OldY) ||
+
+			/* Forward 3 */
+			(NewX == OldX && NewY == OldY + 3) ||
+			/* Right 3 */
+			(NewX == OldX + 3 && NewY == OldY) ||
+			/* Backward 3 */
+			(NewX == OldX && NewY == OldY - 3) ||
+			/* Left 3 */
+			(NewX == OldX - 3 && NewY == OldY)
+		)
+		{
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float Duration)
@@ -183,6 +252,15 @@ bool AParentPiece::SetCurrentTile(ABoardTile* NewTile)
 	}
 	
 	return false;
+}
+
+void AParentPiece::SetAttackInfo(FAttackInfo NewAttackInfo)
+{
+	/* Only allow the attack info to be updated if it has a valid reference to an attacking piece and a defending piece. */
+	if (HasAuthority() && IsValid(NewAttackInfo.Attacker) && IsValid(NewAttackInfo.Defender))
+	{
+		AttackInfo = NewAttackInfo;
+	}
 }
 
 bool AParentPiece::SetCurrentStrength(int NewStrength)
@@ -294,71 +372,5 @@ bool AParentPiece::SetActiveUses(int NewActiveUses)
 		return true;
 	}
 
-	return false;
-}
-
-TArray<class ABoardTile*> AParentPiece::GetValidTiles()
-{
-	/* This array of valid tiles is going to be returned. */
-	TArray<ABoardTile*> ValidTiles;
-
-	/* Get the board manager's array of every tile on the board. */
-	for (ABoardTile* Tile : GetWorld()->GetGameState<AMatch_GameStateBase>()->BoardManager->AllTiles)
-	{
-		/* If the tile's coordinates match with one of this piece's move patterns... */
-		if (TileIsInMoveRange(Tile))
-		{
-			/* Add the tile to the array of valid tiles. */
-			ValidTiles.Add(Tile);
-		}
-	}
-
-	return ValidTiles;
-}
-
-bool AParentPiece::TileIsInMoveRange(ABoardTile* Tile)
-{
-	/* Make sure that a valid tile was passed. */
-	if (IsValid(Tile))
-	{
-		/* Store the given tile and current tile's coordinates in variables for readability. */
-		int NewX = Tile->Coordinates.X, NewY = Tile->Coordinates.Y;
-		int OldX = CurrentTile->Coordinates.X, OldY = CurrentTile->Coordinates.Y;
-	
-		/* Test if the tile's coordinates match with any of this piece's move patterns. */
-		if
-		(
-			/* Forward 1 */
-			(NewX == OldX && NewY == OldY + 1) ||
-			/* Right 1 */
-			(NewX == OldX + 1 && NewY == OldY) ||
-			/* Backward 1 */
-			(NewX == OldX && NewY == OldY - 1) ||
-			/* Left 1 */
-			(NewX == OldX - 1 && NewY == OldY) ||
-	
-			/* Forward 2 */
-			(NewX == OldX && NewY == OldY + 2) ||
-			/* Right 2 */
-			(NewX == OldX + 2 && NewY == OldY) ||
-			/* Backward 2 */
-			(NewX == OldX && NewY == OldY - 2) ||
-			/* Left 2 */
-			(NewX == OldX - 2 && NewY == OldY) ||
-
-			/* Forward 3 */
-			(NewX == OldX && NewY == OldY + 3) ||
-			/* Right 3 */
-			(NewX == OldX + 3 && NewY == OldY) ||
-			/* Backward 3 */
-			(NewX == OldX && NewY == OldY - 3) ||
-			/* Left 3 */
-			(NewX == OldX - 3 && NewY == OldY)
-		)
-		{
-			return true;
-		}
-	}
-	
 	return false;
 }

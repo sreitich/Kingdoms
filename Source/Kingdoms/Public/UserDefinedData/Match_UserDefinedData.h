@@ -74,7 +74,7 @@ USTRUCT(BlueprintType)
 struct FAttackInfo
 {
 	GENERATED_BODY()
-
+	
 	/* The piece initiating the attack. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class AParentPiece* Attacker;

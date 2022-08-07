@@ -84,6 +84,10 @@ public:
 			UFUNCTION(NetMulticast, Reliable)
 			void Multicast_AnimateAttack(FAttackInfo InInfo);
 
+					/* Animates a "damage-taken" particle effect and a "damage-taken" animation when necessary. */
+					UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+					void Multicast_AnimateDamage(FAttackInfo InInfo, bool bAttackerDamaged);
+
 
 /* Public variables. */
 public:

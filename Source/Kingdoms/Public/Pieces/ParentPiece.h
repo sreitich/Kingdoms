@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Net/UnrealNetwork.h"
+#include "UserDefinedData/Match_UserDefinedData.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
@@ -29,6 +30,16 @@ public:
 	/* Replicates variables. */
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	/* Retrieves this piece's piece ID. This function is overridden by each piece with an ID that is unique to that
+	 * piece. This is used in place of a member variable and has complete control over this piece's ID. */
+	virtual FName GetPieceID();
+
+	/* Finds all tiles that this piece can move to (not accounting for other pieces or pathfinding). */
+	virtual TArray<ABoardTile*> GetValidTiles() final;
+
+	/* Pure function that tests if the given tile's coordinates match any of this piece's movement patterns. Overridden by each piece. */
+	virtual bool TileIsInMoveRange(ABoardTile* Tile);
+
 	/* Flashes a given highlight onto the piece at a given strength for a given amount of time. */
 	UFUNCTION()
 	void FlashHighlight(FLinearColor Color, float Brightness, float Duration);
@@ -40,14 +51,9 @@ public:
 			OriginalBrightness, float Speed, float Duration);
 
 
-/* Public functions: accessors and modifiers. */
+/* Public accessors and modifiers. */
 public:
-
-	/* Retrieves this piece's piece ID. This function is overridden by each piece with an ID that is unique to that
-	 * piece. This is used in place of a member variable and has complete control over this piece's ID. */
-	// UFUNCTION(BlueprintPure, Category="Data")
-	virtual FName GetPieceID();
-
+	
 	/* Getter for CurrentTile. */
 	UFUNCTION(BlueprintPure, Category="Current Tile")
 	FORCEINLINE ABoardTile* GetCurrentTile() const { return CurrentTile; }
@@ -55,6 +61,15 @@ public:
 	/* Server-only setter for CurrentTile. */
 	UFUNCTION(BlueprintCallable, Category="Current Tile")
 	bool SetCurrentTile(ABoardTile* NewTile);
+
+	/* Getter for AttackInfo. */
+	UFUNCTION(BlueprintPure, Category="Is Attacking?")
+	FORCEINLINE FAttackInfo GetAttackInfo() const { return AttackInfo; }
+
+	/* Server-only setter for AttackInfo. */
+	UFUNCTION(BlueprintCallable, Category="Is Attacking?")
+	void SetAttackInfo(FAttackInfo NewAttackInfo);
+
 
 	/* Getter for CurrentStrength. */
 	UFUNCTION(BlueprintPure, Category="Piece Stats")
@@ -104,12 +119,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Active Ability")
 	bool SetActiveUses(int NewActiveUses);
 
-	/* Finds all tiles that this piece can move to (not accounting for other pieces or pathfinding). */
-	virtual TArray<ABoardTile*> GetValidTiles() final;
-
-	/* Pure function that tests if the given tile's coordinates match any of this piece's movement patterns. Overridden by each piece. */
-	virtual bool TileIsInMoveRange(ABoardTile* Tile);
-	
 
 /* Public assets. */
 public:
@@ -184,6 +193,16 @@ protected:
 	/* Pointer to the piece currently on this tile. */
 	UPROPERTY(Replicated, EditInstanceOnly, BlueprintReadOnly, Category="Piece Info")
 	ABoardTile* CurrentTile;
+
+	/* Tracks when this piece is participating in an attack as a defender. This is currently used for notifies to
+	 * determine whether a piece is an attacker or defender without a copy of the attack information. */
+	UPROPERTY(Replicated, EditInstanceOnly, BlueprintReadOnly, Category="Attacking")
+	bool bIsAttacking;
+
+	/* Used to keep a copy of the attack information to continue passing down the chain of functions in the attack
+	 * sequence when it gets interrupted by animation notifies. */
+	UPROPERTY(Replicated, EditInstanceOnly, BlueprintReadOnly, Category="Attacking")
+	FAttackInfo AttackInfo;
 
 
 	/* EditAnywhere enabled for playtesting. These will be changed to Replicated, EditInstanceOnly, BlueprintReadOnly

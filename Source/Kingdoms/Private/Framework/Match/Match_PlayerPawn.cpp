@@ -439,6 +439,11 @@ void AMatch_PlayerPawn::ClearSelection(bool bDeselect)
 
 void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo)
 {
+	/* Pass along a copy of the attack information so that it's not lost when the attack function chain is interrupted
+	 * by an animation notify. This is also used to determine which piece is taking damage from the "take damage"
+	 * animation notify. */
+	InInfo.Attacker->SetAttackInfo(InInfo);
+	
 	/* If the attacker needs to be next to the defender to attack (e.g. a melee attack) and the two pieces are too far
 	 * apart ("far" is arbitrarily 1 tile), the attacker walks to the defender. */
 	if (InInfo.bMoveTo &&
@@ -609,5 +614,19 @@ void AMatch_PlayerPawn::Multicast_AnimateAttack_Implementation(FAttackInfo InInf
 	else
 	{
 		Cast<UAnimInstance_Parent>(InInfo.Defender->GetMesh()->GetAnimInstance())->bTakingDamage = true;
+	}
+}
+
+void AMatch_PlayerPawn::Multicast_AnimateDamage_Implementation(FAttackInfo InInfo, bool bAttackerDamaged)
+{
+	if (bAttackerDamaged)
+	{
+		if (IsValid(InInfo.Attacker))
+			UE_LOG(LogTemp, Error, TEXT("Attacker, %s, took damage!"), *InInfo.Attacker->GetName());
+	}
+	else
+	{
+		if (IsValid(InInfo.Defender))
+			UE_LOG(LogTemp, Error, TEXT("Defender, %s, took damage!"), *InInfo.Defender->GetName());
 	}
 }
