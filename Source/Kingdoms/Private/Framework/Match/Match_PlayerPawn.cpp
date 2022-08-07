@@ -443,6 +443,7 @@ void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo)
 	 * by an animation notify. This is also used to determine which piece is taking damage from the "take damage"
 	 * animation notify. */
 	InInfo.Attacker->SetAttackInfo(InInfo);
+	InInfo.Defender->SetAttackInfo(InInfo);
 	
 	/* If the attacker needs to be next to the defender to attack (e.g. a melee attack) and the two pieces are too far
 	 * apart ("far" is arbitrarily 1 tile), the attacker walks to the defender. */
