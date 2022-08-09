@@ -41,7 +41,7 @@ public:
 	virtual bool TileIsInMoveRange(ABoardTile* Tile);
 
 	/* Flashes a given highlight onto the piece at a given strength for a given amount of time. */
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void FlashHighlight(FLinearColor Color, float Brightness, float Duration);
 
 		/* Fades to the target fresnel color and brightness at the given speed. Then waits for the duration and returns

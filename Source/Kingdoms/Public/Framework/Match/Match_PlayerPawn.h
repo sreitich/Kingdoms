@@ -42,10 +42,20 @@ public:
 		/* Clears the currently selected piece and removes all piece-information pop-ups. */
 		void ClearSelection(bool bDeselect);
 
+    /* Scripted attack sequence via blueprint. */
+    UFUNCTION(BlueprintImplementableEvent)
+    void Server_Attack_BP(const FAttackInfo InInfo);
+
 	/* Initiates an attack with given parameters. Moves attacker to the defender if they're too far away. Calls 
 	 * WaitForPieceProximity. Calls Client_SetUpAttack on each client. */
 	UFUNCTION(Server, Reliable)
 	void Server_Attack(const FAttackInfo InInfo);
+
+		/* Helper function for blueprint scripting. */
+		UFUNCTION(BlueprintPure)
+		FCameraInterpolationInfo MovePlayerCameraBP(AParentPiece* Attacker, AParentPiece* Defender);
+
+	
 
 		/* Attack Phase 1. Waits for when the attacker and defender are close enough before calling
 		 * Client_InitiateAttack on each client with server authority. */

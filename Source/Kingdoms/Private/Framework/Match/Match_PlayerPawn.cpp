@@ -439,42 +439,89 @@ void AMatch_PlayerPawn::ClearSelection(bool bDeselect)
 
 void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo)
 {
-	/* Pass along a copy of the attack information so that it's not lost when the attack function chain is interrupted
-	 * by an animation notify. This is also used to determine which piece is taking damage from the "take damage"
-	 * animation notify. */
-	InInfo.Attacker->SetAttackInfo(InInfo);
-	InInfo.Defender->SetAttackInfo(InInfo);
+	Server_Attack_BP(InInfo);
 	
-	/* If the attacker needs to be next to the defender to attack (e.g. a melee attack) and the two pieces are too far
-	 * apart ("far" is arbitrarily 1 tile), the attacker walks to the defender. */
-	if (InInfo.bMoveTo &&
-		(FMath::Abs(InInfo.Attacker->GetCurrentTile()->Coordinates.X - InInfo.Defender->GetCurrentTile()->Coordinates.X) > 2 ||
-			FMath::Abs(InInfo.Attacker->GetCurrentTile()->Coordinates.Y - InInfo.Defender->GetCurrentTile()->Coordinates.Y) > 2))
-	{
-		/* The attacker walks towards the defender, stopping when it gets within 250 units (about 2 tiles). */
-		Cast<APieceAIController>(InInfo.Attacker->GetOwner())->MoveToLocation
-		(
-			InInfo.Defender->GetActorLocation(),
-			250.0f,
-			true,
-			true,
-			false,
-			false,
-			nullptr
-		);
-	}
+	// /* Pass along a copy of the attack information so that it's not lost when the attack function chain is interrupted
+	//  * by an animation notify. This is also used to determine which piece is taking damage from the "take damage"
+	//  * animation notify. */
+	// InInfo.Attacker->SetAttackInfo(InInfo);
+	// InInfo.Defender->SetAttackInfo(InInfo);
+	//
+	// /* If the attacker needs to be next to the defender to attack (e.g. a melee attack) and the two pieces are too far
+	//  * apart ("far" is arbitrarily 1 tile), the attacker walks to the defender. */
+	// if (InInfo.bMoveTo &&
+	// 	(FMath::Abs(InInfo.Attacker->GetCurrentTile()->Coordinates.X - InInfo.Defender->GetCurrentTile()->Coordinates.X) > 2 ||
+	// 		FMath::Abs(InInfo.Attacker->GetCurrentTile()->Coordinates.Y - InInfo.Defender->GetCurrentTile()->Coordinates.Y) > 2))
+	// {
+	// 	/* The attacker walks towards the defender, stopping when it gets within 250 units (about 2 tiles). */
+	// 	Cast<APieceAIController>(InInfo.Attacker->GetOwner())->MoveToLocation
+	// 	(
+	// 		InInfo.Defender->GetActorLocation(),
+	// 		250.0f,
+	// 		true,
+	// 		true,
+	// 		false,
+	// 		false,
+	// 		nullptr
+	// 	);
+	// }
+	//
+	// /* Disable input for both players. */
+	// for (APlayerState* Player : GetWorld()->GetGameState<AMatch_GameStateBase>()->PlayerArray)
+	// {
+	// 	if (AMatch_PlayerPawn* PlayerPawn = Cast<AMatch_PlayerPawn>(Player->GetPawn()))
+	// 	{
+	// 		PlayerPawn->Client_SetUpAttack();
+	// 	}
+	// }
+	//
+	// /* Calls Client_InitiateAttack on each client when the attacker and defender are close enough. */
+	// WaitForPieceProximity(InInfo);
+}
 
-	/* Disable input for both players. */
-	for (APlayerState* Player : GetWorld()->GetGameState<AMatch_GameStateBase>()->PlayerArray)
-	{
-		if (AMatch_PlayerPawn* PlayerPawn = Cast<AMatch_PlayerPawn>(Player->GetPawn()))
-		{
-			PlayerPawn->Client_SetUpAttack();
-		}
-	}
+FCameraInterpolationInfo AMatch_PlayerPawn::MovePlayerCameraBP(AParentPiece* Attacker, AParentPiece* Defender)
+{
+	/* Initialize the vectors we'll need to calculate where to move and rotate the player's camera. */
+	FVector StartLoc = SpringArm->GetComponentLocation();
+	FRotator StartRot = SpringArm->GetRelativeRotation();
+	FVector AttackerLoc = Attacker->GetActorLocation();
+	FVector DefenderLoc = Defender->GetActorLocation();
 
-	/* Calls Client_InitiateAttack on each client when the attacker and defender are close enough. */
-	WaitForPieceProximity(InInfo);
+	/* The horizontal distance we want the camera to be from the pieces and the distance we want it to be above them. */
+	float HorizontalDistance = FVector::Dist(AttackerLoc, DefenderLoc) * 2.0f;
+	float VerticalDistance = 300.0f;
+
+	/* Get the midpoint between the attacker and defender. */
+	FVector Midpoint = (AttackerLoc + DefenderLoc) / 2;
+
+	/* Get the normalized difference in the pieces' positions, creating a vector pointing from one piece to the other. */
+	FVector NormalizedLocDif = (AttackerLoc - DefenderLoc);
+	NormalizedLocDif.Normalize();
+
+	/* Get a normalized vector pointing straight up. */
+	FVector WorldUp = FVector(0.0f, 0.0f, 1.0f);
+
+	/* The cross product of the vectors, giving a direction that points perpendicularly away form the axis that connects the pieces. */
+	FVector DirectionAwayFromPieces = FVector::CrossProduct(NormalizedLocDif, WorldUp);
+	/* Multiply the direction by how far we want the camera to be from the midpoint of the pieces. The camera distance scales linearly from the distance between the pieces. */
+	DirectionAwayFromPieces *= HorizontalDistance;
+	/* Take the midpoint and move it away and upwards from the pieces, giving us the final location we want our camera to be in. */
+	FVector EndLoc = Midpoint + DirectionAwayFromPieces + FVector(0.0f, 0.0f, VerticalDistance);
+
+	/* We want to rotate the camera so that it faces the midpoint of the pieces, and is therefore centered. */
+	FRotator EndRot = UKismetMathLibrary::FindLookAtRotation(EndLoc, Midpoint);
+
+	/* Return the information needed to interpolate the camera to the desired transform. */
+	FCameraInterpolationInfo CameraInterpolationInfo;
+	CameraInterpolationInfo.StartLocation = StartLoc;
+	CameraInterpolationInfo.EndLocation = EndLoc;
+	CameraInterpolationInfo.StartRotation = StartRot;
+	CameraInterpolationInfo.EndRotation = EndRot;
+	CameraInterpolationInfo.StartArmLength = SpringArm->TargetArmLength;
+	CameraInterpolationInfo.EndArmLength = 0.0f;
+	CameraInterpolationInfo.bReverse = false;
+
+	return CameraInterpolationInfo;
 }
 
 void AMatch_PlayerPawn::Client_SetUpAttack_Implementation()

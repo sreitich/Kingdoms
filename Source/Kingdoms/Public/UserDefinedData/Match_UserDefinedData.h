@@ -96,3 +96,38 @@ struct FAttackInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bTakePlace;
 };
+
+/* Information used to interpolate the camera from one transform to another. */
+USTRUCT(BlueprintType)
+struct FCameraInterpolationInfo
+{
+	GENERATED_BODY()
+
+	/* Location to start at or return to. */
+	UPROPERTY(BlueprintReadWrite)
+	FVector StartLocation;
+
+	/* Location to move to. */
+	UPROPERTY(BlueprintReadWrite)
+	FVector EndLocation;
+
+	/* Rotation to start at or return to. */
+	UPROPERTY(BlueprintReadWrite)
+	FRotator StartRotation;
+
+	/* Rotation to move to. */
+	UPROPERTY(BlueprintReadWrite)
+	FRotator EndRotation;
+
+	/* Length to start the camera's spring arm at or to return it to. */
+	UPROPERTY(BlueprintReadWrite)
+	float StartArmLength;
+
+	/* Length to interpolate the camera's spring arm to. */
+	UPROPERTY(BlueprintReadWrite)
+	float EndArmLength;
+
+	/* Whether to interpolate to or from the ending location, rotation, and arm length. */
+	UPROPERTY(BlueprintReadWrite)
+	bool bReverse;
+};
