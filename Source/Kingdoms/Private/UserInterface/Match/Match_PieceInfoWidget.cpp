@@ -59,7 +59,7 @@ void UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool 
     {
         /* Get this piece's row from the piece data. */
         static const FString ContextString(TEXT("Piece Data Struct"));
-        PieceData = PieceDataTable->FindRow<FPieceDataStruct>(NewPiece->GetPieceID(), ContextString, true);
+        PieceData = PieceDataTable->FindRow<FPieceDataStruct>(NewPiece->PieceID, ContextString, true);
 
         /* If the data table row was found... */
         if (PieceData)

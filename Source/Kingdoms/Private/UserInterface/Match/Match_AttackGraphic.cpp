@@ -22,10 +22,8 @@ void UMatch_AttackGraphic::UpdateAttackGraphicInfo(AParentPiece* Attacker, APare
 		{
 			/* Get the attacker and defender's information from the data table. */
 			static const FString ContextString(TEXT("Piece Data Struct"));
-			FPieceDataStruct* AttackerData = PieceDataTable->FindRow<FPieceDataStruct>(Attacker->GetPieceID(),
-				ContextString, true);
-			FPieceDataStruct* DefenderData = PieceDataTable->FindRow<FPieceDataStruct>(Defender->GetPieceID(),
-				ContextString, true);
+			FPieceDataStruct* AttackerData = PieceDataTable->FindRow<FPieceDataStruct>(Attacker->PieceID, ContextString, true);
+			FPieceDataStruct* DefenderData = PieceDataTable->FindRow<FPieceDataStruct>(Defender->PieceID, ContextString, true);
 
 			/* Update the displayed attacker and defender information if they were found. Otherwise, there is a problem
 			 * with the data table or the piece IDs. */

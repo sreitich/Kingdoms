@@ -30,10 +30,6 @@ public:
 	/* Replicates variables. */
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	/* Retrieves this piece's piece ID. This function is overridden by each piece with an ID that is unique to that
-	 * piece. This is used in place of a member variable and has complete control over this piece's ID. */
-	virtual FName GetPieceID();
-
 	/* Finds all tiles that this piece can move to (not accounting for other pieces or pathfinding). */
 	virtual TArray<ABoardTile*> GetValidTiles() final;
 
@@ -118,6 +114,14 @@ public:
 	/* Server-only setter for ActiveUses. */
 	UFUNCTION(BlueprintCallable, Category="Active Ability")
 	bool SetActiveUses(int NewActiveUses);
+
+
+/* Public variables. */
+public:
+
+	/* This piece's unique identifier, set in-editor for each child piece. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Piece Info")
+	FName PieceID = "0-00";
 
 
 /* Public assets. */

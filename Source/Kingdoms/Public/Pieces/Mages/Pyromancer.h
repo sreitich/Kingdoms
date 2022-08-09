@@ -16,9 +16,6 @@ class KINGDOMS_API APyromancer : public AParentPiece
 
 /* Public functions. */
 public:
-
-	/* Gives this piece a unique piece ID that can be accessed from anywhere. */
-	FName GetPieceID() override;
 	
 	/* Sets default values for this character's properties. */
 	APyromancer();

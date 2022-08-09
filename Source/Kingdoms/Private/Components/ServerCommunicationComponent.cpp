@@ -42,6 +42,8 @@ void UServerCommunicationComponent::SpawnPiece_Server_Implementation(UClass* Cla
 			&PieceSpawnRotation,
 			SpawnParams
 		));
+
+		UE_LOG(LogTemp, Error, TEXT("Spawned piece: %s"), *ClassToSpawn->GetName());
 	}
 }
 

@@ -27,8 +27,8 @@ void UMatch_AttackConfirmation::UpdateAttackPreviewInfo(AParentPiece* FriendlyPi
 		{
 			/* Get the friendly and enemy pieces' rows from the piece data table. */
 			static const FString ContextString(TEXT("Piece Data Struct"));
-			FPieceDataStruct* FriendlyPieceData = PieceDataTable->FindRow<FPieceDataStruct>(FriendlyPiece->GetPieceID(), ContextString, true);
-			FPieceDataStruct* EnemyPieceData = PieceDataTable->FindRow<FPieceDataStruct>(EnemyPiece->GetPieceID(), ContextString, true);
+			FPieceDataStruct* FriendlyPieceData = PieceDataTable->FindRow<FPieceDataStruct>(FriendlyPiece->PieceID, ContextString, true);
+			FPieceDataStruct* EnemyPieceData = PieceDataTable->FindRow<FPieceDataStruct>(EnemyPiece->PieceID, ContextString, true);
 
 			/* Update the displayed piece information using the piece data rows, if they could be retrieved. */
 			if (FriendlyPieceData)
