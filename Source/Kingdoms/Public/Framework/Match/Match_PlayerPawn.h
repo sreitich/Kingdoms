@@ -53,9 +53,19 @@ public:
 
 		/* Helper function for blueprint scripting. */
 		UFUNCTION(BlueprintPure)
-		FCameraInterpolationInfo MovePlayerCameraBP(AParentPiece* Attacker, AParentPiece* Defender);
+		FCameraInterpolationInfo MovePlayerCameraBP(const AParentPiece* Attacker, const AParentPiece* Defender);
+
+		/* Calculates a target location and rotation and smoothly interpolates the player's camera to that location
+		 * and rotation. */
+		UFUNCTION(Client, Reliable, BlueprintCallable)
+		void Client_MovePlayerCamera(const AParentPiece* Attacker, const AParentPiece* Defender);
+
+		/* Interpolates the camera between two locations. */
+		UFUNCTION(BlueprintImplementableEvent)
+		void InterpolatePlayerCamera(FVector StartingLocation, FVector EndingLocation, FRotator StartingRotation, FRotator EndingRotation, float StartingArmLength, float EndingArmLength, bool bReverse);
 
 	
+
 
 		/* Attack Phase 1. Waits for when the attacker and defender are close enough before calling
 		 * Client_InitiateAttack on each client with server authority. */
