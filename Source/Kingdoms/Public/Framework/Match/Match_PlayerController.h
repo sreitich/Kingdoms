@@ -68,11 +68,11 @@ public:
 	void UpdateAttackConfirmationWidget(bool bDestroy, AParentPiece* FriendlyPiece, AParentPiece* EnemyPiece);
 
 	/* Creates or destroys an attack graphic. */
-	UFUNCTION(Category="User Interface")
+	UFUNCTION(BlueprintCallable, Category="User Interface")
 	void UpdateAttackGraphicWidget(bool bDestroy, AParentPiece* Attacker, AParentPiece* Defender);
 
 	/* Plays a given animation on the attack graphic. */
-	UFUNCTION(Category="User Interface")
+	UFUNCTION(BlueprintCallable, Category="User Interface")
 	void PlayAttackGraphicAnimation(EAttackGraphicAnimation AttackGraphicAnim);
 
 

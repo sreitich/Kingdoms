@@ -527,8 +527,6 @@ FCameraInterpolationInfo AMatch_PlayerPawn::MovePlayerCameraBP(const AParentPiec
 		
 		return CameraInterpolationInfo;
 	}
-
-	UE_LOG(LogTemp, Error, TEXT("Pieces are NOT valid."));
 	
 	return FCameraInterpolationInfo();
 }
