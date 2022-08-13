@@ -155,6 +155,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
 	UAnimSequenceBase* DeadlockAnimation;
 
+	/* The particle effect to spawn when this piece is damaged. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Effects")
+	UParticleSystem* DamagedParticle;
+
+	/* Which mesh component to play the damage particle effect on. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Effects")
+	USkeletalMeshComponent* DamagedParticleAttachment;
+
+	/* The transform relative to the attached mesh that the damage particle effect should be played with. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Effects")
+	FTransform DamagedParticleTransform;
+
 
 /* Public components. */
 public:
