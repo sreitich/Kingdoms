@@ -54,6 +54,16 @@ enum EAttackBillboardPopUpTexture
 	E_DeadlockIndicator 	UMETA(DisplayName="Deadlock Indicator")
 };
 
+UENUM(BlueprintType)
+enum EAttackResult
+{
+	E_AttackerSurvivesDefenderDies		UMETA(DisplayName="Attacker kills defender and survives"),
+	E_DefenderSurvivesAttackerDies		UMETA(DisplayName="Defender kills attacker and survives"),
+	E_AttackerDiesDefenderDies			UMETA(DisplayName="Attacker kills defender and defender kills attacker"),
+	E_AttackerSurvivesDefenderSurvives	UMETA(DisplayName="Attacker survives and defender survives"),
+	E_DefenderSurvives					UMETA(DisplayName="Defender survives without fighting back")
+};
+
 /* Coordinates for board tiles and pieces. */
 USTRUCT(BlueprintType)
 struct FTileCoordinates
