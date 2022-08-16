@@ -40,7 +40,8 @@ enum EAttackGraphicAnimation
 	E_AttackerDeath 			UMETA(DisplayName="Attacker Death"),
 	E_DefenderDeath				UMETA(DisplayName="Defender Death"),
 	E_AttackerDeadlock 			UMETA(DisplayName="Attacker-Side Deadlock"),
-	E_DefenderDeadlock			UMETA(DisplayName="Defender-Side Deadlock")
+	E_DefenderDeadlock			UMETA(DisplayName="Defender-Side Deadlock"),
+	E_BothSidesDeadlock			UMETA(DisplayName="Both Sides Deadlock")
 };
 
 /* Textures that can be displayed in a billboard attack pop-up. */

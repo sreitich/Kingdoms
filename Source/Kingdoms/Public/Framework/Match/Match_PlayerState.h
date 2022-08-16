@@ -50,7 +50,7 @@ public:
 	int PlayerIndex;
 
 	/* An array of every piece that this player owns. */
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category="Player Information")
 	TArray<AActor*> OwnedPieces;
 
 
