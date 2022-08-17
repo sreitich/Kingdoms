@@ -71,7 +71,7 @@ void UServerCommunicationComponent::UpdatePiecePosition_Server_Implementation(AA
 }
 
 void UServerCommunicationComponent::MovePieceToTile_Server_Implementation(AParentPiece* PieceToMove,
-	ABoardTile* NewTile)
+	ABoardTile* NewTile, bool bFromMove)
 {
 	/* If the piece has a valid piece AI controller, use it to move the piece on the server. */
 	if (IsValid(PieceToMove->GetController()) && PieceToMove->GetController()->GetClass()->IsChildOf(APieceAIController::StaticClass()))
@@ -80,12 +80,13 @@ void UServerCommunicationComponent::MovePieceToTile_Server_Implementation(AParen
 	}
 
 	/* Update the piece's new tile and the new tile's occupying piece on the server. */
+	NewTile->SetOccupyingPiece(PieceToMove);
 	PieceToMove->GetCurrentTile()->SetOccupyingPiece(nullptr);
 	PieceToMove->SetCurrentTile(NewTile);
-	NewTile->SetOccupyingPiece(PieceToMove);
-	
-	/* Reset the player's player state. */
-	Cast<AMatch_PlayerController>(OwningPlayerController)->GetPlayerState<AMatch_PlayerState>()->SetPlayerStatus_Server(E_SelectingPiece);
+
+	/* Reset the player's player state to selecting an action if this move was the result of a move action, rather than an attack. */
+	if (bFromMove)
+		Cast<AMatch_PlayerController>(OwningPlayerController)->GetPlayerState<AMatch_PlayerState>()->SetPlayerStatus_Server(E_SelectingPiece);
 }
 
 void UServerCommunicationComponent::BeginPlay()

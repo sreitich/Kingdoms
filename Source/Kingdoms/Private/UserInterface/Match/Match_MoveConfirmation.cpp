@@ -63,7 +63,7 @@ void UMatch_MoveConfirmation::OnConfirmClicked()
     
     /* Move the piece to the tile on the server via the player controller's server communication component. */
     Cast<AMatch_PlayerController>(PendingPiece->GetInstigator()->GetController())->
-        GetServerCommunicationComponent()->MovePieceToTile_Server(PendingPiece, PendingTile);
+        GetServerCommunicationComponent()->MovePieceToTile_Server(PendingPiece, PendingTile, true);
 
     /* Destroy this widget. */
     RemoveFromParent();

@@ -122,7 +122,7 @@ protected:
 protected:
 
 	/* Pointer to the piece currently on this tile. */
-	UPROPERTY(ReplicatedUsing=OnRep_OccupyingPiece, EditAnywhere, Category="Board Tile")
+	UPROPERTY(ReplicatedUsing=OnRep_OccupyingPiece, VisibleAnywhere, Category="Board Tile")
 	AParentPiece* OccupyingPiece;
 
 };

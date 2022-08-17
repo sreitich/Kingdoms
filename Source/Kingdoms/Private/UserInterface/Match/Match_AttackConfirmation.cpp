@@ -75,10 +75,9 @@ void UMatch_AttackConfirmation::OnAttackClicked()
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->Server_Attack(AttackInfo);
 
 	/* Refresh each tile's highlight to clear the highlights for attacking options. */
-	TArray<AActor*> AllTiles;
-	for (AActor* Tile : AllTiles)
+	for (ABoardTile* Tile : PendingFriendlyPiece->GetValidTiles())
 	{
-		Cast<ABoardTile>(Tile)->RefreshHighlight();
+		Tile->RefreshHighlight();
 	}
 
 	/* Destroy this widget. */

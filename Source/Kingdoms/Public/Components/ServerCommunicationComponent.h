@@ -32,8 +32,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void UpdatePiecePosition_Server(AActor* InPiece, AActor* InNewTile);
 
-	UFUNCTION(Server, Reliable)
-	void MovePieceToTile_Server(AParentPiece* PieceToMove, ABoardTile* NewTile);
+	/* Moves a piece to a new tile on the server, while also updating relevant actor data, including current tile and occupying piece references. */
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void MovePieceToTile_Server(AParentPiece* PieceToMove, ABoardTile* NewTile, bool bFromMove);
 	
 
 /* Protected functions. */

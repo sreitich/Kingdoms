@@ -52,7 +52,7 @@ public:
 public:
 
 	/* A global pointer to this level's tile manager. */
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, BlueprintReadOnly)
 	ABoardManager* BoardManager;
 	
 	/* Tracks the official time of the match. */

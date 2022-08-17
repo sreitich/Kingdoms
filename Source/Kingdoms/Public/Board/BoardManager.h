@@ -20,7 +20,7 @@ public:
 	ABoardManager();
 
 	/* Refreshes the highlights of every tile on the board depending on their state on the server. */
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void RefreshBoard() const;
 
 

@@ -207,17 +207,17 @@ protected:
 protected:
 
 	/* Pointer to the piece currently on this tile. */
-	UPROPERTY(Replicated, EditInstanceOnly, BlueprintReadOnly, Category="Piece Info")
+	UPROPERTY(Replicated, EditInstanceOnly, Category="Piece Info")
 	ABoardTile* CurrentTile;
 
 	/* Tracks when this piece is participating in an attack as a defender. This is currently used for notifies to
 	 * determine whether a piece is an attacker or defender without a copy of the attack information. */
-	UPROPERTY(Replicated, EditInstanceOnly, BlueprintReadOnly, Category="Attacking")
+	UPROPERTY(Replicated, EditInstanceOnly, Category="Attacking")
 	bool bIsAttacking;
 
 	/* Used to keep a copy of the attack information to continue passing down the chain of functions in the attack
 	 * sequence when it gets interrupted by animation notifies. */
-	UPROPERTY(Replicated, EditInstanceOnly, BlueprintReadOnly, Category="Attacking")
+	UPROPERTY(Replicated, EditInstanceOnly, Category="Attacking")
 	FAttackInfo AttackInfo;
 
 
