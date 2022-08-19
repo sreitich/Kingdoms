@@ -58,11 +58,11 @@ public:
 		/* Calculates a target location and rotation and smoothly interpolates the player's camera to that location
 		 * and rotation. */
 		UFUNCTION(Client, Reliable, BlueprintCallable)
-		void Client_MovePlayerCamera(const AParentPiece* Attacker, const AParentPiece* Defender);
+		void Client_MovePlayerCamera(const AParentPiece* Attacker, const AParentPiece* Defender, bool bReverse);
 
 		/* Interpolates the camera between two locations. */
 		UFUNCTION(BlueprintImplementableEvent)
-		void InterpolatePlayerCamera(FVector StartingLocation, FVector EndingLocation, FRotator StartingRotation, FRotator EndingRotation, float StartingArmLength, float EndingArmLength, bool bReverse);
+		void InterpolatePlayerCamera(FVector TargetLocation, FRotator TargetRotation, float TargetArmLength, bool bReverse);
 
 	
 

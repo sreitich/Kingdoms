@@ -483,8 +483,6 @@ FCameraInterpolationInfo AMatch_PlayerPawn::MovePlayerCameraBP(const AParentPiec
 {
 	if (IsValid(Attacker) && IsValid(Defender))
 	{
-		UE_LOG(LogTemp, Error, TEXT("Pieces are valid."));
-		
 		/* Initialize the vectors we'll need to calculate where to move and rotate the player's camera. */
 		FVector StartLoc = SpringArm->GetComponentLocation();
 		FRotator StartRot = SpringArm->GetRelativeRotation();
@@ -532,13 +530,11 @@ FCameraInterpolationInfo AMatch_PlayerPawn::MovePlayerCameraBP(const AParentPiec
 }
 
 void AMatch_PlayerPawn::Client_MovePlayerCamera_Implementation(const AParentPiece* Attacker,
-	const AParentPiece* Defender)
+	const AParentPiece* Defender, bool bReverse)
 {
 	if (IsValid(Attacker) && IsValid(Defender))
 	{
 		/* Initialize the vectors we'll need to calculate where to move and rotate the player's camera. */
-		FVector StartLoc = SpringArm->GetComponentLocation();
-		FRotator StartRot = SpringArm->GetRelativeRotation();
 		FVector AttackerLoc = Attacker->GetActorLocation();
 		FVector DefenderLoc = Defender->GetActorLocation();
 
@@ -567,7 +563,7 @@ void AMatch_PlayerPawn::Client_MovePlayerCamera_Implementation(const AParentPiec
 		FRotator EndRot = UKismetMathLibrary::FindLookAtRotation(EndLoc, Midpoint);
 
 		/* Smoothly move the camera to or from the given location and rotation. */
-		InterpolatePlayerCamera(StartLoc, EndLoc, StartRot, EndRot, SpringArm->TargetArmLength, 0.0f, false);
+		InterpolatePlayerCamera(EndLoc, EndRot, 0.0f, bReverse);
 	}
 }
 
