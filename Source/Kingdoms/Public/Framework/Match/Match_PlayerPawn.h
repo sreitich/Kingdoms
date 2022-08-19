@@ -46,14 +46,9 @@ public:
     UFUNCTION(BlueprintImplementableEvent)
     void Server_Attack_BP(const FAttackInfo InInfo);
 
-	/* Initiates an attack with given parameters. Moves attacker to the defender if they're too far away. Calls 
-	 * WaitForPieceProximity. Calls Client_SetUpAttack on each client. */
-	UFUNCTION(Server, Reliable)
-	void Server_Attack(const FAttackInfo InInfo);
-
 		/* Helper function for blueprint scripting. */
 		UFUNCTION(BlueprintPure)
-		FCameraInterpolationInfo MovePlayerCameraBP(const AParentPiece* Attacker, const AParentPiece* Defender);
+		FCameraInterpolationInfo MovePlayerCameraBP(const AParentPiece* Attacker, const AParentPiece* Defender) const;
 
 		/* Calculates a target location and rotation and smoothly interpolates the player's camera to that location
 		 * and rotation. */
@@ -67,46 +62,6 @@ public:
 	
 
 
-		/* Attack Phase 1. Waits for when the attacker and defender are close enough before calling
-		 * Client_InitiateAttack on each client with server authority. */
-		UFUNCTION(BlueprintImplementableEvent)
-		void WaitForPieceProximity(FAttackInfo InInfo);
-
-		/* Attacking Phase 1. Disables input on the client. */
-		UFUNCTION(Client, Reliable)
-		void Client_SetUpAttack();
-
-		/* Attacking Phase 2. Initializes the client's visual aspects of an attack: changes camera angle, highlights
-		 * pieces, creates an attack graphic, creates billboards, and calls Server_AnimateAttack and
-		 * Client_AnimateAttack when the camera finishes moving. */
-		UFUNCTION(Client, Reliable, BlueprintCallable)
-		void Client_InitiateAttack(FAttackInfo InInfo);
-	
-			/* Calculates a target location and rotation and smoothly interpolates the player's camera to that location
-			 * and rotation. Calls Server_AnimateAttack after a brief duration when the camera finishes moving. */
-			UFUNCTION()
-			void MovePlayerCamera(FAttackInfo InInfo);
-
-				/* Interpolates the camera between two locations. */
-				UFUNCTION(BlueprintImplementableEvent)
-				void InterpolateCamera(FVector StartingLocation, FVector EndingLocation, FRotator StartingRotation, FRotator EndingRotation, float StartingArmLength, float EndingArmLength, bool bReverse, FAttackInfo InInfo);
-
-			/* Spawns a billboard popup at the given location. */
-			UFUNCTION()
-			void SpawnTempBillboardPopup(EAttackBillboardPopUpTexture DisplayedTexture, FVector Location, float Duration) const;
-
-		/* Attacking Phase 3. Animates both pieces' attacks for both players. Animations need to be replicated because
-		 * server-side events are triggered via animation notifies. */
-		UFUNCTION(Server, Reliable, BlueprintCallable)
-		void Server_AnimateAttack(FAttackInfo InInfo);
-
-			/* Triggers the attacking animation of the given pieces on each client. */
-			UFUNCTION(NetMulticast, Reliable)
-			void Multicast_AnimateAttack(FAttackInfo InInfo);
-
-					/* Animates a "damage-taken" particle effect and a "damage-taken" animation when necessary. */
-					UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-					void Multicast_AnimateDamage(FAttackInfo InInfo, bool bAttackerDamaged);
 
 
 /* Public variables. */
