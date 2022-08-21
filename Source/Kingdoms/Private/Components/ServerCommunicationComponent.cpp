@@ -84,6 +84,8 @@ void UServerCommunicationComponent::MovePieceToTile_Server_Implementation(AParen
 	PieceToMove->GetCurrentTile()->SetOccupyingPiece(nullptr);
 	PieceToMove->SetCurrentTile(NewTile);
 
+/* This might be causing a player state problem because I don't think it's exclusive to any pawn. */
+
 	/* Reset the player's player state to selecting an action if this move was the result of a move action, rather than an attack. */
 	if (bFromMove)
 		Cast<AMatch_PlayerController>(OwningPlayerController)->GetPlayerState<AMatch_PlayerState>()->SetPlayerStatus_Server(E_SelectingPiece);
