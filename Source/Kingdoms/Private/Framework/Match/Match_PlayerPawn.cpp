@@ -437,6 +437,12 @@ void AMatch_PlayerPawn::ClearSelection(bool bDeselect)
 	}
 }
 
+void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo)
+{
+	/* Call the blueprint implementation of the attack sequence with server authority. */
+	Server_Attack_BP(InInfo);
+}
+
 
 FCameraInterpolationInfo AMatch_PlayerPawn::MovePlayerCameraBP(const AParentPiece* Attacker, const AParentPiece* Defender) const
 {

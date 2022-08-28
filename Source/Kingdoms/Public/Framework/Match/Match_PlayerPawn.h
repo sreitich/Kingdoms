@@ -42,27 +42,27 @@ public:
 		/* Clears the currently selected piece and removes all piece-information pop-ups. */
 		void ClearSelection(bool bDeselect);
 
-    /* Scripted attack sequence via blueprint. */
-    UFUNCTION(BlueprintImplementableEvent)
-    void Server_Attack_BP(const FAttackInfo InInfo);
+	/* Calls the blueprint-implemented attack sequence with server authority. */
+	UFUNCTION(Server, Reliable)
+	void Server_Attack(const FAttackInfo InInfo);
 
-		/* Helper function for blueprint scripting. */
-		UFUNCTION(BlueprintPure)
-		FCameraInterpolationInfo MovePlayerCameraBP(const AParentPiece* Attacker, const AParentPiece* Defender) const;
+	    /* Scripted attack sequence via blueprint. */
+	    UFUNCTION(BlueprintImplementableEvent)
+	    void Server_Attack_BP(const FAttackInfo InInfo);
 
-		/* Calculates a target location and rotation and smoothly interpolates the player's camera to that location
-		 * and rotation. */
-		UFUNCTION(Client, Reliable, BlueprintCallable)
-		void Client_MovePlayerCamera(const AParentPiece* Attacker, const AParentPiece* Defender, bool bReverse);
+			/* Helper function for blueprint scripting. */
+			UFUNCTION(BlueprintPure)
+			FCameraInterpolationInfo MovePlayerCameraBP(const AParentPiece* Attacker, const AParentPiece* Defender) const;
 
-		/* Interpolates the camera between two locations. */
-		UFUNCTION(BlueprintImplementableEvent)
-		void InterpolatePlayerCamera(FVector TargetLocation, FRotator TargetRotation, float TargetArmLength, bool bReverse);
+			/* Calculates a target location and rotation and smoothly interpolates the player's camera to that location
+			 * and rotation. */
+			UFUNCTION(Client, Reliable, BlueprintCallable)
+			void Client_MovePlayerCamera(const AParentPiece* Attacker, const AParentPiece* Defender, bool bReverse);
 
+			/* Interpolates the camera between two locations. */
+			UFUNCTION(BlueprintImplementableEvent)
+			void InterpolatePlayerCamera(FVector TargetLocation, FRotator TargetRotation, float TargetArmLength, bool bReverse);
 	
-
-
-
 
 /* Public variables. */
 public:
