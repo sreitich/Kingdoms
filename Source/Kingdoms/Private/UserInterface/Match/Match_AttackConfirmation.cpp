@@ -72,7 +72,7 @@ void UMatch_AttackConfirmation::OnAttackClicked()
 	AttackInfo.bTakePlace = true;
 	
 	/* Tell the server to execute the attack logic with authority and on each client. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->Server_Attack(AttackInfo);
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->Server_Attack_BP(AttackInfo);
 
 	/* Refresh each tile's highlight to clear the highlights for attacking options. */
 	for (ABoardTile* Tile : PendingFriendlyPiece->GetValidTiles())

@@ -42,10 +42,6 @@ public:
 		/* Clears the currently selected piece and removes all piece-information pop-ups. */
 		void ClearSelection(bool bDeselect);
 
-	/* Calls Server_Attack_BP with server authority. */
-	UFUNCTION(Server, Reliable)
-	void Server_Attack(const FAttackInfo InInfo);
-	
     /* Scripted attack sequence via blueprint. */
     UFUNCTION(BlueprintImplementableEvent)
     void Server_Attack_BP(const FAttackInfo InInfo);
@@ -56,8 +52,8 @@ public:
 
 		/* Calculates a target location and rotation and smoothly interpolates the player's camera to that location
 		 * and rotation. */
-		UFUNCTION(BlueprintCallable)
-		void MovePlayerCamera(const AParentPiece* Attacker, const AParentPiece* Defender, bool bReverse);
+		UFUNCTION(Client, Reliable, BlueprintCallable)
+		void Client_MovePlayerCamera(const AParentPiece* Attacker, const AParentPiece* Defender, bool bReverse);
 
 		/* Interpolates the camera between two locations. */
 		UFUNCTION(BlueprintImplementableEvent)

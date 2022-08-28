@@ -437,13 +437,6 @@ void AMatch_PlayerPawn::ClearSelection(bool bDeselect)
 	}
 }
 
-void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo)
-{
-	/* Call the blueprint-implemented scripted attack sequence with server authority (blueprint-implementable events
-	 * can't be replicated). */
-	Server_Attack_BP(InInfo);
-}
-
 
 FCameraInterpolationInfo AMatch_PlayerPawn::MovePlayerCameraBP(const AParentPiece* Attacker, const AParentPiece* Defender) const
 {
@@ -495,7 +488,7 @@ FCameraInterpolationInfo AMatch_PlayerPawn::MovePlayerCameraBP(const AParentPiec
 	return FCameraInterpolationInfo();
 }
 
-void AMatch_PlayerPawn::MovePlayerCamera(const AParentPiece* Attacker,
+void AMatch_PlayerPawn::Client_MovePlayerCamera_Implementation(const AParentPiece* Attacker,
 	const AParentPiece* Defender, bool bReverse)
 {
 	if (IsValid(Attacker) && IsValid(Defender))
