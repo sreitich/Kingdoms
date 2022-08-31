@@ -49,10 +49,10 @@ void UMatch_PieceInfoWidget::ClosingAnimFinished()
     SetVisibility(ESlateVisibility::Hidden);
 }
 
-void UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool bIsFriendly, bool bEnableButtons)
+bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool bIsFriendly, bool bEnableButtons)
 {
-    /* Set the displayed piece pointer to be the passed piece for use in other functions. */
-    DisplayedPiece = NewPiece;
+    /* Tracks whether any displayed information has actually changed. */
+    bool bInfoChanged = false;
 
     /* If the piece data table was found... */
     if (PieceDataTable)
@@ -67,6 +67,11 @@ void UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool 
             /* Display constant values retrieved from the piece data table. */
             DisplayedPhoto->SetBrushFromTexture(PieceData->PieceInfoPhoto, true);
 
+            /* If there is no piece info widget displayed or if the new piece is not the same as the old one, 
+            allow the opening animation to play to indicate that it's a different piece. */
+            if (DisplayedPiece == nullptr || !NewPiece->GetFullName().Equals(DisplayedPiece->GetFullName()))
+                bInfoChanged = true;
+            
             DisplayedPieceName->SetText(FText::FromString(PieceData->PieceName.ToUpper()));
 
             DisplayedPieceRarity->SetText(StaticEnum<EPieceRarity>()->GetDisplayNameTextByValue(PieceData->Rarity).ToUpper());
@@ -115,6 +120,10 @@ void UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool 
         /* If the passed piece is valid... */
         if (IsValid(NewPiece))
         {
+            /* If there is no piece info widget currently displayed or the piece's stats have changed since its information was last opened, allow the opening animation to play. */
+            if (DisplayedPiece == nullptr || NewPiece->GetCurrentStrength() != DisplayedPiece->GetCurrentStrength() || NewPiece->GetCurrentArmor() != DisplayedPiece->GetCurrentArmor())
+                    bInfoChanged = true;
+            
             /* Update stats with the current values (so that modifiers are counted). */
             DisplayedStrength->SetText(FText::FromString(FString::FromInt(NewPiece->GetCurrentStrength())));
 
@@ -256,6 +265,12 @@ void UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool 
             PassiveAbilityBackgroundButton->WidgetStyle.Disabled.SetResourceObject(PassiveBackground_Enemy);
         }
     }
+
+    /* Set the displayed piece pointer to the passed piece for use in other functions. */
+    DisplayedPiece = NewPiece;
+
+    /* Return whether any displayed information has changed, if this info widget was already open. */
+    return bInfoChanged;
 }
 
 void UMatch_PieceInfoWidget::PlayOpenCloseAnim(bool bOpen, float StartTime, int32 NumLoops, EUMGSequencePlayMode::Type PlayMode, float Speed, bool bRestoreState)

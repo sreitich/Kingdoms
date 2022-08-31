@@ -21,9 +21,10 @@ class KINGDOMS_API UMatch_PieceInfoWidget : public UUserWidget
 /* Public functions. */
 public:
 
-	/* Updates all displayed piece information by retrieving data from the piece data table. */
+	/* Updates all displayed piece information by retrieving data from the piece data table. Returns whether any
+	 * displayed information changed if the widget was already open. */
 	UFUNCTION()
-	void UpdatePieceInfoWidget(AParentPiece* NewPiece, bool bIsFriendly, bool bEnableButtons);
+	bool UpdatePieceInfoWidget(AParentPiece* NewPiece, bool bIsFriendly, bool bEnableButtons);
 
 	/* Allows the base widget to play this widget's animations. */
 	UFUNCTION()

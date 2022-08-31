@@ -128,6 +128,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
 	bool bIsTopDown;
 
+	/* The view transform to return to after an attack sequence ends. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attacking")
+	FTransform OriginalViewTransform;
+
+	/* The camera arm length to return to after an attack sequence ends. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Attacking")
+	float OriginalCameraArmLength;
+
 	/* A pointer to the piece that this player currently has selected. This is also used by the piece drag widget to get the spawned piece. */
 	UPROPERTY()
 	AParentPiece* SelectedPiece = nullptr;
