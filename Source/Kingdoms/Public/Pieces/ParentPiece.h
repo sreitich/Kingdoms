@@ -30,6 +30,13 @@ public:
 	/* Replicates variables. */
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	/* Plays a pop-up animation on each client, quickly scaling up the piece's size from 0.0 to 1.0, over a given duration. */
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayPiecePopUp(float Duration, bool bReverse);
+
+		UFUNCTION(BlueprintImplementableEvent)
+		void PlayPiecePopUp_BP(float Duration, bool bReverse);
+
 	/* Finds all tiles that this piece can move to (not accounting for other pieces or pathfinding). */
 	virtual TArray<ABoardTile*> GetValidTiles() final;
 

@@ -156,6 +156,12 @@ void AParentPiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(AParentPiece, bIsAttacking);
 }
 
+void AParentPiece::Multicast_PlayPiecePopUp_Implementation(float Duration, bool bReverse)
+{
+	/* Call a pop-up animation with the given parameters for each client. */
+	PlayPiecePopUp_BP(Duration, bReverse);
+}
+
 TArray<class ABoardTile*> AParentPiece::GetValidTiles()
 {
 	/* This array of valid tiles is going to be returned. */
