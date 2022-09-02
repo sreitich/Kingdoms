@@ -50,10 +50,6 @@ public:
 	    UFUNCTION(BlueprintImplementableEvent)
 	    void Server_Attack_BP(const FAttackInfo InInfo);
 
-			/* Helper function for blueprint scripting. */
-			UFUNCTION(BlueprintPure)
-			FCameraInterpolationInfo MovePlayerCameraBP(const AParentPiece* Attacker, const AParentPiece* Defender) const;
-
 			/* Calculates a target location and rotation and smoothly interpolates the player's camera to that location
 			 * and rotation. */
 			UFUNCTION(Client, Reliable, BlueprintCallable)
