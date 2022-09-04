@@ -154,6 +154,7 @@ void AParentPiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(AParentPiece, ActiveUses);
 	
 	DOREPLIFETIME(AParentPiece, bIsAttacking);
+	DOREPLIFETIME(AParentPiece, AttackInfo);
 }
 
 void AParentPiece::Multicast_PlayPiecePopUp_Implementation(float Duration, bool bReverse)
