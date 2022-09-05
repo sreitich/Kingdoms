@@ -327,7 +327,7 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
     GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false);
 
     /* Set the player's state to be selecting a place to move. */
-    GetOwningPlayerState<AMatch_PlayerState>(false)->SetPlayerStatus_Server(E_SelectingTarget_Move);
+    GetOwningPlayerState<AMatch_PlayerState>(false)->Server_SetPlayerStatus(E_SelectingTarget_Move);
 
     /* Make sure that there's a valid displayed piece. */
     if (IsValid(DisplayedPiece))

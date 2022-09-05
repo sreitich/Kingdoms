@@ -39,7 +39,7 @@ public:
 
 	/* Server-side setter for CurrentPlayerStatus. */
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Player Status")
-	void SetPlayerStatus_Server(EPlayerStatus NewPlayerStatus);
+	void Server_SetPlayerStatus(EPlayerStatus NewPlayerStatus);
 
 
 /* Public variables. */

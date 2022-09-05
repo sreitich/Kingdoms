@@ -72,7 +72,7 @@ void UMatch_MoveConfirmation::OnConfirmClicked()
 void UMatch_MoveConfirmation::OnCancelClicked()
 {
     /* Reset the player state. */
-    GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->SetPlayerStatus_Server(E_SelectingPiece);
+    GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
 
     /* For every tile that was highlighted... */
     for (ABoardTile* Tile : PendingPiece->GetValidTiles())

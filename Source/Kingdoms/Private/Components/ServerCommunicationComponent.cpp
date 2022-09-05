@@ -95,7 +95,7 @@ void UServerCommunicationComponent::MovePieceToTile_Server_Implementation(AParen
 
 	/* Reset the player's player state to selecting an action if this move was the result of a move action, rather than an attack. */
 	if (bFromMove)
-		Cast<AMatch_PlayerController>(OwningPlayerController)->GetPlayerState<AMatch_PlayerState>()->SetPlayerStatus_Server(E_SelectingPiece);
+		Cast<AMatch_PlayerController>(OwningPlayerController)->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
 }
 
 void UServerCommunicationComponent::BeginPlay()

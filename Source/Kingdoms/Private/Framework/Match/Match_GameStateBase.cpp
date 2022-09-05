@@ -47,7 +47,7 @@ void AMatch_GameStateBase::SetUpMatch()
         if (Cast<AMatch_PlayerState>(PlayerState))
         {
             /* Set their player state to "placing pieces." */
-            Cast<AMatch_PlayerState>(PlayerState)->SetPlayerStatus_Server(E_PlacingPieces);
+            Cast<AMatch_PlayerState>(PlayerState)->Server_SetPlayerStatus(E_PlacingPieces);
 
             /* Cast to their controller to create the army selection widget. */
             PlayerState->GetPawn<AMatch_PlayerPawn>()->GetController<AMatch_PlayerController>()->CreateSelectArmyWidget(false);
@@ -112,13 +112,13 @@ void AMatch_GameStateBase::StartMatch()
                 if (Cast<AMatch_PlayerState>(PlayerState)->PlayerIndex == 1)
                 {
                     /* Set their player state to "selecting piece." */
-                    Cast<AMatch_PlayerState>(PlayerState)->SetPlayerStatus_Server(E_SelectingPiece);
+                    Cast<AMatch_PlayerState>(PlayerState)->Server_SetPlayerStatus(E_SelectingPiece);
                 }
                 /* If this is player 2... */
                 else if (Cast<AMatch_PlayerState>(PlayerState)->PlayerIndex == 2)
                 {
                     /* Set their player state to "waiting for turn." */
-                    Cast<AMatch_PlayerState>(PlayerState)->SetPlayerStatus_Server(E_WaitingForTurn);
+                    Cast<AMatch_PlayerState>(PlayerState)->Server_SetPlayerStatus(E_WaitingForTurn);
                 }
             }
         }
