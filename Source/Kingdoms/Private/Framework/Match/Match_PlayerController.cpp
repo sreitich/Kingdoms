@@ -215,11 +215,12 @@ void AMatch_PlayerController::UpdatePieceInfoWidget(AParentPiece *NewPiece, bool
             /* If a piece info widget needs to be revealed and the piece info widget class is set... */
             else
             {
-                /* Update the widget's displayed information, reveal it, and play the opening animation if the displayed
-                 * information changed, which will enable the widget after playing. */
+                /* Update the widget's displayed information, enable it, and determine whether or not any information changed. */
                 const bool bInfoChanged = Match_BaseWidget->GetPieceInfoWidget(bIsFriendly)->UpdatePieceInfoWidget(NewPiece, bIsFriendly, bEnableButtons);
                 Match_BaseWidget->GetPieceInfoWidget(bIsFriendly)->SetVisibility(ESlateVisibility::HitTestInvisible);
-                if (bInfoChanged)
+
+                /* If any information changed or the widget wasn't already revealed, play the opening animation. */
+                if (bInfoChanged || Match_BaseWidget->GetPieceInfoWidget(bIsFriendly)->GetRenderOpacity() < 1.0f)
                     Match_BaseWidget->GetPieceInfoWidget(bIsFriendly)->PlayOpenCloseAnim(true, 0.0f, 1, EUMGSequencePlayMode::Forward, 1.0f, false);
             }
         }
