@@ -80,6 +80,9 @@ void UMatch_AttackConfirmation::OnAttackClicked()
 		Tile->RefreshHighlight();
 	}
 
+	/* Remove all other widgets and reset the player's selections when starting the attack sequence. */
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
+
 	/* Destroy this widget. */
 	this->RemoveFromParent();
 }
