@@ -38,6 +38,11 @@ void AMatch_PlayerState::SetReadyToPlay_Server_Implementation(bool bReady)
     OnRep_ReadyToPlay();
 }
 
+void AMatch_PlayerState::SetLocalPlayerStatus(EPlayerStatus NewPlayerStatus)
+{
+    CurrentPlayerStatus = NewPlayerStatus;
+}
+
 void AMatch_PlayerState::Server_SetPlayerStatus_Implementation(EPlayerStatus NewPlayerStatus)
 {
     /* Ways player states can change:

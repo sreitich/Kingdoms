@@ -37,6 +37,10 @@ public:
 	UFUNCTION(BlueprintPure, Category="Player Status")
 	FORCEINLINE EPlayerStatus GetCurrentPlayerStatus() const { return CurrentPlayerStatus; }
 
+	/* Client-side setter for CurrentPlayerStatus to remove client-side latency. */
+	UFUNCTION(BlueprintCallable, Category="Player Status")
+	void SetLocalPlayerStatus(EPlayerStatus NewPlayerStatus);
+	
 	/* Server-side setter for CurrentPlayerStatus. */
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Player Status")
 	void Server_SetPlayerStatus(EPlayerStatus NewPlayerStatus);

@@ -326,6 +326,10 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
     /* CLear the piece info widgets but keep the currently selected piece. */
     GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false);
 
+    /* Instantly change the player status for the local client so that they don't have to wait for the server to update
+     * their status before choosing a target. */
+    GetOwningPlayerState<AMatch_PlayerState>(false)->SetLocalPlayerStatus(E_SelectingTarget_Move);
+    
     /* Set the player's state to be selecting a place to move. */
     GetOwningPlayerState<AMatch_PlayerState>(false)->Server_SetPlayerStatus(E_SelectingTarget_Move);
 
