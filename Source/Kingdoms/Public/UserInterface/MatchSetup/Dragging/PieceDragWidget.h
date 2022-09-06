@@ -67,6 +67,14 @@ protected:
 	FHitResult TraceFromMouse() const;
 
 
+/* Private functions. */
+private:
+
+	/* Returns the closest unoccupied tile to the given location. */
+	UFUNCTION()
+	AActor* GetClosestOpenTile(const FVector& CloseToLocation) const;
+
+
 /* Protected variables. */
 protected:
 	

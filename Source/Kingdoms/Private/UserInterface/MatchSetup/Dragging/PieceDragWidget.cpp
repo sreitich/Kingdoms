@@ -45,8 +45,8 @@ void UPieceDragWidget::InitializeWidget(bool bSpawnPiece)
 		/* If the trace didn't hit a tile, set the new piece's spawn location to the intersection of the trace and board tile plane, so that it is in line with the tiles. */
 		else
 		{
-			/* Move the spawned piece to the interception point. */
-			PieceSpawnLocation = HitResult.ImpactPoint + FVector(0.0f, 0.0f, 165.0f);
+			/* Set the new piece's spawn location to the tile closest to where the player clicked along the plane. */
+			PieceSpawnLocation = GetClosestOpenTile(HitResult.ImpactPoint)->GetActorLocation() + FVector(0.0f, 0.0f, 165.0f);
 		}
 
 		/* Get the direction of this player's pawn so that the placed piece faces the same direction as its owning player. */
@@ -159,26 +159,8 @@ void UPieceDragWidget::NativeDestruct()
 	/* If the piece was placed off the board... */
 	if (!IsValid(CurrentTile))
 	{
-		/* Get every board tile. */
-		TArray<AActor*> AllTiles;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABoardTile::StaticClass(), OUT AllTiles);
-	
-		/* Get the closest tile to wherever the piece was placed. */
-		float DistanceToClosestTile = AllTiles[0]->GetDistanceTo(SpawnedPiece);
-		AActor* ClosestTile = AllTiles[0];
-		
-		for (AActor* Tile : AllTiles)
-		{
-			/* Also make sure that this tile isn't occupied. */
-			if (Tile->GetDistanceTo(SpawnedPiece) < DistanceToClosestTile && !IsValid(Cast<ABoardTile>(Tile)->GetOccupyingPiece()))
-			{
-				DistanceToClosestTile = Tile->GetDistanceTo(SpawnedPiece);
-				ClosestTile = Tile;
-			}
-		}
-	
-		/* Set the piece's current tile to the closest board tile. */
-		CurrentTile = ClosestTile;
+		/* Set the piece's current tile to be the closest available board tile to it. */
+		CurrentTile = GetClosestOpenTile(SpawnedPiece->GetActorLocation());
 	}
 	
 	/* Update the dragged piece's position on the server and its new tile. */
@@ -227,4 +209,33 @@ FHitResult UPieceDragWidget::TraceFromMouse() const
 	}
 
 	return HitResult;
+}
+
+AActor* UPieceDragWidget::GetClosestOpenTile(const FVector& CloseToLocation) const
+{
+	/* Get every board tile. */
+	TArray<AActor*> AllTiles;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABoardTile::StaticClass(), OUT AllTiles);
+	
+	/* Get the closest tile to the given location */
+	float DistanceToClosestTile = FVector::Distance(AllTiles[0]->GetActorLocation(), CloseToLocation);
+	AActor* ClosestTile = AllTiles[0];
+		
+	for (AActor* Tile : AllTiles)
+	{
+		/* Also make sure that this tile isn't occupied. */
+		if (FVector::Distance(Tile->GetActorLocation(), CloseToLocation) < DistanceToClosestTile && !IsValid(Cast<ABoardTile>(Tile)->GetOccupyingPiece()))
+		{
+			DistanceToClosestTile = FVector::Distance(Tile->GetActorLocation(), CloseToLocation);
+			ClosestTile = Tile;
+		}
+	}
+
+	/* Return the the closest board tile if one was found. */
+	if (IsValid(ClosestTile))
+	{
+		return ClosestTile;
+	}
+
+	return nullptr;
 }
