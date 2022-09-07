@@ -10,6 +10,7 @@
 #include "Components/PopUpLocationComponent.h"
 #include "Framework/Match/Match_GameStateBase.h"
 #include "Framework/Match/Match_PlayerPawn.h"
+#include "Framework/Match/Match_PlayerState.h"
 #include "Pieces/PieceAIController.h"
 #include "UserDefinedData/PieceData_UserDefinedData.h"
 
@@ -227,6 +228,18 @@ bool AParentPiece::TileIsInMoveRange(ABoardTile* Tile)
 	}
 	
 	return false;
+}
+
+void AParentPiece::ResetPieceRotation()
+{
+	/* Get the game state. */
+	const AMatch_GameStateBase* GameStatePtr = Cast<AMatch_GameStateBase>(UGameplayStatics::GetGameState(this));
+	/* Get the player index of this piece's owning player. */
+	const int PlayerIndex = Cast<AMatch_PlayerState>(GetInstigator()->GetPlayerState())->PlayerIndex;
+	/* Get the player start that spawned this piece's owning player. */
+	const AActor* PlayerStart = GameStatePtr->PlayerStarts[PlayerIndex - 1];
+	/* Set this actor's rotation to the rotation that its owning player was spawned at. */
+	SetActorRotation(PlayerStart->GetActorRotation(), ETeleportType::None);
 }
 
 void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float Duration)

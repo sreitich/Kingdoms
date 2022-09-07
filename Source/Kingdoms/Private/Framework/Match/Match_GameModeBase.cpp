@@ -50,15 +50,21 @@ AActor* AMatch_GameModeBase::ChoosePlayerStart_Implementation(AController* Playe
         AMatch_PlayerController* PlayerController = Cast<AMatch_PlayerController>(Player);
         AMatch_PlayerState* PlayerState = Cast<AMatch_PlayerState>(PlayerController->PlayerState);
 
+        /* Get a casted game state reference to use throughout this function. */
+        AMatch_GameStateBase* GameStatePtr = Cast<AMatch_GameStateBase>(UGameplayStatics::GetGameState(this));
+        
         /* For every player start... */
         for (APlayerStart* PlayerStart : ClassArray)
         {
             /* If this is player 1... */
-            if (UGameplayStatics::GetGameState(this)->PlayerArray.Num() == 1)
+            if (GameStatePtr->PlayerArray.Num() == 1)
             {
                 /* If the player start has the "player 1" tag... */
                 if (PlayerStart->PlayerStartTag == "Player 1")
                 {
+                    /* Save this player start as player 1's for future reference. */
+                    GameStatePtr->PlayerStarts.EmplaceAt(0, PlayerStart);
+
                     return PlayerStart;
                 }
             }
@@ -68,6 +74,9 @@ AActor* AMatch_GameModeBase::ChoosePlayerStart_Implementation(AController* Playe
                 /* If the player start has the "player 2" tag... */
                 if (PlayerStart->PlayerStartTag == "Player 2")
                 {
+                    /* Save this player start as player 2's for future reference. */
+                    GameStatePtr->PlayerStarts.EmplaceAt(1, PlayerStart);
+
                     return PlayerStart;
                 }
             }

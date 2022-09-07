@@ -43,6 +43,10 @@ public:
 	/* Pure function that tests if the given tile's coordinates match any of this piece's movement patterns. Overridden by each piece. */
 	virtual bool TileIsInMoveRange(ABoardTile* Tile);
 
+	/* Rotates this piece to the rotation it was spawned with, facing away from its owner's starting position. */
+	UFUNCTION(BlueprintCallable)
+	void ResetPieceRotation();
+
 	/* Flashes a given highlight onto the piece at a given strength for a given amount of time. */
 	UFUNCTION(BlueprintCallable)
 	void FlashHighlight(FLinearColor Color, float Brightness, float Duration);

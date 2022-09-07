@@ -4,6 +4,7 @@
 #include "Pieces/PieceAIController.h"
 
 #include "Board/BoardTile.h"
+#include "Pieces/ParentPiece.h"
 
 APieceAIController::APieceAIController()
 {
@@ -34,4 +35,12 @@ void APieceAIController::MovePieceToTile(ABoardTile* NewTile)
             nullptr
         );
     }
+}
+
+void APieceAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
+{
+    Super::OnMoveCompleted(RequestID, Result);
+
+    /* Reset the piece's rotation whenever it finishes moving. */
+    Cast<AParentPiece>(GetPawn())->ResetPieceRotation();
 }

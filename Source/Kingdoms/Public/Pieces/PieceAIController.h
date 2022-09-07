@@ -24,4 +24,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void MovePieceToTile(ABoardTile* NewTile);
 
+	/* Called when a move request is completed. */
+	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
+
 };
