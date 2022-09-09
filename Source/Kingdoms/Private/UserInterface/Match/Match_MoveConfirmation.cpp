@@ -4,11 +4,12 @@
 #include "UserInterface/Match/Match_MoveConfirmation.h"
 
 #include "Board/BoardTile.h"
-#include "Pieces/ParentPiece.h"
-#include "Framework/Match/Match_PlayerPawn.h"
-#include "Framework/Match/Match_PlayerController.h"
 #include "Components/ServerCommunicationComponent.h"
+#include "Framework/Match/Match_PlayerController.h"
+#include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
+#include "Pieces/ParentPiece.h"
+#include "Pieces/PieceAIController.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Runtime/UMG/Public/UMG.h"
@@ -60,6 +61,9 @@ void UMatch_MoveConfirmation::OnConfirmClicked()
     {
         Tile->RefreshHighlight();
     }
+    
+    /* Reset this piece's rotation after it finishes moving. */
+    Cast<AMatch_PlayerPawn>(GetOwningPlayerPawn())->Server_SetResetAfterMove(PendingPiece, true);
     
     /* Move the piece to the tile on the server via the player controller's server communication component. */
     Cast<AMatch_PlayerController>(PendingPiece->GetInstigator()->GetController())->

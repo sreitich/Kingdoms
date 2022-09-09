@@ -437,6 +437,15 @@ void AMatch_PlayerPawn::ClearSelection(bool bDeselect)
 	}
 }
 
+void AMatch_PlayerPawn::Server_SetResetAfterMove_Implementation(AParentPiece* PieceToUpdate, bool bNewReset)
+{
+	/* If the given piece is valid, update its AI's bResetAfterMove variable. */
+	if (IsValid(PieceToUpdate))
+	{
+		Cast<APieceAIController>(PieceToUpdate->GetController())->bResetAfterMove = bNewReset;
+	}
+}
+
 void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo)
 {
     /* Remove the piece info widgets and reset this player's selection. */

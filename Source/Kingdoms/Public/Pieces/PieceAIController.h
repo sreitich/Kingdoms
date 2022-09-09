@@ -27,4 +27,11 @@ public:
 	/* Called when a move request is completed. */
 	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 
+
+/* Public variables. */
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement")
+	bool bResetAfterMove = false;
+
 };

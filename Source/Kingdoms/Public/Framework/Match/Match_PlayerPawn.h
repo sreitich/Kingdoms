@@ -58,6 +58,11 @@ public:
 			/* Interpolates the camera between two locations. */
 			UFUNCTION(BlueprintImplementableEvent)
 			void InterpolatePlayerCamera(FVector TargetLocation, FRotator TargetRotation, float TargetArmLength, bool bReverse);
+
+			/* Updates the given piece's ResetAfterMove variable on the server. This is in the player pawn because
+			 * pieces don't have an owning client, so they can't have server methods. */
+			UFUNCTION(Server, Reliable, BlueprintCallable, Category="Attacking")
+			void Server_SetResetAfterMove(AParentPiece* PieceToUpdate, bool bNewReset);
 	
 
 /* Public variables. */
