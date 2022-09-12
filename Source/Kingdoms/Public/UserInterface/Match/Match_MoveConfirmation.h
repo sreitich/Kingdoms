@@ -23,23 +23,23 @@ class KINGDOMS_API UMatch_MoveConfirmation : public UUserWidget
 public:
 
 	/* Getter for PendingTile. */
-	UFUNCTION(BlueprintPure, Category="Player Status")
+	UFUNCTION(BlueprintPure, Category="Pending Tile")
 	FORCEINLINE ABoardTile* GetPendingTile() const { return PendingTile; }
 
 	/* Setter for PendingTile. */
-	UFUNCTION(BlueprintCallable, Category="Player Status")
+	UFUNCTION(BlueprintCallable, Category="Pending Tile")
 	bool SetPendingTile(ABoardTile* NewPendingTile);
 
 	/* Getter for PendingPiece. */
-	UFUNCTION(BlueprintPure, Category="Player Status")
+	UFUNCTION(BlueprintPure, Category="Pending Piece")
 	FORCEINLINE AParentPiece* GetPendingPiece() const { return PendingPiece; }
 
 	/* Setter for PendingPiece. */
-	UFUNCTION(BlueprintCallable, Category="Player Status")
+	UFUNCTION(BlueprintCallable, Category="Pending Piece")
 	bool SetPendingPiece(AParentPiece* NewPendingPiece);
 
-	/* Resets the move action. Public to be used by the player controller when deselecting a piece while selecting a
-	 * move destination. */
+	/* Resets the move action. Public to be used by the player controller for proper
+	 * cleanup when deselecting a piece while selecting a move destination. */
 	UFUNCTION()
 	void OnCancelClicked();
 
@@ -59,9 +59,11 @@ protected:
 protected:
 
 	/* Pointer to the tile that the player is confirming a move to. */
+	UPROPERTY()
 	ABoardTile* PendingTile;
 
 	/* Pointer to the piece that the player is confirming to move. */
+	UPROPERTY()
 	AParentPiece* PendingPiece;
 
 
@@ -72,7 +74,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* ConfirmButton;
 
-	/* Button that cancel's the player's move. */
+	/* Button that cancels the player's move. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* CancelButton;
 

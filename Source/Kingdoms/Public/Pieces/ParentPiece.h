@@ -37,12 +37,6 @@ public:
 		UFUNCTION(BlueprintImplementableEvent)
 		void PlayPiecePopUp_BP(float Duration, bool bReverse);
 
-	/* Finds all tiles that this piece can move to (not accounting for other pieces or pathfinding). */
-	virtual TArray<ABoardTile*> GetValidTiles() final;
-
-	/* Pure function that tests if the given tile's coordinates match any of this piece's movement patterns. Overridden by each piece. */
-	virtual bool TileIsInMoveRange(ABoardTile* Tile);
-
 	/* Rotates this piece to the rotation it was spawned with, facing away from its owner's starting position. */
 	UFUNCTION(BlueprintCallable)
 	void ResetPieceRotation();
@@ -56,6 +50,36 @@ public:
 		UFUNCTION(BlueprintImplementableEvent)
 		void FlashHighlightTimeline(FLinearColor NewColor, float NewBrightness, FLinearColor OriginalColor, float
 			OriginalBrightness, float Speed, float Duration);
+
+
+/* Public functions overridden by each piece. */
+public:
+
+	/* Returns all tiles that this piece can move to (not accounting for other pieces or pathfinding). Overridden by each piece. */
+	UFUNCTION(BlueprintPure, Category="Piece Range")
+	virtual TArray<ABoardTile*> GetValidTiles();
+
+	/* Tests if the given tile's coordinates match any of this piece's movement patterns. Overridden by each piece. */
+	UFUNCTION(BlueprintPure, Category="Piece Range")
+	virtual bool TileIsInMoveRange(ABoardTile* Tile);
+
+
+	/* Called when a piece uses an active ability, if it has one. Overridden by pieces with an active ability. */
+	UFUNCTION(Category="Active Ability")
+	virtual void OnActiveAbility(TArray<AActor*> Targets);
+
+	/* Returns all actors that this piece's active ability can target. Overridden by pieces with an active ability. */
+	UFUNCTION(BlueprintPure, Category="Active Ability")
+	virtual TArray<AActor*> GetValidActiveAbilityTargets();
+
+
+	/* Called when a piece's passive ability is triggered, if it has one. Overridden by pieces with a passive ability. */
+	UFUNCTION(Category="Passive Ability")
+	virtual void OnPassiveAbility(TArray<AActor*> Targets);
+
+	/* Returns all actors that this piece's passive ability can target. Overridden by pieces with a passive ability. */
+	UFUNCTION(BlueprintPure, Category="Active Ability")
+	virtual TArray<AActor*> GetValidPassiveAbilityTargets();
 
 
 /* Public accessors and modifiers. */

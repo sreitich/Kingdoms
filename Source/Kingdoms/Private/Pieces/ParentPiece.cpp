@@ -113,7 +113,7 @@ void AParentPiece::BeginPlay()
         /* Get this piece's row from the piece data. */
         static const FString ContextString(TEXT("Piece Data Struct"));
         // FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(GetPieceID(), ContextString, true);
-        FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(PieceID, ContextString, true);
+        const FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(PieceID, ContextString, true);
 
 		/* If the data table row was found... */
         if (PieceData)
@@ -164,7 +164,33 @@ void AParentPiece::Multicast_PlayPiecePopUp_Implementation(float Duration, bool 
 	PlayPiecePopUp_BP(Duration, bReverse);
 }
 
-TArray<class ABoardTile*> AParentPiece::GetValidTiles()
+void AParentPiece::ResetPieceRotation()
+{
+	/* Get the game state. */
+	const AMatch_GameStateBase* GameStatePtr = Cast<AMatch_GameStateBase>(UGameplayStatics::GetGameState(this));
+	/* Get the player index of this piece's owning player. */
+	const int PlayerIndex = Cast<AMatch_PlayerState>(GetInstigator()->GetPlayerState())->PlayerIndex;
+	/* Get the player start that spawned this piece's owning player. */
+	const AActor* PlayerStart = GameStatePtr->PlayerStarts[PlayerIndex - 1];
+	/* Set this actor's rotation to the rotation that its owning player was spawned at. */
+	SetActorRotation(PlayerStart->GetActorRotation(), ETeleportType::None);
+}
+
+void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float Duration)
+{
+	/* Store the original color and brightness to restore after the flash. */
+	FLinearColor OriginalColor;
+	DynamicMaterial->GetVectorParameterValue(TEXT("FresnelColor"), OriginalColor);
+	float OriginalBrightness;
+	DynamicMaterial->GetScalarParameterValue(TEXT("Brightness"), OriginalBrightness);
+
+	/* Interpolates to the target color and brightness at the normal speed. Waits for the given duration,
+	 * then interpolates back to the original color and brightness. */
+	FlashHighlightTimeline(Color, Brightness, OriginalColor, OriginalBrightness, 0.25f,
+		Duration);
+}
+
+TArray<ABoardTile*> AParentPiece::GetValidTiles()
 {
 	/* This array of valid tiles is going to be returned. */
 	TArray<ABoardTile*> ValidTiles;
@@ -189,8 +215,8 @@ bool AParentPiece::TileIsInMoveRange(ABoardTile* Tile)
 	if (IsValid(Tile))
 	{
 		/* Store the given tile and current tile's coordinates in variables for readability. */
-		int NewX = Tile->Coordinates.X, NewY = Tile->Coordinates.Y;
-		int OldX = CurrentTile->Coordinates.X, OldY = CurrentTile->Coordinates.Y;
+		const int NewX = Tile->Coordinates.X, NewY = Tile->Coordinates.Y;
+		const int OldX = CurrentTile->Coordinates.X, OldY = CurrentTile->Coordinates.Y;
 	
 		/* Test if the tile's coordinates match with any of this piece's move patterns. */
 		if
@@ -230,30 +256,34 @@ bool AParentPiece::TileIsInMoveRange(ABoardTile* Tile)
 	return false;
 }
 
-void AParentPiece::ResetPieceRotation()
+void AParentPiece::OnActiveAbility(TArray<AActor*> Targets)
 {
-	/* Get the game state. */
-	const AMatch_GameStateBase* GameStatePtr = Cast<AMatch_GameStateBase>(UGameplayStatics::GetGameState(this));
-	/* Get the player index of this piece's owning player. */
-	const int PlayerIndex = Cast<AMatch_PlayerState>(GetInstigator()->GetPlayerState())->PlayerIndex;
-	/* Get the player start that spawned this piece's owning player. */
-	const AActor* PlayerStart = GameStatePtr->PlayerStarts[PlayerIndex - 1];
-	/* Set this actor's rotation to the rotation that its owning player was spawned at. */
-	SetActorRotation(PlayerStart->GetActorRotation(), ETeleportType::None);
+	/* Not all pieces have active abilities. */
+	UE_LOG(LogTemp, Error, TEXT("Active ability called on a piece without an active ability."));
 }
 
-void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float Duration)
+TArray<AActor*> AParentPiece::GetValidActiveAbilityTargets()
 {
-	/* Store the original color and brightness to restore after the flash. */
-	FLinearColor OriginalColor;
-	DynamicMaterial->GetVectorParameterValue(TEXT("FresnelColor"), OriginalColor);
-	float OriginalBrightness;
-	DynamicMaterial->GetScalarParameterValue(TEXT("Brightness"), OriginalBrightness);
+	/* Not all pieces have active abilities. */
+	UE_LOG(LogTemp, Error, TEXT("GetValidActiveAbilityTargets called on a piece without an active ability."));
 
-	/* Interpolates to the target color and brightness at the normal speed. Waits for the given duration,
-	 * then interpolates back to the original color and brightness. */
-	FlashHighlightTimeline(Color, Brightness, OriginalColor, OriginalBrightness, 0.25f,
-		Duration);
+	/* Return an empty array. */
+	return TArray<AActor*>();
+}
+
+void AParentPiece::OnPassiveAbility(TArray<AActor*> Targets)
+{
+	/* Not all pieces have passive abilities. */
+	UE_LOG(LogTemp, Error, TEXT("Passive ability called on a piece without a passive ability."));
+}
+
+TArray<AActor*> AParentPiece::GetValidPassiveAbilityTargets()
+{
+	/* Not all pieces have passive abilities. */
+	UE_LOG(LogTemp, Error, TEXT("GetValidPassiveAbilityTargets called on a piece without a passive ability."));
+
+	/* Return an empty array. */
+	return TArray<AActor*>();
 }
 
 bool AParentPiece::SetCurrentTile(ABoardTile* NewTile)
