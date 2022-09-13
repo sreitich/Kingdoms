@@ -76,11 +76,14 @@ void UMatch_MoveConfirmation::OnCancelClicked()
     /* Reset the player state. */
     GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
 
-    /* For every tile that was highlighted... */
-    for (ABoardTile* Tile : PendingPiece->GetValidTiles())
+    if (IsValid(PendingPiece))
     {
-        /* Refresh the tile's highlight depending on its occupying piece to clear the highlights. */
-        Tile->RefreshHighlight();
+        /* For every tile that was highlighted... */
+        for (ABoardTile* Tile : PendingPiece->GetValidTiles())
+        {
+            /* Refresh the tile's highlight depending on its occupying piece to clear the highlights. */
+            Tile->RefreshHighlight();
+        }
     }
 
     /* Destroy this widget. */

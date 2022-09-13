@@ -11,6 +11,7 @@
 #include "Framework/Match/Match_GameStateBase.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Pieces/PieceAIController.h"
 #include "UserDefinedData/PieceData_UserDefinedData.h"
 
@@ -29,10 +30,12 @@ AParentPiece::AParentPiece()
 	/* This determines the location where overhead pop-ups will spawn, and can be changed for each piece. */
 	PopUpLocationComponent = CreateDefaultSubobject<UPopUpLocationComponent>(TEXT("Pop-Up Location Component"));
 	PopUpLocationComponent->SetupAttachment(GetRootComponent());
+	PopUpLocationComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 125.0f));
 
 	/* Set some class defaults that we want for every piece. */
 	bUseControllerRotationYaw = false;
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	/* Increase the size of the capsule to fit the entire character mesh. */
 	GetCapsuleComponent()->SetCapsuleRadius(44.0f);
@@ -49,6 +52,10 @@ AParentPiece::AParentPiece()
 	GetCapsuleComponent()->CanCharacterStepUpOn = ECB_No;
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("PieceCapsule"));
 	GetMesh()->SetCollisionProfileName(TEXT("PieceMesh"));
+
+	/* Set the default fresnel colors. */
+	FriendlyFresnelColor = FColor(0.023529f, 0.423529f, 0.776471f, 1.0f);
+	EnemyFresnelColor = FColor(0.815686f, 0.015686f, 0.207843f, 1.0f);
 }
 
 void AParentPiece::BeginPlay()
