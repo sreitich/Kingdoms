@@ -2,6 +2,7 @@
 
 #include "Framework/Match/Match_PlayerController.h"
 
+#include "UserInterface/Match/Match_ActiveAbilityConfirmation.h"
 #include "UserInterface/Match/Match_AttackConfirmation.h"
 #include "UserInterface/Match/Match_AttackGraphic.h"
 #include "UserInterface/Match/Match_BaseWidget.h"
@@ -331,6 +332,37 @@ void AMatch_PlayerController::PlayAttackGraphicAnimation(EAttackGraphicAnimation
         {
             /* Play the given animation on the widget. */
             Match_AttackGraphic->PlayAttackGraphicAnimation(AttackGraphicAnim);
+        }
+    }
+}
+
+void AMatch_PlayerController::UpdateActiveAbilityConfirmationWidget(bool bDestroy, AParentPiece* AbilityUser, AActor* Target)
+{
+    /* Only execute on local client. */
+    if (IsLocalPlayerController())
+    {
+        /* If the active ability confirmation widget needs to be destroyed and it's already been created... */
+        if (bDestroy && Match_ActiveAbilityConfirmation)
+        {
+            /* Remove the widget as if the "cancel" button were pressed. */
+            Match_ActiveAbilityConfirmation->OnCancelClicked();
+        }
+        /* If the widget needs to be created... */
+        else if (!bDestroy)
+        {
+            /* Create the widget. */
+            Match_ActiveAbilityConfirmation = CreateWidget<UMatch_ActiveAbilityConfirmation>(GetWorld(), Match_ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
+
+            /* If the active ability confirmation widget was successfully created... */
+            if (Match_ActiveAbilityConfirmation)
+            {
+                /* Update the widget's information using the given piece. This can be expanded upon in the future
+                 * if the confirmation widget needs to display more information. */
+                Match_ActiveAbilityConfirmation->UpdateActionConfirmationInfo(AbilityUser, Target);
+
+                /* Add the widget to the player's viewport. */
+                Match_ActiveAbilityConfirmation->AddToViewport(0);
+            }
         }
     }
 }

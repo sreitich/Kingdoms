@@ -71,9 +71,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category="User Interface")
 	void UpdateAttackGraphicWidget(bool bDestroy, AParentPiece* Attacker, AParentPiece* Defender);
 
-	/* Plays a given animation on the attack graphic. */
-	UFUNCTION(BlueprintCallable, Category="User Interface")
-	void PlayAttackGraphicAnimation(EAttackGraphicAnimation AttackGraphicAnim);
+		/* Plays a given animation on the attack graphic. */
+		UFUNCTION(BlueprintCallable, Category="User Interface")
+		void PlayAttackGraphicAnimation(EAttackGraphicAnimation AttackGraphicAnim);
+
+	/* Creates or destroys an active ability confirmation pop-up. */
+	UFUNCTION(Category="BlueprintInterface")
+	void UpdateActiveAbilityConfirmationWidget(bool bDestroy, AParentPiece* AbilityUser, AActor* Target);
 
 
 /* Protected functions. */
@@ -115,6 +119,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Widget Class Types")
 	TSubclassOf<UUserWidget> Match_AttackGraphicClass;
 
+	UPROPERTY(EditDefaultsOnly, Category="Widget Class Types")
+	TSubclassOf<UUserWidget> Match_ActiveAbilityConfirmationClass;
+
 
 /* Private widget objects (pointers to the above classes to access them after being created). */
 private:
@@ -149,6 +156,9 @@ private:
 
 	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
 	class UMatch_AttackGraphic* Match_AttackGraphic = nullptr;
+
+	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
+	class UMatch_ActiveAbilityConfirmation* Match_ActiveAbilityConfirmation = nullptr;
 
 	/* Handles the match timer. */
 	FTimerHandle MatchTimeTimerHandle;

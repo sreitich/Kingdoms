@@ -328,32 +328,28 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 
 void AMatch_PlayerPawn::Interact_SelectingTargetActiveAbility(FHitResult InteractionHit)
 {
-	/* Stores which piece to interact with when it's determined whether the player clicked a piece or an occupied tile. */
-	AParentPiece* InteractedPiece;
+	/* Stores the selected ability target. */
+	AActor* SelectedTarget = InteractionHit.GetActor();
 
-	/* If a piece was clicked... */
-	if (Cast<AParentPiece>(InteractionHit.Actor))
+	/* Test if the selected target is a valid target. */
+	bool bTargetIsValid = false;
+	for (AActor* ValidTarget : SelectedPiece->GetValidActiveAbilityTargets())
 	{
-		/* Interact with the clicked piece. */
-		InteractedPiece = Cast<AParentPiece>(InteractionHit.Actor);
+		if (ValidTarget == SelectedTarget)
+		{
+			bTargetIsValid = true;
+			break;
+		}
 	}
-	/* If a board tile was clicked... */
-	else if (Cast<ABoardTile>(InteractionHit.Actor))
+
+	/* If the player selected a valid target for this ability, create the active ability confirmation widget using that target. */
+	if (bTargetIsValid)
 	{
-		/* Interact with the piece occupying the clicked tile. */
-		InteractedPiece = Cast<ABoardTile>(InteractionHit.Actor)->GetOccupyingPiece();
+		Cast<AMatch_PlayerController>(GetController())->UpdateActiveAbilityConfirmationWidget(false, SelectedPiece, SelectedTarget);
 	}
-	/* If anything else was clicked... */
 	else
 	{
-		/* Clear the currently selected piece and remove all piece-information pop-ups. */
-		ClearSelection(true);
-	}
-
-	/* If the interacted piece is valid for this action... */
-	if (true /* call a PieceIsValidActiveAbility function on the selected piece */ )
-	{
-		/* Confirm action pop-up. */
+		/* "select a valid target" pop-up */
 	}
 }
 

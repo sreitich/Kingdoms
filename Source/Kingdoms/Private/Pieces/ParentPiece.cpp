@@ -256,7 +256,7 @@ bool AParentPiece::TileIsInMoveRange(ABoardTile* Tile)
 	return false;
 }
 
-void AParentPiece::OnActiveAbility(TArray<AActor*> Targets)
+void AParentPiece::OnActiveAbility(AActor* Target)
 {
 	/* Not all pieces have active abilities. */
 	UE_LOG(LogTemp, Error, TEXT("Active ability called on a piece without an active ability."));
@@ -271,7 +271,7 @@ TArray<AActor*> AParentPiece::GetValidActiveAbilityTargets()
 	return TArray<AActor*>();
 }
 
-void AParentPiece::OnPassiveAbility(TArray<AActor*> Targets)
+void AParentPiece::OnPassiveAbility(AActor* Target)
 {
 	/* Not all pieces have passive abilities. */
 	UE_LOG(LogTemp, Error, TEXT("Passive ability called on a piece without a passive ability."));

@@ -20,4 +20,10 @@ public:
 	/* Sets default values for this character's properties. */
 	AKnight();
 
+	/* Implementation of "Dash" ability. */
+	virtual void OnActiveAbility(AActor* Target) override;
+
+	/* Valid targets for "Dash" ability. */
+	virtual TArray<AActor*> GetValidActiveAbilityTargets() override;
+
 };

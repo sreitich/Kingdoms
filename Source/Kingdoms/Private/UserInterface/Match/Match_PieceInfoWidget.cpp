@@ -3,14 +3,15 @@
 
 #include "UserInterface/Match/Match_PieceInfoWidget.h"
 
+#include "Board/BoardTile.h"
+#include "Framework/Match/Match_PlayerController.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
 #include "Pieces/ParentPiece.h"
-#include "UserDefinedData/PieceData_UserDefinedData.h"
-#include "UserInterface/Match/Match_AbilityInfo.h"
-#include "Board/BoardTile.h"
 #include "Pieces/Mages/Pyromancer.h"
 #include "Pieces/Soldiers/Knight.h"
+#include "UserDefinedData/PieceData_UserDefinedData.h"
+#include "UserInterface/Match/Match_AbilityInfo.h"
 
 #include "Runtime/UMG/Public/UMG.h"
 
@@ -323,7 +324,7 @@ void UMatch_PieceInfoWidget::OnAbilityUnhovered()
 
 void UMatch_PieceInfoWidget::OnMoveClicked()
 {
-    /* CLear the piece info widgets but keep the currently selected piece. */
+    /* Clear the piece info widgets but keep the currently selected piece. */
     GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false);
 
     /* Instantly change the player status for the local client so that they don't have to wait for the server to update
@@ -361,5 +362,51 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
 
 void UMatch_PieceInfoWidget::OnUseActiveClicked()
 {
+    /* Clear the piece info widgets but keep the currently selected piece. */
+    GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false);
 
+    /* Instantly change the player status for the local client so that they don't have to wait for the server to update
+    * their status before choosing targets. */
+    GetOwningPlayerState<AMatch_PlayerState>(false)->SetLocalPlayerStatus(E_SelectingTarget_ActiveAbility);
+
+    /* Set the player's state to be selecting targets for an active ability. */
+    GetOwningPlayerState<AMatch_PlayerState>(false)->Server_SetPlayerStatus(E_SelectingTarget_ActiveAbility);
+
+    /* Make sure that there's a valid displayed piece. */
+    if (IsValid(DisplayedPiece))
+    {
+        /* If the active ability has targets, create the confirmation widget immediately. Otherwise, highlight the valid targets for the ability. */
+        if (DisplayedPiece->GetValidActiveAbilityTargets().Num() > 0 && DisplayedPiece->GetValidActiveAbilityTargets()[0] == UGameplayStatics::GetGameState(DisplayedPiece))
+        {
+            Cast<AMatch_PlayerController>(GetOwningPlayer())->UpdateActiveAbilityConfirmationWidget(false, DisplayedPiece, UGameplayStatics::GetGameState(DisplayedPiece));
+        }
+        else
+        {
+            /* Highlight every target that the player can select. This can be iterated on if there are abilities that
+             * can target things other than pieces or tiles. */
+            for (AActor* Target : DisplayedPiece->GetValidActiveAbilityTargets())
+            {
+                /* If the target was a tile, highlight it. */
+                if (const ABoardTile* Tile = Cast<ABoardTile>(Target))
+                {
+                    Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidMove);
+                }
+                /* If the target was a piece, highlight that piece's tile depending on its allegiance. */
+                else if (const AParentPiece* Piece = Cast<AParentPiece>(Target))
+                {
+                    /* Highlight a friendly piece if it has a valid tile. */
+                    if (IsValid(Piece->GetCurrentTile()) && Piece->GetInstigator()->IsLocallyControlled())
+                    {
+                        Piece->GetCurrentTile()->Highlight->SetMaterial(0, Tile->Highlight_ValidFriendly);
+                    }
+                    /* Highlight an enemy piece if it has a valid tile. */
+                    else if (IsValid(Piece->GetCurrentTile()))
+                    {
+                        Piece->GetCurrentTile()->Highlight->SetMaterial(0, Tile->Highlight_ValidEnemy);
+                    }
+                }
+                /* This can be iterated on if we add pieces that can target things other than tiles or pieces in the future. */
+            }
+        }
+    }
 }

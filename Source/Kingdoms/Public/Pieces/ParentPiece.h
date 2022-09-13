@@ -66,16 +66,17 @@ public:
 
 	/* Called when a piece uses an active ability, if it has one. Overridden by pieces with an active ability. */
 	UFUNCTION(Category="Active Ability")
-	virtual void OnActiveAbility(TArray<AActor*> Targets);
+	virtual void OnActiveAbility(AActor* Target);
 
-	/* Returns all actors that this piece's active ability can target. Overridden by pieces with an active ability. */
+	/* Returns all actors that this piece's active ability can target. If an active ability does not target anything,
+	 * this returns the game state actor. Overridden by pieces with an active ability. */
 	UFUNCTION(BlueprintPure, Category="Active Ability")
 	virtual TArray<AActor*> GetValidActiveAbilityTargets();
 
 
 	/* Called when a piece's passive ability is triggered, if it has one. Overridden by pieces with a passive ability. */
 	UFUNCTION(Category="Passive Ability")
-	virtual void OnPassiveAbility(TArray<AActor*> Targets);
+	virtual void OnPassiveAbility(AActor* Target);
 
 	/* Returns all actors that this piece's passive ability can target. Overridden by pieces with a passive ability. */
 	UFUNCTION(BlueprintPure, Category="Active Ability")

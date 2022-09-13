@@ -9,6 +9,16 @@
 #include "Framework/Match/Match_PlayerState.h"
 #include "Pieces/ParentPiece.h"
 
+void UMatch_ActiveAbilityConfirmation::UpdateActionConfirmationInfo(AParentPiece* NewAbilityUser, AActor* Target)
+{
+	/* Update the user of the ability this widget is confirming, if the given one is valid. */
+	if (IsValid(NewAbilityUser))	
+		AbilityUser = NewAbilityUser;
+
+	/* Set this ability's target. */
+	PendingTarget = Target;
+}
+
 bool UMatch_ActiveAbilityConfirmation::SetAbilityUser(AParentPiece* NewAbilityUser)
 {
 	/* Update the ability user and return true if the given piece is valid. */
@@ -21,31 +31,12 @@ bool UMatch_ActiveAbilityConfirmation::SetAbilityUser(AParentPiece* NewAbilityUs
 	return false;
 }
 
-bool UMatch_ActiveAbilityConfirmation::SetPendingTargets(TArray<AActor*> NewTargets)
+bool UMatch_ActiveAbilityConfirmation::SetPendingTarget(AActor* NewTarget)
 {
-	/* Update the targets array and return true if ALL of the given pieces are valid. This also allows the array
-	 * to be reset by passing an empty array, which will still pass this test. */
-	bool AllActorsAreValid = true;
-	
-	for (const AActor* Actor : NewTargets)
-	{
-		if (!IsValid(Actor))
-			AllActorsAreValid = false;
-	}
-	
-	if (AllActorsAreValid)
-		PendingTargets = NewTargets;
-
-	return AllActorsAreValid;
-}
-
-bool UMatch_ActiveAbilityConfirmation::AddPendingTarget(AActor* NewTarget)
-{
-	/* Add the given target to the array if it's valid. */
+	/* Update the pending target and return true if the given target is valid. */
 	if (IsValid(NewTarget))
 	{
-		PendingTargets.Add(NewTarget);
-
+		PendingTarget = NewTarget;
 		return true;
 	}
 
@@ -66,7 +57,7 @@ void UMatch_ActiveAbilityConfirmation::OnConfirmClicked()
 {
 	/* Activate the selected piece's active ability if the selected piece is valid. */
 	if (IsValid(AbilityUser))
-		AbilityUser->OnActiveAbility(PendingTargets);
+		AbilityUser->OnActiveAbility(PendingTarget);
 }
 
 void UMatch_ActiveAbilityConfirmation::OnCancelClicked()
@@ -74,21 +65,19 @@ void UMatch_ActiveAbilityConfirmation::OnCancelClicked()
 	/* Reset the player state. */
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
 
-	/* Clear targeting indicators for every pending target (tile's highlights, pieces' tile's highlights, etc.) */
-	for (AActor* Target : PendingTargets)
+	/* Clear targeting indicators the target depending on what class it was. */
+
+	/* If the target was a tile, refresh its highlight. */
+	if (ABoardTile* Tile = Cast<ABoardTile>(PendingTarget))
 	{
-		/* If the target was a tile, refresh its highlight. */
-		if (ABoardTile* Tile = Cast<ABoardTile>(Target))
-		{
-			Tile->RefreshHighlight();
-		}
-		/* If the target was a piece, refresh that piece's tile's highlight. */
-		else if (const AParentPiece* Piece = Cast<AParentPiece>(Target))
-		{
-			Piece->GetCurrentTile()->RefreshHighlight();
-		}
-		/* This can be iterated on if we add pieces that can target things other than tiles or pieces in the future. */
+		Tile->RefreshHighlight();
 	}
+	/* If the target was a piece, refresh that piece's tile's highlight. */
+	else if (const AParentPiece* Piece = Cast<AParentPiece>(PendingTarget))
+	{
+		Piece->GetCurrentTile()->RefreshHighlight();
+	}
+	/* This can be iterated on if we add pieces that can target things other than tiles or pieces in the future. */
 
 	/* Destroy this widget. */
 	RemoveFromParent();

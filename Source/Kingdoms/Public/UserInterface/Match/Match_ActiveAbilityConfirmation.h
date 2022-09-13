@@ -21,6 +21,10 @@ class KINGDOMS_API UMatch_ActiveAbilityConfirmation : public UUserWidget
 /* Public functions. */
 public:
 
+	/* Updates the widget's displayed and internal information. Only used when creating this widget. */
+	UFUNCTION()
+	void UpdateActionConfirmationInfo(AParentPiece* NewAbilityUser, AActor* Target);
+
 	/* Getter for AbilityUser. */
 	UFUNCTION(BlueprintPure, Category="Ability User")
 	FORCEINLINE AParentPiece* GetAbilityUser() const { return AbilityUser; }
@@ -29,17 +33,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Ability User")
 	bool SetAbilityUser(AParentPiece* NewAbilityUser);
 
-	/* Getter for PendingTargets. */
+	/* Getter for PendingTarget. */
 	UFUNCTION(BlueprintPure, Category="Pending Target")
-	FORCEINLINE TArray<AActor*> GetPendingTargets() const { return PendingTargets; };
+	FORCEINLINE AActor* GetPendingTarget() const { return PendingTarget; };
 
-	/* Setter for PendingTargets. */
+	/* Setter for PendingTarget. */
 	UFUNCTION(BlueprintCallable, Category="Pending Target")
-	bool SetPendingTargets(TArray<AActor*> NewTargets);
-
-	/* Allows a target to be added to the array of targets, instead of setting the entire array. */
-	UFUNCTION(BlueprintCallable, Category="Pending Target")
-	bool AddPendingTarget(AActor* NewTarget);
+	bool SetPendingTarget(AActor* NewTarget);
 
 	/* Resets the "use active ability" action. Public to be used by the player controller for proper
 	 * cleanup when deselecting a piece while selecting a target. */
@@ -65,10 +65,10 @@ protected:
 	UPROPERTY()
 	AParentPiece* AbilityUser;
 
-	/* The actor or actors that this ability is targeting. Different abilities target different types
-	 * and different amounts of actors, so this needs to be an array of pointers to generic AActors. */
+	/* The actor this ability is targeting. Different abilities target different types of actors, so this needs to be a pointer to
+	 * generic AActors. This could be changed to a TArray to support multiple targets, but no abilities currently have more than one target. */
 	UPROPERTY()
-	TArray<AActor*> PendingTargets;
+	AActor* PendingTarget;
 
 
 /* Protected widgets. */
