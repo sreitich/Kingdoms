@@ -36,6 +36,7 @@ AParentPiece::AParentPiece()
 	bUseControllerRotationYaw = false;
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+	bUseControllerRotationYaw = true;
 
 	/* Increase the size of the capsule to fit the entire character mesh. */
 	GetCapsuleComponent()->SetCapsuleRadius(44.0f);
@@ -52,10 +53,6 @@ AParentPiece::AParentPiece()
 	GetCapsuleComponent()->CanCharacterStepUpOn = ECB_No;
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("PieceCapsule"));
 	GetMesh()->SetCollisionProfileName(TEXT("PieceMesh"));
-
-	/* Set the default fresnel colors. */
-	FriendlyFresnelColor = FColor(0.023529f, 0.423529f, 0.776471f, 1.0f);
-	EnemyFresnelColor = FColor(0.815686f, 0.015686f, 0.207843f, 1.0f);
 }
 
 void AParentPiece::BeginPlay()

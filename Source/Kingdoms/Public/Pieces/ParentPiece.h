@@ -232,11 +232,11 @@ protected:
 
 	/* The color that friendly pieces will be highlighted in. */
 	UPROPERTY(EditDefaultsOnly, Category="Materials")
-	FLinearColor FriendlyFresnelColor;
+	FLinearColor FriendlyFresnelColor = FColor(0.023529f, 0.423529f, 0.776471f, 1.0f);;
 
 	/* The color that enemy pieces will be highlighted in. */
 	UPROPERTY(EditDefaultsOnly, Category="Materials")
-	FLinearColor EnemyFresnelColor;
+	FLinearColor EnemyFresnelColor = FColor(0.815686f, 0.015686f, 0.207843f, 1.0f);
 
 
 /* Protected runtime variables. These are variables that change during runtime, instead of being constants stored in the piece data table. */
