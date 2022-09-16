@@ -23,6 +23,10 @@ public:
 	/* Implementation of "Dash" ability. */
 	virtual void OnActiveAbility(AActor* Target) override;
 
+	/* Blueprint implementation of "Dash" ability, called by OnActiveAbility(). */
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_OnActiveAbility(AActor* Target);
+
 	/* Valid targets for "Dash" ability. */
 	virtual TArray<AActor*> GetValidActiveAbilityTargets() override;
 

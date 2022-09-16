@@ -58,6 +58,9 @@ void UMatch_ActiveAbilityConfirmation::OnConfirmClicked()
 	/* Activate the selected piece's active ability if the selected piece is valid. */
 	if (IsValid(AbilityUser))
 		AbilityUser->OnActiveAbility(PendingTarget);
+
+	/* Act as if the widget was cancelled, resetting the player's state and removing all highlighted valid targets.*/
+	OnCancelClicked();
 }
 
 void UMatch_ActiveAbilityConfirmation::OnCancelClicked()
@@ -66,18 +69,20 @@ void UMatch_ActiveAbilityConfirmation::OnCancelClicked()
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
 
 	/* Clear targeting indicators the target depending on what class it was. */
-
-	/* If the target was a tile, refresh its highlight. */
-	if (ABoardTile* Tile = Cast<ABoardTile>(PendingTarget))
-	{
-		Tile->RefreshHighlight();
-	}
-	/* If the target was a piece, refresh that piece's tile's highlight. */
-	else if (const AParentPiece* Piece = Cast<AParentPiece>(PendingTarget))
-	{
-		Piece->GetCurrentTile()->RefreshHighlight();
-	}
-	/* This can be iterated on if we add pieces that can target things other than tiles or pieces in the future. */
+    for (AActor* ValidTarget : AbilityUser->GetValidActiveAbilityTargets())
+    {
+		/* If the target was a tile, refresh its highlight. */
+		if (ABoardTile* Tile = Cast<ABoardTile>(ValidTarget))
+		{
+			Tile->RefreshHighlight();
+		}
+		/* If the target was a piece, refresh that piece's tile's highlight. */
+		else if (const AParentPiece* Piece = Cast<AParentPiece>(ValidTarget))
+		{
+			Piece->GetCurrentTile()->RefreshHighlight();
+		}
+		/* This can be iterated on if we add pieces that can target things other than tiles or pieces in the future. */
+    }
 
 	/* Destroy this widget. */
 	RemoveFromParent();

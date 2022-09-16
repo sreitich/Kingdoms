@@ -89,47 +89,55 @@ void UPieceDragWidget::NativeConstruct()
 
 void UPieceDragWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	/* If the piece has been spawned yet, which is always should be... */
-	if (IsValid(SpawnedPiece))
+	/* Try to destroy this widget again if it's safe to. */
+	if (bPendingDestruction)
 	{
-		/* Perform a line trace for board tiles */
-		FHitResult HitResult = TraceFromMouse();
-		
-		/* If the trace hit a board tile... */
-		if (HitResult.bBlockingHit)
+		NativeDestruct();
+	}
+	else
+	{
+		/* If the piece has been spawned yet, which is always should be... */
+		if (IsValid(SpawnedPiece))
 		{
-			/* If the tile is empty, snap the piece to 165 units above the hit tile. If the tile already has a piece and isn't the dragged piece's current tile, don't move the dragged piece. */
-			if (!IsValid(Cast<ABoardTile>(HitResult.GetActor())->GetOccupyingPiece()) || SpawnedPiece->GetCurrentTile() == HitResult.GetActor())
+			/* Perform a line trace for board tiles */
+			FHitResult HitResult = TraceFromMouse();
+			
+			/* If the trace hit a board tile... */
+			if (HitResult.bBlockingHit)
 			{
-				/* Snap the spawned piece to 165 units above the hit tile. */
-				SpawnedPiece->SetActorLocation(HitResult.GetActor()->GetActorLocation() + FVector(0.0f, 0.0f, 165.0f));
-
-				/* Set this piece's new board tile. */
-				CurrentTile = HitResult.GetActor();
-
-				/* If the tile actually needs to be updated. */
-				if (SpawnedPiece->GetCurrentTile() != CurrentTile)
+				/* If the tile is empty, snap the piece to 165 units above the hit tile. If the tile already has a piece and isn't the dragged piece's current tile, don't move the dragged piece. */
+				if (!IsValid(Cast<ABoardTile>(HitResult.GetActor())->GetOccupyingPiece()) || SpawnedPiece->GetCurrentTile() == HitResult.GetActor())
 				{
-					/* Update the dragged piece's position on the server and its new tile. */
-					GetOwningPlayer<AMatch_PlayerController>()->GetServerCommunicationComponent()->UpdatePiecePosition_Server(SpawnedPiece, CurrentTile);
+					/* Snap the spawned piece to 165 units above the hit tile. */
+					SpawnedPiece->SetActorLocation(HitResult.GetActor()->GetActorLocation() + FVector(0.0f, 0.0f, 165.0f));
+
+					/* Set this piece's new board tile. */
+					CurrentTile = HitResult.GetActor();
+
+					/* If the tile actually needs to be updated. */
+					if (SpawnedPiece->GetCurrentTile() != CurrentTile)
+					{
+						/* Update the dragged piece's position on the server and its new tile. */
+						GetOwningPlayer<AMatch_PlayerController>()->GetServerCommunicationComponent()->UpdatePiecePosition_Server(SpawnedPiece, CurrentTile);
+					}
 				}
 			}
 		}
-	}
-	/* If this widget doesn't have a reference to the new piece yet... */
-	else
-	{
-		/* Get this widget's owning pawn. */
-		AMatch_PlayerPawn* PlayerPawn = Cast<AMatch_PlayerPawn>(GetOwningPlayerPawn());
-	
-		/* If the pawn is of the correct class, and the new piece has been spawned... */
-		if (PlayerPawn && PlayerPawn->DraggedPiece)
+		/* If this widget doesn't have a reference to the new piece yet... */
+		else
 		{
-			/* Get a reference to the newly spawned piece. */
-			SpawnedPiece = Cast<AParentPiece>(PlayerPawn->DraggedPiece);
+			/* Get this widget's owning pawn. */
+			AMatch_PlayerPawn* PlayerPawn = Cast<AMatch_PlayerPawn>(GetOwningPlayerPawn());
+		
+			/* If the pawn is of the correct class, and the new piece has been spawned... */
+			if (PlayerPawn && PlayerPawn->DraggedPiece)
+			{
+				/* Get a reference to the newly spawned piece. */
+				SpawnedPiece = Cast<AParentPiece>(PlayerPawn->DraggedPiece);
 
-			/* Clear the pawn's DraggedPiece so that it isn't assigned to the next drag widget by mistake. */
-			PlayerPawn->DraggedPiece = nullptr;
+				/* Clear the pawn's DraggedPiece so that it isn't assigned to the next drag widget by mistake. */
+				PlayerPawn->DraggedPiece = nullptr;
+			}
 		}
 	}
 }
@@ -138,33 +146,41 @@ void UPieceDragWidget::NativeDestruct()
 {
 	Super::NativeDestruct();
 
-	/* Get the PlacePieces widget and return the remaining cards to the screen. */
-	TArray<UUserWidget*> PlacePiecesWidgets;
-	UWidgetBlueprintLibrary::GetAllWidgetsOfClass(GetWorld(), OUT PlacePiecesWidgets, UMatchSetup_PlacePieces::StaticClass(), true);
-	if (PlacePiecesWidgets.Num() > 0)
+	/* The server needs this widget's data to spawn the piece, so it can't be destroyed before the server finished spawning the piece. */
+	if (IsValid(SpawnedPiece))
 	{
-		Cast<UMatchSetup_PlacePieces>(PlacePiecesWidgets[0])->PlayHideCardsAnim(true);
-	}
+		/* Get the PlacePieces widget and return the remaining cards to the screen. */
+		TArray<UUserWidget*> PlacePiecesWidgets;
+		UWidgetBlueprintLibrary::GetAllWidgetsOfClass(GetWorld(), OUT PlacePiecesWidgets, UMatchSetup_PlacePieces::StaticClass(), true);
+		if (PlacePiecesWidgets.Num() > 0)
+		{
+			Cast<UMatchSetup_PlacePieces>(PlacePiecesWidgets[0])->PlayHideCardsAnim(true);
+		}
 
-	/* If the original widget that this widget represents was set, then it was created by an unplaced piece widget that needs to call the following additional logic when destroyed. */
-	if (RepresentedWidget)
+		/* If the original widget that this widget represents was set, then it was created by an unplaced piece widget that needs to call the following additional logic when destroyed. */
+		if (RepresentedWidget)
+		{
+			/* Remove the original widget from the unplaced pieces box. */
+			RepresentedWidget->RemoveFromParent();
+
+			/* If all of this player's pieces have been placed, allow them to declare that they are ready. */
+			Cast<UMatchSetup_PlacePieces>(PlacePiecesWidgets[0])->CheckAllPiecesPlaced();
+		}
+
+		/* If the piece was placed off the board... */
+		if (!IsValid(CurrentTile))
+		{
+			/* Set the piece's current tile to be the closest available board tile to it. */
+			CurrentTile = GetClosestOpenTile(SpawnedPiece->GetActorLocation());
+		}
+		
+		/* Update the dragged piece's position on the server and its new tile. */
+		GetOwningPlayer<AMatch_PlayerController>()->GetServerCommunicationComponent()->UpdatePiecePosition_Server(SpawnedPiece, CurrentTile);
+	}
+	else
 	{
-		/* Remove the original widget from the unplaced pieces box. */
-		RepresentedWidget->RemoveFromParent();
-
-		/* If all of this player's pieces have been placed, allow them to declare that they are ready. */
-		Cast<UMatchSetup_PlacePieces>(PlacePiecesWidgets[0])->CheckAllPiecesPlaced();
+		bPendingDestruction = true;
 	}
-
-	/* If the piece was placed off the board... */
-	if (!IsValid(CurrentTile))
-	{
-		/* Set the piece's current tile to be the closest available board tile to it. */
-		CurrentTile = GetClosestOpenTile(SpawnedPiece->GetActorLocation());
-	}
-	
-	/* Update the dragged piece's position on the server and its new tile. */
-	GetOwningPlayer<AMatch_PlayerController>()->GetServerCommunicationComponent()->UpdatePiecePosition_Server(SpawnedPiece, CurrentTile);
 }
 
 void UPieceDragWidget::TransitionAnimFinished()

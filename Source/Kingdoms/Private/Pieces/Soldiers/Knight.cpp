@@ -4,6 +4,8 @@
 #include "Pieces/Soldiers/Knight.h"
 
 #include "Board/BoardTile.h"
+#include "Components/ServerCommunicationComponent.h"
+#include "Framework/Match/Match_PlayerController.h"
 
 AKnight::AKnight()
 {
@@ -11,9 +13,8 @@ AKnight::AKnight()
 
 void AKnight::OnActiveAbility(AActor* Target)
 {
-	Super::OnActiveAbility(Target);
-
-	UE_LOG(LogTemp, Error, TEXT("DASHED!"));
+	/* Call the blueprint implementation of "Dash." */
+	BP_OnActiveAbility(Target);
 }
 
 TArray<AActor*> AKnight::GetValidActiveAbilityTargets()
