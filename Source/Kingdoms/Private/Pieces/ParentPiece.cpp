@@ -260,10 +260,44 @@ bool AParentPiece::TileIsInMoveRange(ABoardTile* Tile)
 	return false;
 }
 
+void AParentPiece::OnActiveClicked()
+{
+	/* By default, highlight every target that the player can select. This can be iterated on if there are abilities that
+	* can target things other than pieces or tiles. */
+	for (AActor* Target : GetValidActiveAbilityTargets())
+	{
+		/* If the target was a tile, highlight it. */
+		if (const ABoardTile* Tile = Cast<ABoardTile>(Target))
+		{
+			Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidMove);
+		}
+		/* If the target was a piece, highlight that piece's tile depending on its allegiance. */
+		else if (const AParentPiece* Piece = Cast<AParentPiece>(Target))
+		{
+			/* Highlight a friendly piece if it has a valid tile. */
+			if (IsValid(Piece->GetCurrentTile()) && Piece->GetInstigator()->IsLocallyControlled())
+			{
+				Piece->GetCurrentTile()->Highlight->SetMaterial(0, Tile->Highlight_ValidFriendly);
+			}
+			/* Highlight an enemy piece if it has a valid tile. */
+			else if (IsValid(Piece->GetCurrentTile()))
+			{
+				Piece->GetCurrentTile()->Highlight->SetMaterial(0, Tile->Highlight_ValidEnemy);
+			}
+		}
+		/* This can be iterated on if we add pieces that can target things other than tiles or pieces in the future. */
+	}
+}
+
+void AParentPiece::StartActiveConfirmation(TArray<AActor*> Targets)
+{
+	UE_LOG(LogTemp, Error, TEXT("StartActiveConfirmation called on a piece without an active ability."));
+}
+
 void AParentPiece::OnActiveAbility(AActor* Target)
 {
 	/* Not all pieces have active abilities. */
-	UE_LOG(LogTemp, Error, TEXT("Active ability called on a piece without an active ability."));
+	UE_LOG(LogTemp, Error, TEXT("OnActiveAbility called on a piece without an active ability."));
 }
 
 TArray<AActor*> AParentPiece::GetValidActiveAbilityTargets()

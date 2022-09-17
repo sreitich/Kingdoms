@@ -75,9 +75,9 @@ public:
 		UFUNCTION(BlueprintCallable, Category="User Interface")
 		void PlayAttackGraphicAnimation(EAttackGraphicAnimation AttackGraphicAnim);
 
-	/* Creates or destroys an active ability confirmation pop-up. */
+	/* Sets a reference to or destroys an active ability confirmation pop-up. The pop-up is created by the piece that it corresponds to. */
 	UFUNCTION(Category="BlueprintInterface")
-	void UpdateActiveAbilityConfirmationWidget(bool bDestroy, AParentPiece* AbilityUser, AActor* Target);
+	void UpdateActiveAbilityConfirmationWidget(bool bDestroy, UUserWidget* NewConfirmationWidget);
 
 
 /* Protected functions. */
@@ -119,9 +119,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Widget Class Types")
 	TSubclassOf<UUserWidget> Match_AttackGraphicClass;
 
-	UPROPERTY(EditDefaultsOnly, Category="Widget Class Types")
-	TSubclassOf<UUserWidget> Match_ActiveAbilityConfirmationClass;
-
 
 /* Private widget objects (pointers to the above classes to access them after being created). */
 private:
@@ -158,7 +155,7 @@ private:
 	class UMatch_AttackGraphic* Match_AttackGraphic = nullptr;
 
 	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
-	class UMatch_ActiveAbilityConfirmation* Match_ActiveAbilityConfirmation = nullptr;
+	class UUserWidget* ActiveAbilityConfirmationWidget = nullptr;
 
 	/* Handles the match timer. */
 	FTimerHandle MatchTimeTimerHandle;

@@ -375,38 +375,8 @@ void UMatch_PieceInfoWidget::OnUseActiveClicked()
     /* Make sure that there's a valid displayed piece. */
     if (IsValid(DisplayedPiece))
     {
-        /* If the active ability has targets, create the confirmation widget immediately. Otherwise, highlight the valid targets for the ability. */
-        if (DisplayedPiece->GetValidActiveAbilityTargets().Num() > 0 && DisplayedPiece->GetValidActiveAbilityTargets()[0] == UGameplayStatics::GetGameState(DisplayedPiece))
-        {
-            Cast<AMatch_PlayerController>(GetOwningPlayer())->UpdateActiveAbilityConfirmationWidget(false, DisplayedPiece, UGameplayStatics::GetGameState(DisplayedPiece));
-        }
-        else
-        {
-            /* Highlight every target that the player can select. This can be iterated on if there are abilities that
-             * can target things other than pieces or tiles. */
-            for (AActor* Target : DisplayedPiece->GetValidActiveAbilityTargets())
-            {
-                /* If the target was a tile, highlight it. */
-                if (const ABoardTile* Tile = Cast<ABoardTile>(Target))
-                {
-                    Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidMove);
-                }
-                /* If the target was a piece, highlight that piece's tile depending on its allegiance. */
-                else if (const AParentPiece* Piece = Cast<AParentPiece>(Target))
-                {
-                    /* Highlight a friendly piece if it has a valid tile. */
-                    if (IsValid(Piece->GetCurrentTile()) && Piece->GetInstigator()->IsLocallyControlled())
-                    {
-                        Piece->GetCurrentTile()->Highlight->SetMaterial(0, Tile->Highlight_ValidFriendly);
-                    }
-                    /* Highlight an enemy piece if it has a valid tile. */
-                    else if (IsValid(Piece->GetCurrentTile()))
-                    {
-                        Piece->GetCurrentTile()->Highlight->SetMaterial(0, Tile->Highlight_ValidEnemy);
-                    }
-                }
-                /* This can be iterated on if we add pieces that can target things other than tiles or pieces in the future. */
-            }
-        }
+        /* Call the ability-specific code used when the active ability is selected. By default, this just highlights
+         * all of the valid targets. */
+        DisplayedPiece->OnActiveClicked();
     }
 }

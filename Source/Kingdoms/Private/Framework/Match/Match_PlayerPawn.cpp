@@ -333,7 +333,7 @@ void AMatch_PlayerPawn::Interact_SelectingTargetActiveAbility(FHitResult Interac
 
 	/* Test if the selected target is a valid target. */
 	bool bTargetIsValid = false;
-	for (AActor* ValidTarget : SelectedPiece->GetValidActiveAbilityTargets())
+	for (const AActor* ValidTarget : SelectedPiece->GetValidActiveAbilityTargets())
 	{
 		if (ValidTarget == SelectedTarget)
 		{
@@ -342,10 +342,16 @@ void AMatch_PlayerPawn::Interact_SelectingTargetActiveAbility(FHitResult Interac
 		}
 	}
 
-	/* If the player selected a valid target for this ability, create the active ability confirmation widget using that target. */
+	/* If the player selected a valid target for this ability, call a function that creates a confirmation widget
+	 * specific to that ability. */
 	if (bTargetIsValid)
 	{
-		Cast<AMatch_PlayerController>(GetController())->UpdateActiveAbilityConfirmationWidget(false, SelectedPiece, SelectedTarget);
+		/* No abilities currently require the player to select multiple pieces. If this ability had multiple targets,
+		 * this function is skipped over. */
+		TArray<AActor*> Targets = TArray<AActor*>();
+		Targets.Add(SelectedTarget);
+
+		SelectedPiece->StartActiveConfirmation(Targets);
 	}
 	else
 	{

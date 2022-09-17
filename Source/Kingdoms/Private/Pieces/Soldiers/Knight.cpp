@@ -4,17 +4,10 @@
 #include "Pieces/Soldiers/Knight.h"
 
 #include "Board/BoardTile.h"
-#include "Components/ServerCommunicationComponent.h"
-#include "Framework/Match/Match_PlayerController.h"
+#include "UserInterface/Match/ActiveAbilityConfirmations/Soldiers/Knight_ActiveAbilityConfirmation.h"
 
 AKnight::AKnight()
 {
-}
-
-void AKnight::OnActiveAbility(AActor* Target)
-{
-	/* Call the blueprint implementation of "Dash." */
-	BP_OnActiveAbility(Target);
 }
 
 TArray<AActor*> AKnight::GetValidActiveAbilityTargets()
@@ -28,4 +21,17 @@ TArray<AActor*> AKnight::GetValidActiveAbilityTargets()
 	}
 
 	return ValidTargets;
+}
+
+void AKnight::StartActiveConfirmation(TArray<AActor*> Targets)
+{
+	UKnight_ActiveAbilityConfirmation* ActiveAbilityConfirmation = CreateWidget<UKnight_ActiveAbilityConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
+
+	ActiveAbilityConfirmation->AddToViewport(0);
+}
+
+void AKnight::OnActiveAbility(AActor* Target)
+{
+	/* Call the blueprint implementation of "Dash." */
+	BP_OnActiveAbility(Target);
 }

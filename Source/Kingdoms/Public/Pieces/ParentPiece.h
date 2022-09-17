@@ -64,23 +64,32 @@ public:
 	virtual bool TileIsInMoveRange(ABoardTile* Tile);
 
 
-	/* Called when a piece uses an active ability, if it has one. Overridden by pieces with an active ability. */
-	UFUNCTION(Category="Active Ability")
-	virtual void OnActiveAbility(AActor* Target);
+	/* Called when the player clicks the "Use Active" button to start selecting a target, or to immediately open a confirmation
+	 * pop-up if the ability auto-targets. This is not overridden if the ability requires the player to manually select a target. */
+	UFUNCTION(Category="ActiveAbility")
+	virtual void OnActiveClicked();
 
 	/* Returns all actors that this piece's active ability can target. If an active ability does not target anything,
 	 * this returns the game state actor. Overridden by pieces with an active ability. */
 	UFUNCTION(BlueprintPure, Category="Active Ability")
 	virtual TArray<AActor*> GetValidActiveAbilityTargets();
 
+	/* Called when the player selects a target to display and update a confirmation pop-up specific to that ability. */
+	UFUNCTION(Category="ActiveAbility")
+	virtual void StartActiveConfirmation(TArray<AActor*> Targets);
+	
+	/* Called when a piece uses an active ability, if it has one. Overridden by pieces with an active ability. */
+	UFUNCTION(Category="Active Ability")
+	virtual void OnActiveAbility(AActor* Target);
 
-	/* Called when a piece's passive ability is triggered, if it has one. Overridden by pieces with a passive ability. */
-	UFUNCTION(Category="Passive Ability")
-	virtual void OnPassiveAbility(AActor* Target);
 
 	/* Returns all actors that this piece's passive ability can target. Overridden by pieces with a passive ability. */
 	UFUNCTION(BlueprintPure, Category="Active Ability")
 	virtual TArray<AActor*> GetValidPassiveAbilityTargets();
+
+	/* Called when a piece's passive ability is triggered, if it has one. Overridden by pieces with a passive ability. */
+	UFUNCTION(Category="Passive Ability")
+	virtual void OnPassiveAbility(AActor* Target);
 
 
 /* Public accessors and modifiers. */
@@ -237,6 +246,10 @@ protected:
 	/* The color that enemy pieces will be highlighted in. */
 	UPROPERTY(EditDefaultsOnly, Category="Materials")
 	FLinearColor EnemyFresnelColor = FColor(0.815686f, 0.015686f, 0.207843f, 1.0f);
+
+	/* The widget that is created to confirm this piece's active ability. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Abilities")
+	TSubclassOf<UUserWidget> ActiveAbilityConfirmationClass;
 
 
 /* Protected runtime variables. These are variables that change during runtime, instead of being constants stored in the piece data table. */
