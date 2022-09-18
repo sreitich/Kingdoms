@@ -79,6 +79,8 @@ void AParentPiece::BeginPlay()
 		AnimInstance->DeathAnimation = DeathAnimation;
 		AnimInstance->CelebrationAnimation = CelebrationAnimation;
 		AnimInstance->DeadlockAnimation = DeadlockAnimation;
+		AnimInstance->ActiveAbilityAnimation = ActiveAbilityAnimation;
+		AnimInstance->PassiveAbilityAnimation = PassiveAbilityAnimation;
 	}
 	
 	/* If the player spawned this piece (during the piece setup phase). */
@@ -294,7 +296,7 @@ void AParentPiece::StartActiveConfirmation(TArray<AActor*> Targets)
 	UE_LOG(LogTemp, Error, TEXT("StartActiveConfirmation called on a piece without an active ability."));
 }
 
-void AParentPiece::OnActiveAbility(AActor* Target)
+void AParentPiece::OnActiveAbility(TArray<AActor*> Targets)
 {
 	/* Not all pieces have active abilities. */
 	UE_LOG(LogTemp, Error, TEXT("OnActiveAbility called on a piece without an active ability."));
@@ -309,7 +311,7 @@ TArray<AActor*> AParentPiece::GetValidActiveAbilityTargets()
 	return TArray<AActor*>();
 }
 
-void AParentPiece::OnPassiveAbility(AActor* Target)
+void AParentPiece::OnPassiveAbility(TArray<AActor*> Targets)
 {
 	/* Not all pieces have passive abilities. */
 	UE_LOG(LogTemp, Error, TEXT("Passive ability called on a piece without a passive ability."));

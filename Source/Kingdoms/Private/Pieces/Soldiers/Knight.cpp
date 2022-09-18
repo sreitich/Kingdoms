@@ -26,12 +26,14 @@ TArray<AActor*> AKnight::GetValidActiveAbilityTargets()
 void AKnight::StartActiveConfirmation(TArray<AActor*> Targets)
 {
 	UKnight_ActiveAbilityConfirmation* ActiveAbilityConfirmation = CreateWidget<UKnight_ActiveAbilityConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
+	ActiveAbilityConfirmation->UpdateActionConfirmationInfo(this, Cast<ABoardTile>(Targets[0]));
 
 	ActiveAbilityConfirmation->AddToViewport(0);
 }
 
-void AKnight::OnActiveAbility(AActor* Target)
+void AKnight::OnActiveAbility(TArray<AActor*> Targets)
 {
 	/* Call the blueprint implementation of "Dash." */
-	BP_OnActiveAbility(Target);
+	if (ABoardTile* TargetTile = Cast<ABoardTile>(Targets[0]))
+		BP_OnActiveAbility(Cast<ABoardTile>(TargetTile));
 }

@@ -21,7 +21,7 @@ public:
 	APyromancer();
 
 	/* Implementation of "Dash" ability. */
-	virtual void OnActiveAbility(AActor* Target) override;
+	virtual void OnActiveAbility(TArray<AActor*> Targets) override;
 
 	/* Valid targets for "Dash" ability. */
 	virtual TArray<AActor*> GetValidActiveAbilityTargets() override;

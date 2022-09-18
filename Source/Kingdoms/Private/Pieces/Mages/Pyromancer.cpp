@@ -11,9 +11,9 @@ APyromancer::APyromancer()
 {
 }
 
-void APyromancer::OnActiveAbility(AActor* Target)
+void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 {
-	Super::OnActiveAbility(Target);
+	Super::OnActiveAbility(Targets);
 
 	UE_LOG(LogTemp, Error, TEXT("FIREBALL ACTIVATED!"));
 }

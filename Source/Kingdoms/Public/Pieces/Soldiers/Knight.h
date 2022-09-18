@@ -6,6 +6,8 @@
 #include "Pieces/ParentPiece.h"
 #include "Knight.generated.h"
 
+class ABoardTile;
+
 /**
  * 
  */
@@ -27,10 +29,10 @@ public:
 	virtual void StartActiveConfirmation(TArray<AActor*> Targets) override;
 
 	/* Implementation of "Dash" ability. */
-	virtual void OnActiveAbility(AActor* Target) override;
+	virtual void OnActiveAbility(TArray<AActor*> Targets) override;
 
 		/* Blueprint implementation of "Dash" ability, called by OnActiveAbility(). */
 		UFUNCTION(BlueprintImplementableEvent)
-		void BP_OnActiveAbility(AActor* Target);
+		void BP_OnActiveAbility(ABoardTile* Target);
 
 };

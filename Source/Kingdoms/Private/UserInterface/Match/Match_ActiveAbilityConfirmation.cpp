@@ -57,7 +57,7 @@ void UMatch_ActiveAbilityConfirmation::OnConfirmClicked()
 {
 	/* Activate the selected piece's active ability if the selected piece is valid. */
 	if (IsValid(AbilityUser))
-		AbilityUser->OnActiveAbility(PendingTarget);
+		// AbilityUser->OnActiveAbility(PendingTarget);
 
 	/* Act as if the widget was cancelled, resetting the player's state and removing all highlighted valid targets.*/
 	OnCancelClicked();

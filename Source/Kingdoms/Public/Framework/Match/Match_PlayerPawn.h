@@ -64,6 +64,10 @@ public:
 			UFUNCTION(Server, Reliable, BlueprintCallable, Category="Attacking")
 			void Server_SetResetAfterMove(AParentPiece* PieceToUpdate, bool bNewReset);
 	
+	/* Calls active abilities with server authority. */
+	UFUNCTION(Server, Reliable)
+	void Server_UseActiveAbility(AParentPiece* AbilityUser, const TArray<AActor*>& Targets);
+
 
 /* Public variables. */
 public:

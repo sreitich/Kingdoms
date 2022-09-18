@@ -45,6 +45,13 @@ AMatch_PlayerPawn::AMatch_PlayerPawn()
 	Camera->SetupAttachment(SpringArm);
 }
 
+void AMatch_PlayerPawn::Server_UseActiveAbility_Implementation(AParentPiece* AbilityUser, const TArray<AActor*>& Targets)
+{
+	/* Call the ability with server authority. */
+	if (IsValid(AbilityUser))
+		AbilityUser->OnActiveAbility(Targets);
+}
+
 void AMatch_PlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();

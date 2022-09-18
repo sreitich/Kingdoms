@@ -37,6 +37,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, BlueprintReadWrite, Category="Animations")
 	UAnimSequenceBase* DeadlockAnimation;
 
+	UPROPERTY(BlueprintReadWrite, BlueprintReadWrite, Category="Animations")
+	UAnimSequenceBase* ActiveAbilityAnimation;
+
+	UPROPERTY(BlueprintReadWrite, BlueprintReadWrite, Category="Animations")
+	UAnimSequenceBase* PassiveAbilityAnimation;
+
 
 /* Public animation triggers. Setting these to "true" triggers the corresponding animation. */
 public:
@@ -60,6 +66,14 @@ public:
 	/* Deadlock animation. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation Triggers")
 	bool bDeadlocking = false;
+
+	/* Active ability animation. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation Triggers")
+	bool bUsingActive = false;
+
+	/* Passive ability animation. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation Triggers")
+	bool bUsingPassive = false;
 	
 	
 };

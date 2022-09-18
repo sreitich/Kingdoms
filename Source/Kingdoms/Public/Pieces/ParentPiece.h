@@ -79,8 +79,8 @@ public:
 	virtual void StartActiveConfirmation(TArray<AActor*> Targets);
 	
 	/* Called when a piece uses an active ability, if it has one. Overridden by pieces with an active ability. */
-	UFUNCTION(Category="Active Ability")
-	virtual void OnActiveAbility(AActor* Target);
+	UFUNCTION(BlueprintCallable, Category="Active Ability")
+	virtual void OnActiveAbility(TArray<AActor*> Targets);
 
 
 	/* Returns all actors that this piece's passive ability can target. Overridden by pieces with a passive ability. */
@@ -89,7 +89,7 @@ public:
 
 	/* Called when a piece's passive ability is triggered, if it has one. Overridden by pieces with a passive ability. */
 	UFUNCTION(Category="Passive Ability")
-	virtual void OnPassiveAbility(AActor* Target);
+	virtual void OnPassiveAbility(TArray<AActor*> Targets);
 
 
 /* Public accessors and modifiers. */
@@ -199,6 +199,14 @@ public:
 	/* Played when a fight ends in a deadlock. This needs to have an "EndDeadlockAnim" animation notify. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
 	UAnimSequenceBase* DeadlockAnimation;
+
+	/* Played when this piece uses an active ability, if it has one. This needs to have an "EndActive" animation notify. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UAnimSequenceBase* ActiveAbilityAnimation;
+
+	/* Played when this piece uses a passive ability, if it has one. This needs to have an "EndPassive" animation notify. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UAnimSequenceBase* PassiveAbilityAnimation;
 
 	/* The particle effect to spawn when this piece is damaged. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Effects")
