@@ -27,10 +27,16 @@ TArray<AActor*> AKnight::GetValidActiveAbilityTargets()
 
 void AKnight::StartActiveConfirmation(TArray<AActor*> Targets)
 {
-	/* Create an ability confirmation widget. */
-	UKnight_ActiveAbilityConfirmation* ActiveAbilityConfirmation = CreateWidget<UKnight_ActiveAbilityConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
-	ActiveAbilityConfirmation->UpdateActionConfirmationInfo(this, Cast<ABoardTile>(Targets[0]));
-	ActiveAbilityConfirmation->AddToViewport(0);
+	/* If the confirmation widget hasn't been created yet, create it. */
+	if (!ConfirmationWidget)
+	{
+		/* Create an ability confirmation widget. */
+		ConfirmationWidget = CreateWidget<UKnight_ActiveAbilityConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
+		ConfirmationWidget->AddToViewport(0);
+	}
+
+	/* Update the widget's information. */
+	ConfirmationWidget->UpdateActionConfirmationInfo(this, Cast<ABoardTile>(Targets[0]));
 
 	/* Highlight the pending tile. */
 	Cast<ABoardTile>(Targets[0])->Highlight->SetMaterial(0, Cast<ABoardTile>(Targets[0])->Highlight_Target);

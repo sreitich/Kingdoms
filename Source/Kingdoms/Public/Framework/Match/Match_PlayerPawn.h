@@ -165,5 +165,8 @@ protected:
 
 	UPROPERTY()
 	UPieceDragWidget* PieceDragWidget;
+
+	UPROPERTY()
+	UUserWidget* ActiveAbilityConfirmationWidget;
 	
 };

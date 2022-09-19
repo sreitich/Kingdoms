@@ -134,10 +134,6 @@ void AMatch_PlayerPawn::Interact()
 			}
 		}
 	}
-	else
-	{
-		ClearSelection(true);
-	}
 }
 
 void AMatch_PlayerPawn::Interact_PlacingPieces(FHitResult InteractionHit)
@@ -323,31 +319,40 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 
 void AMatch_PlayerPawn::Interact_SelectingTargetActiveAbility(FHitResult InteractionHit)
 {
-	/* Stores the selected ability target. */
-	AActor* SelectedTarget = InteractionHit.GetActor();
+    /* If the player clicked something... */
+    if (IsValid(InteractionHit.GetActor()))
+    {
+		/* Stores the selected ability target. */
+		AActor* SelectedTarget = InteractionHit.GetActor();
 
-	/* Test if the selected target is a valid target. */
-	bool bTargetIsValid = false;
-	for (const AActor* ValidTarget : SelectedPiece->GetValidActiveAbilityTargets())
-	{
-		if (ValidTarget == SelectedTarget)
+		/* Test if the selected target is a valid target. */
+		bool bTargetIsValid = false;
+		for (const AActor* ValidTarget : SelectedPiece->GetValidActiveAbilityTargets())
 		{
-			bTargetIsValid = true;
-			break;
+			if (ValidTarget == SelectedTarget)
+			{
+				bTargetIsValid = true;
+				break;
+			}
+		}
+
+		/* If the player selected a valid target for this ability, call a function that creates a confirmation widget
+		 * specific to that ability. */
+		if (bTargetIsValid)
+		{
+			/* No abilities currently require the player to select multiple pieces. If this ability had multiple targets,
+			 * this function is skipped over. */
+			TArray<AActor*> Targets = TArray<AActor*>();
+			Targets.Add(SelectedTarget);
+
+			SelectedPiece->StartActiveConfirmation(Targets);
+		}
+		else
+		{
+			/* "select a valid target" pop-up */
 		}
 	}
-
-	/* If the player selected a valid target for this ability, call a function that creates a confirmation widget
-	 * specific to that ability. */
-	if (bTargetIsValid)
-	{
-		/* No abilities currently require the player to select multiple pieces. If this ability had multiple targets,
-		 * this function is skipped over. */
-		TArray<AActor*> Targets = TArray<AActor*>();
-		Targets.Add(SelectedTarget);
-
-		SelectedPiece->StartActiveConfirmation(Targets);
-	}
+	/* If the player (somehow) didn't click anything. */
 	else
 	{
 		/* "select a valid target" pop-up */

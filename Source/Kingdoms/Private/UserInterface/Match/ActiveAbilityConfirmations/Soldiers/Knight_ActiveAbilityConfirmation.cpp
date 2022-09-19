@@ -5,8 +5,6 @@
 
 #include "Board/BoardTile.h"
 #include "Components/Button.h"
-#include "Components/ServerCommunicationComponent.h"
-#include "Framework/Match/Match_PlayerController.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
 #include "Pieces/Soldiers/Knight.h"
@@ -14,13 +12,19 @@
 void UKnight_ActiveAbilityConfirmation::UpdateActionConfirmationInfo(AKnight* NewAbilityUser,
 	ABoardTile* NewTargetTile)
 {
-	/* Store a reference to the ability's user and target if they are valid. */
+	/* Store a reference to the ability's user if it's valid. */
 	if (IsValid(NewAbilityUser))
 		AbilityUser = NewAbilityUser;
 
+	/* Store a reference to the new one if it's valid. */
 	if (IsValid(NewTargetTile))
-		TargetTile = NewTargetTile;
+	{
+		/* Remove the selection highlight from the old tile if there is one. */
+		if (IsValid(TargetTile))
+			TargetTile->Highlight->SetMaterial(0, TargetTile->Highlight_ValidMove);
 		
+		TargetTile = NewTargetTile;
+	}
 }
 
 void UKnight_ActiveAbilityConfirmation::NativeConstruct()
@@ -40,10 +44,12 @@ void UKnight_ActiveAbilityConfirmation::OnConfirmClicked()
 	{
 		const TArray<AActor*> Targets = { TargetTile };
 
-		// AbilityUser->OnActiveAbility(Targets);
-
 		Cast<AMatch_PlayerPawn>(GetOwningPlayerPawn())->Server_UseActiveAbility(AbilityUser, Targets);
 	}
+
+	/* Clear these variables manually when this widget is destroyed. */
+	TargetTile = nullptr;
+	AbilityUser->ConfirmationWidget = nullptr;
 
 	/* Destroy this widget after the ability is confirmed. */
 	RemoveFromParent();
