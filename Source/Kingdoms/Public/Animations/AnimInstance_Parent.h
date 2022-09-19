@@ -74,6 +74,13 @@ public:
 	/* Passive ability animation. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation Triggers")
 	bool bUsingPassive = false;
-	
+
+
+/* Additional parameters used when animating. */
+public:
+
+	/* If the active ability animation loops. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animation Parameters")
+	bool bActiveAbilityLoops = false;
 	
 };

@@ -44,6 +44,6 @@ void APieceAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFoll
     if (bResetAfterMove)
     {
         /* Reset the piece's rotation whenever it finishes moving. */
-        Cast<AParentPiece>(GetPawn())->ResetPieceRotation();
+        Cast<AParentPiece>(GetPawn())->Server_ResetPieceRotation();
     }
 }

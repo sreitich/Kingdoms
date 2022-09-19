@@ -81,6 +81,7 @@ void AParentPiece::BeginPlay()
 		AnimInstance->DeadlockAnimation = DeadlockAnimation;
 		AnimInstance->ActiveAbilityAnimation = ActiveAbilityAnimation;
 		AnimInstance->PassiveAbilityAnimation = PassiveAbilityAnimation;
+		AnimInstance->bActiveAbilityLoops = bActiveAbilityLoops;
 	}
 	
 	/* If the player spawned this piece (during the piece setup phase). */
@@ -170,7 +171,7 @@ void AParentPiece::Multicast_PlayPiecePopUp_Implementation(float Duration, bool 
 	PlayPiecePopUp_BP(Duration, bReverse);
 }
 
-void AParentPiece::ResetPieceRotation()
+void AParentPiece::Server_ResetPieceRotation_Implementation()
 {
 	/* Get the game state. */
 	const AMatch_GameStateBase* GameStatePtr = Cast<AMatch_GameStateBase>(UGameplayStatics::GetGameState(this));
@@ -178,8 +179,8 @@ void AParentPiece::ResetPieceRotation()
 	const int PlayerIndex = Cast<AMatch_PlayerState>(GetInstigator()->GetPlayerState())->PlayerIndex;
 	/* Get the player start that spawned this piece's owning player. */
 	const AActor* PlayerStart = GameStatePtr->PlayerStarts[PlayerIndex - 1];
-	/* Set this actor's rotation to the rotation that its owning player was spawned at. */
-	SetActorRotation(PlayerStart->GetActorRotation(), ETeleportType::None);
+	/* Interpolate this actor's rotation to the rotation that its owning player was spawned at. */
+	InterpolatePieceRotation(GetActorRotation(),PlayerStart->GetActorRotation());
 }
 
 void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float Duration)

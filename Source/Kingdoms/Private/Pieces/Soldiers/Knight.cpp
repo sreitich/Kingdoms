@@ -14,10 +14,12 @@ TArray<AActor*> AKnight::GetValidActiveAbilityTargets()
 {
 	TArray<AActor*> ValidTargets;
 	
-	/* The dash can move to any tile that the piece can move to with a move action. */
+	/* The dash can move to any unoccupied tile that the piece can move to with a move action. */
 	for (ABoardTile* Tile : GetValidTiles())
 	{
-		ValidTargets.Add(Cast<AActor>(Tile));
+		/* Add the tile to the valid targets array if the tile is unoccupied. */
+		if (!IsValid(Tile->GetOccupyingPiece()))
+			ValidTargets.Add(Cast<AActor>(Tile));
 	}
 
 	return ValidTargets;
@@ -25,10 +27,13 @@ TArray<AActor*> AKnight::GetValidActiveAbilityTargets()
 
 void AKnight::StartActiveConfirmation(TArray<AActor*> Targets)
 {
+	/* Create an ability confirmation widget. */
 	UKnight_ActiveAbilityConfirmation* ActiveAbilityConfirmation = CreateWidget<UKnight_ActiveAbilityConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
 	ActiveAbilityConfirmation->UpdateActionConfirmationInfo(this, Cast<ABoardTile>(Targets[0]));
-
 	ActiveAbilityConfirmation->AddToViewport(0);
+
+	/* Highlight the pending tile. */
+	Cast<ABoardTile>(Targets[0])->Highlight->SetMaterial(0, Cast<ABoardTile>(Targets[0])->Highlight_Target);
 }
 
 void AKnight::OnActiveAbility(TArray<AActor*> Targets)

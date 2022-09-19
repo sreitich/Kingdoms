@@ -38,8 +38,12 @@ public:
 		void PlayPiecePopUp_BP(float Duration, bool bReverse);
 
 	/* Rotates this piece to the rotation it was spawned with, facing away from its owner's starting position. */
-	UFUNCTION(BlueprintCallable)
-	void ResetPieceRotation();
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void Server_ResetPieceRotation();
+
+		/* Smoothly rotates the piece to the target rotation over a short time period. */
+		UFUNCTION(BlueprintImplementableEvent)
+		void InterpolatePieceRotation(FRotator CurrentRot, FRotator TargetRot);
 
 	/* Flashes a given highlight onto the piece at a given strength for a given amount of time. */
 	UFUNCTION(BlueprintCallable)
@@ -167,6 +171,10 @@ public:
 	/* This piece's unique identifier, set in-editor for each child piece. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Piece Info")
 	FName PieceID = "0-00";
+
+	/* Determines whether this piece's active ability animation is looped or not. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	bool bActiveAbilityLoops = false;
 
 
 /* Public assets. */

@@ -74,15 +74,6 @@ void AMatch_PlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AMatch_PlayerPawn::Interact()
 {
-/* Debugging for piece ID system.
-	TArray<AActor*> AllPieces;
-	UGameplayStatics::GetAllActorsOfClass(this, AParentPiece::StaticClass(), AllPieces);
-	for (AActor* Piece : AllPieces)
-	{
-		AParentPiece* Pointer = Cast<AParentPiece>(Piece);
-		UE_LOG(LogTemp, Error, TEXT("Piece ID: %s"), *Pointer->GetPieceID().ToString());
-	}
-*/
 	/* Stores the location and direction of the player's click. */
 	FVector WorldLocation;
 	FVector WorldDirection;
@@ -106,9 +97,6 @@ void AMatch_PlayerPawn::Interact()
 		/* If this pawn's controller's player state is valid... */
 		if (GetPlayerState<AMatch_PlayerState>())
 		{
-			/* Get a copy of this player's player status. REDUNDANT */
-			// EPlayerStatus CurrentPlayerStatus = GetPlayerState<AMatch_PlayerState>()->GetCurrentPlayerStatus();
-
 			/* Call corresponding function depending on the state of the player. */
 			switch (GetPlayerState<AMatch_PlayerState>()->GetCurrentPlayerStatus())
 			{
