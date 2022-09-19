@@ -44,6 +44,9 @@ void UKnight_ActiveAbilityConfirmation::OnConfirmClicked()
 
 		Cast<AMatch_PlayerPawn>(GetOwningPlayerPawn())->Server_UseActiveAbility(AbilityUser, Targets);
 	}
+
+	/* Destroy this widget after the ability is confirmed. */
+	RemoveFromParent();
 }
 
 void UKnight_ActiveAbilityConfirmation::NativeDestruct()
