@@ -2,6 +2,7 @@
 
 
 #include "Pieces/Soldiers/Knight.h"
+#include "UserDefinedData/PieceData_UserDefinedData.h"
 
 #include "Board/BoardTile.h"
 #include "UserInterface/Match/ActiveAbilityConfirmations/Soldiers/Knight_ActiveAbilityConfirmation.h"
@@ -47,4 +48,19 @@ void AKnight::OnActiveAbility(TArray<AActor*> Targets)
 	/* Call the blueprint implementation of "Dash." */
 	if (ABoardTile* TargetTile = Cast<ABoardTile>(Targets[0]))
 		BP_OnActiveAbility(Cast<ABoardTile>(TargetTile));
+
+	/* If the piece data table was found... */
+	if (PieceDataTable)
+	{
+		/* Get this piece's row from the piece data. */
+		static const FString ContextString(TEXT("Piece Data Struct"));
+		const FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(PieceID, ContextString, true);
+
+		/* If the data table row was found... */
+		if (PieceData)
+		{
+			/* Put the ability onto cooldown. */
+			SetActiveCD(PieceData->ActiveCD);
+		}
+	}
 }

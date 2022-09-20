@@ -88,6 +88,13 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool 
 
                 /* Set the correct number of total uses. */
                 ResetBars(true, PieceData->ActiveUses);
+
+                /* If this piece has limited active ability uses and doesn't have any uses left, disable the active
+                 * ability button. */
+                if (PieceData->ActiveUses > 0 && DisplayedPiece->GetActiveUses() == 0)
+                {
+                    ActiveButton->SetIsEnabled(false);
+                }
             }
 
             /* If this piece has a passive ability... */
@@ -151,7 +158,6 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool 
                 Cast<UHorizontalBoxSlot>(ActiveAbilityBox->Slot)->SetPadding(FMargin(0.0f, 15.0f, 57.0f, 0.0f));
             }
 
-
             /* If this piece has an active ability... */
             if (PieceData && PieceData->ActiveName != "")
             {
@@ -167,6 +173,9 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool 
 
                     /* Reveal the active cooldown indicator, greying out the active ability icon. Disable test visibility so that it doesn't block the button. */
                     ActiveCooldownIndicator->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+                    /* Disable the "use active ability" button. */
+                    ActiveButton->SetIsEnabled(false);
                 }
                 /* If the active ability can be used... */
                 else
