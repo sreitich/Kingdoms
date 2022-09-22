@@ -39,9 +39,9 @@ protected:
 	/* Called when the game starts or when created. */
 	virtual void NativeConstruct() override;
 
-	/* Attacks the enemy piece at the target tile. */
+	/* Attacks the enemy piece at the target tile. Can be overridden by custom attack confirmation widgets. */
 	UFUNCTION()
-	void OnAttackClicked();
+	virtual void OnAttackClicked();
 
 
 /* Protected variables. */

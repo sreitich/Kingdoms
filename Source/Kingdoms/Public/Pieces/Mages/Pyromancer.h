@@ -20,9 +20,23 @@ public:
 	/* Sets default values for this character's properties. */
 	APyromancer();
 
-	/* Implementation of "Dash" ability. */
+	/* Valid targets for "Fireball" ability. All targets are enemy pieces. */
+	virtual TArray<AActor*> GetValidActiveAbilityTargets() override;
+
+	/* Creates a confirmation widget. */
+	virtual void StartActiveConfirmation(TArray<AActor*> Targets) override;
+
+	/* Implementation of "Fireball" ability. */
 	virtual void OnActiveAbility(TArray<AActor*> Targets) override;
 
-	/* Valid targets for "Dash" ability. */
-	virtual TArray<AActor*> GetValidActiveAbilityTargets() override;
+		/* Blueprint implementation of "Pyromancer" ability, called by OnActiveAbility(). */
+		UFUNCTION(BlueprintImplementableEvent)
+		void BP_OnActiveAbility(ABoardTile* Target);
+
+
+/* Public variables. */
+public:
+
+	UPROPERTY()
+	class UMatch_AttackConfirmation* ConfirmationWidget;
 };
