@@ -4,10 +4,7 @@
 
 #include "UserDefinedData/Match_UserDefinedData.h"
 
-#include "Components/SceneComponent.h"
-#include "Components/StaticMeshComponent.h"
 #include "Components/ArrowComponent.h"
-#include "Materials/MaterialInstance.h"
 #include "Net/UnrealNetwork.h"
 
 #include "CoreMinimal.h"
@@ -80,31 +77,43 @@ public:
 
 	/* Empty tile. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	class UMaterialInstance* Highlight_Empty;
+	UMaterialInstance* Highlight_Empty;
 
 	/* Tile occupied by friendly piece. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	class UMaterialInstance* Highlight_Friendly;
+	UMaterialInstance* Highlight_Friendly;
 
 	/* Tile occupied by enemy piece. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	class UMaterialInstance* Highlight_Enemy;
+	UMaterialInstance* Highlight_Enemy;
 
 	/* Tile valid for the currently selected piece to move to. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	class UMaterialInstance* Highlight_ValidMove;
+	UMaterialInstance* Highlight_ValidMove;
+
+	/* Tile is in range but not valid for the current action. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
+	UMaterialInstance* Highlight_ValidRange;
 
 	/* Tile occupied by a friendly piece that is a valid target of an ability. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	class UMaterialInstance* Highlight_ValidFriendly;
+	UMaterialInstance* Highlight_ValidFriendly;
+
+	/* Tile is in range and occupied by a friendly piece but not valid for the current action. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
+	UMaterialInstance* Highlight_ValidFriendlyRange;
 
 	/* tile occupied by an enemy piece that is a valid target of an ability. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	class UMaterialInstance* Highlight_ValidEnemy;
+	UMaterialInstance* Highlight_ValidEnemy;
+
+	/* Tile is in range and occupied by a enemy piece but not valid for the current action. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
+	UMaterialInstance* Highlight_ValidEnemyRange;
 
 	/* Tile that the mouse is currently hovering over. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	class UMaterialInstance* Highlight_Target;
+	UMaterialInstance* Highlight_Target;
 
 
 /* Protected functions. */

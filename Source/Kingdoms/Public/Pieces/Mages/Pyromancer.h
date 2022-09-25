@@ -20,8 +20,15 @@ public:
 	/* Sets default values for this character's properties. */
 	APyromancer();
 
-	/* Valid targets for "Fireball" ability. All targets are enemy pieces. */
+	/* Lightly highlights all potential targets and fully highlights valid targets. */
+	virtual void OnActiveClicked() override;
+	
+	/* Valid targets for "Fireball" ability. Returns all valid tile locations, but doesn't check if
+	 * there are enemy pieces occupying them. */
 	virtual TArray<AActor*> GetValidActiveAbilityTargets() override;
+
+		/* Returns all of the tiles within the fireball's range, regardless of if they have valid target pieces. */
+		virtual TArray<AActor*> GetActiveAbilityRange() override;
 
 	/* Creates a confirmation widget. */
 	virtual void StartActiveConfirmation(TArray<AActor*> Targets) override;
@@ -39,4 +46,13 @@ public:
 
 	UPROPERTY()
 	class UMatch_AttackConfirmation* ConfirmationWidget;
+
+
+/* Public assets. */
+public:
+
+	/* Played when this piece uses its active ability when powering up before using
+	 * its active ability animation to attack. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UAnimSequenceBase* PowerUpAnimation;
 };

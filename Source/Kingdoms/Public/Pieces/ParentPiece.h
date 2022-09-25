@@ -69,7 +69,7 @@ public:
 
 
 	/* Called when the player clicks the "Use Active" button to start selecting a target, or to immediately open a confirmation
-	 * pop-up if the ability auto-targets. This is not overridden if the ability requires the player to manually select a target. */
+	 * pop-up if the ability auto-targets. Default implementation highlights all valid targets. */
 	UFUNCTION(Category="ActiveAbility")
 	virtual void OnActiveClicked();
 
@@ -77,6 +77,11 @@ public:
 	 * this returns the game state actor. Overridden by pieces with an active ability. */
 	UFUNCTION(BlueprintPure, Category="Active Ability")
 	virtual TArray<AActor*> GetValidActiveAbilityTargets();
+
+		/* Returns the tiles within range of this piece's active ability, without checking validity. This is mainly used
+		 * to show the range of an ability that has specifications for its target. Overridden by pieces with an active ability.*/
+		UFUNCTION(BlueprintPure, Category="Active Ability")
+		virtual TArray<AActor*> GetActiveAbilityRange();
 
 	/* Called when the player selects a target to display and update a confirmation pop-up specific to that ability. */
 	UFUNCTION(Category="ActiveAbility")

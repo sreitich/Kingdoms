@@ -340,8 +340,8 @@ void AMatch_PlayerPawn::Interact_SelectingTargetActiveAbility(FHitResult Interac
 		 * specific to that ability. */
 		if (bTargetIsValid)
 		{
-			/* No abilities currently require the player to select multiple pieces. If this ability had multiple targets,
-			 * this function is skipped over. */
+			/* No abilities currently require the player to select multiple pieces. If this ability had multiple
+			 * targets, this function is skipped over. */
 			TArray<AActor*> Targets = TArray<AActor*>();
 			Targets.Add(SelectedTarget);
 

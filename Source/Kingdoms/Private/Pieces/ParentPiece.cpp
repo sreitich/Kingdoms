@@ -312,6 +312,15 @@ TArray<AActor*> AParentPiece::GetValidActiveAbilityTargets()
 	return TArray<AActor*>();
 }
 
+TArray<AActor*> AParentPiece::GetActiveAbilityRange()
+{
+	/* Not all pieces have active abilities. */
+	UE_LOG(LogTemp, Error, TEXT("GetActiveAbilityRange called on a piece without an active ability."));
+
+	/* Return an empty array. */
+	return TArray<AActor*>();
+}
+
 void AParentPiece::OnPassiveAbility(TArray<AActor*> Targets)
 {
 	/* Not all pieces have passive abilities. */
