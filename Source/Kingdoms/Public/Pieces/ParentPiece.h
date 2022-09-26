@@ -127,7 +127,7 @@ public:
 
 	/* Server-only setter for CurrentStrength. */
 	UFUNCTION(BlueprintCallable, Category="Piece Stats")
-	bool SetCurrentStrength(int NewStrength);
+	bool SetCurrentStrength(int NewStrength, bool bActivatePopUp);
 
 	/* Getter for CurrentArmor. */
 	UFUNCTION(BlueprintPure, Category="Piece Stats")
@@ -135,7 +135,7 @@ public:
 
 	/* Server-only setter for CurrentArmor. */
 	UFUNCTION(BlueprintCallable, Category="Piece Stats")
-	bool SetCurrentArmor(int NewArmor);
+	bool SetCurrentArmor(int NewArmor, bool bActivatePopUp);
 
 	/* Getter for PassiveCD. */
 	UFUNCTION(BlueprintPure, Category="Passive Ability")

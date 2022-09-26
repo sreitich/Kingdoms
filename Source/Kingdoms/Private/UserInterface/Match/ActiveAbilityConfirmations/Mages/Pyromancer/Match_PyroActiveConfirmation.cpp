@@ -13,27 +13,14 @@
 
 void UMatch_PyroActiveConfirmation::OnAttackClicked()
 {
-	/* Zoom each player's camera into the fight
-	 * Set attack animation to be the power-up animation.
-	 * In the power-up animation, increase the piece's strength and make a strength buff pop-up
-	 * When the animation ends, reset the attack animation variable.
-	 * Change the pyromancer's attack animation.
-	 * Start the attack sequence.
-	 */
-
-	for (const APlayerState* PlayerStatePtr : UGameplayStatics::GetGameState(this)->PlayerArray)
+	/* Activate this piece's active ability if there is a valid reference to it. */
+	if (IsValid(PendingFriendlyPiece))
 	{
-		/* Zoom each player into the fight. */
-		if (AMatch_PlayerPawn* PlayerPawnPtr = Cast<AMatch_PlayerPawn>(PlayerStatePtr->GetPawn()))
-			PlayerPawnPtr->Client_MovePlayerCamera(PendingFriendlyPiece, PendingEnemyPiece, false);
-
-		/* Play the power-up animation. */
-		if (UAnimInstance_Parent* AnimInstance = Cast<UAnimInstance_Parent>(PendingFriendlyPiece->GetMesh()->GetAnimInstance()))
-		{
-			AnimInstance->ActiveAbilityAnimation = Cast<APyromancer>(PendingFriendlyPiece)->PowerUpAnimation;
-			AnimInstance->bUsingActive = true;
-		}
+		const TArray<AActor*> Targets = { PendingEnemyPiece };
+	
+		Cast<AMatch_PlayerPawn>(GetOwningPlayerPawn())->Server_UseActiveAbility(PendingFriendlyPiece, Targets);
 	}
 	
-	// Super::OnAttackClicked();
+	/* Destroy this widget after the ability is confirmed. */
+	RemoveFromParent();
 }

@@ -359,7 +359,7 @@ void AParentPiece::SetAttackInfo(FAttackInfo NewAttackInfo)
 	}
 }
 
-bool AParentPiece::SetCurrentStrength(int NewStrength)
+bool AParentPiece::SetCurrentStrength(int NewStrength, bool bActivatePopUp)
 {
 	/* Make sure that the server is calling this. */
 	if (HasAuthority())
@@ -373,7 +373,7 @@ bool AParentPiece::SetCurrentStrength(int NewStrength)
 	return false;
 }
 
-bool AParentPiece::SetCurrentArmor(int NewArmor)
+bool AParentPiece::SetCurrentArmor(int NewArmor, bool bActivatePopUp)
 {
 	/* Make sure that the server is calling this. */
 	if (HasAuthority())

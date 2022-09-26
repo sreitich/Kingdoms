@@ -2,11 +2,16 @@
 
 
 #include "Pieces/Mages/Pyromancer.h"
-#include "UserInterface/Match/Match_AttackConfirmation.h"
 
+#include "Animations/AnimInstance_Parent.h"
 #include "Board/BoardManager.h"
 #include "Board/BoardTile.h"
 #include "Framework/Match/Match_GameStateBase.h"
+#include "Framework/Match/Match_PlayerPawn.h"
+#include "Framework/Match/Match_PlayerState.h"
+#include "UserInterface/Match/ActiveAbilityConfirmations/Mages/Pyromancer/Match_PyroActiveConfirmation.h"
+
+#include "Kismet/GameplayStatics.h"
 
 APyromancer::APyromancer()
 {
@@ -47,7 +52,9 @@ TArray<AActor*> APyromancer::GetValidActiveAbilityTargets()
 		{
 			if (IsValid(Tile->GetOccupyingPiece()) && !Tile->GetOccupyingPiece()->GetInstigator()->IsLocallyControlled())
 			{
+				/* The player can select the piece or its tile. */
 				ValidTargets.Add(Cast<AActor>(Tile->GetOccupyingPiece()));
+				ValidTargets.Add(Cast<AActor>(Tile));
 			}
 		}
 	}
@@ -137,22 +144,66 @@ void APyromancer::StartActiveConfirmation(TArray<AActor*> Targets)
 	if (!ConfirmationWidget)
 	{
 		/* Create an ability confirmation widget. */
-		ConfirmationWidget = CreateWidget<UMatch_AttackConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
+		ConfirmationWidget = CreateWidget<UMatch_PyroActiveConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
 		ConfirmationWidget->AddToViewport(0);
 	}
 
-	if (AParentPiece* Target = Cast<AParentPiece>(Targets[0])) // causing crash
+	/* Get the target as a piece. If the player clicked a piece, cast it to a piece pointer. If they clicked
+	 * a tile, get its occupying piece. */
+	AParentPiece* Target = nullptr;
+	if (AParentPiece* TargetPiece = Cast<AParentPiece>(Targets[0]))
+	{
+		Target = TargetPiece;
+	}
+	else if (const ABoardTile* TargetTile = Cast<ABoardTile>(Targets[0]))
+	{
+		Target = TargetTile->GetOccupyingPiece();
+	}
+	else
+	{
+		/* Only pieces and tiles can be targeted, so this should never happen. */
+	}
+
+	/* If the target piece was successfully found, update the confirmation widget's info and highlight
+	 * the pending tile. */
+	if (IsValid(Target))
 	{
 		/* Update the widget's information. */
 		ConfirmationWidget->UpdateAttackPreviewInfo(this, Target);
-
+	
 		/* Highlight the pending tile. */
-		Cast<ABoardTile>(Target->GetCurrentTile())->Highlight->SetMaterial(0, Cast<ABoardTile>(Targets[0])->Highlight_Target);
+		Cast<ABoardTile>(Target->GetCurrentTile())->Highlight->SetMaterial(0, Target->GetCurrentTile()->Highlight_Target);
+
+		UE_LOG(LogTemp, Error, TEXT("Updated"));
 	}
 }
 
 void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 {
-	Super::OnActiveAbility(Targets);
+	/* Zoom each player's camera into the fight
+	 * Set attack animation to be the power-up animation.
+	 * In the power-up animation, increase the piece's strength and make a strength buff pop-up
+	 * When the animation ends, reset the attack animation variable.
+	 * Change the pyromancer's attack animation.
+	 * Start the attack sequence.
+	 */
 
+	BP_OnActiveAbility(Cast<AParentPiece>(Targets[0]));
+
+	// for (const APlayerState* PlayerStatePtr : UGameplayStatics::GetGameState(this)->PlayerArray)
+	// {
+	// 	/* Zoom each player into the fight. */
+	// 	if (AMatch_PlayerPawn* PlayerPawnPtr = Cast<AMatch_PlayerPawn>(PlayerStatePtr->GetPawn()))
+	// 	{
+	// 		PlayerPawnPtr->DisableInput(Cast<APlayerController>(PlayerPawnPtr->GetController()));
+	// 		PlayerPawnPtr->Client_MovePlayerCamera(this, Cast<AParentPiece>(Targets[0]), false);
+	// 	}
+	//
+	// 	/* Play the power-up animation. Needs to be replicated. */
+	// 	if (UAnimInstance_Parent* AnimInstance = Cast<UAnimInstance_Parent>(GetMesh()->GetAnimInstance()))
+	// 	{
+	// 		AnimInstance->ActiveAbilityAnimation = PowerUpAnimation;
+	// 		AnimInstance->bUsingActive = true;
+	// 	}
+	// }
 }

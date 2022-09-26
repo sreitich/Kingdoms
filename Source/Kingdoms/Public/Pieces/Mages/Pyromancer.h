@@ -38,14 +38,17 @@ public:
 
 		/* Blueprint implementation of "Pyromancer" ability, called by OnActiveAbility(). */
 		UFUNCTION(BlueprintImplementableEvent)
-		void BP_OnActiveAbility(ABoardTile* Target);
+		void BP_OnActiveAbility(AParentPiece* Target);
 
 
 /* Public variables. */
 public:
 
 	UPROPERTY()
-	class UMatch_AttackConfirmation* ConfirmationWidget;
+	class UMatch_PyroActiveConfirmation* ConfirmationWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Active Ability")
+	bool bPowered = false;
 
 
 /* Public assets. */

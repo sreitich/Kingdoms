@@ -45,13 +45,6 @@ AMatch_PlayerPawn::AMatch_PlayerPawn()
 	Camera->SetupAttachment(SpringArm);
 }
 
-void AMatch_PlayerPawn::Server_UseActiveAbility_Implementation(AParentPiece* AbilityUser, const TArray<AActor*>& Targets)
-{
-	/* Call the ability with server authority. */
-	if (IsValid(AbilityUser))
-		AbilityUser->OnActiveAbility(Targets);
-}
-
 void AMatch_PlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
@@ -439,15 +432,6 @@ void AMatch_PlayerPawn::ClearSelection(bool bDeselect)
 	}
 }
 
-void AMatch_PlayerPawn::Server_SetResetAfterMove_Implementation(AParentPiece* PieceToUpdate, bool bNewReset)
-{
-	/* If the given piece is valid, update its AI's bResetAfterMove variable. */
-	if (IsValid(PieceToUpdate))
-	{
-		Cast<APieceAIController>(PieceToUpdate->GetController())->bResetAfterMove = bNewReset;
-	}
-}
-
 void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo)
 {
     /* Remove the piece info widgets and reset this player's selection. */
@@ -502,4 +486,20 @@ void AMatch_PlayerPawn::Client_MovePlayerCamera_Implementation(const AParentPiec
 		/* Smoothly move the camera to or from the given location and rotation. */
 		InterpolatePlayerCamera(EndLoc, EndRot, 0.0f, bReverse);
 	}
+}
+
+void AMatch_PlayerPawn::Server_SetResetAfterMove_Implementation(AParentPiece* PieceToUpdate, bool bNewReset)
+{
+	/* If the given piece is valid, update its AI's bResetAfterMove variable. */
+	if (IsValid(PieceToUpdate))
+	{
+		Cast<APieceAIController>(PieceToUpdate->GetController())->bResetAfterMove = bNewReset;
+	}
+}
+
+void AMatch_PlayerPawn::Server_UseActiveAbility_Implementation(AParentPiece* AbilityUser, const TArray<AActor*>& Targets)
+{
+	/* Call the ability with server authority. */
+	if (IsValid(AbilityUser))
+		AbilityUser->OnActiveAbility(Targets);
 }
