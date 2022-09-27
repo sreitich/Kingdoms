@@ -55,6 +55,10 @@ public:
 		void FlashHighlightTimeline(FLinearColor NewColor, float NewBrightness, FLinearColor OriginalColor, float
 			OriginalBrightness, float Speed, float Duration);
 
+	/* Spawns and animates a modifier pop-up with the appropriate information at this piece's pop-up location. */
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void Multicast_CreateModifierPopUp(int ValueChange, bool bStrength);
+
 
 /* Public functions overridden by each piece. */
 public:
@@ -182,7 +186,7 @@ public:
 	bool bActiveAbilityLoops = false;
 
 
-/* Public assets. */
+/* Public constants and asset references. */
 public:
 
 	/* Pointer to the piece data table, used to retrieve this piece's statistics. */
@@ -253,7 +257,7 @@ protected:
 	virtual void BeginPlay() override;
 
 
-/* Protected constant variables. */
+/* Protected constants and asset references. */
 protected:
 
 	/* The material used for this piece's skeletal meshes, including the parent mesh. Used to edit the fresnel during runtime. */
@@ -271,6 +275,10 @@ protected:
 	/* The widget that is created to confirm this piece's active ability. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Abilities")
 	TSubclassOf<UUserWidget> ActiveAbilityConfirmationClass;
+
+	/* The class to be spawned when creating a modifier pop-up actor. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Pop-Ups")
+	TSubclassOf<class AModifierBoardPopup> ModifierBoardPopupClass;
 
 
 /* Protected runtime variables. These are variables that change during runtime, instead of being constants stored in the piece data table. */

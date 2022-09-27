@@ -6,6 +6,7 @@
 #include "Animations/AnimInstance_Parent.h"
 #include "Board/BoardManager.h"
 #include "Board/BoardTile.h"
+#include "Board/ModifierBoardPopup.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/PopUpLocationComponent.h"
 #include "Framework/Match/Match_GameStateBase.h"
@@ -197,6 +198,32 @@ void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float Du
 		Duration);
 }
 
+void AParentPiece::Multicast_CreateModifierPopUp_Implementation(int ValueChange, bool bStrength)
+{
+	/* Define additional spawn parameters. */
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Instigator = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	/* Get the location and rotation to spawn this pop-up at. */
+	const FVector SpawnLocation = PopUpLocationComponent->GetComponentLocation();
+	const FRotator SpawnRotation = PopUpLocationComponent->GetComponentRotation();
+	
+	/* Spawn a piece of a given class from the server. */
+	AModifierBoardPopup* SpawnedPopUp = Cast<AModifierBoardPopup>(GetWorld()->SpawnActor
+	(
+		ModifierBoardPopupClass,
+		&SpawnLocation,
+		&SpawnRotation,
+		SpawnParams
+	));
+
+	/* Activate the pop-up. */
+	SpawnedPopUp->BP_ActivateModifierPopUp(SpawnLocation, ValueChange, true, 1.0f);
+
+	UE_LOG(LogTemp, Error, TEXT("Created pop-up"));
+}
+
 TArray<ABoardTile*> AParentPiece::GetValidTiles()
 {
 	/* This array of valid tiles is going to be returned. */
@@ -364,8 +391,15 @@ bool AParentPiece::SetCurrentStrength(int NewStrength, bool bActivatePopUp)
 	/* Make sure that the server is calling this. */
 	if (HasAuthority())
 	{
+		/* Save the original strength to find the value to display in the modifier pop-up. */
+		const int OriginalStrength = CurrentStrength;
+		
 		/* Strength cannot go below 0 or above 20. */
 		CurrentStrength = FMath::Clamp(NewStrength, 0, 20);
+
+		/* Spawn a strength modifier pop-up if requested. */
+		if (bActivatePopUp)
+			Multicast_CreateModifierPopUp(CurrentStrength - OriginalStrength, true);
 
 		return true;
 	}
@@ -378,8 +412,15 @@ bool AParentPiece::SetCurrentArmor(int NewArmor, bool bActivatePopUp)
 	/* Make sure that the server is calling this. */
 	if (HasAuthority())
 	{
+		/* Save the original armor to find the value to display in the modifier pop-up. */
+		const int OriginalArmor = CurrentArmor;
+			
 		/* Armor cannot go below 0 or above 20. */
 		CurrentArmor = FMath::Clamp(NewArmor, 0, 20);
+
+		/* Spawn an armor modifier pop-up if requested. */
+		if (bActivatePopUp)
+			Multicast_CreateModifierPopUp(CurrentArmor - OriginalArmor, false);
 
 		return true;
 	}

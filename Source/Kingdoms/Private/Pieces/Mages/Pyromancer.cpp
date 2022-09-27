@@ -189,21 +189,4 @@ void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 	 */
 
 	BP_OnActiveAbility(Cast<AParentPiece>(Targets[0]));
-
-	// for (const APlayerState* PlayerStatePtr : UGameplayStatics::GetGameState(this)->PlayerArray)
-	// {
-	// 	/* Zoom each player into the fight. */
-	// 	if (AMatch_PlayerPawn* PlayerPawnPtr = Cast<AMatch_PlayerPawn>(PlayerStatePtr->GetPawn()))
-	// 	{
-	// 		PlayerPawnPtr->DisableInput(Cast<APlayerController>(PlayerPawnPtr->GetController()));
-	// 		PlayerPawnPtr->Client_MovePlayerCamera(this, Cast<AParentPiece>(Targets[0]), false);
-	// 	}
-	//
-	// 	/* Play the power-up animation. Needs to be replicated. */
-	// 	if (UAnimInstance_Parent* AnimInstance = Cast<UAnimInstance_Parent>(GetMesh()->GetAnimInstance()))
-	// 	{
-	// 		AnimInstance->ActiveAbilityAnimation = PowerUpAnimation;
-	// 		AnimInstance->bUsingActive = true;
-	// 	}
-	// }
 }
