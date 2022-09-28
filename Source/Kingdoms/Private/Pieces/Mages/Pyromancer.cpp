@@ -9,6 +9,7 @@
 #include "Framework/Match/Match_GameStateBase.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
+// #include "Pieces/ParentPiece.h"
 #include "UserInterface/Match/ActiveAbilityConfirmations/Mages/Pyromancer/Match_PyroActiveConfirmation.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -187,6 +188,17 @@ void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 	 * Change the pyromancer's attack animation.
 	 * Start the attack sequence.
 	 */
+
+	/* Refresh the highlight of every tile except for the one with the target piece. */
+	for (AActor* Actor : GetActiveAbilityRange())
+	{
+		ABoardTile* Tile = Cast<ABoardTile>(Actor);
+		
+		if (IsValid(Tile) && Tile != Cast<AParentPiece>(Targets[0])->GetCurrentTile())
+		{
+			Tile->RefreshHighlight();
+		}
+	}
 
 	BP_OnActiveAbility(Cast<AParentPiece>(Targets[0]));
 }

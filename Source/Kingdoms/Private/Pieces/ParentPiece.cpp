@@ -220,8 +220,6 @@ void AParentPiece::Multicast_CreateModifierPopUp_Implementation(int ValueChange,
 
 	/* Activate the pop-up. */
 	SpawnedPopUp->BP_ActivateModifierPopUp(SpawnLocation, ValueChange, true, 1.0f);
-
-	UE_LOG(LogTemp, Error, TEXT("Created pop-up"));
 }
 
 TArray<ABoardTile*> AParentPiece::GetValidTiles()
