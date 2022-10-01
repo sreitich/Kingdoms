@@ -54,8 +54,11 @@ public:
 /* Public assets. */
 public:
 
-	/* Played when this piece uses its active ability when powering up before using
-	 * its active ability animation to attack. */
+	/* Played when this piece attacks using a "move" action. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
-	UAnimSequenceBase* PowerUpAnimation;
+	UAnimSequenceBase* MoveAttackAnimation;
+
+	/* Played when this piece attacks using its active ability, "Fireball." */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UAnimSequenceBase* FireballAttackAnimation;
 };

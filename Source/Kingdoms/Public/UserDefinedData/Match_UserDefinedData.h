@@ -88,16 +88,20 @@ struct FAttackInfo
 	
 	/* The piece initiating the attack. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class AParentPiece* Attacker;
+	class AParentPiece* Attacker = nullptr;
 
 	/* The target of the attack. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AParentPiece* Defender;
+	AParentPiece* Defender = nullptr;
 
 	/* If the attacker needs to move to the defender before attacking. Usually only false if the attack is ranged. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bMoveTo;
 
+	/* If the attacker has moved to the defender because bMoveTo was true and it was far enough away. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bMoved;
+	
 	/* If the defender fights back against the attacker. False indicates that this is a one-sided attack. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bDefenderFights;

@@ -439,7 +439,7 @@ void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo)
 
 	/* Call the blueprint implementation of the attack sequence with server authority. Blueprint-implementable events
 	 * can't be RPCs. */
-	Server_Attack_BP(InInfo);
+	BP_Attack(InInfo);
 }
 
 void AMatch_PlayerPawn::Client_MovePlayerCamera_Implementation(const AParentPiece* Attacker,

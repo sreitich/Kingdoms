@@ -198,7 +198,7 @@ public:
 	UBlendSpaceBase* IdleWalkBS;
 
 	/* Played when this piece attacks. This needs to have an "EndAttack" animation notify. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Animations")
 	UAnimSequenceBase* AttackAnimation;
 
 	/* Played when this piece takes damage without fighting back. This needs to have an "EndTakeDamage" animation notify. */

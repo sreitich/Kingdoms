@@ -43,12 +43,12 @@ public:
 		void ClearSelection(bool bDeselect);
 
 	/* Calls the blueprint-implemented attack sequence with server authority. */
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_Attack(const FAttackInfo InInfo);
 
 	    /* Scripted attack sequence via blueprint. */
 	    UFUNCTION(BlueprintImplementableEvent)
-	    void Server_Attack_BP(const FAttackInfo InInfo);
+	    void BP_Attack(const FAttackInfo InInfo);
 
 			/* Calculates a target location and rotation and smoothly interpolates the player's camera to that location
 			 * and rotation. */
