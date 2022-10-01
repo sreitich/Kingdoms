@@ -432,14 +432,14 @@ void AMatch_PlayerPawn::ClearSelection(bool bDeselect)
 	}
 }
 
-void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo)
+void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo, bool bMoveCamera)
 {
     /* Remove the piece info widgets and reset this player's selection. */
     ClearSelection(true);
 
 	/* Call the blueprint implementation of the attack sequence with server authority. Blueprint-implementable events
 	 * can't be RPCs. */
-	BP_Attack(InInfo);
+	BP_Attack(InInfo, bMoveCamera);
 }
 
 void AMatch_PlayerPawn::Client_MovePlayerCamera_Implementation(const AParentPiece* Attacker,

@@ -67,12 +67,13 @@ void UMatch_AttackConfirmation::OnAttackClicked()
 	FAttackInfo AttackInfo;
 	AttackInfo.Attacker = PendingFriendlyPiece;
 	AttackInfo.Defender = PendingEnemyPiece;
-	AttackInfo.bDefenderFights = true;
 	AttackInfo.bMoveTo = true;
+	AttackInfo.bMoved = false;
+	AttackInfo.bDefenderFights = true;
 	AttackInfo.bTakePlace = true;
 	
 	/* Tell the server to execute the attack logic with authority and on each client. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->Server_Attack(AttackInfo);
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->Server_Attack(AttackInfo, true);
 
 	/* Refresh each tile's highlight to clear the highlights for attacking options. */
 	for (ABoardTile* Tile : PendingFriendlyPiece->GetValidTiles())

@@ -181,14 +181,6 @@ void APyromancer::StartActiveConfirmation(TArray<AActor*> Targets)
 
 void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 {
-	/* Zoom each player's camera into the fight
-	 * Set attack animation to be the power-up animation.
-	 * In the power-up animation, increase the piece's strength and make a strength buff pop-up
-	 * When the animation ends, reset the attack animation variable.
-	 * Change the pyromancer's attack animation.
-	 * Start the attack sequence.
-	 */
-
 	/* Refresh the highlight of every tile except for the one with the target piece. */
 	for (AActor* Actor : GetActiveAbilityRange())
 	{
@@ -199,6 +191,7 @@ void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 			Tile->RefreshHighlight();
 		}
 	}
-
+		
+	/* Call the blueprint implementation of the ability, which begins the power-up phase. */
 	BP_OnActiveAbility(Cast<AParentPiece>(Targets[0]));
 }
