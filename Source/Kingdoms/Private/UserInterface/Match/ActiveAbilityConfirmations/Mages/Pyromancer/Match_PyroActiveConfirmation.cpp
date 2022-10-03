@@ -3,10 +3,8 @@
 
 #include "UserInterface/Match/ActiveAbilityConfirmations/Mages/Pyromancer/Match_PyroActiveConfirmation.h"
 
-#include "Animations/AnimInstance_Parent.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "GameFramework/GameStateBase.h"
-#include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Pieces/ParentPiece.h"
 #include "Pieces/Mages/Pyromancer.h"
@@ -20,6 +18,8 @@ void UMatch_PyroActiveConfirmation::OnAttackClicked()
 	
 		Cast<AMatch_PlayerPawn>(GetOwningPlayerPawn())->Server_UseActiveAbility(PendingFriendlyPiece, Targets);
 	}
+
+	ConfirmingPiece->ConfirmationWidget = nullptr;
 	
 	/* Destroy this widget after the ability is confirmed. */
 	RemoveFromParent();

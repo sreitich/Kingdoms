@@ -14,6 +14,12 @@ class KINGDOMS_API UMatch_PyroActiveConfirmation : public UMatch_AttackConfirmat
 {
 	GENERATED_BODY()
 
+/* Public variables. */
+public:
+
+	UPROPERTY()
+	class APyromancer* ConfirmingPiece = nullptr;
+	
 /* Protected functions. */
 protected:
 

@@ -145,6 +145,7 @@ void APyromancer::StartActiveConfirmation(TArray<AActor*> Targets)
 	{
 		/* Create an ability confirmation widget. */
 		ConfirmationWidget = CreateWidget<UMatch_PyroActiveConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
+		ConfirmationWidget->ConfirmingPiece = this;
 		ConfirmationWidget->AddToViewport(0);
 	}
 
@@ -173,8 +174,6 @@ void APyromancer::StartActiveConfirmation(TArray<AActor*> Targets)
 	
 		/* Highlight the pending tile. */
 		Cast<ABoardTile>(Target->GetCurrentTile())->Highlight->SetMaterial(0, Target->GetCurrentTile()->Highlight_Target);
-
-		UE_LOG(LogTemp, Error, TEXT("Updated"));
 	}
 }
 
@@ -205,7 +204,7 @@ void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 		if (PieceData)
 		{
 			/* Put the ability onto cooldown. */
-			SetActiveCD(PieceData->ActiveCD);
+			// SetActiveCD(PieceData->ActiveCD);
 		}
 	}
 }
