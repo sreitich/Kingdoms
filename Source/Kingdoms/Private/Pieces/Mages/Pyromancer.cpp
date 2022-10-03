@@ -204,7 +204,7 @@ void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 		if (PieceData)
 		{
 			/* Put the ability onto cooldown. */
-			// SetActiveCD(PieceData->ActiveCD);
+			SetActiveCD(PieceData->ActiveCD);
 		}
 	}
 }
