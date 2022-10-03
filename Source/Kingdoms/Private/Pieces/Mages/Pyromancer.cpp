@@ -3,13 +3,12 @@
 
 #include "Pieces/Mages/Pyromancer.h"
 
-#include "Animations/AnimInstance_Parent.h"
 #include "Board/BoardManager.h"
 #include "Board/BoardTile.h"
 #include "Framework/Match/Match_GameStateBase.h"
 #include "Framework/Match/Match_PlayerPawn.h"
-#include "Framework/Match/Match_PlayerState.h"
-// #include "Pieces/ParentPiece.h"
+#include "UserDefinedData/PieceData_UserDefinedData.h"
+
 #include "UserInterface/Match/ActiveAbilityConfirmations/Mages/Pyromancer/Match_PyroActiveConfirmation.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -194,4 +193,19 @@ void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 		
 	/* Call the blueprint implementation of the ability, which begins the power-up phase. */
 	BP_OnActiveAbility(Cast<AParentPiece>(Targets[0]));
+
+	/* If the piece data table was found... */
+	if (PieceDataTable)
+	{
+		/* Get this piece's row from the piece data. */
+		static const FString ContextString(TEXT("Piece Data Struct"));
+		const FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(PieceID, ContextString, true);
+
+		/* If the data table row was found... */
+		if (PieceData)
+		{
+			/* Put the ability onto cooldown. */
+			SetActiveCD(PieceData->ActiveCD);
+		}
+	}
 }
