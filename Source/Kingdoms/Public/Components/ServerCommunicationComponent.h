@@ -32,9 +32,14 @@ public:
 	UFUNCTION(Server, Reliable)
 	void UpdatePiecePosition_Server(AActor* InPiece, AActor* InNewTile);
 
-	/* Moves a piece to a new tile on the server, while also updating relevant actor data, including current tile and occupying piece references. If bFromMove, the player state will be reset to E_SelectingPiece. */
+	/* Rotates the piece to a target tile destination and calls MovePieceToTile when completed. */
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void MovePieceToTile_Server(AParentPiece* PieceToMove, ABoardTile* NewTile, bool bFromMove);
+	void Server_MovePieceToTile(AParentPiece* PieceToMove, ABoardTile* NewTile, bool bResetStateWhenFinished);
+
+	/* Moves a piece to a new tile on the server, while also updating relevant actor data, including current tile and occupying piece references.
+	If bFromMove, the player state will be reset to E_SelectingPiece. Called after Server_MovePieceToTile() finishes rotating the target piece. */
+		UFUNCTION(BlueprintCallable)
+		void MovePieceToTile(AParentPiece* PieceToMove, ABoardTile* NewTile, bool bResetStateWhenFinished);
 	
 
 /* Protected functions. */

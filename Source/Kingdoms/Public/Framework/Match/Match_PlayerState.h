@@ -50,7 +50,7 @@ public:
 public:
 
 	/* Which of the two players this player state belongs to. */
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, BlueprintReadOnly)
 	int PlayerIndex;
 
 	/* An array of every piece that this player owns. */

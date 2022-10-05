@@ -21,8 +21,8 @@ public:
 	APieceAIController();
 
 	/* Moves the piece to a new tile. */
-	UFUNCTION(BlueprintCallable)
-	void MovePieceToTile(ABoardTile* NewTile);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void MovePieceToTile(ABoardTile* NewTile, bool bResetStateWhenFinished);
 
 	/* Called when a move request is completed. */
 	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
@@ -33,5 +33,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement")
 	bool bResetAfterMove = false;
-
 };

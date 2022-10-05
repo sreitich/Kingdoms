@@ -41,6 +41,12 @@ public:
 
 		/* Clears the currently selected piece and removes all piece-information pop-ups. */
 		void ClearSelection(bool bDeselect);
+	
+	/* Smoothly rotates the piece to the target rotation over a short time period. If bMoveWhenFinished is true, the
+	 * piece is moved to the target tile when it finishes rotating. If bResetStateWhenFinished is true, the player's
+	 * state is reset after the piece finishes rotating. */
+	UFUNCTION(BlueprintImplementableEvent)
+	void InterpolatePieceRotation(AParentPiece* PieceToRotate, ABoardTile* NewTile, FRotator CurrentRot, FRotator TargetRot, bool bMoveWhenFinished, bool bResetStateWhenFinished);
 
 	/* Calls the blueprint-implemented attack sequence with server authority. */
 	UFUNCTION(Server, Reliable, BlueprintCallable)

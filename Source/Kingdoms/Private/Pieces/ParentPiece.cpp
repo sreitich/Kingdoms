@@ -181,7 +181,7 @@ void AParentPiece::Server_ResetPieceRotation_Implementation()
 	/* Get the player start that spawned this piece's owning player. */
 	const AActor* PlayerStart = GameStatePtr->PlayerStarts[PlayerIndex - 1];
 	/* Interpolate this actor's rotation to the rotation that its owning player was spawned at. */
-	InterpolatePieceRotation(GetActorRotation(),PlayerStart->GetActorRotation());
+	Cast<AMatch_PlayerPawn>(GetInstigator())->InterpolatePieceRotation(this, nullptr, GetActorRotation(),PlayerStart->GetActorRotation(), false, false);
 }
 
 void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float Duration)

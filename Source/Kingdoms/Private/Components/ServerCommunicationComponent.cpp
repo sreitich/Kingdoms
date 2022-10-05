@@ -3,12 +3,14 @@
 
 #include "Components/ServerCommunicationComponent.h"
 
-#include "Framework/Match/Match_PlayerState.h"
-#include "Pieces/ParentPiece.h"
 #include "Board/BoardTile.h"
 #include "Framework/Match/Match_PlayerController.h"
 #include "Framework/Match/Match_PlayerPawn.h"
+#include "Framework/Match/Match_PlayerState.h"
+#include "Pieces/ParentPiece.h"
 #include "Pieces/PieceAIController.h"
+
+#include "Kismet/KismetMathLibrary.h"
 
 UServerCommunicationComponent::UServerCommunicationComponent()
 {
@@ -77,23 +79,32 @@ void UServerCommunicationComponent::UpdatePiecePosition_Server_Implementation(AA
 	}
 }
 
-void UServerCommunicationComponent::MovePieceToTile_Server_Implementation(AParentPiece* PieceToMove,
-	ABoardTile* NewTile, bool bFromMove)
+void UServerCommunicationComponent::Server_MovePieceToTile_Implementation(AParentPiece* PieceToMove,
+	ABoardTile* NewTile, bool bResetStateWhenFinished)
+{
+	/* Rotate the piece towards its destination. When it finishes rotating, it calls MovePieceToTile. */
+	Cast<AMatch_PlayerPawn>(PieceToMove->GetInstigator())->InterpolatePieceRotation(
+		PieceToMove,
+		NewTile,
+		PieceToMove->GetActorRotation(),
+		UKismetMathLibrary::FindLookAtRotation(PieceToMove->GetCurrentTile()->GetActorLocation(), NewTile->GetActorLocation()),
+		true,
+		true);
+}
+
+void UServerCommunicationComponent::MovePieceToTile(AParentPiece* PieceToMove, ABoardTile* NewTile, bool bResetStateWhenFinished)
 {
 	/* If the piece has a valid piece AI controller, use it to move the piece on the server. */
 	if (IsValid(PieceToMove->GetController()) && PieceToMove->GetController()->GetClass()->IsChildOf(APieceAIController::StaticClass()))
 	{
-		Cast<APieceAIController>(PieceToMove->GetController())->MovePieceToTile(NewTile);
+		/* This will reset the player's state when the piece finishes moving if bResetStateWhenFinished is true. */
+		Cast<APieceAIController>(PieceToMove->GetController())->MovePieceToTile(NewTile, bResetStateWhenFinished);
 	}
 
 	/* Update the piece's new tile and the new tile's occupying piece on the server. */
 	NewTile->SetOccupyingPiece(PieceToMove);
 	PieceToMove->GetCurrentTile()->SetOccupyingPiece(nullptr);
 	PieceToMove->SetCurrentTile(NewTile);
-
-	/* Reset the player's player state to selecting an action if this move was the result of a move action, rather than an attack or ability. */
-	if (bFromMove)
-		Cast<AMatch_PlayerController>(OwningPlayerController)->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
 }
 
 void UServerCommunicationComponent::BeginPlay()

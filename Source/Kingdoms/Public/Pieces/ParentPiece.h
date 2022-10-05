@@ -41,10 +41,6 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_ResetPieceRotation();
 
-		/* Smoothly rotates the piece to the target rotation over a short time period. */
-		UFUNCTION(BlueprintImplementableEvent)
-		void InterpolatePieceRotation(FRotator CurrentRot, FRotator TargetRot);
-
 	/* Flashes a given highlight onto the piece at a given strength for a given amount of time. */
 	UFUNCTION(BlueprintCallable)
 	void FlashHighlight(FLinearColor Color, float Brightness, float Duration);
