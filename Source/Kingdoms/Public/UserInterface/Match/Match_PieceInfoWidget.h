@@ -10,6 +10,14 @@ struct FPieceDataStruct;
 
 class AParentPiece;
 
+class UButton;
+class UCanvasPanel;
+class UDataTable;
+class UImage;
+class UTextBlock;
+class UTexture2D;
+class UVerticalBox;
+
 /**
  * 
  */
@@ -83,45 +91,37 @@ protected:
 	
 	/* Pointer to the piece currently being displayed. */
 	UPROPERTY()
-	class AParentPiece* DisplayedPiece;
+	AParentPiece* DisplayedPiece;
 
 	/* Pointer to the piece data table, used to retrieve information to display. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data")
-	class UDataTable* PieceDataTable;
+	UDataTable* PieceDataTable;
 
 	/* Pointers to the images to use as backgrounds for each rarity. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Backgrounds")
-	class UTexture2D* Background_Basic;
+	UTexture2D* Background_Basic;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Backgrounds")
-	class UTexture2D* Background_Superior;
+	UTexture2D* Background_Superior;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Backgrounds")
-	class UTexture2D* Background_Heroic;
+	UTexture2D* Background_Heroic;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Backgrounds")
-	class UTexture2D* Background_Champion;
+	UTexture2D* Background_Champion;
 
 	/* Pointers to the images that need to be changed depending on the affinity of the selected piece. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Affinity Indicators")
-	class UTexture2D* ActiveBackground_Friendly;
+	UTexture2D* ActiveBackground_Friendly;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Affinity Indicators")
-	class UTexture2D* ActiveBackground_Enemy;
+	UTexture2D* ActiveBackground_Enemy;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Affinity Indicators")
-	class UTexture2D* PassiveBackground_Friendly;
+	UTexture2D* PassiveBackground_Friendly;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Affinity Indicators")
-	class UTexture2D* PassiveBackground_Enemy;
-
-
-/* Protected widget class types. */
-protected:
-
-	/* Class reference for spawning the ability info pop-up when an ability is hovered over. */
-	UPROPERTY(EditAnywhere, Category="Default")
-	TSubclassOf<UUserWidget> AbilityInfoClass;
+	UTexture2D* PassiveBackground_Enemy;
 
 
 /* Protected widgets. */
@@ -129,83 +129,83 @@ protected:
 
 	/* The piece's photo background (dependent on rarity). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UImage* DisplayedPhotoBackground;
+	UImage* DisplayedPhotoBackground;
 
 	/* The piece's photo. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UImage* DisplayedPhoto;
+	UImage* DisplayedPhoto;
 
 	/* This piece's name. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UTextBlock* DisplayedPieceName;
+	UTextBlock* DisplayedPieceName;
 
 	/* This piece's rarity. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UTextBlock* DisplayedPieceRarity;
+	UTextBlock* DisplayedPieceRarity;
 
 	/* This piece's class. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UTextBlock* DisplayedPieceClass;
+	UTextBlock* DisplayedPieceClass;
 
 	/* This piece's current strength (including modifiers). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UTextBlock* DisplayedStrength;
+	UTextBlock* DisplayedStrength;
 
 	/* This piece's current armor (including modifiers). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UTextBlock* DisplayedArmor;
+	UTextBlock* DisplayedArmor;
 
 	/* Contains all of the active ability widgets. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UVerticalBox* ActiveAbilityBox;
+	UVerticalBox* ActiveAbilityBox;
 
 	/* Displays the active ability background and brings up a description when hovered over. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UButton* ActiveAbilityBackgroundButton;
+	UButton* ActiveAbilityBackgroundButton;
 
 	/* Displays this piece's active ability's icon. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UImage* ActiveAbilityIcon;
+	UImage* ActiveAbilityIcon;
 
 	/* Semi-transparent image that greys out the active ability icon if the cooldown is active. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UImage* ActiveCooldownIndicator;
+	UImage* ActiveCooldownIndicator;
 
 	/* Live counter of how many turns before this piece's active ability can be used again. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UTextBlock* DisplayedActiveCD;
+	UTextBlock* DisplayedActiveCD;
 
 	/* Contains all of the passive ability widgets. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UVerticalBox* PassiveAbilityBox;
+	UVerticalBox* PassiveAbilityBox;
 
 	/* Displays the passive ability background and brings up a description when hovered over. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UButton* PassiveAbilityBackgroundButton;
+	UButton* PassiveAbilityBackgroundButton;
 
 	/* Displays this piece's passive ability's icon. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UImage* PassiveAbilityIcon;
+	UImage* PassiveAbilityIcon;
 
 	/* Semi-transparent image that greys out the passive ability icon if the cooldown is active. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UImage* PassiveCooldownIndicator;
+	UImage* PassiveCooldownIndicator;
 
 	/* Live counter of how many turns before this piece's passive ability can be used again. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UTextBlock* DisplayedPassiveCD;
+	UTextBlock* DisplayedPassiveCD;
 
 	/* Button that prompts a piece to move or attack when clicked. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UButton* MoveButton;
+	UButton* MoveButton;
 
 	/* Button that prompts a piece to use its active ability when clicked. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UButton* ActiveButton;
+	UButton* ActiveButton;
 
-	/* Pointer to the ability info pop-up to manipulate it. */
+	/* Pointer to the ability info pop-up. */
 	UPROPERTY()
-	class UMatch_AbilityInfo* AbilityInfoWidget = nullptr;
+	class UMatch_AbilityInfoPopup* AbilityInfoPopup = nullptr;
 
 
 /* Protected animations. */

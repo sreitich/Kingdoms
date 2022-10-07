@@ -14,6 +14,7 @@
 #include "UserInterface/Match/Match_AbilityInfo.h"
 
 #include "Runtime/UMG/Public/UMG.h"
+#include "UserInterface/Match/Match_AbilityInfoPopup.h"
 
 void UMatch_PieceInfoWidget::NativeConstruct()
 {
@@ -300,34 +301,43 @@ void UMatch_PieceInfoWidget::PlayOpenCloseAnim(bool bOpen, float StartTime, int3
 void UMatch_PieceInfoWidget::OnActiveHovered()
 {
     /* If the piece data has been found for this piece and the ability info class is set... */
-    if (PieceData && AbilityInfoClass)
+    if (PieceData && DisplayedPiece->ActiveAbilityInfoWidget)
     {
-        /* Create a new ability info pop-up widget and update its name and description. */
-        AbilityInfoWidget = Cast<UMatch_AbilityInfo>(CreateWidget<UUserWidget>(GetWorld(), AbilityInfoClass, FName("Ability Info")));
-        AbilityInfoWidget->AddToViewport(0);
-        AbilityInfoWidget->UpdateAbilityInfo(PieceData->ActiveName, PieceData->ActiveDes);
+        /* Create a new ability info pop-up widget and update its information. */
+        AbilityInfoPopup = Cast<UMatch_AbilityInfoPopup>(CreateWidget<UUserWidget>(GetWorld(), DisplayedPiece->ActiveAbilityInfoWidget, FName("Ability Info Pop-Up")));
+        AbilityInfoPopup->SetUpWidget(DisplayedPiece, true);
+        /* Attach the widget to the active ability icon. */
+        ActiveAbilityBackgroundButton->AddChild(AbilityInfoPopup);
+        /* Offset the widget based on the size of the ability icon. */
+        UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(AbilityInfoPopup->AbilityInfoOverlay->Slot);
+        CanvasSlot->SetPosition(FVector2D(ActiveAbilityBackgroundButton->GetDesiredSize().X - 20.0f, -ActiveAbilityBackgroundButton->GetDesiredSize().Y + 20.0f));
     }
 }
 
 void UMatch_PieceInfoWidget::OnPassiveHovered()
 {
     /* If the piece data has been found for this piece and the ability info class is set... */
-    if (PieceData && AbilityInfoClass)
+    if (PieceData && DisplayedPiece->PassiveAbilityInfoWidget)
     {
-        /* Create a new ability info pop-up widget and update its name and description. */
-        AbilityInfoWidget = Cast<UMatch_AbilityInfo>(CreateWidget<UUserWidget>(GetWorld(), AbilityInfoClass, FName("Ability Info")));
-        AbilityInfoWidget->AddToViewport(0);
-        AbilityInfoWidget->UpdateAbilityInfo(PieceData->PassiveName, PieceData->PassiveDes);
+        /* Create a new ability info pop-up widget and update its information. */
+        AbilityInfoPopup = Cast<UMatch_AbilityInfoPopup>(CreateWidget<UUserWidget>(GetWorld(), DisplayedPiece->PassiveAbilityInfoWidget, FName("Ability Info Pop-Up")));
+        AbilityInfoPopup->SetUpWidget(DisplayedPiece, false);
+        /* Attach the widget to the passive ability icon. */
+        PassiveAbilityBackgroundButton->AddChild(AbilityInfoPopup);
+        /* Offset the widget based on the size of the ability icon. */
+        UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(AbilityInfoPopup->AbilityInfoOverlay->Slot);
+        CanvasSlot->SetPosition(FVector2D(PassiveAbilityBackgroundButton->GetDesiredSize().X - 20.0f, -PassiveAbilityBackgroundButton->GetDesiredSize().Y + 20.0f));
     }
 }
 
 void UMatch_PieceInfoWidget::OnAbilityUnhovered()
 {
     /* If an ability info widget is currently displayed... */
-    if (IsValid(AbilityInfoWidget))
+    if (IsValid(AbilityInfoPopup))
     {
         /* Destroy the widget. */
-        AbilityInfoWidget->RemoveFromParent();
+        AbilityInfoPopup->RemoveFromParent();
+        AbilityInfoPopup = nullptr;
     }
 }
 

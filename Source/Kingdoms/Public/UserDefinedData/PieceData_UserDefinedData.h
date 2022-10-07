@@ -68,14 +68,6 @@ struct FPieceDataStruct : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Photos")
 	UTexture2D* PieceCardPortrait = nullptr;
 
-	/* The displayed icon for this piece's active ability. This gets set in blueprints. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Photos")
-	UTexture2D* ActiveIcon = nullptr;
-
-	/* The displayed icon for this piece's passive ability. This gets set in blueprints. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Photos")
-	UTexture2D* PassiveIcon = nullptr;
-
 	/* The photo displayed when a piece is viewed in a match. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Photos")
 	UTexture2D* PieceInfoPhoto = nullptr;
@@ -100,6 +92,10 @@ struct FPieceDataStruct : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
 	int ActiveUses = 0;
 
+	/* The displayed icon for this piece's active ability. This gets set in blueprints. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Photos")
+	UTexture2D* ActiveIcon = nullptr;
+
 	/* This piece's passive ability's name. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
 	FString PassiveName = "";
@@ -115,5 +111,9 @@ struct FPieceDataStruct : public FTableRowBase
 	/* How many times this piece's passive ability can be used. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
 	int PassiveUses = 0;
+
+	/* The displayed icon for this piece's passive ability. This gets set in blueprints. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Photos")
+	UTexture2D* PassiveIcon = nullptr;
 
 };

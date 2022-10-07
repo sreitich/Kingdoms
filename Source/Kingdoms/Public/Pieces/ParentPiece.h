@@ -13,6 +13,8 @@ class ABoardTile;
 class UCurveFloat;
 class UPopUpLocationComponent;
 
+class UMatch_AbilityInfoPopup;
+
 UCLASS()
 class KINGDOMS_API AParentPiece : public ACharacter
 {
@@ -176,6 +178,14 @@ public:
 	/* This piece's unique identifier, set in-editor for each child piece. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Piece Info")
 	FName PieceID = "0-00";
+
+	/* The widget to display when hovering over this piece's passive ability. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widgets")
+	TSubclassOf<UUserWidget> PassiveAbilityInfoWidget;
+
+	/* The widget to display when hovering over this piece's active ability. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widgets")
+	TSubclassOf<UUserWidget> ActiveAbilityInfoWidget;
 
 	/* Determines whether this piece's active ability animation is looped or not. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
