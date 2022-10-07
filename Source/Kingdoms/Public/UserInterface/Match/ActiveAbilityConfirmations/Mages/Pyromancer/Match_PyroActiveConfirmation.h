@@ -25,5 +25,8 @@ protected:
 
 	/* We need additional "fireball" ability code to execute before starting the attack. */
 	virtual void OnAttackClicked() override;
+
+	/* Overridden to clean up everything when the active ability is cancelled. */
+	virtual void OnCancelClicked() override;
 	
 };

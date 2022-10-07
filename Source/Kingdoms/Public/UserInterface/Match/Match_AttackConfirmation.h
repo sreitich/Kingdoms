@@ -30,7 +30,7 @@ public:
 	/* Resets the move action. Public to be used by the player controller when deselecting a piece while selecting a
 	 * move destination. */
 	UFUNCTION()
-	void OnCancelClicked();
+	virtual void OnCancelClicked();
 
 
 /* Protected functions. */

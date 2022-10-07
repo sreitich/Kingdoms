@@ -144,7 +144,7 @@ void APyromancer::StartActiveConfirmation(TArray<AActor*> Targets)
 	if (!ConfirmationWidget)
 	{
 		/* Create an ability confirmation widget. */
-		ConfirmationWidget = CreateWidget<UMatch_PyroActiveConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
+		ConfirmationWidget = CreateWidget<UMatch_PyroActiveConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Fireball Ability Confirmation Widget"));
 		ConfirmationWidget->ConfirmingPiece = this;
 		ConfirmationWidget->AddToViewport(0);
 	}
@@ -171,6 +171,8 @@ void APyromancer::StartActiveConfirmation(TArray<AActor*> Targets)
 	{
 		/* Update the widget's information. */
 		ConfirmationWidget->UpdateAttackPreviewInfo(this, Target);
+
+		UE_LOG(LogTemp, Error, TEXT("Called"));
 	
 		/* Highlight the pending tile. */
 		Cast<ABoardTile>(Target->GetCurrentTile())->Highlight->SetMaterial(0, Target->GetCurrentTile()->Highlight_Target);

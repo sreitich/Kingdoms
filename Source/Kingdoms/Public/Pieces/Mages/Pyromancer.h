@@ -44,9 +44,11 @@ public:
 /* Public variables. */
 public:
 
+	/* Pointer to the currently displayed active ability confirmation widget. */
 	UPROPERTY()
 	class UMatch_PyroActiveConfirmation* ConfirmationWidget;
 
+	/* Tracks whether or not the piece's power-up animation has played yet. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Active Ability")
 	bool bPowered = false;
 

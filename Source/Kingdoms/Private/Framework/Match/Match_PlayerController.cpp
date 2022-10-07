@@ -65,6 +65,7 @@ void AMatch_PlayerController::CreateSelectArmyWidget_Implementation(bool bDestro
         {
             /* Destroy this widget. */
             MatchSetup_SelectArmy->RemoveFromParent();
+            MatchSetup_SelectArmy = nullptr;
         }
         /* If this widget needs to be created... */
         else
@@ -99,6 +100,7 @@ void AMatch_PlayerController::CreatePlacePiecesWidget_Implementation(FArmyPreset
             {
                 /* Destroy this widget. */
                 MatchSetup_PlacePieces->RemoveFromParent();
+                MatchSetup_PlacePieces = nullptr;
             }
         }
         /* If this widget needs to be created... */
@@ -137,6 +139,7 @@ void AMatch_PlayerController::CreateBaseWidget_Implementation(bool bDestroy, boo
             {
                 /* Destroy it. */
                 Match_BaseWidget->RemoveFromParent();
+                Match_BaseWidget = nullptr;
             }
             /* If this widget needs to be hidden... */
             else if (bHide)
@@ -236,8 +239,9 @@ void AMatch_PlayerController::UpdateMoveConfirmationWidget(bool bDestroy, ABoard
         /* If the confirmation widget needs to be destroyed and the widget exists... */
         if (bDestroy && Match_MoveConfirmation)
         {
-            /* Remove the widget as if the "cancel" button were pressed. */
+            /* Remove the widget as if the "cancel" button were pressed. This destroys the widget. */
             Match_MoveConfirmation->OnCancelClicked();
+            Match_MoveConfirmation = nullptr;
         }
         /* If the confirmation widget needs to be created... */
         else if (!bDestroy)
@@ -268,8 +272,9 @@ void AMatch_PlayerController::UpdateAttackConfirmationWidget(bool bDestroy, APar
         /* If the attack confirmation widget needs to be destroyed and it's already been created... */
         if (bDestroy && Match_AttackConfirmation)
         {
-            /* Remove the widget as if the "cancel" button were pressed. */
+            /* Remove the widget as if the "cancel" button were pressed. This destroys the widget. */
             Match_AttackConfirmation->OnCancelClicked();
+            Match_AttackConfirmation = nullptr;
         }
         /* If the widget needs to be created... */
         else if (!bDestroy)
@@ -301,6 +306,7 @@ void AMatch_PlayerController::UpdateAttackGraphicWidget(bool bDestroy, AParentPi
         {
             /* Remove the widget, destructing it. */
             Match_AttackGraphic->RemoveFromParent();
+            Match_AttackGraphic = nullptr;
         }
         /* If the widget needs to be created... */
         else if (!bDestroy)
