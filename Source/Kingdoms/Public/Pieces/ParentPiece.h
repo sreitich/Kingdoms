@@ -304,6 +304,10 @@ protected:
 	UPROPERTY(Replicated, EditInstanceOnly, Category="Attacking")
 	FAttackInfo AttackInfo;
 
+	/* Every modifier currently applied to this piece's statistics. */
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category="Piece Info")
+	TArray<FModifierSource> TemporaryModifiers;
+
 
 	/* EditAnywhere enabled for playtesting. These will be changed to Replicated, EditInstanceOnly, BlueprintReadOnly
 	 * later. */
