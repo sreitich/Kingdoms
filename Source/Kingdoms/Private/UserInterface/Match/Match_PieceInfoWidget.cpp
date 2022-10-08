@@ -305,12 +305,15 @@ void UMatch_PieceInfoWidget::OnActiveHovered()
     {
         /* Create a new ability info pop-up widget and update its information. */
         AbilityInfoPopup = Cast<UMatch_AbilityInfoPopup>(CreateWidget<UUserWidget>(GetWorld(), DisplayedPiece->ActiveAbilityInfoWidget, FName("Ability Info Pop-Up")));
-        AbilityInfoPopup->SetUpWidget(DisplayedPiece, true);
+        AbilityInfoPopup->SetUpWidget(DisplayedPiece, true, DisplayedPiece->GetInstigator()->IsLocallyControlled());
         /* Attach the widget to the active ability icon. */
-        ActiveAbilityBackgroundButton->AddChild(AbilityInfoPopup);
+        ActiveAbilityPopupWrapper->AddChild(AbilityInfoPopup);
+
         /* Offset the widget based on the size of the ability icon. */
         UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(AbilityInfoPopup->AbilityInfoOverlay->Slot);
-        CanvasSlot->SetPosition(FVector2D(ActiveAbilityBackgroundButton->GetDesiredSize().X - 20.0f, -ActiveAbilityBackgroundButton->GetDesiredSize().Y + 20.0f));
+        CanvasSlot->SetPosition(FVector2D(ActiveAbilityBackgroundButton->GetDesiredSize().X / 2.0f, -ActiveAbilityBackgroundButton->GetDesiredSize().Y / 2.0f));
+        /* Align the pop-up to the left if it's for a friendly piece. Align it to the right if it's for an enemy piece. */
+        CanvasSlot->SetAlignment(DisplayedPiece->GetInstigator()->IsLocallyControlled() ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
     }
 }
 
@@ -321,12 +324,15 @@ void UMatch_PieceInfoWidget::OnPassiveHovered()
     {
         /* Create a new ability info pop-up widget and update its information. */
         AbilityInfoPopup = Cast<UMatch_AbilityInfoPopup>(CreateWidget<UUserWidget>(GetWorld(), DisplayedPiece->PassiveAbilityInfoWidget, FName("Ability Info Pop-Up")));
-        AbilityInfoPopup->SetUpWidget(DisplayedPiece, false);
+        AbilityInfoPopup->SetUpWidget(DisplayedPiece, false, DisplayedPiece->GetInstigator()->IsLocallyControlled());
         /* Attach the widget to the passive ability icon. */
-        PassiveAbilityBackgroundButton->AddChild(AbilityInfoPopup);
+        PassiveAbilityPopupWrapper->AddChild(AbilityInfoPopup);
+
         /* Offset the widget based on the size of the ability icon. */
         UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(AbilityInfoPopup->AbilityInfoOverlay->Slot);
-        CanvasSlot->SetPosition(FVector2D(PassiveAbilityBackgroundButton->GetDesiredSize().X - 20.0f, -PassiveAbilityBackgroundButton->GetDesiredSize().Y + 20.0f));
+        CanvasSlot->SetPosition(FVector2D(PassiveAbilityBackgroundButton->GetDesiredSize().X / 2.0f, -PassiveAbilityBackgroundButton->GetDesiredSize().Y / 2.0f));
+        /* Align the pop-up to the left if it's for a friendly piece. Align it to the right if it's for an enemy piece. */
+        CanvasSlot->SetAlignment(DisplayedPiece->GetInstigator()->IsLocallyControlled() ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
     }
 }
 

@@ -14,6 +14,7 @@ class UButton;
 class UCanvasPanel;
 class UDataTable;
 class UImage;
+class USizeBox;
 class UTextBlock;
 class UTexture2D;
 class UVerticalBox;
@@ -163,6 +164,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* ActiveAbilityBackgroundButton;
 
+	/* Widget that the active ability pop-up is parented to. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	USizeBox* ActiveAbilityPopupWrapper;
+
 	/* Displays this piece's active ability's icon. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UImage* ActiveAbilityIcon;
@@ -182,6 +187,10 @@ protected:
 	/* Displays the passive ability background and brings up a description when hovered over. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* PassiveAbilityBackgroundButton;
+
+	/* Widget that the passive ability pop-up is parented to. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	USizeBox* PassiveAbilityPopupWrapper;
 
 	/* Displays this piece's passive ability's icon. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))

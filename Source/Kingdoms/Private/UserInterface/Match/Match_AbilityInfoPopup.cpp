@@ -8,7 +8,7 @@
 
 #include "Components/TextBlock.h"
 
-void UMatch_AbilityInfoPopup::SetUpWidget(AParentPiece* DisplayedPiece, bool bActive)
+void UMatch_AbilityInfoPopup::SetUpWidget(AParentPiece* DisplayedPiece, bool bActive, bool bAlignedLeft)
 {
 	/* Piece's data table asset pointers are public, so we can just steal one from the piece whose ability is being displayed. */
 	if (DisplayedPiece->PieceDataTable)
@@ -25,6 +25,18 @@ void UMatch_AbilityInfoPopup::SetUpWidget(AParentPiece* DisplayedPiece, bool bAc
 			DisplayedAbilityName->SetText(FText::FromString(bActive ? PieceData->ActiveName : PieceData->PassiveName));
 			DisplayedAbilityDescription->SetText(FText::FromString(bActive ? PieceData->ActiveDes : PieceData->PassiveDes));
 		}
+	}
+
+	/* Set the justification of the text. */
+	if (bAlignedLeft)
+	{
+		DisplayedAbilityName->SetJustification(ETextJustify::Left);
+		DisplayedAbilityDescription->SetJustification(ETextJustify::Left);
+	}
+	else
+	{
+		DisplayedAbilityName->SetJustification(ETextJustify::Right);
+		DisplayedAbilityDescription->SetJustification(ETextJustify::Right);
 	}
 }
 

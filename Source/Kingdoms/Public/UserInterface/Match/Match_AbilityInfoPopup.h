@@ -25,7 +25,7 @@ public:
 	/* Called when this widget is created. Updates displayed name and description from the piece data
 	 * table by default. */
 	UFUNCTION()
-	virtual void SetUpWidget(AParentPiece* DisplayedPiece, bool bActive);
+	virtual void SetUpWidget(AParentPiece* DisplayedPiece, bool bActive, bool bAlignedLeft);
 
 
 /* Public widgets. */
