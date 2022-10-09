@@ -148,29 +148,29 @@ struct FCameraInterpolationInfo
 };
 
 USTRUCT(BlueprintType)
-struct FModifierSource
+struct FModifier
 {
 	GENERATED_BODY()
 
 	/* Assigned to ModifiedStat. */
-	static const int Strength = 0;
-	static const int Armor = 1;
+	static const int Armor = 0;
+	static const int Strength = 1;
 
 	/* The piece responsible for the modifier. */
 	UPROPERTY(BlueprintReadWrite)
-	AParentPiece* ModifyingPiece;
+	AParentPiece* SourcePiece;
 
-	/* Which stat is being modified. 0 is strength, 1 is armor. */
+	/* Which stat is being modified. 0 is armor, 1 is strength. */
 	UPROPERTY(BlueprintReadWrite)
-	int ModifiedStat;
+	int EffectedStat;
 
 	/* The net effect of the modifier. */
 	UPROPERTY(BlueprintReadWrite)
-	int ModifierValue;
+	int Value;
 
 	/* The piece responsible for the modifier. */
 	UPROPERTY(BlueprintReadWrite)
-	FText ModifyingAbilityName;
+	FText SourceAbilityName;
 
 	/* The remaining turn duration of the modifier. */
 	UPROPERTY(BlueprintReadWrite)

@@ -142,6 +142,14 @@ void AParentPiece::BeginPlay()
 	}
 }
 
+void AParentPiece::OnRep_CurrentStrength()
+{
+}
+
+void AParentPiece::OnRep_CurrentArmor()
+{
+}
+
 void AParentPiece::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -328,6 +336,12 @@ void AParentPiece::OnActiveAbility(TArray<AActor*> Targets)
 	UE_LOG(LogTemp, Error, TEXT("OnActiveAbility called on a piece without an active ability."));
 }
 
+void AParentPiece::OnActiveEffectEnded(TArray<AActor*> Targets)
+{
+	/* Not all pieces have active abilities. */
+	UE_LOG(LogTemp, Error, TEXT("OnActiveEffectEnded called on a piece without an active ability."));
+}
+
 TArray<AActor*> AParentPiece::GetValidActiveAbilityTargets()
 {
 	/* Not all pieces have active abilities. */
@@ -384,46 +398,75 @@ void AParentPiece::SetAttackInfo(FAttackInfo NewAttackInfo)
 	}
 }
 
-bool AParentPiece::SetCurrentStrength(int NewStrength, bool bActivatePopUp)
+void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool bActivatePopUp)
 {
-	/* Make sure that the server is calling this. */
-	if (HasAuthority())
+	/* Store the original strength or armor value to find out the final change that this modifier applies. */
+	const int OriginalValue = NewModifier.EffectedStat ? CurrentStrength : CurrentArmor;
+	int NewValue = 0;
+
+	/* Set the new statistic, clamped so that it can't go below 0 or above 20. */
+	if (NewModifier.EffectedStat == FModifier::Strength)
 	{
-		/* Save the original strength to find the value to display in the modifier pop-up. */
-		const int OriginalStrength = CurrentStrength;
-		
-		/* Strength cannot go below 0 or above 20. */
-		CurrentStrength = FMath::Clamp(NewStrength, 0, 20);
-
-		/* Spawn a strength modifier pop-up if requested. */
-		if (bActivatePopUp)
-			Multicast_CreateModifierPopUp(CurrentStrength - OriginalStrength, true);
-
-		return true;
+		CurrentStrength = FMath::Clamp(CurrentStrength + NewModifier.Value, 0, 20);
+		NewValue = CurrentStrength;
+	}
+	else
+	{
+		CurrentArmor = FMath::Clamp(CurrentArmor + NewModifier.Value, 0, 20);
+		NewValue = CurrentArmor;
 	}
 
-	return false;
+	// /* If this modifier is already applied, stack it. */
+	// bool bRepeatedModifier;
+	// for (FModifier Modifier : TemporaryModifiers)
+	// {
+	// 	if (Modifier.SourcePiece == NewModifier.SourcePiece)
+	// 	{
+	// 		
+	// 	}
+	// }
+
+	TemporaryModifiers.Add(NewModifier);
+	
+	/* Spawn a modifier pop-up if requested. */
+	if (bActivatePopUp)
+		Multicast_CreateModifierPopUp(NewValue - OriginalValue, bool(NewModifier.EffectedStat));
 }
 
-bool AParentPiece::SetCurrentArmor(int NewArmor, bool bActivatePopUp)
+void AParentPiece::Server_DecrementModifierDurations_Implementation()
 {
-	/* Make sure that the server is calling this. */
-	if (HasAuthority())
+	/* For every modifier applied to this piece... */
+	for (int i = 0; i < TemporaryModifiers.Num(); i++)
 	{
-		/* Save the original armor to find the value to display in the modifier pop-up. */
-		const int OriginalArmor = CurrentArmor;
+		/* Reduce the remaining duration by 1 turn. */
+		const int NewRemainingDuration = TemporaryModifiers[i].RemainingDuration--;
+
+		/* If the modifier's duration has ended... */
+		if (NewRemainingDuration < 1)
+		{
+			/* Get a shortened reference to the currently iterated modifier for readability. */
+			const FModifier& Modifier = TemporaryModifiers[i];
 			
-		/* Armor cannot go below 0 or above 20. */
-		CurrentArmor = FMath::Clamp(NewArmor, 0, 20);
+			/* Call any ability-specific logic that needs to execute when an active ability's effect ends. */
+			const TArray<AActor*> Targets = { this };
+			Modifier.SourcePiece->OnActiveEffectEnded(Targets);
 
-		/* Spawn an armor modifier pop-up if requested. */
-		if (bActivatePopUp)
-			Multicast_CreateModifierPopUp(CurrentArmor - OriginalArmor, false);
+			/* Remove the effect of the modifier from the stat it was modifying. */
+			if (Modifier.EffectedStat == FModifier::Strength)
+			{
+				CurrentStrength = FMath::Clamp(CurrentStrength - Modifier.Value, 0, 20);
+			}
+			else
+			{
+				CurrentArmor = FMath::Clamp(CurrentArmor - Modifier.Value, 0, 20);
+			}
 
-		return true;
+			UE_LOG(LogTemp, Error, TEXT("B"));
+			
+			/* Remove this modifier from this piece. */
+			TemporaryModifiers.RemoveAt(i);
+		}
 	}
-
-	return false;
 }
 
 bool AParentPiece::SetPassiveCD(int NewPassiveCD)

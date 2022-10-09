@@ -93,6 +93,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Active Ability")
 	virtual void OnActiveAbility(TArray<AActor*> Targets);
 
+	/* If this piece's active ability has a lasting effect (e.g. a modifier), this is called when that effect ends.
+	 * Overridden by pieces with an active ability.*/
+	UFUNCTION(BlueprintCallable, Category="Active Ability")
+	virtual void OnActiveEffectEnded(TArray<AActor*> Targets);
+
 
 	/* Returns all actors that this piece's passive ability can target. Overridden by pieces with a passive ability. */
 	UFUNCTION(BlueprintPure, Category="Active Ability")
@@ -103,7 +108,7 @@ public:
 	virtual void OnPassiveAbility(TArray<AActor*> Targets);
 
 
-/* Public accessors and modifiers. */
+/* Public accessors and mutators. */
 public:
 	
 	/* Getter for CurrentTile. */
@@ -123,21 +128,26 @@ public:
 	void SetAttackInfo(FAttackInfo NewAttackInfo);
 
 
+	/* Getter for TemporaryModifiers. */
+	UFUNCTION(BlueprintCallable, Category="Modifiers")
+	FORCEINLINE TArray<FModifier> GetTemporaryModifiers() const { return TemporaryModifiers; }
+
+	/* Apply a new modifier ot this piece, activating a pop-up if requested. If the modifier already exists, reset the
+	 * duration and stack the modifiers together. */
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
+	void Server_AddModifier(FModifier NewModifier, bool bActivatePopUp);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
+	void Server_DecrementModifierDurations();
+
+
 	/* Getter for CurrentStrength. */
 	UFUNCTION(BlueprintPure, Category="Piece Stats")
 	FORCEINLINE int GetCurrentStrength() const { return CurrentStrength; }
 
-	/* Server-only setter for CurrentStrength. */
-	UFUNCTION(BlueprintCallable, Category="Piece Stats")
-	bool SetCurrentStrength(int NewStrength, bool bActivatePopUp);
-
 	/* Getter for CurrentArmor. */
 	UFUNCTION(BlueprintPure, Category="Piece Stats")
 	FORCEINLINE int GetCurrentArmor() const { return CurrentArmor; }
-
-	/* Server-only setter for CurrentArmor. */
-	UFUNCTION(BlueprintCallable, Category="Piece Stats")
-	bool SetCurrentArmor(int NewArmor, bool bActivatePopUp);
 
 	/* Getter for PassiveCD. */
 	UFUNCTION(BlueprintPure, Category="Passive Ability")
@@ -262,6 +272,12 @@ protected:
 	/* Called when the game starts or when spawned. */
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void OnRep_CurrentStrength();
+
+	UFUNCTION()
+	void OnRep_CurrentArmor();
+
 
 /* Protected constants and asset references. */
 protected:
@@ -306,18 +322,18 @@ protected:
 
 	/* Every modifier currently applied to this piece's statistics. */
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category="Piece Info")
-	TArray<FModifierSource> TemporaryModifiers;
+	TArray<FModifier> TemporaryModifiers;
 
 
 	/* EditAnywhere enabled for playtesting. These will be changed to Replicated, EditInstanceOnly, BlueprintReadOnly
 	 * later. */
 
 	/* This piece's current strength with modifiers. */
-	UPROPERTY(Replicated, EditAnywhere, Category="Piece Stats")
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentStrength, EditAnywhere, Category="Piece Stats")
 	int CurrentStrength;
 
 	/* This piece's current armor with modifiers. */
-	UPROPERTY(Replicated, EditAnywhere, Category="Piece Stats")
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentArmor, EditAnywhere, Category="Piece Stats")
 	int CurrentArmor;
 
 	/* How long before this piece's passive ability can be used again. */

@@ -3,6 +3,7 @@
 
 #include "Pieces/Mages/Pyromancer.h"
 
+#include "Animations/AnimInstance_Parent.h"
 #include "Board/BoardManager.h"
 #include "Board/BoardTile.h"
 #include "Framework/Match/Match_GameStateBase.h"
@@ -209,4 +210,10 @@ void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 			SetActiveCD(PieceData->ActiveCD);
 		}
 	}
+}
+
+void APyromancer::OnActiveEffectEnded(TArray<AActor*> Targets)
+{
+	/* TO-DO: Toggle off the Pyromancer's flaming hands. */
+	// Cast<UAnimInstance_Parent>(GetMesh()->GetAnimInstance());
 }

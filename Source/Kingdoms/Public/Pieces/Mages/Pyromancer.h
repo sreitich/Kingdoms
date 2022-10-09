@@ -40,6 +40,9 @@ public:
 		UFUNCTION(BlueprintImplementableEvent)
 		void BP_OnActiveAbility(AParentPiece* Target);
 
+	/* Stops the Pyromaner's flaming hands. */
+	virtual void OnActiveEffectEnded(TArray<AActor*> Targets) override;
+
 
 /* Public variables. */
 public:
@@ -51,6 +54,10 @@ public:
 	/* Tracks whether or not the piece's power-up animation has played yet. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Active Ability")
 	bool bPowered = false;
+
+	/* How much strength the Pyromancer gains from casting Fireball. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Active Ability")
+	int StrengthBuff = 2;
 
 
 /* Public assets. */
