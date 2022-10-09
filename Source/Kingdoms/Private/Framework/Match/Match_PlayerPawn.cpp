@@ -503,3 +503,9 @@ void AMatch_PlayerPawn::Server_UseActiveAbility_Implementation(AParentPiece* Abi
 	if (IsValid(AbilityUser))
 		AbilityUser->OnActiveAbility(Targets);
 }
+
+void AMatch_PlayerPawn::Client_RefreshPieceInfoWidgets_Implementation(AParentPiece* OtherPiece) const
+{
+	/* Refresh both piece info widgets if necessary. */
+	Cast<AMatch_PlayerController>(GetController())->RefreshPieceInfoWidgets(OtherPiece);
+}

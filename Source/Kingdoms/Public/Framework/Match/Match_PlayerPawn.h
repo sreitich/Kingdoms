@@ -74,6 +74,11 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_UseActiveAbility(AParentPiece* AbilityUser, const TArray<AActor*>& Targets);
 
+	/* Refreshes both piece info widgets if they are displaying the same piece. The strength and armor need to be passed
+	 * in explicitly because they won't have had time to replicate yet when this is called. */
+	UFUNCTION(Client, Reliable)
+	void Client_RefreshPieceInfoWidgets(AParentPiece* OtherPiece) const;
+
 
 /* Public variables. */
 public:

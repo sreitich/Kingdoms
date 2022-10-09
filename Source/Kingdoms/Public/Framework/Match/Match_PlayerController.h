@@ -36,15 +36,15 @@ public:
 	FORCEINLINE UServerCommunicationComponent* GetServerCommunicationComponent() const { return ServerCommunicationComponent; }
 	
 	/* Creates or destroys the army selection widget. */
-	UFUNCTION(Client, Unreliable, Category="User Inteface")
+	UFUNCTION(Client, Reliable, Category="User Inteface")
 	void CreateSelectArmyWidget(bool bDestroy);
 
 	/* Creates or destroys the place pieces widget. */
-	UFUNCTION(Client, Unreliable, Category="User Inteface")
+	UFUNCTION(Client, Reliable, Category="User Inteface")
 	void CreatePlacePiecesWidget(FArmyPresetStruct SelectedArmy, bool bDestroy);
 
 	/* Creates, destroys, hides, or reveals the base widget. */
-	UFUNCTION(Client, Unreliable, Category="User Inteface")
+	UFUNCTION(Client, Reliable, Category="User Inteface")
 	void CreateBaseWidget(bool bDestroy, bool bHide);
 
 	/* Updates the displayed time every second by getting the time from the game state. */
@@ -58,6 +58,10 @@ public:
 	/* Reveals and updates or hides one of the piece info widgets. */
 	UFUNCTION(Category="User Interface")
 	void UpdatePieceInfoWidget(AParentPiece* NewPiece, bool bIsFriendly, bool bEnableButtons, bool bHide);
+	
+		/* Refreshes both piece info widgets, if they have been created. */
+		UFUNCTION(Category="User Interface")
+		void RefreshPieceInfoWidgets(AParentPiece* OtherPiece) const;
 
 	/* Creates or destroys a move confirmation pop-up. */
 	UFUNCTION(Category="User Interface")

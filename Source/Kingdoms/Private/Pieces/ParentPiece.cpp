@@ -144,10 +144,14 @@ void AParentPiece::BeginPlay()
 
 void AParentPiece::OnRep_CurrentStrength()
 {
+	/* Refresh any piece info widgets currently displaying this piece's statistics. */
+	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this);
 }
 
 void AParentPiece::OnRep_CurrentArmor()
 {
+	/* Refresh any piece info widgets currently displaying this piece's statistics. */
+	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this);
 }
 
 void AParentPiece::Tick(float DeltaTime)
@@ -409,11 +413,13 @@ void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool
 	{
 		CurrentStrength = FMath::Clamp(CurrentStrength + NewModifier.Value, 0, 20);
 		NewValue = CurrentStrength;
+		OnRep_CurrentStrength();
 	}
 	else
 	{
 		CurrentArmor = FMath::Clamp(CurrentArmor + NewModifier.Value, 0, 20);
 		NewValue = CurrentArmor;
+		OnRep_CurrentArmor();
 	}
 
 	// /* If this modifier is already applied, stack it. */
@@ -455,13 +461,13 @@ void AParentPiece::Server_DecrementModifierDurations_Implementation()
 			if (Modifier.EffectedStat == FModifier::Strength)
 			{
 				CurrentStrength = FMath::Clamp(CurrentStrength - Modifier.Value, 0, 20);
+				OnRep_CurrentStrength();
 			}
 			else
 			{
 				CurrentArmor = FMath::Clamp(CurrentArmor - Modifier.Value, 0, 20);
+				OnRep_CurrentArmor();
 			}
-
-			UE_LOG(LogTemp, Error, TEXT("B"));
 			
 			/* Remove this modifier from this piece. */
 			TemporaryModifiers.RemoveAt(i);

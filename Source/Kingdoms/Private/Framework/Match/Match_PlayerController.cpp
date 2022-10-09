@@ -231,6 +231,17 @@ void AMatch_PlayerController::UpdatePieceInfoWidget(AParentPiece *NewPiece, bool
     }
 }
 
+void AMatch_PlayerController::RefreshPieceInfoWidgets(AParentPiece* OtherPiece) const
+{
+    /* Refresh the friendly piece info widget if the widget exists, if it's currently displaying the same piece as was given, and if it's currently visible. */
+    if (Match_BaseWidget && Match_BaseWidget->GetPieceInfoWidget(true)->GetDisplayedPiece() == OtherPiece && Match_BaseWidget->GetPieceInfoWidget(true)->GetVisibility() == ESlateVisibility::Visible)
+        Match_BaseWidget->GetPieceInfoWidget(true)->RefreshWidget();
+    
+    /* Refresh the enemy piece info widget if the widget exists, if it's currently displaying the same piece as was given, and if it's currently visible. */
+    if (Match_BaseWidget && Match_BaseWidget->GetPieceInfoWidget(false)->GetDisplayedPiece() == OtherPiece && Match_BaseWidget->GetPieceInfoWidget(false)->GetVisibility() == ESlateVisibility::Visible)
+        Match_BaseWidget->GetPieceInfoWidget(false)->RefreshWidget();
+}
+
 void AMatch_PlayerController::UpdateMoveConfirmationWidget(bool bDestroy, ABoardTile *PendingTile, AParentPiece *PendingPiece)
 {
     /* Only execute on local client. */

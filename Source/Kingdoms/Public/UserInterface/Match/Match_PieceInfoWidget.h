@@ -39,6 +39,14 @@ public:
 	UFUNCTION()
 	void PlayOpenCloseAnim(bool bOpen, float StartTime, int32 NumLoops, EUMGSequencePlayMode::Type PlayMode, float Speed, bool bRestoreState);
 
+	/* Refreshes this widget using all of the same parameters. */
+	UFUNCTION()
+	void RefreshWidget();
+
+	/* Returns the currently displayed piece. */
+	UFUNCTION()
+	FORCEINLINE AParentPiece* GetDisplayedPiece() const { return DisplayedPiece; }
+
 
 /* Protected functions. */
 protected:

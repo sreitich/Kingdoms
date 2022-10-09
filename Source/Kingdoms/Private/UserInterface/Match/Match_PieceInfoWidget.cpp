@@ -131,7 +131,7 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool 
         {
             /* If there is no piece info widget currently displayed or the piece's stats have changed since its information was last opened, allow the opening animation to play. */
             if (DisplayedPiece == nullptr || NewPiece->GetCurrentStrength() != DisplayedPiece->GetCurrentStrength() || NewPiece->GetCurrentArmor() != DisplayedPiece->GetCurrentArmor())
-                    bInfoChanged = true;
+                bInfoChanged = true;
             
             /* Update stats with the current values (so that modifiers are counted). */
             DisplayedStrength->SetText(FText::FromString(FString::FromInt(NewPiece->GetCurrentStrength())));
@@ -296,6 +296,12 @@ void UMatch_PieceInfoWidget::PlayOpenCloseAnim(bool bOpen, float StartTime, int3
         Speed,
         bRestoreState
     );
+}
+
+void UMatch_PieceInfoWidget::RefreshWidget()
+{
+    /* Refresh the information in this widget. */
+    UpdatePieceInfoWidget(DisplayedPiece, DisplayedPiece->GetInstigator()->IsLocallyControlled(), MoveButton->GetVisibility() == ESlateVisibility::Visible);
 }
 
 void UMatch_PieceInfoWidget::OnActiveHovered()
