@@ -422,18 +422,31 @@ void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool
 		OnRep_CurrentArmor();
 	}
 
-	// /* If this modifier is already applied, stack it. */
-	// bool bRepeatedModifier;
-	// for (FModifier Modifier : TemporaryModifiers)
-	// {
-	// 	if (Modifier.SourcePiece == NewModifier.SourcePiece)
-	// 	{
-	// 		
-	// 	}
-	// }
+	/* Check if this modifier is already applied. */
+	int RepeatIndex = -1;
+	for (int i = 0; i < TemporaryModifiers.Num(); i++)
+	{
+		if (TemporaryModifiers[i].SourcePiece == NewModifier.SourcePiece &&
+			TemporaryModifiers[i].SourceAbilityName.EqualTo(NewModifier.SourceAbilityName) &&
+			TemporaryModifiers[i].EffectedStat == NewModifier.EffectedStat)
+		{
+			RepeatIndex = i;
+			break;
+		}
+	}
 
-	TemporaryModifiers.Add(NewModifier);
-	
+	/* If this modifier is already applied, reset its duration and stack the values together. */
+	if (RepeatIndex != -1)
+	{
+		TemporaryModifiers[RepeatIndex].RemainingDuration = NewModifier.RemainingDuration;
+		TemporaryModifiers[RepeatIndex].Value += NewModifier.Value;
+	}
+	/* If this modifier isn't already applied, apply it. */
+	else
+	{
+		TemporaryModifiers.Add(NewModifier);
+	}
+
 	/* Spawn a modifier pop-up if requested. */
 	if (bActivatePopUp)
 		Multicast_CreateModifierPopUp(NewValue - OriginalValue, bool(NewModifier.EffectedStat));

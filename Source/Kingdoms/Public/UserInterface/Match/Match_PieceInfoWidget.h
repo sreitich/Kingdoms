@@ -132,6 +132,19 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Affinity Indicators")
 	UTexture2D* PassiveBackground_Enemy;
 
+	/* The colors used for different text states. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Colors")
+	FColor DefaultTextColor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Colors")
+	FColor BuffColor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Colors")
+	FColor DebuffColor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Colors")
+	FColor IneffectiveModifierColor;
+
 
 /* Protected widgets. */
 protected:
