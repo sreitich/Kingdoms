@@ -70,6 +70,24 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category="Updating Piece Info Widget")
 	void EmptyBars(bool bActive, int AmountUsed);
 
+
+	/* Creates and displays a list of all active strength modifiers. */
+	UFUNCTION()
+	void OnStrengthHovered();
+
+	/* Creates and displays a list of all active armor modifiers. */
+	UFUNCTION()
+	void OnArmorHovered();
+
+	/* Destroys the list of all active strength modifiers. */
+	UFUNCTION()
+	void OnStrengthUnhovered();
+
+	/* Destroys the list of all active armor modifiers. */
+	UFUNCTION()
+	void OnArmorUnhovered();
+
+
 	/* Displays and updates ability info pop-up with this piece's active ability info. */
 	UFUNCTION()
 	void OnActiveHovered();
@@ -81,6 +99,7 @@ protected:
 	/* Destroys the ability info pop-up. */
 	UFUNCTION()
 	void OnAbilityUnhovered();
+
 
 	/* Begins targeting a location to move to or to attack. */
 	UFUNCTION()
@@ -173,9 +192,25 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UTextBlock* DisplayedStrength;
 
+	/* Displays a list of active strength modifiers when hovered over. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* StrengthButton;
+
+	/* Widget that the strength modifier list pop-up is parented to */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	USizeBox* StrengthModifierListWrapper;
+
 	/* This piece's current armor (including modifiers). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UTextBlock* DisplayedArmor;
+
+	/* Displays a list of active armor modifiers when hovered over. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* ArmorButton;
+
+	/* Widget that the armor modifier list pop-up is parented to */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	USizeBox* ArmorModifierListWrapper;
 
 	/* Contains all of the active ability widgets. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
@@ -236,6 +271,18 @@ protected:
 	/* Pointer to the ability info pop-up. */
 	UPROPERTY()
 	class UMatch_AbilityInfoPopup* AbilityInfoPopup = nullptr;
+
+	/* Pointer to the modifier list pop-up. */
+	UPROPERTY()
+	class UMatch_ModifierList* ModifierList = nullptr;
+
+
+/* Protected widget class-types. */
+protected:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Widget Class-Types")
+	TSubclassOf<UMatch_ModifierList> ModifierListClass;
+	
 
 
 /* Protected animations. */

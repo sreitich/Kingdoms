@@ -321,7 +321,7 @@ protected:
 	FAttackInfo AttackInfo;
 
 	/* Every modifier currently applied to this piece's statistics. */
-	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category="Piece Info")
+	UPROPERTY(Replicated, EditInstanceOnly, BlueprintReadWrite, Category="Piece Info")
 	TArray<FModifier> TemporaryModifiers;
 
 

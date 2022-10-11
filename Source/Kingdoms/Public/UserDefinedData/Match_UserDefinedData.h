@@ -170,7 +170,7 @@ struct FModifier
 
 	/* The piece responsible for the modifier. */
 	UPROPERTY(BlueprintReadWrite)
-	FText SourceAbilityName;
+	FString SourceAbilityName;
 
 	/* The remaining turn duration of the modifier. */
 	UPROPERTY(BlueprintReadWrite)

@@ -57,7 +57,11 @@ public:
 
 	/* How much strength the Pyromancer gains from casting Fireball. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Active Ability")
-	int StrengthBuff = 2;
+	int StrengthBuffValue = 2;
+
+	/* How long the Pyromancer's strength buff lasts for. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Active Ability")
+	int StrengthBuffDuration = 1;
 
 
 /* Public assets. */

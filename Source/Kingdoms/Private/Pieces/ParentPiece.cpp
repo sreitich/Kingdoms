@@ -173,6 +173,8 @@ void AParentPiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(AParentPiece, PassiveUses);
 	DOREPLIFETIME(AParentPiece, ActiveCD);
 	DOREPLIFETIME(AParentPiece, ActiveUses);
+
+	DOREPLIFETIME(AParentPiece, TemporaryModifiers);
 	
 	DOREPLIFETIME(AParentPiece, bIsAttacking);
 	DOREPLIFETIME(AParentPiece, AttackInfo);
@@ -427,7 +429,7 @@ void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool
 	for (int i = 0; i < TemporaryModifiers.Num(); i++)
 	{
 		if (TemporaryModifiers[i].SourcePiece == NewModifier.SourcePiece &&
-			TemporaryModifiers[i].SourceAbilityName.EqualTo(NewModifier.SourceAbilityName) &&
+			TemporaryModifiers[i].SourceAbilityName == NewModifier.SourceAbilityName &&
 			TemporaryModifiers[i].EffectedStat == NewModifier.EffectedStat)
 		{
 			RepeatIndex = i;
