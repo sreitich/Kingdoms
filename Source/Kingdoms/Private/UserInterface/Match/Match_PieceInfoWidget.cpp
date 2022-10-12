@@ -408,10 +408,10 @@ void UMatch_PieceInfoWidget::OnStrengthHovered()
         ModifierList->PopulateModifierList(StrengthModifiers);
 
         /* Offset the widget based on the size of the strength text. */
-        // UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(ModifierList->Slot);
-        // CanvasSlot->SetPosition(FVector2D(StrengthButton->GetDesiredSize().X / 2.0f, -StrengthButton->GetDesiredSize().Y / 2.0f));
+        UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(ModifierList->ModifierListOverlay->Slot);
+        CanvasSlot->SetPosition(FVector2D(DisplayedStrength->GetDesiredSize().X - 20.0f, -DisplayedStrength->GetDesiredSize().Y + 20.0f));
         /* Align the pop-up to the left if it's for a friendly piece. Align it to the right if it's for an enemy piece. */
-        // CanvasSlot->SetAlignment(DisplayedPiece->GetInstigator()->IsLocallyControlled() ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
+        CanvasSlot->SetAlignment(DisplayedPiece->GetInstigator()->IsLocallyControlled() ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
     }
 }
 

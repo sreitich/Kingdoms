@@ -3,11 +3,8 @@
 
 #include "Framework/Match/Match_PlayerPawn.h"
 
-#include "Animations/AnimInstance_Parent.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Board/BoardTile.h"
-#include "Board/TextureBoardPopup.h"
-#include "Framework/Match/Match_GameStateBase.h"
 #include "Framework/Match/Match_PlayerController.h"
 #include "Framework/Match/Match_PlayerState.h"
 #include "Pieces/ParentPiece.h"
@@ -16,8 +13,6 @@
 #include "UserInterface/MatchSetup/Dragging/PieceDragWidget.h"
 
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "Components/PopUpLocationComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"

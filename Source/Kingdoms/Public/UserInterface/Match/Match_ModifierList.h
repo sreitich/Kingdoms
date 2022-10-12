@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Match_ModifierList.generated.h"
 
+class UOverlay;
 class UScrollBox;
 
 class UMatch_Modifier;
@@ -26,6 +27,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void PopulateModifierList(TArray<FModifier> Modifiers);
 
+
+/* Public widgets. */
+public:
+
+	/* The parent overlay of this widget. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(BindWidget))
+	UOverlay* ModifierListOverlay;
 
 /* Protected widgets. */
 protected:
