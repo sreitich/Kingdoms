@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "UserDefinedData/PieceData_UserDefinedData.h"
 #include "UserDefinedData/SaveGameData_UserDefinedData.h"
 
 #include "CoreMinimal.h"
@@ -49,19 +50,19 @@ public:
 
 	/* Updates the displayed time every second by getting the time from the game state. */
 	UFUNCTION(Category="User Interface")
-	void UpdateTimer();
+	void UpdateTimer() const;
 
 	/* Updates the currently displayed map name. Gets the name from the game state, or can be passed a map name with NewName. */
 	UFUNCTION(Category="User Interface")
-	void UpdateMapName(FName NewName);
+	void UpdateMapName(FName NewName) const;
 
 	/* Reveals and updates or hides one of the piece info widgets. */
 	UFUNCTION(Category="User Interface")
-	void UpdatePieceInfoWidget(AParentPiece* NewPiece, bool bIsFriendly, bool bEnableButtons, bool bHide);
+	void UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlignment Alignment, bool bEnableButtons, bool bHide) const;
 	
 		/* Refreshes both piece info widgets, if they have been created. */
 		UFUNCTION(Category="User Interface")
-		void RefreshPieceInfoWidgets(AParentPiece* OtherPiece) const;
+		void RefreshPieceInfoWidgets(const AParentPiece* OtherPiece) const;
 
 	/* Creates or destroys a move confirmation pop-up. */
 	UFUNCTION(Category="User Interface")

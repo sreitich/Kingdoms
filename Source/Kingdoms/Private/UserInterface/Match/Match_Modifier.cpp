@@ -23,7 +23,7 @@ void UMatch_Modifier::UpdateDisplayedModifier(FModifier NewModifier, bool bAlign
 		/* If the data table row was found, update this modifier's displayed info. */
 		if (PieceData)
 		{
-			FString NewModifierText = "";
+			FString NewModifierText;
 
 			/* Modifier value. */
 			if (NewModifier.Value > 0)

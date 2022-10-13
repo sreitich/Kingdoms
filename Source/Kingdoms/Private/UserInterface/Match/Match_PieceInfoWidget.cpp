@@ -58,7 +58,7 @@ void UMatch_PieceInfoWidget::ClosingAnimFinished()
     SetVisibility(ESlateVisibility::Hidden);
 }
 
-bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool bIsFriendly, bool bEnableButtons)
+bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlignment Alignment, bool bEnableButtons)
 {
     /* Tracks whether any displayed information has actually changed. */
     bool bInfoChanged = false;
@@ -96,13 +96,6 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool 
 
                 /* Set the correct number of total uses. */
                 ResetBars(true, PieceData->ActiveUses);
-
-                /* If this piece has limited active ability uses and doesn't have any uses left, disable the active
-                 * ability button. */
-                if (PieceData->ActiveUses > 0 && DisplayedPiece->GetActiveUses() == 0)
-                {
-                    ActiveButton->SetIsEnabled(false);
-                }
             }
 
             /* If this piece has a passive ability... */
@@ -147,7 +140,7 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool 
                 {
                     /* Check if the piece does have strength modifiers, but they actually just cancel out. */
                     bool bModifiersCancel = false;
-                    for (FModifier Modifier : NewPiece->GetTemporaryModifiers())
+                    for (FModifier const Modifier : NewPiece->GetTemporaryModifiers())
                     {
                         if (Modifier.EffectedStat == Modifier.Strength)
                         {
@@ -186,7 +179,7 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool 
                 {
                     /* Check if the piece does have armor modifiers, but they actually just cancel out. */
                     bool bModifiersCancel = false;
-                    for (FModifier Modifier : NewPiece->GetTemporaryModifiers())
+                    for (FModifier const Modifier : NewPiece->GetTemporaryModifiers())
                     {
                         if (Modifier.EffectedStat == Modifier.Armor)
                         {
@@ -244,7 +237,7 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool 
                     /* Reveal all of the active ability widgets. */
                     ActiveAbilityBox->SetVisibility(ESlateVisibility::Visible);
 
-                    /* If the active ability's cooldown is active... */
+                    /* If the active ability's cooldown is active, display the cooldown and disable the active ability button. */
                     if (NewPiece->GetActiveCD() > 0)
                     {
                         /* Update and display the current cooldown. */
@@ -257,12 +250,20 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool 
                         /* Disable the "use active ability" button. */
                         ActiveButton->SetIsEnabled(false);
                     }
-                    /* If the active ability can be used... */
+                    /* If this piece has limited active ability uses and doesn't have any uses left, disable the active ability button. */
+                    else if (PieceData->ActiveUses > 0 && DisplayedPiece->GetActiveUses() == 0)
+                    {
+                        ActiveButton->SetIsEnabled(false);
+                    }
+                    /* If the active ability is not on a cooldown and is has remaining uses, hide the cooldown and enable the ability button. */
                     else
                     {
                         /* Hide the active cooldown indicator and the cooldown turn counter. */
                         ActiveCooldownIndicator->SetVisibility(ESlateVisibility::Hidden);
                         DisplayedActiveCD->SetVisibility(ESlateVisibility::Hidden);
+
+                        /* Enable the "use active ability" button. */
+                        ActiveButton->SetIsEnabled(true);
                     }
 
                     /* Update the number of uses remaining. */
@@ -328,7 +329,7 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, bool 
         }
 
         /* If the selected piece is friendly... */
-        if (bIsFriendly)
+        if (Alignment == E_Friendly)
         {
             /* Change the background textures to be friendly. */
             ActiveAbilityBackgroundButton->WidgetStyle.Normal.SetResourceObject(ActiveBackground_Friendly);
@@ -381,7 +382,7 @@ void UMatch_PieceInfoWidget::PlayOpenCloseAnim(bool bOpen, float StartTime, int3
 void UMatch_PieceInfoWidget::RefreshWidget()
 {
     /* Refresh the information in this widget. */
-    UpdatePieceInfoWidget(DisplayedPiece, DisplayedPiece->GetInstigator()->IsLocallyControlled(), MoveButton->GetVisibility() == ESlateVisibility::Visible);
+    UpdatePieceInfoWidget(DisplayedPiece, DisplayedPiece->GetAlignment(), MoveButton->GetVisibility() == ESlateVisibility::Visible);
 }
 
 void UMatch_PieceInfoWidget::OnStrengthHovered()
@@ -399,8 +400,8 @@ void UMatch_PieceInfoWidget::OnStrengthHovered()
     /* If this piece has any active strength modifiers... */
     if (StrengthModifiers.Num() > 0 && ModifierListClass)
     {
-        /* Store whether the displayed piece is friendly or not so we don't have to keep checking. */
-        const bool bFriendlyDisplayed = DisplayedPiece->GetInstigator()->IsLocallyControlled();
+        /* Store the alignment of the piece so we don't have to keep checking. */
+        const EAlignment PieceAlignment = DisplayedPiece->GetAlignment();
         
         /* Create and populate a list of active strength modifiers. */
         ModifierList = Cast<UMatch_ModifierList>(CreateWidget<UUserWidget>(GetWorld(), ModifierListClass, FName("Modifier List Widget")));
@@ -408,13 +409,13 @@ void UMatch_PieceInfoWidget::OnStrengthHovered()
         StrengthModifierListWrapper->AddChild(ModifierList);
 
         /* Populate the modifier list with all active strength modifiers. */
-        ModifierList->PopulateModifierList(this, StrengthModifiers, bFriendlyDisplayed);
+        ModifierList->PopulateModifierList(this, StrengthModifiers, PieceAlignment == E_Friendly);
 
         /* Offset the widget based on the size of the strength text depending on whether or not the displayed piece is friendly. */
         UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(ModifierList->ModifierListOverlay->Slot);
-        CanvasSlot->SetPosition(FVector2D(bFriendlyDisplayed ? DisplayedStrength->GetDesiredSize().X - 20.0f : 20.0f, -DisplayedStrength->GetDesiredSize().Y + 20.0f));
+        CanvasSlot->SetPosition(FVector2D(PieceAlignment == E_Friendly ? DisplayedStrength->GetDesiredSize().X - 20.0f : 20.0f, -DisplayedStrength->GetDesiredSize().Y + 20.0f));
         /* Align the pop-up to the left if it's for a friendly piece. Align it to the right if it's for an enemy piece. */
-        CanvasSlot->SetAlignment(bFriendlyDisplayed ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
+        CanvasSlot->SetAlignment(PieceAlignment == E_Friendly ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
     }
 }
 
@@ -440,19 +441,19 @@ void UMatch_PieceInfoWidget::OnActiveHovered()
     if (PieceData && DisplayedPiece->ActiveAbilityInfoWidget)
     {
         /* Store whether the displayed piece is friendly or not so we don't have to keep checking. */
-        const bool bFriendlyDisplayed = DisplayedPiece->GetInstigator()->IsLocallyControlled();
+        const EAlignment PieceAlignment = DisplayedPiece->GetAlignment();
 
         /* Create a new ability info pop-up widget and update its information. */
         AbilityInfoPopup = Cast<UMatch_AbilityInfoPopup>(CreateWidget<UUserWidget>(GetWorld(), DisplayedPiece->ActiveAbilityInfoWidget, FName("Ability Info Pop-Up")));
-        AbilityInfoPopup->SetUpWidget(DisplayedPiece, true, bFriendlyDisplayed);
+        AbilityInfoPopup->SetUpWidget(DisplayedPiece, true, PieceAlignment == E_Friendly);
         /* Attach the widget to the active ability icon. */
         ActiveAbilityPopupWrapper->AddChild(AbilityInfoPopup);
 
         /* Offset the widget based on the size of the ability icon depending on whether or not the displayed piece is friendly. */
         UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(AbilityInfoPopup->AbilityInfoOverlay->Slot);
-        CanvasSlot->SetPosition(FVector2D(bFriendlyDisplayed ? ActiveAbilityBackgroundButton->GetDesiredSize().X - 20.0f : 20.0f, -ActiveAbilityBackgroundButton->GetDesiredSize().Y + 20.0f));
+        CanvasSlot->SetPosition(FVector2D(PieceAlignment == E_Friendly ? ActiveAbilityBackgroundButton->GetDesiredSize().X - 20.0f : 20.0f, -ActiveAbilityBackgroundButton->GetDesiredSize().Y + 20.0f));
         /* Align the pop-up to the left if it's for a friendly piece. Align it to the right if it's for an enemy piece. */
-        CanvasSlot->SetAlignment(bFriendlyDisplayed ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
+        CanvasSlot->SetAlignment(PieceAlignment == E_Friendly ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
     }
 }
 
@@ -461,9 +462,12 @@ void UMatch_PieceInfoWidget::OnPassiveHovered()
     /* If the piece data has been found for this piece and the ability info class is set... */
     if (PieceData && DisplayedPiece->PassiveAbilityInfoWidget)
     {
+        /* Store whether the displayed piece is friendly or not so we don't have to keep checking. */
+        const EAlignment PieceAlignment = DisplayedPiece->GetAlignment() ? E_Friendly : E_Hostile;
+
         /* Create a new ability info pop-up widget and update its information. */
         AbilityInfoPopup = Cast<UMatch_AbilityInfoPopup>(CreateWidget<UUserWidget>(GetWorld(), DisplayedPiece->PassiveAbilityInfoWidget, FName("Ability Info Pop-Up")));
-        AbilityInfoPopup->SetUpWidget(DisplayedPiece, false, DisplayedPiece->GetInstigator()->IsLocallyControlled());
+        AbilityInfoPopup->SetUpWidget(DisplayedPiece, false, PieceAlignment == E_Friendly);
         /* Attach the widget to the passive ability icon. */
         PassiveAbilityPopupWrapper->AddChild(AbilityInfoPopup);
 
@@ -471,7 +475,7 @@ void UMatch_PieceInfoWidget::OnPassiveHovered()
         UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(AbilityInfoPopup->AbilityInfoOverlay->Slot);
         CanvasSlot->SetPosition(FVector2D(PassiveAbilityBackgroundButton->GetDesiredSize().X / 2.0f, -PassiveAbilityBackgroundButton->GetDesiredSize().Y / 2.0f));
         /* Align the pop-up to the left if it's for a friendly piece. Align it to the right if it's for an enemy piece. */
-        CanvasSlot->SetAlignment(DisplayedPiece->GetInstigator()->IsLocallyControlled() ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
+        CanvasSlot->SetAlignment(PieceAlignment == E_Friendly ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
     }
 }
 
@@ -503,10 +507,10 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
     {
         /* Set a new highlight for every tile that this piece can move to to show the player their options for
          * actions. */
-        for (ABoardTile* Tile : DisplayedPiece->GetValidTiles())
+        for (const ABoardTile* Tile : DisplayedPiece->GetValidTiles())
         {
             /* If this tile is occupied by a friendly piece... */
-            if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetInstigator()->IsLocallyControlled())
+            if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetAlignment() == E_Friendly)
             {
                 Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidFriendly);
             }

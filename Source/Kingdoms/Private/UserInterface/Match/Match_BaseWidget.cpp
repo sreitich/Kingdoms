@@ -49,16 +49,16 @@ void UMatch_BaseWidget::UpdateMapName_Implementation(FName NewName)
     MapName->SetText(FText::FromName(NewName));
 }
 
-UMatch_PieceInfoWidget* UMatch_BaseWidget::GetPieceInfoWidget(bool bFriendly)
+UMatch_PieceInfoWidget* UMatch_BaseWidget::GetPieceInfoWidget(EAlignment Alignment) const
 {
-    if (bFriendly)
+    if (Alignment == E_Friendly)
     {
         if (FriendlyPieceInfoWidget)
         {
             return FriendlyPieceInfoWidget;
         }
     }
-    else
+    else if (Alignment == E_Hostile)
     {
         if (EnemyPieceInfoWidget)
         {

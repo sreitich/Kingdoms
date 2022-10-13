@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Match_PieceInfoWidget.generated.h"
 
-struct FPieceDataStruct;
+enum EAlignment;
 
 class AParentPiece;
 
@@ -18,6 +18,8 @@ class USizeBox;
 class UTextBlock;
 class UTexture2D;
 class UVerticalBox;
+
+struct FPieceDataStruct;
 
 /**
  * 
@@ -33,7 +35,7 @@ public:
 	/* Updates all displayed piece information by retrieving data from the piece data table. Returns whether any
 	 * displayed information changed if the widget was already open. */
 	UFUNCTION()
-	bool UpdatePieceInfoWidget(AParentPiece* NewPiece, bool bIsFriendly, bool bEnableButtons);
+	bool UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlignment Alignment, bool bEnableButtons);
 
 	/* Allows the base widget to play this widget's animations. */
 	UFUNCTION()

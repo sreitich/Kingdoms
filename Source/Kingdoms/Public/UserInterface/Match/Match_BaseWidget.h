@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Match_BaseWidget.generated.h"
 
+enum EAlignment;
+
 /**
  * 
  */
@@ -30,7 +32,7 @@ public:
 
 	/* Returns a reference to the corresponding piece info widget. */
 	UFUNCTION()
-	class UMatch_PieceInfoWidget* GetPieceInfoWidget(bool bFriendly);
+	class UMatch_PieceInfoWidget* GetPieceInfoWidget(EAlignment Alignment) const;
 
 
 /* Protected functions. */

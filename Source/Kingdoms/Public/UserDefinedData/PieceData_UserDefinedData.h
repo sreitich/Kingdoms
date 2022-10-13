@@ -30,6 +30,15 @@ enum EPieceRarity
 	E_Champion	UMETA(DisplayName="Champion")
 };
 
+/* The alignment of a piece relative to the local player. */
+UENUM(BlueprintType)
+enum EAlignment
+{
+	E_Friendly	UMETA(DisplayName="Friendly"),
+	E_Hostile	UMETA(DisplayName="Hostile"),
+	E_Neutral	UMETA(DisplayName="Neutral")
+};
+
 /* The structure of the piece data table. */
 USTRUCT(BlueprintType)
 struct FPieceDataStruct : public FTableRowBase

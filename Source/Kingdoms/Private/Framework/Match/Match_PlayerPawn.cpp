@@ -173,21 +173,18 @@ void AMatch_PlayerPawn::Interact_WaitingForTurn(FHitResult InteractionHit)
 	/* If the player interacted with a valid piece and it has a valid player controller... */
 	if (InteractedPiece && GetController<AMatch_PlayerController>())
 	{
-		/* If the piece is friendly... */
-		if (InteractedPiece->GetInstigator()->IsLocallyControlled())
+		/* Get this piece's alignment. */
+		const EAlignment Alignment = InteractedPiece->GetAlignment();
+
+		/* Select the piece if it's friendly. */
+		if (Alignment == E_Friendly)
 		{
 			/* Select the piece. */
 			SelectedPiece = InteractedPiece;
+		}
 
-			/* Update and reveal the friendly piece info widget with no buttons. */
-			GetController<AMatch_PlayerController>()->UpdatePieceInfoWidget(InteractedPiece, true, false, false);
-		}
-		/* If the piece is an enemy piece... */
-		else
-		{
-			/* Update and reveal the enemy piece info widget with no buttons. */
-			GetController<AMatch_PlayerController>()->UpdatePieceInfoWidget(InteractedPiece, false, false, false);
-		}
+		/* Update and reveal the corresponding piece info widget with no buttons. */
+		GetController<AMatch_PlayerController>()->UpdatePieceInfoWidget(InteractedPiece, Alignment, false, false);
 	}
 }
 
@@ -218,20 +215,23 @@ void AMatch_PlayerPawn::Interact_SelectingPiece(FHitResult InteractionHit)
 	/* If the player interacted with a valid piece and the player has a valid player controller... */
 	if (IsValid(InteractedPiece) && GetController<AMatch_PlayerController>())
 	{
+		/* Get this piece's alignment. */
+		const EAlignment Alignment = InteractedPiece->GetAlignment();
+		
 		/* If the piece is friendly... */
-		if (InteractedPiece->GetInstigator()->IsLocallyControlled())
+		if (Alignment == E_Friendly)
 		{
 			/* Select the piece. */
 			SelectedPiece = InteractedPiece;
 
-			/* Update and reveal the friendly piece info widget with buttons. */
-			GetController<AMatch_PlayerController>()->UpdatePieceInfoWidget(InteractedPiece, true, true, false);
+			/* Update and reveal the friendly piece info widget with buttons, so the player can perform actions. */
+			GetController<AMatch_PlayerController>()->UpdatePieceInfoWidget(InteractedPiece, E_Friendly, true, false);
 		}
 		/* If the piece is an enemy piece... */
-		else
+		else if (Alignment == E_Hostile)
 		{
-			/* Update and reveal the enemy piece info widget with no buttons. */
-			GetController<AMatch_PlayerController>()->UpdatePieceInfoWidget(InteractedPiece, false, false, false);
+			/* Update and reveal the enemy piece info widget with no buttons so the player can't perform actions. */
+			GetController<AMatch_PlayerController>()->UpdatePieceInfoWidget(InteractedPiece, E_Hostile, false, false);
 		}
 	}
 }
@@ -242,7 +242,7 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 	ABoardTile* InteractedTile = nullptr;
 
 	/* If a piece was clicked... */
-	if (AParentPiece* PiecePtr = Cast<AParentPiece>(InteractionHit.Actor))
+	if (const AParentPiece* PiecePtr = Cast<AParentPiece>(InteractionHit.Actor))
 	{
 		/* Interact with the piece's tile. */
 		InteractedTile = PiecePtr->GetCurrentTile();
@@ -394,10 +394,10 @@ void AMatch_PlayerPawn::ClearSelection(bool bDeselect)
 	if (AMatch_PlayerController* PlayerController = Cast<AMatch_PlayerController>(GetController()))
 	{
 		/* Hide the friendly piece info widget. */
-		PlayerController->UpdatePieceInfoWidget(SelectedPiece, true, false, true);
+		PlayerController->UpdatePieceInfoWidget(SelectedPiece, E_Friendly, false, true);
 
 		/* Hide the enemy piece info widget. */
-		PlayerController->UpdatePieceInfoWidget(SelectedPiece, false, false, true);
+		PlayerController->UpdatePieceInfoWidget(SelectedPiece, E_Hostile, false, true);
 
 		switch (GetPlayerState<AMatch_PlayerState>()->GetCurrentPlayerStatus())
 		{
@@ -451,32 +451,32 @@ void AMatch_PlayerPawn::Client_MovePlayerCamera_Implementation(const AParentPiec
 		}
 
 		/* Initialize the vectors we'll need to calculate where to move and rotate the player's camera. */
-		FVector AttackerLoc = Attacker->GetActorLocation();
-		FVector DefenderLoc = Defender->GetActorLocation();
+		const FVector AttackerLoc = Attacker->GetActorLocation();
+		const FVector DefenderLoc = Defender->GetActorLocation();
 
 		/* The horizontal distance we want the camera to be from the pieces and the distance we want it to be above them. */
-		float HorizontalDistance = FVector::Dist(AttackerLoc, DefenderLoc) * 2.0f;
-		float VerticalDistance = 300.0f;
+		const float HorizontalDistance = FVector::Dist(AttackerLoc, DefenderLoc) * 2.0f;
+		const float VerticalDistance = 300.0f;
 
 		/* Get the midpoint between the attacker and defender. */
-		FVector Midpoint = (AttackerLoc + DefenderLoc) / 2;
+		const FVector Midpoint = (AttackerLoc + DefenderLoc) / 2;
 
 		/* Get the normalized difference in the pieces' positions, creating a vector pointing from one piece to the other. */
 		FVector NormalizedLocDif = (AttackerLoc - DefenderLoc);
 		NormalizedLocDif.Normalize();
 
 		/* Get a normalized vector pointing straight up. */
-		FVector WorldUp = FVector(0.0f, 0.0f, 1.0f);
+		const FVector WorldUp = FVector(0.0f, 0.0f, 1.0f);
 
 		/* The cross product of the vectors, giving a direction that points perpendicularly away form the axis that connects the pieces. */
 		FVector DirectionAwayFromPieces = FVector::CrossProduct(NormalizedLocDif, WorldUp);
 		/* Multiply the direction by how far we want the camera to be from the midpoint of the pieces. The camera distance scales linearly from the distance between the pieces. */
 		DirectionAwayFromPieces *= HorizontalDistance;
 		/* Take the midpoint and move it away and upwards from the pieces, giving us the final location we want our camera to be in. */
-		FVector EndLoc = Midpoint + DirectionAwayFromPieces + FVector(0.0f, 0.0f, VerticalDistance);
+		const FVector EndLoc = Midpoint + DirectionAwayFromPieces + FVector(0.0f, 0.0f, VerticalDistance);
 
 		/* We want to rotate the camera so that it faces the midpoint of the pieces, and is therefore centered. */
-		FRotator EndRot = UKismetMathLibrary::FindLookAtRotation(EndLoc, Midpoint);
+		const FRotator EndRot = UKismetMathLibrary::FindLookAtRotation(EndLoc, Midpoint);
 
 		/* Smoothly move the camera to or from the given location and rotation. */
 		InterpolatePlayerCamera(EndLoc, EndRot, 0.0f, bReverse);

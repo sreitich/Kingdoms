@@ -4,6 +4,7 @@
 
 #include "Net/UnrealNetwork.h"
 #include "UserDefinedData/Match_UserDefinedData.h"
+#include "UserDefinedData/PieceData_UserDefinedData.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
@@ -31,6 +32,10 @@ public:
 
 	/* Replicates variables. */
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	/* Returns this piece's alignment relative to the local player. */
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE EAlignment GetAlignment() const { return GetInstigator()->IsLocallyControlled() ? E_Friendly : E_Hostile; }
 
 	/* Plays a pop-up animation on each client, quickly scaling up the piece's size from 0.0 to 1.0, over a given duration. */
 	UFUNCTION(NetMulticast, Reliable)
