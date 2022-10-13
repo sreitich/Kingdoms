@@ -10,6 +10,7 @@ class UOverlay;
 class UScrollBox;
 
 class UMatch_Modifier;
+class UMatch_PieceInfoWidget;
 
 struct FModifier;
 
@@ -25,8 +26,10 @@ class KINGDOMS_API UMatch_ModifierList : public UUserWidget
 public:
 
 	UFUNCTION(BlueprintCallable)
-	void PopulateModifierList(TArray<FModifier> Modifiers);
+	void PopulateModifierList(UMatch_PieceInfoWidget* SpawningPieceInfoWidget, TArray<FModifier> Modifiers, bool bAlignedLeft);
 
+	virtual void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+	
 
 /* Public widgets. */
 public:
@@ -34,6 +37,14 @@ public:
 	/* The parent overlay of this widget. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(BindWidget))
 	UOverlay* ModifierListOverlay;
+
+
+/* Protected variables. */
+protected:
+
+	UPROPERTY()
+	UMatch_PieceInfoWidget* PieceInfoWidget;
+
 
 /* Protected widgets. */
 protected:

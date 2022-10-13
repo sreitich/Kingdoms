@@ -7,8 +7,9 @@
 #include "UserDefinedData/Match_UserDefinedData.h"
 
 #include "Components/ScrollBox.h"
+#include "UserInterface/Match/Match_PieceInfoWidget.h"
 
-void UMatch_ModifierList::PopulateModifierList(TArray<FModifier> Modifiers)
+void UMatch_ModifierList::PopulateModifierList(UMatch_PieceInfoWidget* SpawningPieceInfoWidget, TArray<FModifier> Modifiers, bool bAlignedLeft)
 {
 	/* Remove any modifiers that were already listed. */
 	for (UWidget* Widget : ModifierListBox->GetAllChildren())
@@ -23,7 +24,23 @@ void UMatch_ModifierList::PopulateModifierList(TArray<FModifier> Modifiers)
 		{
 			UMatch_Modifier* ModifierWidget = Cast<UMatch_Modifier>(CreateWidget<UUserWidget>(GetWorld(), ModifierClass, FName("Modifier " + i)));
 			ModifierListBox->AddChild(ModifierWidget);
-			ModifierWidget->UpdateDisplayedModifier(Modifiers[i]);
+			/* Align the widget's text to the left depending on whether or not the piece is friendly. */
+			ModifierWidget->UpdateDisplayedModifier(Modifiers[i], bAlignedLeft);
 		}
 	}
+
+	/* Save a pointer to the piece info widget that spawned this widget. */
+	if (SpawningPieceInfoWidget)
+	{
+		PieceInfoWidget = SpawningPieceInfoWidget;
+	}
+}
+
+void UMatch_ModifierList::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
+{
+	Super::NativeOnMouseLeave(InMouseEvent);
+
+	PieceInfoWidget->ModifierList = nullptr;
+	
+	RemoveFromParent();
 }

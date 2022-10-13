@@ -399,19 +399,23 @@ void UMatch_PieceInfoWidget::OnStrengthHovered()
     /* If this piece has any active strength modifiers... */
     if (StrengthModifiers.Num() > 0 && ModifierListClass)
     {
+        /* Store whether the displayed piece is friendly or not so we don't have to keep checking. */
+        const bool bFriendlyDisplayed = DisplayedPiece->GetInstigator()->IsLocallyControlled();
+        
         /* Create and populate a list of active strength modifiers. */
         ModifierList = Cast<UMatch_ModifierList>(CreateWidget<UUserWidget>(GetWorld(), ModifierListClass, FName("Modifier List Widget")));
         /* Attach the widget to the displayed strength text. */
         StrengthModifierListWrapper->AddChild(ModifierList);
+        ModifierList->SetFocus();
 
         /* Populate the modifier list with all active strength modifiers. */
-        ModifierList->PopulateModifierList(StrengthModifiers);
+        ModifierList->PopulateModifierList(this, StrengthModifiers, bFriendlyDisplayed);
 
-        /* Offset the widget based on the size of the strength text. */
+        /* Offset the widget based on the size of the strength text depending on whether or not the displayed piece is friendly. */
         UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(ModifierList->ModifierListOverlay->Slot);
-        CanvasSlot->SetPosition(FVector2D(DisplayedStrength->GetDesiredSize().X - 20.0f, -DisplayedStrength->GetDesiredSize().Y + 20.0f));
+        CanvasSlot->SetPosition(FVector2D(bFriendlyDisplayed ? DisplayedStrength->GetDesiredSize().X - 20.0f : 20.0f, -DisplayedStrength->GetDesiredSize().Y + 20.0f));
         /* Align the pop-up to the left if it's for a friendly piece. Align it to the right if it's for an enemy piece. */
-        CanvasSlot->SetAlignment(DisplayedPiece->GetInstigator()->IsLocallyControlled() ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
+        CanvasSlot->SetAlignment(bFriendlyDisplayed ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
     }
 }
 
@@ -421,15 +425,14 @@ void UMatch_PieceInfoWidget::OnArmorHovered()
 
 void UMatch_PieceInfoWidget::OnStrengthUnhovered()
 {
-    if (ModifierList)
-    {
-        ModifierList->RemoveFromParent();
-        ModifierList = nullptr;
-    }
+    /* Destroy the modifier list widget if the player isn't hovering over it or the strength widget. */
+    BP_OnStatUnhovered();
 }
 
 void UMatch_PieceInfoWidget::OnArmorUnhovered()
 {
+    /* Destroy the modifier list widget if the player isn't hovering over it or the strength widget. */
+    BP_OnStatUnhovered();
 }
 
 void UMatch_PieceInfoWidget::OnActiveHovered()
@@ -437,17 +440,20 @@ void UMatch_PieceInfoWidget::OnActiveHovered()
     /* If the piece data has been found for this piece and the ability info class is set... */
     if (PieceData && DisplayedPiece->ActiveAbilityInfoWidget)
     {
+        /* Store whether the displayed piece is friendly or not so we don't have to keep checking. */
+        const bool bFriendlyDisplayed = DisplayedPiece->GetInstigator()->IsLocallyControlled();
+
         /* Create a new ability info pop-up widget and update its information. */
         AbilityInfoPopup = Cast<UMatch_AbilityInfoPopup>(CreateWidget<UUserWidget>(GetWorld(), DisplayedPiece->ActiveAbilityInfoWidget, FName("Ability Info Pop-Up")));
-        AbilityInfoPopup->SetUpWidget(DisplayedPiece, true, DisplayedPiece->GetInstigator()->IsLocallyControlled());
+        AbilityInfoPopup->SetUpWidget(DisplayedPiece, true, bFriendlyDisplayed);
         /* Attach the widget to the active ability icon. */
         ActiveAbilityPopupWrapper->AddChild(AbilityInfoPopup);
 
-        /* Offset the widget based on the size of the ability icon. */
+        /* Offset the widget based on the size of the ability icon depending on whether or not the displayed piece is friendly. */
         UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(AbilityInfoPopup->AbilityInfoOverlay->Slot);
-        CanvasSlot->SetPosition(FVector2D(ActiveAbilityBackgroundButton->GetDesiredSize().X / 2.0f, -ActiveAbilityBackgroundButton->GetDesiredSize().Y / 2.0f));
+        CanvasSlot->SetPosition(FVector2D(bFriendlyDisplayed ? ActiveAbilityBackgroundButton->GetDesiredSize().X - 20.0f : 20.0f, -ActiveAbilityBackgroundButton->GetDesiredSize().Y + 20.0f));
         /* Align the pop-up to the left if it's for a friendly piece. Align it to the right if it's for an enemy piece. */
-        CanvasSlot->SetAlignment(DisplayedPiece->GetInstigator()->IsLocallyControlled() ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
+        CanvasSlot->SetAlignment(bFriendlyDisplayed ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
     }
 }
 

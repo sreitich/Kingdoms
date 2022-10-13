@@ -24,7 +24,7 @@ class KINGDOMS_API UMatch_Modifier : public UUserWidget
 public:
 
 	UFUNCTION(BlueprintCallable)
-	void UpdateDisplayedModifier(FModifier NewModifier);
+	void UpdateDisplayedModifier(FModifier NewModifier, bool bAlignedLeft);
 
 
 /* Protected functions. */

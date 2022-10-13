@@ -87,6 +87,9 @@ protected:
 	UFUNCTION()
 	void OnArmorUnhovered();
 
+		/* Adds a delay before checking if the modifier list is being hovered before trying to destroy it. */
+		UFUNCTION(BlueprintImplementableEvent)
+		void BP_OnStatUnhovered();
 
 	/* Displays and updates ability info pop-up with this piece's active ability info. */
 	UFUNCTION()
@@ -108,6 +111,14 @@ protected:
 	/* Call's the piece's implemented ability function. */
 	UFUNCTION()
 	void OnUseActiveClicked();
+
+
+/* Public widgets. */
+public:
+
+	/* Pointer to the modifier list pop-up. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UMatch_ModifierList* ModifierList = nullptr;
 
 
 /* Protected variables. */
@@ -271,10 +282,6 @@ protected:
 	/* Pointer to the ability info pop-up. */
 	UPROPERTY()
 	class UMatch_AbilityInfoPopup* AbilityInfoPopup = nullptr;
-
-	/* Pointer to the modifier list pop-up. */
-	UPROPERTY()
-	class UMatch_ModifierList* ModifierList = nullptr;
 
 
 /* Protected widget class-types. */

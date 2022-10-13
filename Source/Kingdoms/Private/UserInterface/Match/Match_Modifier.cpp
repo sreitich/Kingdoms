@@ -8,7 +8,7 @@
 #include "UserDefinedData/Match_UserDefinedData.h"
 #include "UserDefinedData/PieceData_UserDefinedData.h"
 
-void UMatch_Modifier::UpdateDisplayedModifier(FModifier NewModifier)
+void UMatch_Modifier::UpdateDisplayedModifier(FModifier NewModifier, bool bAlignedLeft)
 {
 	if (PieceDataTable)
 	{
@@ -63,6 +63,16 @@ void UMatch_Modifier::UpdateDisplayedModifier(FModifier NewModifier)
 			/* Update the displayed text. */
 			ModifierInfo->SetText(FText::FromString(NewModifierText));
 		}
+	}
+
+	/* Align the text to the left or right depending on if the displayed piece is friendly or an enemy. */
+	if (bAlignedLeft)
+	{
+		ModifierInfo->SetJustification(ETextJustify::Left);
+	}
+	else
+	{
+		ModifierInfo->SetJustification(ETextJustify::Right);
 	}
 }
 
