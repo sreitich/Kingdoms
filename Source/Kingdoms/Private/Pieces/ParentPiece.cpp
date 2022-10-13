@@ -64,10 +64,11 @@ void AParentPiece::BeginPlay()
 	 * be changed during runtime. */
 	DynamicMaterial = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(0), this);
 	TArray<USceneComponent*> MeshChildren;
-	GetMesh()->GetChildrenComponents(false, MeshChildren);
+	GetMesh()->GetChildrenComponents(true, MeshChildren);
 	for (USceneComponent* SkeletalMesh : MeshChildren)
 	{
-		Cast<USkeletalMeshComponent>(SkeletalMesh)->SetMaterial(0, DynamicMaterial);
+		if (USkeletalMeshComponent* SkeletalMeshPtr = Cast<USkeletalMeshComponent>(SkeletalMesh))
+			SkeletalMeshPtr->SetMaterial(0, DynamicMaterial);
 	}
 	
 	/* Set the animations to use in this piece's animation blueprint. */
@@ -198,7 +199,7 @@ void AParentPiece::Server_ResetPieceRotation_Implementation()
 	Cast<AMatch_PlayerPawn>(GetInstigator())->InterpolatePieceRotation(this, nullptr, GetActorRotation(),PlayerStart->GetActorRotation(), false, false);
 }
 
-void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float Duration)
+void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float PlayRate, float Duration, bool bIndefiniteDuration)
 {
 	/* Store the original color and brightness to restore after the flash. */
 	FLinearColor OriginalColor;
@@ -208,8 +209,8 @@ void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float Du
 
 	/* Interpolates to the target color and brightness at the normal speed. Waits for the given duration,
 	 * then interpolates back to the original color and brightness. */
-	FlashHighlightTimeline(Color, Brightness, OriginalColor, OriginalBrightness, 0.25f,
-		Duration);
+	FlashHighlightTimeline(Color, Brightness, OriginalColor, OriginalBrightness, PlayRate,
+		Duration, bIndefiniteDuration);
 }
 
 void AParentPiece::Multicast_CreateModifierPopUp_Implementation(int ValueChange, bool bStrength)

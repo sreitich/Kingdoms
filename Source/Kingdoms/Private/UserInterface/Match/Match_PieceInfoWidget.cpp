@@ -406,7 +406,6 @@ void UMatch_PieceInfoWidget::OnStrengthHovered()
         ModifierList = Cast<UMatch_ModifierList>(CreateWidget<UUserWidget>(GetWorld(), ModifierListClass, FName("Modifier List Widget")));
         /* Attach the widget to the displayed strength text. */
         StrengthModifierListWrapper->AddChild(ModifierList);
-        ModifierList->SetFocus();
 
         /* Populate the modifier list with all active strength modifiers. */
         ModifierList->PopulateModifierList(this, StrengthModifiers, bFriendlyDisplayed);

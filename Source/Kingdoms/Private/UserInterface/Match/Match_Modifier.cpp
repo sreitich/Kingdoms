@@ -3,6 +3,7 @@
 
 #include "UserInterface/Match/Match_Modifier.h"
 
+#include "Components/Button.h"
 #include "Components/RichTextBlock.h"
 #include "Pieces/ParentPiece.h"
 #include "UserDefinedData/Match_UserDefinedData.h"
@@ -10,6 +11,9 @@
 
 void UMatch_Modifier::UpdateDisplayedModifier(FModifier NewModifier, bool bAlignedLeft)
 {
+	/* Save the information of the modifier that this widget represents. */
+	ModifierInfo = NewModifier;
+
 	if (PieceDataTable)
 	{
 		/* Get this source piece's row from the piece data table. */
@@ -61,22 +65,63 @@ void UMatch_Modifier::UpdateDisplayedModifier(FModifier NewModifier, bool bAlign
 			}
 
 			/* Update the displayed text. */
-			ModifierInfo->SetText(FText::FromString(NewModifierText));
+			DisplayedModifierInfo->SetText(FText::FromString(NewModifierText));
 		}
 	}
 
 	/* Align the text to the left or right depending on if the displayed piece is friendly or an enemy. */
 	if (bAlignedLeft)
 	{
-		ModifierInfo->SetJustification(ETextJustify::Left);
+		DisplayedModifierInfo->SetJustification(ETextJustify::Left);
 	}
 	else
 	{
-		ModifierInfo->SetJustification(ETextJustify::Right);
+		DisplayedModifierInfo->SetJustification(ETextJustify::Right);
 	}
 }
 
 void UMatch_Modifier::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	ModifierButton->OnHovered.AddDynamic(this, &UMatch_Modifier::OnModifierButtonHovered);
+	ModifierButton->OnUnhovered.AddDynamic(this, &UMatch_Modifier::OnModifierButtonUnhovered);
+}
+
+void UMatch_Modifier::NativeDestruct()
+{
+	Super::NativeDestruct();
+
+	ModifierInfo.SourcePiece->FlashHighlight
+	(
+		ModifierInfo.SourcePiece->GetInstigator()->IsLocallyControlled() ? ModifierInfo.SourcePiece->FriendlyFresnelColor : ModifierInfo.SourcePiece->EnemyFresnelColor,
+		2.0f,
+		0.5f,
+		0.0f,
+		true
+	);
+}
+
+void UMatch_Modifier::OnModifierButtonHovered()
+{
+	ModifierInfo.SourcePiece->FlashHighlight
+		(
+			ModifierInfo.SourcePiece->GetInstigator()->IsLocallyControlled() ? ModifierInfo.SourcePiece->FriendlyFresnelColor : ModifierInfo.SourcePiece->EnemyFresnelColor,
+			20.0f,
+			0.5f,
+			0.0f,
+			true
+		);
+}
+
+void UMatch_Modifier::OnModifierButtonUnhovered()
+{
+	ModifierInfo.SourcePiece->FlashHighlight
+	(
+		ModifierInfo.SourcePiece->GetInstigator()->IsLocallyControlled() ? ModifierInfo.SourcePiece->FriendlyFresnelColor : ModifierInfo.SourcePiece->EnemyFresnelColor,
+		2.0f,
+		0.5f,
+		0.0f,
+		true
+	);
 }

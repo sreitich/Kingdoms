@@ -43,15 +43,16 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_ResetPieceRotation();
 
-	/* Flashes a given highlight onto the piece at a given strength for a given amount of time. */
+	/* Flashes a given highlight onto the piece at a given strength for a given amount of time. Standard play-rate is
+	 * 0.25. Standard duration is 0.5. */
 	UFUNCTION(BlueprintCallable)
-	void FlashHighlight(FLinearColor Color, float Brightness, float Duration);
+	void FlashHighlight(FLinearColor Color, float Brightness, float PlayRate, float Duration, bool bIndefiniteDuration);
 
 		/* Fades to the target fresnel color and brightness at the given speed. Then waits for the duration and returns
 		 * to the original color and brightness. */
 		UFUNCTION(BlueprintImplementableEvent)
 		void FlashHighlightTimeline(FLinearColor NewColor, float NewBrightness, FLinearColor OriginalColor, float
-			OriginalBrightness, float Speed, float Duration);
+			OriginalBrightness, float PlayRate, float Duration, bool bIndefiniteDuration);
 
 	/* Spawns and animates a modifier pop-up with the appropriate information at this piece's pop-up location. */
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
@@ -209,6 +210,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data")
 	class UDataTable* PieceDataTable;
 
+	/* The color that friendly pieces will be highlighted in. */
+	UPROPERTY(EditDefaultsOnly, Category="Materials")
+	FLinearColor FriendlyFresnelColor = FColor(0.023529f, 0.423529f, 0.776471f, 1.0f);
+
+	/* The color that enemy pieces will be highlighted in. */
+	UPROPERTY(EditDefaultsOnly, Category="Materials")
+	FLinearColor EnemyFresnelColor = FColor(0.815686f, 0.015686f, 0.207843f, 1.0f);
+
 	/* This piece's idle/walk blend space. Used to interpolate and play this piece's unique idle and walk animations. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
 	UBlendSpaceBase* IdleWalkBS;
@@ -285,14 +294,6 @@ protected:
 	/* The material used for this piece's skeletal meshes, including the parent mesh. Used to edit the fresnel during runtime. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Materials")
 	UMaterialInstanceDynamic* DynamicMaterial;
-
-	/* The color that friendly pieces will be highlighted in. */
-	UPROPERTY(EditDefaultsOnly, Category="Materials")
-	FLinearColor FriendlyFresnelColor = FColor(0.023529f, 0.423529f, 0.776471f, 1.0f);;
-
-	/* The color that enemy pieces will be highlighted in. */
-	UPROPERTY(EditDefaultsOnly, Category="Materials")
-	FLinearColor EnemyFresnelColor = FColor(0.815686f, 0.015686f, 0.207843f, 1.0f);
 
 	/* The widget that is created to confirm this piece's active ability. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Abilities")

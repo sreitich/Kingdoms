@@ -2,10 +2,13 @@
 
 #pragma once
 
+#include "UserDefinedData/Match_UserDefinedData.h"
+
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Match_Modifier.generated.h"
 
+class UButton;
 class URichTextBlock;
 
 class UDataTable;
@@ -33,12 +36,28 @@ protected:
 	/* Called when the game starts or when created. */
 	virtual void NativeConstruct() override;
 
+	/* Called when destroyed. */
+	virtual void NativeDestruct() override;
+
+	/* Strengthens the fresnel of this modifier's source piece. */
+	UFUNCTION()
+	void OnModifierButtonHovered();
+
+	/* Resets the fresnel of this modifier's source piece. */
+	UFUNCTION()
+	void OnModifierButtonUnhovered();
+
 
 /* Protected variables. */
 protected:
 
+	/* A pointer to the piece data table asset. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data")
 	UDataTable* PieceDataTable;
+
+	/* Stores the information of the modifier that this widget represents. */
+	UPROPERTY()
+	FModifier ModifierInfo;
 
 
 /* Protected widgets. */
@@ -46,7 +65,10 @@ protected:
 
 	/* The text block displaying the modifier's information. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	URichTextBlock* ModifierInfo;
+	URichTextBlock* DisplayedModifierInfo;
 
+	/* Encompasses the entire widget; when hovered, the source piece of this modifier is highlighted. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* ModifierButton;
 
 };
