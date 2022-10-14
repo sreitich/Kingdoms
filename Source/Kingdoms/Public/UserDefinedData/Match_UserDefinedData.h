@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UserDefinedData/PieceData_UserDefinedData.h"
+
 #include "CoreMinimal.h"
 
 #include "Match_UserDefinedData.generated.h"
@@ -156,9 +158,21 @@ struct FModifier
 	static const int Armor = 0;
 	static const int Strength = 1;
 
-	/* The piece responsible for the modifier. */
+	/* The actor (usually a piece) responsible for the modifier. */
 	UPROPERTY(BlueprintReadWrite)
-	AParentPiece* SourcePiece;
+	AActor* SourceActor;
+
+	/* The alignment of the actor responsible for the modifier, relative to the player whose piece is being modified. */
+	UPROPERTY(BlueprintReadWrite)
+	TEnumAsByte<EAlignment> SourceAlignmentToTarget;
+	
+	/* The name of the actor that caused the modifier. */
+	UPROPERTY(BlueprintReadWrite)
+	FString SourceName;
+
+	/* The name of the ability or effect that caused the modifier. */
+	UPROPERTY(BlueprintReadWrite)
+	FString SourceAbilityName;
 
 	/* Which stat is being modified. 0 is armor, 1 is strength. */
 	UPROPERTY(BlueprintReadWrite)
@@ -167,10 +181,6 @@ struct FModifier
 	/* The net effect of the modifier. */
 	UPROPERTY(BlueprintReadWrite)
 	int Value;
-
-	/* The piece responsible for the modifier. */
-	UPROPERTY(BlueprintReadWrite)
-	FString SourceAbilityName;
 
 	/* The remaining turn duration of the modifier. */
 	UPROPERTY(BlueprintReadWrite)

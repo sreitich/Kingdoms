@@ -235,7 +235,7 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
                 if (PieceData && PieceData->ActiveName != "")
                 {
                     /* Reveal all of the active ability widgets. */
-                    ActiveAbilityBox->SetVisibility(ESlateVisibility::Visible);
+                    ActiveAbilityBox->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
                     /* If the active ability's cooldown is active, display the cooldown and disable the active ability button. */
                     if (NewPiece->GetActiveCD() > 0)
@@ -281,7 +281,7 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
                 if (PieceData && PieceData->PassiveName != "")
                 {
                     /* Reveal all of the passive ability widgets. */
-                    PassiveAbilityBox->SetVisibility(ESlateVisibility::Visible);
+                    PassiveAbilityBox->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
                     /* If the passive ability's cooldown is active... */
                     if (NewPiece->GetPassiveCD() > 0)

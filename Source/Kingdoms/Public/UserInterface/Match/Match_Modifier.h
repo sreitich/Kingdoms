@@ -47,13 +47,13 @@ protected:
 	UFUNCTION()
 	void OnModifierButtonUnhovered();
 
+	/* Highlights the actor responsible for this modifier depending on its class. */
+	UFUNCTION()
+	void HighlightSource(bool bRemoveHighlight) const;
+
 
 /* Protected variables. */
 protected:
-
-	/* A pointer to the piece data table asset. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data")
-	UDataTable* PieceDataTable;
 
 	/* Stores the information of the modifier that this widget represents. */
 	UPROPERTY()

@@ -409,7 +409,7 @@ void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool
 {
 	/* Store the original strength or armor value to find out the final change that this modifier applies. */
 	const int OriginalValue = NewModifier.EffectedStat ? CurrentStrength : CurrentArmor;
-	int NewValue = 0;
+	int NewValue;
 
 	/* Set the new statistic, clamped so that it can't go below 0 or above 20. */
 	if (NewModifier.EffectedStat == FModifier::Strength)
@@ -429,7 +429,7 @@ void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool
 	int RepeatIndex = -1;
 	for (int i = 0; i < TemporaryModifiers.Num(); i++)
 	{
-		if (TemporaryModifiers[i].SourcePiece == NewModifier.SourcePiece &&
+		if (TemporaryModifiers[i].SourceActor == NewModifier.SourceActor &&
 			TemporaryModifiers[i].SourceAbilityName == NewModifier.SourceAbilityName &&
 			TemporaryModifiers[i].EffectedStat == NewModifier.EffectedStat)
 		{
@@ -452,7 +452,7 @@ void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool
 
 	/* Spawn a modifier pop-up if requested. */
 	if (bActivatePopUp)
-		Multicast_CreateModifierPopUp(NewValue - OriginalValue, bool(NewModifier.EffectedStat));
+		Multicast_CreateModifierPopUp(NewValue - OriginalValue, NewModifier.EffectedStat == FModifier::Strength);
 }
 
 void AParentPiece::Server_DecrementModifierDurations_Implementation()
@@ -469,9 +469,11 @@ void AParentPiece::Server_DecrementModifierDurations_Implementation()
 			/* Get a shortened reference to the currently iterated modifier for readability. */
 			const FModifier& Modifier = TemporaryModifiers[i];
 			
-			/* Call any ability-specific logic that needs to execute when an active ability's effect ends. */
+			/* Call any ability-specific logic that needs to execute when an active ability's effect ends. if the source
+			 * of the modifier is a piece. */
 			const TArray<AActor*> Targets = { this };
-			Modifier.SourcePiece->OnActiveEffectEnded(Targets);
+			if (AParentPiece* Piece = Cast<AParentPiece>(Modifier.SourceActor))
+				Piece->OnActiveEffectEnded(Targets);
 
 			/* Remove the effect of the modifier from the stat it was modifying. */
 			if (Modifier.EffectedStat == FModifier::Strength)

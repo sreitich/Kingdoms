@@ -43,6 +43,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Board Tile")
 	void RefreshHighlight();
 
+	UFUNCTION(BlueprintImplementableEvent, Category="Board Tile")
+	void EnableGlow(bool bReverse);
+	
 
 /* Public variables. */
 public:
@@ -133,5 +136,10 @@ protected:
 	/* Pointer to the piece currently on this tile. */
 	UPROPERTY(ReplicatedUsing=OnRep_OccupyingPiece, VisibleAnywhere, Category="Board Tile")
 	AParentPiece* OccupyingPiece;
+
+	/* How bright the tile gets when highlighted. This doesn't affect tile highlight materials, just the light that
+	 * emits when the tile is being highlighted as the source of a modifier. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Board Tile")
+	float TileLightBrightness = 3000.0f;
 
 };
