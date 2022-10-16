@@ -15,6 +15,8 @@
 
 void UMatch_AttackConfirmation::UpdateAttackPreviewInfo(AParentPiece* FriendlyPiece, AParentPiece* EnemyPiece)
 {
+	UE_LOG(LogTemp, Error, TEXT("E"));
+
 	/* Both given pieces need to be valid for this widget to update. */
 	if (IsValid(FriendlyPiece) && IsValid(EnemyPiece))
 	{
@@ -27,8 +29,8 @@ void UMatch_AttackConfirmation::UpdateAttackPreviewInfo(AParentPiece* FriendlyPi
 		{
 			/* Get the friendly and enemy pieces' rows from the piece data table. */
 			static const FString ContextString(TEXT("Piece Data Struct"));
-			FPieceDataStruct* FriendlyPieceData = PieceDataTable->FindRow<FPieceDataStruct>(FriendlyPiece->PieceID, ContextString, true);
-			FPieceDataStruct* EnemyPieceData = PieceDataTable->FindRow<FPieceDataStruct>(EnemyPiece->PieceID, ContextString, true);
+			const FPieceDataStruct* FriendlyPieceData = PieceDataTable->FindRow<FPieceDataStruct>(FriendlyPiece->PieceID, ContextString, true);
+			const FPieceDataStruct* EnemyPieceData = PieceDataTable->FindRow<FPieceDataStruct>(EnemyPiece->PieceID, ContextString, true);
 
 			/* Update the displayed piece information using the piece data rows, if they could be retrieved. */
 			if (FriendlyPieceData)

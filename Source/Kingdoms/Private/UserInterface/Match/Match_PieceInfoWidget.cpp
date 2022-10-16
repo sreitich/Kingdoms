@@ -509,21 +509,21 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
          * actions. */
         for (const ABoardTile* Tile : DisplayedPiece->GetValidTiles())
         {
-            /* If this tile is occupied by a friendly piece... */
-            if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetAlignment() == E_Friendly)
-            {
-                Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidFriendly);
-            }
-            /* If this tile is occupied by an enemy piece... */
-            else if (IsValid(Tile->GetOccupyingPiece()))
-            {
-                Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidEnemy);
-            }
-            /* If the tile is empty... */
-            else
-            {
-                Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidMove);
-            }
+            // /* If this tile is occupied by a friendly piece... */
+            // if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetAlignment() == E_Friendly)
+            // {
+            //     Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidFriendly);
+            // }
+            // /* If this tile is occupied by an enemy piece... */
+            // else if (IsValid(Tile->GetOccupyingPiece()))
+            // {
+            //     Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidEnemy);
+            // }
+            // /* If the tile is empty... */
+            // else
+            // {
+            //     Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidMove);
+            // }
         }
     }
 }

@@ -74,7 +74,7 @@ void UServerCommunicationComponent::UpdatePiecePosition_Server_Implementation(AA
 		Piece->SetActorLocation(InNewTile->GetActorLocation() + FVector(0.0f, 0.0f, 165.0f));
 
 		/* Set the piece's new current tile and the tile's new occupying piece. */
-		Piece->SetCurrentTile(NewTile);
+		Piece->Server_SetCurrentTile(NewTile);
 		Cast<ABoardTile>(InNewTile)->SetOccupyingPiece(Piece);
 	}
 }
@@ -104,7 +104,7 @@ void UServerCommunicationComponent::MovePieceToTile(AParentPiece* PieceToMove, A
 	/* Update the piece's new tile and the new tile's occupying piece on the server. */
 	NewTile->SetOccupyingPiece(PieceToMove);
 	PieceToMove->GetCurrentTile()->SetOccupyingPiece(nullptr);
-	PieceToMove->SetCurrentTile(NewTile);
+	PieceToMove->Server_SetCurrentTile(NewTile);
 }
 
 void UServerCommunicationComponent::BeginPlay()

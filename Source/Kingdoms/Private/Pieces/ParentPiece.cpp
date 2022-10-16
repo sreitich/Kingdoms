@@ -112,8 +112,8 @@ void AParentPiece::BeginPlay()
 			DynamicMaterial->SetVectorParameterValue(TEXT("FresnelColor"), EnemyFresnelColor);
         }
 
-		/* Enable this piece's fresnel. */
-		DynamicMaterial->SetScalarParameterValue(TEXT("Brightness"), 2.0f);
+		/* Initialize the dynamic material's fresnel brightness with the default brightness. */
+		DynamicMaterial->SetScalarParameterValue(TEXT("Brightness"), DynamicMaterial->K2_GetScalarParameterValue(TEXT("Brightness")));
 	}
 
 	/* If the piece data table was found... */
@@ -312,21 +312,21 @@ void AParentPiece::OnActiveClicked()
 		/* If the target was a tile, highlight it. */
 		if (const ABoardTile* Tile = Cast<ABoardTile>(Target))
 		{
-			Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidMove);
+			// Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidMove);
 		}
 		/* If the target was a piece, highlight that piece's tile depending on its allegiance. */
 		else if (const AParentPiece* Piece = Cast<AParentPiece>(Target))
 		{
-			/* Highlight a friendly piece if it has a valid tile. */
-			if (IsValid(Piece->GetCurrentTile()) && Piece->GetInstigator()->IsLocallyControlled())
-			{
-				Piece->GetCurrentTile()->Highlight->SetMaterial(0, Tile->Highlight_ValidFriendly);
-			}
-			/* Highlight an enemy piece if it has a valid tile. */
-			else if (IsValid(Piece->GetCurrentTile()))
-			{
-				Piece->GetCurrentTile()->Highlight->SetMaterial(0, Tile->Highlight_ValidEnemy);
-			}
+			// /* Highlight a friendly piece if it has a valid tile. */
+			// if (IsValid(Piece->GetCurrentTile()) && Piece->GetInstigator()->IsLocallyControlled())
+			// {
+			// 	Piece->GetCurrentTile()->Highlight->SetMaterial(0, Tile->Highlight_ValidFriendly);
+			// }
+			// /* Highlight an enemy piece if it has a valid tile. */
+			// else if (IsValid(Piece->GetCurrentTile()))
+			// {
+			// 	Piece->GetCurrentTile()->Highlight->SetMaterial(0, Tile->Highlight_ValidEnemy);
+			// }
 		}
 		/* This can be iterated on if we add pieces that can target things other than tiles or pieces in the future. */
 	}
@@ -382,18 +382,10 @@ TArray<AActor*> AParentPiece::GetValidPassiveAbilityTargets()
 	return TArray<AActor*>();
 }
 
-bool AParentPiece::SetCurrentTile(ABoardTile* NewTile)
+void AParentPiece::Server_SetCurrentTile_Implementation(ABoardTile* NewTile)
 {
-	/* Make sure that the new tile isn't null and that the server is calling this. */
-	if (IsValid(NewTile) && HasAuthority())
-	{
-		/* Change the occupying piece. Only the server can do this. */
-		CurrentTile = NewTile;
-
-		return true;
-	}
-	
-	return false;
+	/* Change the occupying piece. Only the server can do this. */
+	CurrentTile = NewTile;
 }
 
 void AParentPiece::SetAttackInfo(FAttackInfo NewAttackInfo)

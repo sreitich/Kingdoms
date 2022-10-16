@@ -40,7 +40,7 @@ void AKnight::StartActiveConfirmation(TArray<AActor*> Targets)
 	ConfirmationWidget->UpdateActionConfirmationInfo(this, Cast<ABoardTile>(Targets[0]));
 
 	/* Highlight the pending tile. */
-	Cast<ABoardTile>(Targets[0])->Highlight->SetMaterial(0, Cast<ABoardTile>(Targets[0])->Highlight_Target);
+	// Cast<ABoardTile>(Targets[0])->Highlight->SetMaterial(0, Cast<ABoardTile>(Targets[0])->Highlight_Target);
 }
 
 void AKnight::OnActiveAbility(TArray<AActor*> Targets)

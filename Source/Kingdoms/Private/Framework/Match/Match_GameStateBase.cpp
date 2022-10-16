@@ -37,6 +37,7 @@ void AMatch_GameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
     DOREPLIFETIME(AMatch_GameStateBase, TurnTime);
     DOREPLIFETIME(AMatch_GameStateBase, bAnimatedPiece);
     DOREPLIFETIME(AMatch_GameStateBase, PlayerStarts);
+    DOREPLIFETIME(AMatch_GameStateBase, CurrentAttackInfo);
 }
 
 void AMatch_GameStateBase::SetUpMatch()
@@ -88,14 +89,14 @@ void AMatch_GameStateBase::StartMatch()
     {
         Piece->SetActorHiddenInGame(false);
     }
-    
-    /* Refresh each tile's highlight so that players see each other's piece highlights. */
-    if (IsValid(BoardManager))
-    {
-        BoardManager->RefreshBoard();
-    }
 
-    
+    // /* Refresh each tile's highlight so that players see each other's piece highlights. */
+    // if (IsValid(BoardManager))
+    // {
+    //     BoardManager->RefreshBoard();
+    // }
+
+
     /* Only allow the server to begin the game. */
     if (HasAuthority())
     {

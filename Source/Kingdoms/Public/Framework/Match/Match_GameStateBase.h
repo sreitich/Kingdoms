@@ -74,6 +74,10 @@ public:
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	bool bAnimatedPiece;
 
+	/* Maintains the information of the current attack. */
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	FAttackInfo CurrentAttackInfo;
+
 
 /* Protected functions. */
 protected:

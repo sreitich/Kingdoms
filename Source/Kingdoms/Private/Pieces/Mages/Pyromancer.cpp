@@ -20,27 +20,27 @@ APyromancer::APyromancer()
 
 void APyromancer::OnActiveClicked()
 {
-	for (AActor* TileActor : GetActiveAbilityRange())
-	{
-		if (const ABoardTile* Tile = Cast<ABoardTile>(TileActor))
-		{
-			/* If the tile is empty, it's in a valid range but isn't a valid target. */
-			if (!IsValid(Tile->GetOccupyingPiece()))
-			{
-				Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidRange);
-			}
-			/* If the tile is occupied by a friendly piece, highlight it within range but invalid. */
-			else if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetInstigator()->IsLocallyControlled())
-			{
-				Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidFriendlyRange);
-			}
-			/* If the tile is occupied by an enemy piece, it's a valid target. */
-			else if (IsValid(Tile->GetOccupyingPiece()) && !Tile->GetOccupyingPiece()->GetInstigator()->IsLocallyControlled())
-			{
-				Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidEnemy);
-			}
-		}
-	}
+	// for (AActor* TileActor : GetActiveAbilityRange())
+	// {
+	// 	if (const ABoardTile* Tile = Cast<ABoardTile>(TileActor))
+	// 	{
+	// 		/* If the tile is empty, it's in a valid range but isn't a valid target. */
+	// 		if (!IsValid(Tile->GetOccupyingPiece()))
+	// 		{
+	// 			Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidRange);
+	// 		}
+	// 		/* If the tile is occupied by a friendly piece, highlight it within range but invalid. */
+	// 		else if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetInstigator()->IsLocallyControlled())
+	// 		{
+	// 			Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidFriendlyRange);
+	// 		}
+	// 		/* If the tile is occupied by an enemy piece, it's a valid target. */
+	// 		else if (IsValid(Tile->GetOccupyingPiece()) && !Tile->GetOccupyingPiece()->GetInstigator()->IsLocallyControlled())
+	// 		{
+	// 			Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidEnemy);
+	// 		}
+	// 	}
+	// }
 }
 
 TArray<AActor*> APyromancer::GetValidActiveAbilityTargets()
@@ -176,7 +176,7 @@ void APyromancer::StartActiveConfirmation(TArray<AActor*> Targets)
 		UE_LOG(LogTemp, Error, TEXT("Called"));
 	
 		/* Highlight the pending tile. */
-		Cast<ABoardTile>(Target->GetCurrentTile())->Highlight->SetMaterial(0, Target->GetCurrentTile()->Highlight_Target);
+		// Cast<ABoardTile>(Target->GetCurrentTile())->Highlight->SetMaterial(0, Target->GetCurrentTile()->Highlight_Target);
 	}
 }
 

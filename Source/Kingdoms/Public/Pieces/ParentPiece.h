@@ -122,8 +122,8 @@ public:
 	FORCEINLINE ABoardTile* GetCurrentTile() const { return CurrentTile; }
 
 	/* Server-only setter for CurrentTile. */
-	UFUNCTION(BlueprintCallable, Category="Current Tile")
-	bool SetCurrentTile(ABoardTile* NewTile);
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Current Tile")
+	void Server_SetCurrentTile(ABoardTile* NewTile);
 
 	/* Getter for AttackInfo. */
 	UFUNCTION(BlueprintPure, Category="Is Attacking?")

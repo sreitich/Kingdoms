@@ -76,9 +76,6 @@ void AMatch_PlayerPawn::Interact()
 	/* Line trace from the player 3000 units out to where they clicked. */
 	GetWorld()->LineTraceSingleByChannel(OUT HitResult, Camera->GetComponentLocation(), WorldLocation + (WorldDirection * 3000), ECC_Visibility, TraceParams);
 
-	// DrawDebugLine(GetWorld(), Camera->GetComponentLocation(), WorldLocation + (WorldDirection * 3000), FColor(255, 0, 0), true, 20.0f, 0, 5.0f);
-
-
 	/* If the line trace hit something... */
 	if (HitResult.bBlockingHit)
 	{
@@ -267,12 +264,12 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 		if (IsValid(InteractedTile->GetOccupyingPiece()))
 		{
 			/* If the interacted tile's piece is friendly... */
-			if (InteractedTile->GetOccupyingPiece()->GetInstigator()->IsLocallyControlled())
+			if (InteractedTile->GetOccupyingPiece()->GetAlignment() == E_Friendly)
 			{
 				/* Cannot move to occupied piece pop-up. */
 			}
 			/* If the interacted tile is occupied by an enemy piece... */
-			else
+			else if (InteractedTile->GetOccupyingPiece()->GetAlignment() == E_Hostile)
 			{
 				/* If this player has a valid player controller... */
 				if (AMatch_PlayerController* ControllerPtr = GetController<AMatch_PlayerController>())
@@ -280,8 +277,11 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 					/* Create and update the attack confirmation pop-up. */
 					ControllerPtr->UpdateAttackConfirmationWidget(false, SelectedPiece, InteractedTile->GetOccupyingPiece());
 
+					/* Clear the selected piece pointer. */
+					SelectedPiece = nullptr;
+
 					/* Highlight the pending tile. */
-					InteractedTile->Highlight->SetMaterial(0, InteractedTile->Highlight_Target);
+					// InteractedTile->Highlight->SetMaterial(0, InteractedTile->Highlight_Target);
 				}
 			}
 		}
@@ -295,7 +295,7 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 				ControllerPtr->UpdateMoveConfirmationWidget(false, InteractedTile, SelectedPiece);
 
 				/* Highlight the pending tile. */
-				InteractedTile->Highlight->SetMaterial(0, InteractedTile->Highlight_Target);
+				// InteractedTile->Highlight->SetMaterial(0, InteractedTile->Highlight_Target);
 			}
 		}
 	}

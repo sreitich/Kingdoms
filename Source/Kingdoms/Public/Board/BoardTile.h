@@ -40,6 +40,7 @@ public:
 	void SetOccupyingPiece(AParentPiece* NewOccupyingPiece);
 
 	/* Sets the highlight depending on the occupying piece. */
+	/* DEPRECATED: Tiles no longer highlight to signify occupation.  */
 	UFUNCTION(BlueprintCallable, Category="Board Tile")
 	void RefreshHighlight();
 
@@ -78,10 +79,14 @@ public:
 /* Public assets. */
 public:
 
-	/* Empty tile. */
+	/* Blank tile highlight. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	UMaterialInstance* Highlight_Empty;
+	UMaterialInstance* Highlight_Blank;
 
+
+	// Rework cutoff
+	
+	
 	/* Tile occupied by friendly piece. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
 	UMaterialInstance* Highlight_Friendly;
