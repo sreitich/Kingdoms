@@ -3,7 +3,7 @@
 
 #include "Board/BoardTile.h"
 
-#include "Framework/Match/Match_GameStateBase.h"
+#include "Components/RectLightComponent.h"
 #include "Pieces/ParentPiece.h"
 
 ABoardTile::ABoardTile()
@@ -21,9 +21,17 @@ ABoardTile::ABoardTile()
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	Body->SetupAttachment(SceneRoot);
 
+	Checker = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Checker"));
+	Checker->SetupAttachment(Body);
+	Checker->SetIsReplicated(false);
+
 	Highlight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Highlight"));
-	Highlight->SetupAttachment(Body);
+	Highlight->SetupAttachment(Checker);
 	Highlight->SetIsReplicated(true);
+
+	EmissiveHighlight = CreateDefaultSubobject<URectLightComponent>(TEXT("Emissive Highlight"));
+	EmissiveHighlight->SetupAttachment(Body);
+	EmissiveHighlight->SetIsReplicated(false);
 
 	Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
 	Arrow->SetupAttachment(Body);

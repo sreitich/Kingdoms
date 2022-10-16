@@ -11,8 +11,9 @@
 #include "GameFramework/Actor.h"
 #include "BoardTile.generated.h"
 
-/* Avoid circular dependecy: a tile and its occupying piece need to have pointers to each other. */
+/* Avoid circular dependency: a tile and its occupying piece need to have pointers to each other. */
 class AParentPiece;
+class URectLightComponent;
 
 UCLASS()
 class KINGDOMS_API ABoardTile : public AActor
@@ -61,19 +62,27 @@ public:
 
 	/* Root of the actor. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
-	class USceneComponent* SceneRoot;
+	USceneComponent* SceneRoot;
 
 	/* The tile object itself. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
-	class UStaticMeshComponent* Body;
+	UStaticMeshComponent* Body;
+
+	/* A monochromatic plane covering the tile to give the board a checkered appearance. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
+	UStaticMeshComponent* Checker;
 
 	/* The highlight that indicates the occupied piece and valid tiles when moving or attacking. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
-	class UStaticMeshComponent* Highlight;
+	UStaticMeshComponent* Highlight;
+
+	/* Provides an emissive highlight onto this tile. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
+	URectLightComponent* EmissiveHighlight;
 
 	/* An arrow that should point from player 1's spawn towards player 2's spawn. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
-	class UArrowComponent* Arrow;
+	UArrowComponent* Arrow;
 
 
 /* Public assets. */
