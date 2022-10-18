@@ -21,13 +21,24 @@ ABoardTile::ABoardTile()
 	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	Body->SetupAttachment(SceneRoot);
 
+	/* Bind these functions to be called when this tile is hovered over. */
+	Body->OnBeginCursorOver.AddDynamic(this, &ABoardTile::OnBeginCursorOver);
+	Body->OnEndCursorOver.AddDynamic(this, &ABoardTile::OnEndCursorOver);
+
 	Checker = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Checker"));
 	Checker->SetupAttachment(Body);
 	Checker->SetIsReplicated(false);
 
 	Highlight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Highlight"));
-	Highlight->SetupAttachment(Checker);
+	Highlight->SetupAttachment(Body);
 	Highlight->SetIsReplicated(true);
+
+	Highlight->OnBeginCursorOver.AddDynamic(this, &ABoardTile::OnBeginCursorOver);
+
+
+	Reticle = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Reticle"));
+	Reticle->SetupAttachment(Body);
+	Reticle->SetIsReplicated(false);
 
 	EmissiveHighlight = CreateDefaultSubobject<URectLightComponent>(TEXT("Emissive Highlight"));
 	EmissiveHighlight->SetupAttachment(Body);
@@ -35,13 +46,15 @@ ABoardTile::ABoardTile()
 
 	Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
 	Arrow->SetupAttachment(Body);
-
 }
 
 void ABoardTile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	/* Create a dynamic material for the reticle mesh, allowing the material's parameters to be changed during runtime. */
+	ReticleMaterial = UMaterialInstanceDynamic::Create(Reticle->GetMaterial(0), this);
+	Reticle->SetMaterial(0, ReticleMaterial);
 }
 
 void ABoardTile::OnRep_OccupyingPiece()
@@ -80,6 +93,23 @@ void ABoardTile::SetOccupyingPiece_Implementation(AParentPiece* NewOccupyingPiec
 		/* The server won't call the OnRep function automatically. */
 		// OnRep_OccupyingPiece();
 	}
+}
+
+void ABoardTile::OnBeginCursorOver(UPrimitiveComponent* Component)
+{
+	UpdateReticle(true, true);
+}
+
+void ABoardTile::OnEndCursorOver(UPrimitiveComponent* Component)
+{
+	UpdateReticle(false, true);
+}
+
+void ABoardTile::UpdateReticle(bool bReveal, bool bYellow)
+{
+	/* Reveal or hide the reticle and update its color. */
+	Reticle->SetVisibility(bReveal, false);
+	ReticleMaterial->SetVectorParameterValue(TEXT("EmissiveColor"), bYellow ? ReticleColor_Hovered : ReticleColor_Selected);
 }
 
 void ABoardTile::RefreshHighlight()

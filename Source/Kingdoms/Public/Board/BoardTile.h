@@ -40,14 +40,29 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Occupying Piece")
 	void SetOccupyingPiece(AParentPiece* NewOccupyingPiece);
 
-	/* Sets the highlight depending on the occupying piece. */
-	/* DEPRECATED: Tiles no longer highlight to signify occupation.  */
+	/* Called when the player starts hovering over this tile. */
 	UFUNCTION(BlueprintCallable, Category="Board Tile")
-	void RefreshHighlight();
+	void OnBeginCursorOver(UPrimitiveComponent* Component);
+
+	/* Called when the player stops hovering over this tile. */
+	UFUNCTION(BlueprintCallable, Category="Board Tile")
+	void OnEndCursorOver(UPrimitiveComponent* Component);
+	
+	/* Reveals or hides a yellow or green reticle, indicating that the player is hovering over this tile. */
+	UFUNCTION(BlueprintCallable, Category="Board Tile")
+	void UpdateReticle(bool bReveal, bool bYellow);
 
 	UFUNCTION(BlueprintImplementableEvent, Category="Board Tile")
 	void EnableGlow(bool bReverse);
-	
+
+
+
+
+	/* Sets the highlight depending on the occupying piece. */
+	/* DEPRECATED: Tiles no longer highlight to signify occupation.  */
+	UFUNCTION(BlueprintCallable, Category="Board Tile")
+	void RefreshHighlight();	
+
 
 /* Public variables. */
 public:
@@ -68,6 +83,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* Body;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
+	UStaticMeshComponent* Test;
+
 	/* A monochromatic plane covering the tile to give the board a checkered appearance. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* Checker;
@@ -75,6 +93,10 @@ public:
 	/* The highlight that indicates the occupied piece and valid tiles when moving or attacking. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* Highlight;
+
+	/* The reticle indicating if the player is hovering over this tile. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
+	UStaticMeshComponent* Reticle;
 
 	/* Provides an emissive highlight onto this tile. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
@@ -91,6 +113,14 @@ public:
 	/* Blank tile highlight. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
 	UMaterialInstance* Highlight_Blank;
+
+	/* The color of the reticle that appears when the player hovers over a tile. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
+	FLinearColor ReticleColor_Hovered;
+
+	/* The color of the reticle that appears when the player selects a tile. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
+	FLinearColor ReticleColor_Selected;
 
 
 	// Rework cutoff
@@ -151,6 +181,10 @@ protected:
 	UPROPERTY(ReplicatedUsing=OnRep_OccupyingPiece, VisibleAnywhere, Category="Board Tile")
 	AParentPiece* OccupyingPiece;
 
+	/* This is the reticle mesh's material, used to change the material's parameters at runtime (usually the reticle color). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Board Tile")
+	UMaterialInstanceDynamic* ReticleMaterial;
+	
 	/* How bright the tile gets when highlighted. This doesn't affect tile highlight materials, just the light that
 	 * emits when the tile is being highlighted as the source of a modifier. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Board Tile")
