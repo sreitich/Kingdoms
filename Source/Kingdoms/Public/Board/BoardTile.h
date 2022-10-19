@@ -11,7 +11,7 @@
 #include "GameFramework/Actor.h"
 #include "BoardTile.generated.h"
 
-/* Avoid circular dependency: a tile and its occupying piece need to have pointers to each other. */
+class AMatch_PlayerState;
 class AParentPiece;
 class URectLightComponent;
 
@@ -52,14 +52,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Board Tile")
 	void UpdateReticle(bool bReveal, bool bYellow);
 
+	/* Enables/disables the emissive highlight, interpolating its brightness to glow the given color. */
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Board Tile")
+	void UpdateEmissiveHighlight(bool bReveal, FLinearColor Color);
+
+
+	/* Rework cutoff */
+	
+
+	/* Enables the emissive highlight with a brightness interpolation.
+	 * DEPRECATED: The highlight texture has been completely replaced with the emissive highlight. */
 	UFUNCTION(BlueprintImplementableEvent, Category="Board Tile")
 	void EnableGlow(bool bReverse);
 
-
-
-
-	/* Sets the highlight depending on the occupying piece. */
-	/* DEPRECATED: Tiles no longer highlight to signify occupation.  */
+	/* Sets the highlight depending on the occupying piece.
+	 * DEPRECATED: Tiles no longer highlight to signify occupation.  */
 	UFUNCTION(BlueprintCallable, Category="Board Tile")
 	void RefreshHighlight();	
 
@@ -90,15 +97,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* Checker;
 
-	/* The highlight that indicates the occupied piece and valid tiles when moving or attacking. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
-	UStaticMeshComponent* Highlight;
-
 	/* The reticle indicating if the player is hovering over this tile. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* Reticle;
 
-	/* Provides an emissive highlight onto this tile. */
+	/* The emissive highlight that indicates the occupied piece and valid tiles when moving or attacking. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	URectLightComponent* EmissiveHighlight;
 
@@ -107,12 +110,24 @@ public:
 	UArrowComponent* Arrow;
 
 
+
+
+	/* The highlight that indicates the occupied piece and valid tiles when moving or attacking.
+	 * DEPRECATED: This has been replaced by the emissive highlight component. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
+	UStaticMeshComponent* Highlight;
+
+
 /* Public assets. */
 public:
 
 	/* Blank tile highlight. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
 	UMaterialInstance* Highlight_Blank;
+
+	/* Indicates a friendly piece that can be the target of an action. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
+	UMaterialInstance* Highlight_Friendly;
 
 	/* The color of the reticle that appears when the player hovers over a tile. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
@@ -126,9 +141,9 @@ public:
 	// Rework cutoff
 	
 	
-	/* Tile occupied by friendly piece. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	UMaterialInstance* Highlight_Friendly;
+	// /* Tile occupied by friendly piece. */
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
+	// UMaterialInstance* Highlight_Friendly;
 
 	/* Tile occupied by enemy piece. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
@@ -169,7 +184,8 @@ protected:
 	/* Called when the game starts or when spawned. */
 	virtual void BeginPlay() override;
 
-	/* Refreshes this tile's highlight whenever its occupying piece changes. */
+	/* Refreshes this tile's highlight whenever its occupying piece changes.
+	 * DEPRECATED: Logic no longer needs to be called every time the occupying piece changes. */
 	UFUNCTION()
 	void OnRep_OccupyingPiece();
 
@@ -177,8 +193,12 @@ protected:
 /* Protected variables. */
 protected:
 
+	/* Pointer to the local player's player state. */
+	UPROPERTY(VisibleAnywhere, Category="Board Tile")
+	AMatch_PlayerState* LocalPlayerState;
+
 	/* Pointer to the piece currently on this tile. */
-	UPROPERTY(ReplicatedUsing=OnRep_OccupyingPiece, VisibleAnywhere, Category="Board Tile")
+	UPROPERTY(Replicated, VisibleAnywhere, Category="Board Tile")
 	AParentPiece* OccupyingPiece;
 
 	/* This is the reticle mesh's material, used to change the material's parameters at runtime (usually the reticle color). */
