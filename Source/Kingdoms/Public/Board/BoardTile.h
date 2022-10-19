@@ -194,8 +194,8 @@ protected:
 protected:
 
 	/* Pointer to the local player's player state. */
-	UPROPERTY(VisibleAnywhere, Category="Board Tile")
-	AMatch_PlayerState* LocalPlayerState;
+	// UPROPERTY(VisibleAnywhere, Category="Board Tile")
+	// AMatch_PlayerState* LocalPlayerState;
 
 	/* Pointer to the piece currently on this tile. */
 	UPROPERTY(Replicated, VisibleAnywhere, Category="Board Tile")

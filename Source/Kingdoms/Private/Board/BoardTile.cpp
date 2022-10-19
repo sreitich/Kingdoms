@@ -4,9 +4,9 @@
 #include "Board/BoardTile.h"
 
 #include "Components/RectLightComponent.h"
+#include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
 #include "GameFramework/GameStateBase.h"
-#include "GameFramework/PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Pieces/ParentPiece.h"
 
@@ -57,15 +57,15 @@ void ABoardTile::BeginPlay()
 	ReticleMaterial = UMaterialInstanceDynamic::Create(Reticle->GetMaterial(0), this);
 	Reticle->SetMaterial(0, ReticleMaterial);
 
-	/* Get a pointer to the local player's pawn to use later. */
-	for (APlayerState* PlayerStatePtr : UGameplayStatics::GetGameState(this)->PlayerArray)
-	{
-		if (PlayerStatePtr->GetPawn()->IsLocallyControlled())
-		{
-			LocalPlayerState = Cast<AMatch_PlayerState>(PlayerStatePtr);
-			break;
-		}
-	}
+	// /* Get a pointer to the local player's pawn to use later. */
+	// for (APlayerState* PlayerStatePtr : UGameplayStatics::GetGameState(this)->PlayerArray)
+	// {
+	// 	if (IsValid(PlayerStatePtr->GetPawn()) && PlayerStatePtr->GetPawn()->IsLocallyControlled())
+	// 	{
+	// 		LocalPlayerState = Cast<AMatch_PlayerState>(PlayerStatePtr);
+	// 		break;
+	// 	}
+	// }
 }
 
 void ABoardTile::OnRep_OccupyingPiece()
@@ -113,19 +113,23 @@ void ABoardTile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 void ABoardTile::OnBeginCursorOver(UPrimitiveComponent* Component)
 {
-	if (IsValid(LocalPlayerState))
+	if (const AMatch_PlayerState* LocalPlayerState = Cast<AMatch_PlayerState>(UGameplayStatics::GetPlayerPawn(this, 0)->GetPlayerState()))
 	{
+		// if (IsValid(LocalPlayerState))
+		// {
+		/* If the player is selecting a piece, display a reticle on the tile they hover over. */
 		switch (LocalPlayerState->GetCurrentPlayerStatus())
 		{
-		case E_SelectingPiece || E_WaitingForTurn:
+		case E_SelectingPiece:
+			UpdateReticle(true, true);
 			break;
 
-		/* If the player is in any other state, don't display a reticle. */
-		default:
-			break;
+			/* If the player is in any other state, don't display a reticle. */
+			default:
+				break;
 		}
+		// }
 	}
-	// UpdateReticle(true, true);
 }
 
 void ABoardTile::OnEndCursorOver(UPrimitiveComponent* Component)
