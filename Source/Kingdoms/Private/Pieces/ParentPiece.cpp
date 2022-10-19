@@ -42,10 +42,6 @@ AParentPiece::AParentPiece()
 	/* Increase the size of the capsule to fit the entire character mesh. */
 	GetCapsuleComponent()->SetCapsuleRadius(44.0f);
 
-	/* Bind these functions to be called when this piece is hovered over. */
-	GetCapsuleComponent()->OnBeginCursorOver.AddDynamic(this, &AParentPiece::OnBeginCursorOver);
-	GetCapsuleComponent()->OnEndCursorOver.AddDynamic(this, &AParentPiece::OnEndCursorOver);
-
 	/* Set the mesh's default relative position. */
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -100.0f));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
@@ -53,6 +49,10 @@ AParentPiece::AParentPiece()
 	/* Make the mesh invisible. The mesh only acts as a skeleton for the rest of the modular pieces to follow when animating. */
 	GetMesh()->SetVisibility(false, false);
 	
+    /* Bind these functions to be called when this piece is hovered over. */
+    GetMesh()->OnBeginCursorOver.AddDynamic(this, &AParentPiece::OnBeginCursorOver);
+    GetMesh()->OnEndCursorOver.AddDynamic(this, &AParentPiece::OnEndCursorOver);
+
 	/* Set the collision settings for the capsule and mesh components. Check the project's custom collision profiles
 	 * for an explanation of each collision preset. */
 	GetCapsuleComponent()->CanCharacterStepUpOn = ECB_No;
