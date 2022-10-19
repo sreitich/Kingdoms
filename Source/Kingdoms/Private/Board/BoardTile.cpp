@@ -56,16 +56,6 @@ void ABoardTile::BeginPlay()
 	/* Create a dynamic material for the reticle mesh, allowing the material's parameters to be changed during runtime. */
 	ReticleMaterial = UMaterialInstanceDynamic::Create(Reticle->GetMaterial(0), this);
 	Reticle->SetMaterial(0, ReticleMaterial);
-
-	// /* Get a pointer to the local player's pawn to use later. */
-	// for (APlayerState* PlayerStatePtr : UGameplayStatics::GetGameState(this)->PlayerArray)
-	// {
-	// 	if (IsValid(PlayerStatePtr->GetPawn()) && PlayerStatePtr->GetPawn()->IsLocallyControlled())
-	// 	{
-	// 		LocalPlayerState = Cast<AMatch_PlayerState>(PlayerStatePtr);
-	// 		break;
-	// 	}
-	// }
 }
 
 void ABoardTile::OnRep_OccupyingPiece()
@@ -115,20 +105,21 @@ void ABoardTile::OnBeginCursorOver(UPrimitiveComponent* Component)
 {
 	if (const AMatch_PlayerState* LocalPlayerState = Cast<AMatch_PlayerState>(UGameplayStatics::GetPlayerPawn(this, 0)->GetPlayerState()))
 	{
-		// if (IsValid(LocalPlayerState))
-		// {
-		/* If the player is selecting a piece, display a reticle on the tile they hover over. */
 		switch (LocalPlayerState->GetCurrentPlayerStatus())
 		{
+		/* If the player is selecting a piece, display a reticle on the tile they hover over. */
 		case E_SelectingPiece:
 			UpdateReticle(true, true);
 			break;
+		/* If the player is waiting for their turn, display a reticle on the tile they hover over. */
+		case E_WaitingForTurn:
+			UpdateReticle(true, true);
+			break;
 
-			/* If the player is in any other state, don't display a reticle. */
-			default:
-				break;
+		/* If the player is in any other state, don't display a reticle. */
+		default:
+			break;
 		}
-		// }
 	}
 }
 

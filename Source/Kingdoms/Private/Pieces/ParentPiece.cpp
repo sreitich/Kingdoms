@@ -42,6 +42,10 @@ AParentPiece::AParentPiece()
 	/* Increase the size of the capsule to fit the entire character mesh. */
 	GetCapsuleComponent()->SetCapsuleRadius(44.0f);
 
+	/* Bind these functions to be called when this piece is hovered over. */
+	GetCapsuleComponent()->OnBeginCursorOver.AddDynamic(this, &AParentPiece::OnBeginCursorOver);
+	GetCapsuleComponent()->OnEndCursorOver.AddDynamic(this, &AParentPiece::OnEndCursorOver);
+
 	/* Set the mesh's default relative position. */
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -100.0f));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
@@ -179,6 +183,26 @@ void AParentPiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	
 	DOREPLIFETIME(AParentPiece, bIsAttacking);
 	DOREPLIFETIME(AParentPiece, AttackInfo);
+}
+
+void AParentPiece::OnBeginCursorOver(UPrimitiveComponent* Component)
+{
+	/* If this piece occupies a tile, call that tile's OnBeginCursorOver function, which just handles the logic for
+	 * displaying a reticle. */
+	if (IsValid(CurrentTile))
+	{
+		CurrentTile->OnBeginCursorOver(Component);
+	}
+}
+
+void AParentPiece::OnEndCursorOver(UPrimitiveComponent* Component)
+{
+	/* If this piece occupies a tile, call that tile's OnEndCursorOver function, which just handles the logic for
+	 * removing a displayed reticle. */
+	if (IsValid(CurrentTile))
+	{
+		CurrentTile->OnEndCursorOver(Component);
+	}
 }
 
 void AParentPiece::Multicast_PlayPiecePopUp_Implementation(float Duration, bool bReverse)

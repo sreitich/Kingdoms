@@ -33,6 +33,14 @@ public:
 	/* Replicates variables. */
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	/* Called when the player starts hovering over this piece. */
+	UFUNCTION()
+	void OnBeginCursorOver(UPrimitiveComponent* Component);
+
+	/* Called when the player stops hovering over this piece. */
+	UFUNCTION()
+	void OnEndCursorOver(UPrimitiveComponent* Component);
+
 	/* Returns this piece's alignment relative to the local player. */
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE EAlignment GetAlignment() const { return GetInstigator()->IsLocallyControlled() ? E_Friendly : E_Hostile; }
