@@ -190,9 +190,7 @@ void AParentPiece::OnBeginCursorOver(UPrimitiveComponent* Component)
 	/* If this piece occupies a tile, call that tile's OnBeginCursorOver function, which just handles the logic for
 	 * displaying a reticle. */
 	if (IsValid(CurrentTile))
-	{
 		CurrentTile->OnBeginCursorOver(Component);
-	}
 }
 
 void AParentPiece::OnEndCursorOver(UPrimitiveComponent* Component)
