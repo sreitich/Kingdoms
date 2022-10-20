@@ -103,36 +103,59 @@ void ABoardTile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 void ABoardTile::OnBeginCursorOver(UPrimitiveComponent* Component)
 {
-	if (const AMatch_PlayerState* LocalPlayerState = Cast<AMatch_PlayerState>(UGameplayStatics::GetPlayerPawn(this, 0)->GetPlayerState()))
+	/* Only update this tile's reticle if it is being controlled by cursor events. */
+	if (bReticleControlledByCursor)
 	{
-		switch (LocalPlayerState->GetCurrentPlayerStatus())
+		if (const AMatch_PlayerState* LocalPlayerState = Cast<AMatch_PlayerState>(UGameplayStatics::GetPlayerPawn(this, 0)->GetPlayerState()))
 		{
-		/* If the player is selecting a piece, display a reticle on the tile they hover over. */
-		case E_SelectingPiece:
-			UpdateReticle(true, true);
-			break;
-		/* If the player is waiting for their turn, display a reticle on the tile they hover over. */
-		case E_WaitingForTurn:
-			UpdateReticle(true, true);
-			break;
+			switch (LocalPlayerState->GetCurrentPlayerStatus())
+			{
 
-		/* If the player is in any other state, don't display a reticle. */
-		default:
-			break;
+			/* If the player is selecting a piece, display a reticle on the tile that they are currently hovering over. */
+			case E_SelectingPiece:
+				UpdateReticle(true, true);
+				break;
+
+			/* If the player is waiting for their turn, display a reticle on the tile that they are currently hovering over,
+			 * unless the tile is occupied by their currently selected piece, if they have one. */
+			case E_WaitingForTurn:
+				UpdateReticle(true, true);
+				break;
+
+			/* When a piece is currently selected, display a reticle over the tile that the player is currently hovering
+			 * over, unless the tile is occupied by the selected piece. */
+			case E_SelectingAction:
+				UpdateReticle(true, true);
+				break;
+
+
+
+			/* If the player is in any other state, don't display a reticle. */
+			default:
+				break;
+			}
 		}
 	}
 }
 
 void ABoardTile::OnEndCursorOver(UPrimitiveComponent* Component)
 {
-	UpdateReticle(false, true);
+	/* Allows us to control when this reticle is removed, if ever. */
+	if (bReticleControlledByCursor)
+	{
+		UpdateReticle(false, true);
+	}
 }
 
 void ABoardTile::UpdateReticle(bool bReveal, bool bYellow)
 {
-	/* Reveal or hide the reticle and update its color. */
-	Reticle->SetVisibility(bReveal, false);
-	ReticleMaterial->SetVectorParameterValue(TEXT("EmissiveColor"), bYellow ? ReticleColor_Hovered : ReticleColor_Selected);
+	/* Exception catch: some crashes were being caused by these not being initialized yet. */
+	if (Reticle && ReticleMaterial)
+	{
+		/* Reveal or hide the reticle and update its color. */
+		Reticle->SetVisibility(bReveal, false);
+		ReticleMaterial->SetVectorParameterValue(TEXT("EmissiveColor"), bYellow ? ReticleColor_Hovered : ReticleColor_Selected);
+	}
 }
 
 void ABoardTile::RefreshHighlight()

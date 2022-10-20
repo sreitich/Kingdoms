@@ -99,7 +99,7 @@ void AMatch_PlayerPawn::Interact()
 				break;
 			/* If this player is selecting an action from a piece information pop-up... */
 			case E_SelectingAction:
-				ClearSelection(true);
+				Interact_SelectingPiece(HitResult);
 				break;
 			/* If this player is selecting a target for a movement or attack... */
 			case E_SelectingTarget_Move:
@@ -176,8 +176,19 @@ void AMatch_PlayerPawn::Interact_WaitingForTurn(FHitResult InteractionHit)
 		/* Select the piece if it's friendly. */
 		if (Alignment == E_Friendly)
 		{
+			/* Remove the selection reticle from the old piece if the player already had one selected. */
+			if (IsValid(SelectedPiece))
+			{
+				SelectedPiece->GetCurrentTile()->bReticleControlledByCursor = true;
+				SelectedPiece->GetCurrentTile()->UpdateReticle(false, true);
+			}
+			
 			/* Select the piece. */
 			SelectedPiece = InteractedPiece;
+
+			/* Place a green reticle over the selected tile and don't remove it if the player hovers off of it. */
+			SelectedPiece->GetCurrentTile()->bReticleControlledByCursor = false;
+			SelectedPiece->GetCurrentTile()->UpdateReticle(true, false);
 		}
 
 		/* Update and reveal the corresponding piece info widget with no buttons. */
@@ -218,11 +229,27 @@ void AMatch_PlayerPawn::Interact_SelectingPiece(FHitResult InteractionHit)
 		/* If the piece is friendly... */
 		if (Alignment == E_Friendly)
 		{
+			/* If a piece has not been selected yet, update the player's status to be selecting an action within a piece info widget. */
+		    if (SelectedPiece == nullptr)
+		    {
+			    Cast<AMatch_PlayerState>(GetPlayerState())->Server_SetPlayerStatus(E_SelectingAction);
+		    }
+			/* If the selected piece is changing, remove the selection reticle from the previous piece. */
+		    else
+		    {
+			    SelectedPiece->GetCurrentTile()->bReticleControlledByCursor = true;
+		    	SelectedPiece->GetCurrentTile()->UpdateReticle(false, true);
+		    }
+
 			/* Select the piece. */
 			SelectedPiece = InteractedPiece;
 
 			/* Update and reveal the friendly piece info widget with buttons, so the player can perform actions. */
 			GetController<AMatch_PlayerController>()->UpdatePieceInfoWidget(InteractedPiece, E_Friendly, true, false);
+
+			/* Place a green reticle over the selected tile and don't remove it if the player hovers off of it. */
+			SelectedPiece->GetCurrentTile()->bReticleControlledByCursor = false;
+			SelectedPiece->GetCurrentTile()->UpdateReticle(true, false);
 		}
 		/* If the piece is an enemy piece... */
 		else if (Alignment == E_Hostile)
@@ -425,6 +452,8 @@ void AMatch_PlayerPawn::ClearSelection(bool bDeselect)
 		/* SelectedPiece needs to be cleared after the widgets are removed because it's used in updating the piece info. */
 		SelectedPiece = nullptr;
 	}
+
+	/* Possibly need to reset the player state here back to selecting a piece, if it was selecting an action. */
 }
 
 void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo, bool bMoveCamera)

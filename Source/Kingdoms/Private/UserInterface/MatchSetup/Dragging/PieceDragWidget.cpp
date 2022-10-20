@@ -173,9 +173,12 @@ void UPieceDragWidget::NativeDestruct()
 			/* Set the piece's current tile to be the closest available board tile to it. */
 			CurrentTile = GetClosestOpenTile(SpawnedPiece->GetActorLocation());
 		}
-		
-		/* Update the dragged piece's position on the server and its new tile. */
-		GetOwningPlayer<AMatch_PlayerController>()->GetServerCommunicationComponent()->UpdatePiecePosition_Server(SpawnedPiece, CurrentTile);
+
+		/* Update the dragged piece's position on the server and its new tile, if it needs to be. */
+		if (SpawnedPiece->GetCurrentTile() != CurrentTile)
+		{
+			GetOwningPlayer<AMatch_PlayerController>()->GetServerCommunicationComponent()->UpdatePiecePosition_Server(SpawnedPiece, CurrentTile);
+		}
 	}
 	else
 	{

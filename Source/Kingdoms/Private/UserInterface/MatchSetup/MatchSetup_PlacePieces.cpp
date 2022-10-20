@@ -73,6 +73,7 @@ void UMatchSetup_PlacePieces::OnReadyClicked()
     /* Ask the server to set this player's bReadyToPlay variable to true. */
     GetOwningPlayerState<AMatch_PlayerState>(false)->SetReadyToPlay_Server(true);
 
-	/* Make the ready button green. */
+	/* Make the ready button green and disable it. */
 	ReadyButton->SetBackgroundColor(FLinearColor(0.0f, 1.0f, 0.0f, 1.0f));
+	ReadyButton->SetIsEnabled(false);
 }

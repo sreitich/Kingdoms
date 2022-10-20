@@ -91,7 +91,7 @@ protected:
 
 	/* The current board tile that the dragged piece was placed onto. Used when updating the piece's position. */
 	UPROPERTY()
-	class AActor* CurrentTile;
+	AActor* CurrentTile;
 	
 	/* Used to mark this widget for destruction when this widget's data is stilled required by another class, ensuring
 	 * that it doesn't get destroyed while it's a dependency. */

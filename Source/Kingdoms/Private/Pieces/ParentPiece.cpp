@@ -198,9 +198,7 @@ void AParentPiece::OnEndCursorOver(UPrimitiveComponent* Component)
 	/* If this piece occupies a tile, call that tile's OnEndCursorOver function, which just handles the logic for
 	 * removing a displayed reticle. */
 	if (IsValid(CurrentTile))
-	{
 		CurrentTile->OnEndCursorOver(Component);
-	}
 }
 
 void AParentPiece::Multicast_PlayPiecePopUp_Implementation(float Duration, bool bReverse)

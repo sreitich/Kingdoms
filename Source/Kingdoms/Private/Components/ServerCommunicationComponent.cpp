@@ -64,7 +64,7 @@ void UServerCommunicationComponent::UpdatePiecePosition_Server_Implementation(AA
 		ABoardTile* NewTile = Cast<ABoardTile>(InNewTile);
 		
 		/* If the piece already had a current tile set... */
-		if (Piece->GetCurrentTile())
+		if (IsValid(Piece->GetCurrentTile()))
 		{
 			/* Make the old tile unoccupied. */
 			Piece->GetCurrentTile()->SetOccupyingPiece(nullptr);

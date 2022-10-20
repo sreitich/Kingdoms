@@ -78,6 +78,11 @@ public:
 	UPROPERTY(EditInstanceOnly, Category="Board Tile")
 	FTileCoordinates Coordinates;
 
+	/* Whether or not this reticle is controlled by cursor hovering events. This determines if the reticle is updated
+	 * when the tile is hovered over and if the reticle is removed when unhovered. */
+	UPROPERTY(EditInstanceOnly, Category="Board Tile")
+	bool bReticleControlledByCursor = true;
+
 
 /* Public components. */
 public:
