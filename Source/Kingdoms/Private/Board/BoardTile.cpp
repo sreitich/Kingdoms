@@ -182,13 +182,13 @@ void ABoardTile::RefreshHighlight()
 
 void ABoardTile::SetOccupyingPiece_Implementation(AParentPiece* NewOccupyingPiece)
 {
-	// /* Make sure that the new occupying piece is valid or a null pointer to reset it. */
-	// if (IsValid(NewOccupyingPiece) || NewOccupyingPiece == nullptr)
-	// {
-	// 	/* Change the occupying piece. Only the server can do this. */
-	// 	OccupyingPiece = NewOccupyingPiece;
-	//
-	// 	/* The server won't call the OnRep function automatically. */
-	// 	// OnRep_OccupyingPiece();
-	// }
+	/* Make sure that the new occupying piece is valid or a null pointer to reset it. */
+	if (IsValid(NewOccupyingPiece) || NewOccupyingPiece == nullptr)
+	{
+		/* Change the occupying piece. Only the server can do this. */
+		OccupyingPiece = NewOccupyingPiece;
+	
+		/* The server won't call the OnRep function automatically. */
+		OnRep_OccupyingPiece();
+	}
 }

@@ -15,8 +15,6 @@
 
 void UMatch_AttackConfirmation::UpdateAttackPreviewInfo(AParentPiece* FriendlyPiece, AParentPiece* EnemyPiece)
 {
-	UE_LOG(LogTemp, Error, TEXT("E"));
-
 	/* Both given pieces need to be valid for this widget to update. */
 	if (IsValid(FriendlyPiece) && IsValid(EnemyPiece))
 	{

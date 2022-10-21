@@ -315,7 +315,7 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 					ControllerPtr->UpdateAttackConfirmationWidget(false, SelectedPiece, InteractedTile->GetOccupyingPiece());
 
 					/* Clear the selected piece pointer. */
-					SelectedPiece = nullptr;
+					// SelectedPiece = nullptr;
 
 					/* Highlight the pending tile. */
 					// InteractedTile->Highlight->SetMaterial(0, InteractedTile->Highlight_Target);

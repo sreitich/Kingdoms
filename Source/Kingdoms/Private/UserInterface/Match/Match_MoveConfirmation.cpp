@@ -40,7 +40,6 @@ bool UMatch_MoveConfirmation::SetPendingPiece(AParentPiece* NewPendingPiece)
     return false;
 }
 
-
 void UMatch_MoveConfirmation::NativeConstruct()
 {
 	Super::NativeConstruct();
