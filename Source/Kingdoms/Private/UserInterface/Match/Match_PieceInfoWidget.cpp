@@ -505,25 +505,19 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
     /* Make sure that there's a valid displayed piece. */
     if (IsValid(DisplayedPiece))
     {
-        /* Set a new highlight for every tile that this piece can move to to show the player their options for
-         * actions. */
-        for (const ABoardTile* Tile : DisplayedPiece->GetValidTiles())
+        /* Set a new highlight for every tile that this piece can move to to show the player their options. */
+        for (ABoardTile* Tile : DisplayedPiece->GetValidTiles())
         {
-            // /* If this tile is occupied by a friendly piece... */
-            // if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetAlignment() == E_Friendly)
-            // {
-            //     Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidFriendly);
-            // }
-            // /* If this tile is occupied by an enemy piece... */
-            // else if (IsValid(Tile->GetOccupyingPiece()))
-            // {
-            //     Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidEnemy);
-            // }
-            // /* If the tile is empty... */
-            // else
-            // {
-            //     Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidMove);
-            // }
+            /* If this tile is occupied by an enemy piece, highlight it as a valid attack target. */
+            if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetAlignment() == E_Hostile)
+            {
+                Tile->UpdateEmissiveHighlight(true, 4.0f, Tile->Highlight_Enemy);
+            }
+            /* If the tile is empty, highlight it as a valid target destination. */
+            else if (!IsValid(Tile->GetOccupyingPiece()))
+            {
+                Tile->UpdateEmissiveHighlight(true, 4.0f, Tile->Highlight_ValidUnoccupiedTile);
+            }
         }
     }
 }

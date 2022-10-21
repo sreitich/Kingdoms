@@ -54,7 +54,7 @@ public:
 
 	/* Enables/disables the emissive highlight, interpolating its brightness to glow the given color. */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Board Tile")
-	void UpdateEmissiveHighlight(bool bReveal, FLinearColor Color);
+	void UpdateEmissiveHighlight(bool bReveal, float PlayRate, FLinearColor Color);
 
 
 	/* Rework cutoff */
@@ -62,8 +62,8 @@ public:
 
 	/* Enables the emissive highlight with a brightness interpolation.
 	 * DEPRECATED: The highlight texture has been completely replaced with the emissive highlight. */
-	UFUNCTION(BlueprintImplementableEvent, Category="Board Tile")
-	void EnableGlow(bool bReverse);
+	// UFUNCTION(BlueprintImplementableEvent, Category="Board Tile")
+	// void EnableGlow(bool bReverse);
 
 	/* Sets the highlight depending on the occupying piece.
 	 * DEPRECATED: Tiles no longer highlight to signify occupation.  */
@@ -82,6 +82,22 @@ public:
 	 * when the tile is hovered over and if the reticle is removed when unhovered. */
 	UPROPERTY(EditInstanceOnly, Category="Board Tile")
 	bool bReticleControlledByCursor = true;
+
+
+/* Public constants. */
+public:
+
+	/* Indicates valid tile targets for move destinations or abilities that target unoccupied tiles. */
+	UPROPERTY(EditDefaultsOnly, Category="Colors")
+	FLinearColor Highlight_ValidUnoccupiedTile;
+
+	/* Indicates an enemy or enemy-occupied tile that is a valid target for a move (attack) or ability. */
+	UPROPERTY(EditDefaultsOnly, Category="Colors")
+	FLinearColor Highlight_Enemy;
+
+	/* Indicates a friendly or friendly-occupied tile that is a valid target for an ability. */
+	UPROPERTY(EditDefaultsOnly, Category="Colors")
+	FLinearColor Highlight_Friendly;
 
 
 /* Public components. */
@@ -130,10 +146,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
 	UMaterialInstance* Highlight_Blank;
 
-	/* Indicates a friendly piece that can be the target of an action. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	UMaterialInstance* Highlight_Friendly;
-
 	/* The color of the reticle that appears when the player hovers over a tile. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
 	FLinearColor ReticleColor_Hovered;
@@ -150,9 +162,13 @@ public:
 	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
 	// UMaterialInstance* Highlight_Friendly;
 
-	/* Tile occupied by enemy piece. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	UMaterialInstance* Highlight_Enemy;
+	// /* Indicates a friendly piece that can be the target of an action. */
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
+	// UMaterialInstance* Highlight_Friendly;
+
+	// /* Tile occupied by enemy piece. */
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
+	// UMaterialInstance* Highlight_Enemy;
 
 	/* Tile valid for the currently selected piece to move to. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
