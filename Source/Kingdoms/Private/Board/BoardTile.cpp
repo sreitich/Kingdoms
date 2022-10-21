@@ -128,7 +128,11 @@ void ABoardTile::OnBeginCursorOver(UPrimitiveComponent* Component)
 				UpdateReticle(true, true);
 				break;
 
-
+			/* When the player is selecting a movement destination, display a green reticle when hovering over a valid
+			 * destination and a yellow reticle over all other tiles. */
+			case E_SelectingTarget_Move:
+				/* This tile is only valid if its emissive highlight is currently visible. */
+				UpdateReticle(true, !EmissiveHighlight->IsVisible());
 
 			/* If the player is in any other state, don't display a reticle. */
 			default:
