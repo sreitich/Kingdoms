@@ -5,6 +5,7 @@
 
 #include "Board/BoardTile.h"
 #include "Components/Button.h"
+#include "Components/RectLightComponent.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
 #include "Pieces/ParentPiece.h"
@@ -75,10 +76,10 @@ void UMatch_AttackConfirmation::OnAttackClicked()
 	/* Tell the server to execute the attack logic with authority and on each client. */
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->Server_Attack(AttackInfo, true);
 
-	/* Refresh each tile's highlight to clear the highlights for attacking options. */
+	/* Reset the highlight of every tile that was highlighted. */
 	for (ABoardTile* Tile : PendingFriendlyPiece->GetValidTiles())
 	{
-		Tile->RefreshHighlight();
+		Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
 	}
 
 	/* Remove all other widgets and reset the player's selections when starting the attack sequence. */
@@ -95,11 +96,10 @@ void UMatch_AttackConfirmation::OnCancelClicked()
 	/* Clear the player's selected piece. */
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
 
-	/* For every tile that was highlighted... */
+	/* Reset the highlight of every tile that was highlighted. */
 	for (ABoardTile* Tile : PendingFriendlyPiece->GetValidTiles())
 	{
-		/* Refresh the tile's highlight depending on its occupying piece to clear the highlights. */
-		Tile->RefreshHighlight();
+		Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
 	}
 
 	/* Destroy this widget. */

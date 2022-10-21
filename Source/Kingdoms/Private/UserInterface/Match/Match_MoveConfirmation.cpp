@@ -4,6 +4,7 @@
 #include "UserInterface/Match/Match_MoveConfirmation.h"
 
 #include "Board/BoardTile.h"
+#include "Components/RectLightComponent.h"
 #include "Components/ServerCommunicationComponent.h"
 #include "Framework/Match/Match_PlayerController.h"
 #include "Framework/Match/Match_PlayerPawn.h"
@@ -52,11 +53,10 @@ void UMatch_MoveConfirmation::NativeConstruct()
 
 void UMatch_MoveConfirmation::OnConfirmClicked()
 {
-    /* Refresh the highlights of every highlighted tile before the server updates the piece's location. GetValidTiles()
-     * won't work properly if called afterwards. */
+    /* Reset the highlight of every tile that was highlighted. */
     for (ABoardTile* Tile : PendingPiece->GetValidTiles())
     {
-        Tile->RefreshHighlight();
+        Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
     }
     
     /* Remove all other widgets and reset the player's selections when this piece starts moving. */
@@ -82,11 +82,10 @@ void UMatch_MoveConfirmation::OnCancelClicked()
 
     if (IsValid(PendingPiece))
     {
-        /* For every tile that was highlighted... */
+        /* Reset the highlight of every tile that was highlighted. */
         for (ABoardTile* Tile : PendingPiece->GetValidTiles())
         {
-            /* Refresh the tile's highlight depending on its occupying piece to clear the highlights. */
-            Tile->RefreshHighlight();
+            Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
         }
     }
 

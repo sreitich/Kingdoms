@@ -314,11 +314,19 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 					/* Create and update the attack confirmation pop-up. */
 					ControllerPtr->UpdateAttackConfirmationWidget(false, SelectedPiece, InteractedTile->GetOccupyingPiece());
 
-					/* Clear the selected piece pointer. */
-					// SelectedPiece = nullptr;
+					/* If the player already had a tile selected, remove that tile's selection reticle. */
+					if (IsValid(SelectedTile))
+					{
+						SelectedTile->bReticleControlledByCursor = true;
+						SelectedTile->UpdateReticle(false, true);
+					}
 
-					/* Highlight the pending tile. */
-					// InteractedTile->Highlight->SetMaterial(0, InteractedTile->Highlight_Target);
+					/* Save the new tile that the player currently has selected. */
+					SelectedTile = InteractedTile;
+
+					/* Place a persistent selection reticle over the newly selected tile. */
+					SelectedTile->bReticleControlledByCursor = false;
+					SelectedTile->UpdateReticle(true, false);
 				}
 			}
 		}
@@ -331,8 +339,19 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 				/* Create and update the move confirmation pop-up. */
 				ControllerPtr->UpdateMoveConfirmationWidget(false, InteractedTile, SelectedPiece);
 
-				/* Highlight the pending tile. */
-				// InteractedTile->Highlight->SetMaterial(0, InteractedTile->Highlight_Target);
+				/* If the player already had a tile selected, remove that tile's selection reticle. */
+				if (IsValid(SelectedTile))
+				{
+					SelectedTile->bReticleControlledByCursor = true;
+					SelectedTile->UpdateReticle(false, true);
+				}
+
+				/* Save the new tile that the player currently has selected. */
+				SelectedTile = InteractedTile;
+
+				/* Place a persistent selection reticle over the newly selected tile. */
+				SelectedTile->bReticleControlledByCursor = false;
+				SelectedTile->UpdateReticle(true, false);
 			}
 		}
 	}
@@ -459,15 +478,21 @@ void AMatch_PlayerPawn::ClearSelection(bool bDeselect)
 	/* If the selected piece needs to be deselected... */
 	if (bDeselect && SelectedPiece != nullptr)
 	{
-		/* Remove the piece's selection reticle. */
+		/* Remove the piece's selection reticle and fresnel strength. */
 		SelectedPiece->GetCurrentTile()->bReticleControlledByCursor = true;
 		SelectedPiece->GetCurrentTile()->UpdateReticle(false, true);
-		
-		/* Reset the piece's fresnel strength. */
 		SelectedPiece->FlashHighlight(SelectedPiece->FriendlyFresnelColor, 4.0f, 1.0f, 0.0f, true);
 
-		/* SelectedPiece needs to be cleared after the widgets are removed because it's used in updating the piece info. */
+		/* If a tile was selected, reset its reticle. */
+		if (IsValid(SelectedTile))
+		{
+			SelectedTile->bReticleControlledByCursor = true;
+			SelectedTile->UpdateReticle(false, true);
+		}
+
+		/* Reset the currently selected piece and tile if requested. */
 		SelectedPiece = nullptr;
+		SelectedTile = nullptr;
 	}
 }
 
