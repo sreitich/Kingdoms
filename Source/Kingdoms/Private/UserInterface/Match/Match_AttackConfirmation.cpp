@@ -94,6 +94,8 @@ void UMatch_AttackConfirmation::OnCancelClicked()
 {
 	/* Reset the player state. */
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
+	/* Clear the player's selected piece. */
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
 
 	/* For every tile that was highlighted... */
 	for (ABoardTile* Tile : PendingFriendlyPiece->GetValidTiles())

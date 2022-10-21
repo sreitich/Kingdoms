@@ -56,8 +56,8 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void Server_ResetPieceRotation();
 
-	/* Flashes a given highlight onto the piece at a given strength for a given amount of time. Standard play-rate is
-	 * 0.25. Standard duration is 0.5. */
+	/* Flashes a given highlight onto the piece at a given strength for a given amount of time. Normal brightness is 4.0.
+	 * Highlighted brightness is 20.0. Standard play-rate is 0.25. Standard duration is 0.5. */
 	UFUNCTION(BlueprintCallable)
 	void FlashHighlight(FLinearColor Color, float Brightness, float PlayRate, float Duration, bool bIndefiniteDuration);
 

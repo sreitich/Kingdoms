@@ -60,9 +60,12 @@ void UMatch_MoveConfirmation::OnConfirmClicked()
         Tile->RefreshHighlight();
     }
     
+    /* Remove all other widgets and reset the player's selections when this piece starts moving. */
+    GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
+
     /* Reset this piece's rotation after it finishes moving. */
     Cast<AMatch_PlayerPawn>(GetOwningPlayerPawn())->Server_SetResetAfterMove(PendingPiece, true);
-    
+
     /* Move the piece to the tile on the server via the player controller's server communication component. */
     Cast<AMatch_PlayerController>(PendingPiece->GetInstigator()->GetController())->
         GetServerCommunicationComponent()->Server_MovePieceToTile(PendingPiece, PendingTile, true);
@@ -75,6 +78,8 @@ void UMatch_MoveConfirmation::OnCancelClicked()
 {
     /* Reset the player state. */
     GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
+    /* Clear the player's selected piece. */
+    GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
 
     if (IsValid(PendingPiece))
     {

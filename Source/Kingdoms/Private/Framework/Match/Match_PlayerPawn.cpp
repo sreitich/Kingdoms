@@ -176,11 +176,13 @@ void AMatch_PlayerPawn::Interact_WaitingForTurn(FHitResult InteractionHit)
 		/* Select the piece if it's friendly. */
 		if (Alignment == E_Friendly)
 		{
-			/* Remove the selection reticle from the old piece if the player already had one selected. */
+			/* Remove the selection reticle from the old piece and reset its fresnel brightness if the player already had one selected. */
 			if (IsValid(SelectedPiece))
 			{
 				SelectedPiece->GetCurrentTile()->bReticleControlledByCursor = true;
 				SelectedPiece->GetCurrentTile()->UpdateReticle(false, true);
+
+				SelectedPiece->FlashHighlight(SelectedPiece->FriendlyFresnelColor, 4.0f, 1.0f, 0.0f, true);
 			}
 			
 			/* Select the piece. */
@@ -189,6 +191,9 @@ void AMatch_PlayerPawn::Interact_WaitingForTurn(FHitResult InteractionHit)
 			/* Place a green reticle over the selected tile and don't remove it if the player hovers off of it. */
 			SelectedPiece->GetCurrentTile()->bReticleControlledByCursor = false;
 			SelectedPiece->GetCurrentTile()->UpdateReticle(true, false);
+
+			/* Strengthen the new piece's fresnel to indicate that it is currently selected. */
+			SelectedPiece->FlashHighlight(SelectedPiece->FriendlyFresnelColor, 20.0f, 1.0f, 0.0f, true);
 		}
 
 		/* Update and reveal the corresponding piece info widget with no buttons. */
@@ -234,11 +239,13 @@ void AMatch_PlayerPawn::Interact_SelectingPiece(FHitResult InteractionHit)
 		    {
 			    Cast<AMatch_PlayerState>(GetPlayerState())->Server_SetPlayerStatus(E_SelectingAction);
 		    }
-			/* If the selected piece is changing, remove the selection reticle from the previous piece. */
+			/* If the selected piece is changing, remove the selection reticle from the previous piece and reset its fresnel brightness. */
 		    else
 		    {
 			    SelectedPiece->GetCurrentTile()->bReticleControlledByCursor = true;
 		    	SelectedPiece->GetCurrentTile()->UpdateReticle(false, true);
+
+		    	SelectedPiece->FlashHighlight(SelectedPiece->FriendlyFresnelColor, 4.0f, 1.0f, 0.0f, true);
 		    }
 
 			/* Select the piece. */
@@ -250,6 +257,9 @@ void AMatch_PlayerPawn::Interact_SelectingPiece(FHitResult InteractionHit)
 			/* Place a green reticle over the selected tile and don't remove it if the player hovers off of it. */
 			SelectedPiece->GetCurrentTile()->bReticleControlledByCursor = false;
 			SelectedPiece->GetCurrentTile()->UpdateReticle(true, false);
+
+			/* Strengthen this piece's fresnel to indicate that it is currently selected. */
+			SelectedPiece->FlashHighlight(SelectedPiece->FriendlyFresnelColor, 20.0f, 1.0f, 0.0f, true);
 		}
 		/* If the piece is an enemy piece... */
 		else if (Alignment == E_Hostile)
@@ -447,13 +457,18 @@ void AMatch_PlayerPawn::ClearSelection(bool bDeselect)
 	}
 
 	/* If the selected piece needs to be deselected... */
-	if (bDeselect)
+	if (bDeselect && SelectedPiece != nullptr)
 	{
+		/* Remove the piece's selection reticle. */
+		SelectedPiece->GetCurrentTile()->bReticleControlledByCursor = true;
+		SelectedPiece->GetCurrentTile()->UpdateReticle(false, true);
+		
+		/* Reset the piece's fresnel strength. */
+		SelectedPiece->FlashHighlight(SelectedPiece->FriendlyFresnelColor, 4.0f, 1.0f, 0.0f, true);
+
 		/* SelectedPiece needs to be cleared after the widgets are removed because it's used in updating the piece info. */
 		SelectedPiece = nullptr;
 	}
-
-	/* Possibly need to reset the player state here back to selecting a piece, if it was selecting an action. */
 }
 
 void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo, bool bMoveCamera)
