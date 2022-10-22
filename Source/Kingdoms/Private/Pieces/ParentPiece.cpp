@@ -329,24 +329,37 @@ void AParentPiece::OnActiveClicked()
 	* can target things other than pieces or tiles. */
 	for (AActor* Target : GetValidActiveAbilityTargets())
 	{
-		/* If the target was a tile, highlight it. */
-		if (const ABoardTile* Tile = Cast<ABoardTile>(Target))
+		/* If the target is a tile, highlight it, depending on if this ability targets tiles or pieces. */
+		if (ABoardTile* Tile = Cast<ABoardTile>(Target))
 		{
-			// Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidMove);
+			/* If the piece data table object was set... */
+			if (PieceDataTable)
+			{
+				/* Get this piece's row from the piece data. */
+				static const FString ContextString(TEXT("Piece Data Struct"));
+				const FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(PieceID, ContextString, true);
+
+				/* If the data table row was found... */
+				if (PieceData)
+				{
+					/* If this ability only targets tiles, highlight the target tile yellow. */
+					if (PieceData->bActiveTargetsTiles)
+					{
+						Tile->UpdateEmissiveHighlight(true, 4.0f, Tile->Highlight_ValidUnoccupiedTile);
+					}
+					/* If this ability targets pieces, highlight the target tile depending on the piece alignment. */
+					else if (IsValid(Tile->GetOccupyingPiece()) && !PieceData->bActiveTargetsTiles)
+					{
+						Tile->UpdateEmissiveHighlight(true, 4.0f, Tile->GetOccupyingPiece()->GetAlignment() == E_Friendly ? Tile->Highlight_Friendly : Tile->Highlight_Enemy);
+					}
+				}
+			}
 		}
 		/* If the target was a piece, highlight that piece's tile depending on its allegiance. */
 		else if (const AParentPiece* Piece = Cast<AParentPiece>(Target))
 		{
-			// /* Highlight a friendly piece if it has a valid tile. */
-			// if (IsValid(Piece->GetCurrentTile()) && Piece->GetInstigator()->IsLocallyControlled())
-			// {
-			// 	Piece->GetCurrentTile()->Highlight->SetMaterial(0, Tile->Highlight_ValidFriendly);
-			// }
-			// /* Highlight an enemy piece if it has a valid tile. */
-			// else if (IsValid(Piece->GetCurrentTile()))
-			// {
-			// 	Piece->GetCurrentTile()->Highlight->SetMaterial(0, Tile->Highlight_ValidEnemy);
-			// }
+			ABoardTile* const TargetPieceTile = Piece->GetCurrentTile();
+			TargetPieceTile->UpdateEmissiveHighlight(true, 4.0f, Piece->GetAlignment() == E_Friendly ? TargetPieceTile->Highlight_Friendly : TargetPieceTile->Highlight_Enemy);
 		}
 		/* This can be iterated on if we add pieces that can target things other than tiles or pieces in the future. */
 	}

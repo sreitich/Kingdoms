@@ -20,8 +20,10 @@ public:
 	/* Sets default values for this character's properties. */
 	APyromancer();
 
-	/* Lightly highlights all potential targets and fully highlights valid targets. */
-	virtual void OnActiveClicked() override;
+	/* Lightly highlights all potential targets and fully highlights valid targets.
+	 * DEPRECATED: targets within range are no longer highlighted. This ability uses the default parent OnActiveClicked
+	 * function. */
+	// virtual void OnActiveClicked() override;
 	
 	/* Valid targets for "Fireball" ability. Returns all valid tile locations, but doesn't check if
 	 * there are enemy pieces occupying them. */

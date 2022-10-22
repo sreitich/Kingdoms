@@ -221,7 +221,7 @@ public:
 
 	/* Pointer to the piece data table, used to retrieve this piece's statistics. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data")
-	class UDataTable* PieceDataTable;
+	UDataTable* PieceDataTable;
 
 	/* The color that friendly pieces will be highlighted in. */
 	UPROPERTY(EditDefaultsOnly, Category="Materials")

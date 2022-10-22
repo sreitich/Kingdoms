@@ -94,6 +94,10 @@ struct FPieceDataStruct : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
 	FString ActiveDes = "";
 
+	/* Whether or not this piece's active ability targets tiles. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
+	bool bActiveTargetsTiles = false;
+
 	/* This piece's active ability's base cooldown. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
 	int ActiveCD = 0;
@@ -113,6 +117,10 @@ struct FPieceDataStruct : public FTableRowBase
 	/* This piece's passive ability's displayed description. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
 	FString PassiveDes = "";
+
+	/* Whether or not this piece's passive ability targets tiles. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
+	bool bPassiveTargetsTiles = false;
 
 	/* This piece's passive ability's base cooldown. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")

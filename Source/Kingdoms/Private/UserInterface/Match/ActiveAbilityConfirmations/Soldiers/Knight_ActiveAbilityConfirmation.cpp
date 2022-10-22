@@ -5,12 +5,14 @@
 
 #include "Board/BoardTile.h"
 #include "Components/Button.h"
+#include "Components/RectLightComponent.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
 #include "Pieces/Soldiers/Knight.h"
+#include "UserInterface/Match/Match_ActiveAbilityConfirmation.h"
 
 void UKnight_ActiveAbilityConfirmation::UpdateActionConfirmationInfo(AKnight* NewAbilityUser,
-	ABoardTile* NewTargetTile)
+                                                                     ABoardTile* NewTargetTile)
 {
 	/* Store a reference to the ability's user if it's valid. */
 	if (IsValid(NewAbilityUser))
@@ -39,6 +41,18 @@ void UKnight_ActiveAbilityConfirmation::NativeConstruct()
 
 void UKnight_ActiveAbilityConfirmation::OnConfirmClicked()
 {
+	/* Clear the player's selected piece. */
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
+
+	/* Reset the highlight of every tile that was highlighted. */
+	if (IsValid(AbilityUser))
+	{
+		for (ABoardTile* Tile : AbilityUser->GetValidTiles())
+		{
+			Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+		}
+	}
+
 	/* Activate this piece's active ability if there is a valid reference to it. */
 	if (IsValid(AbilityUser))
 	{
@@ -75,7 +89,24 @@ void UKnight_ActiveAbilityConfirmation::NativeDestruct()
 
 void UKnight_ActiveAbilityConfirmation::OnCancelClicked()
 {
-	/* Clean up and destroy this widget. */
-	NativeDestruct();
+	/* Reset the player state. */
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
+	/* Clear the player's selected piece. */
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
+
+	/* Reset the highlight of every tile that was highlighted. */
+	if (IsValid(AbilityUser))
+	{
+		for (ABoardTile* Tile : AbilityUser->GetValidTiles())
+		{
+			Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+		}
+	}
+
+	/* Nullify the piece's pointer to its ability confirmation widget so it makes a new one next time. */
+	AbilityUser->ConfirmationWidget = nullptr;
+
+	/* Destroy this widget. */
+	RemoveFromParent();
 }
 

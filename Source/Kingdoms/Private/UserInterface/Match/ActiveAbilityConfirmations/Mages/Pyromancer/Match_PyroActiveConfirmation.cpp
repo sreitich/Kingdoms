@@ -4,6 +4,7 @@
 #include "UserInterface/Match/ActiveAbilityConfirmations/Mages/Pyromancer/Match_PyroActiveConfirmation.h"
 
 #include "Board/BoardTile.h"
+#include "Components/RectLightComponent.h"
 #include "Framework/Match/Match_PlayerController.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
@@ -14,6 +15,16 @@
 
 void UMatch_PyroActiveConfirmation::OnAttackClicked()
 {
+	/* Clear the player's selected piece. */
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
+
+	/* Reset the highlight of every tile that was highlighted. */
+	for (AActor* Target : PendingFriendlyPiece->GetValidActiveAbilityTargets())
+	{
+		if (ABoardTile* Tile = Cast<ABoardTile>(Target))
+			Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+	}
+
 	/* Activate this piece's active ability if there is a valid reference to it. */
 	if (IsValid(PendingFriendlyPiece))
 	{
@@ -30,19 +41,9 @@ void UMatch_PyroActiveConfirmation::OnAttackClicked()
 
 void UMatch_PyroActiveConfirmation::OnCancelClicked()
 {
-	/* Reset the player state. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
-
-	/* For every tile that was highlighted... */
-	for (AActor* Tile : PendingFriendlyPiece->GetActiveAbilityRange())
-	{
-		/* Refresh the tile's highlight depending on its occupying piece to clear the highlights. */
-		Cast<ABoardTile>(Tile)->RefreshHighlight();
-	}
-
 	/* Nullify the piece's pointer to its ability confirmation widget so it makes a new one next time. */
 	Cast<APyromancer>(PendingFriendlyPiece)->ConfirmationWidget = nullptr;
 
-	/* Destroy this widget. */
-	RemoveFromParent();
+	/* Reset the player state, clear the player's selection data, and reset tile highlights before destroying this widget. */
+	UMatch_AttackConfirmation::OnCancelClicked();
 }

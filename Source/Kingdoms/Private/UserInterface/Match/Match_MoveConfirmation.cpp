@@ -80,9 +80,9 @@ void UMatch_MoveConfirmation::OnCancelClicked()
     /* Clear the player's selected piece. */
     GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
 
+    /* Reset the highlight of every tile that was highlighted. */
     if (IsValid(PendingPiece))
     {
-        /* Reset the highlight of every tile that was highlighted. */
         for (ABoardTile* Tile : PendingPiece->GetValidTiles())
         {
             Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());

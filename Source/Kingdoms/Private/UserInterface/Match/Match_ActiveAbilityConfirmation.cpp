@@ -5,6 +5,7 @@
 
 #include "Board/BoardTile.h"
 #include "Components/Button.h"
+#include "Components/RectLightComponent.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
 #include "Pieces/ParentPiece.h"
@@ -67,19 +68,21 @@ void UMatch_ActiveAbilityConfirmation::OnCancelClicked()
 {
 	/* Reset the player state. */
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
+	/* Clear the player's selected piece. */
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
 
 	/* Clear targeting indicators the target depending on what class it was. */
     for (AActor* ValidTarget : AbilityUser->GetValidActiveAbilityTargets())
     {
-		/* If the target was a tile, refresh its highlight. */
+		/* If the target was a tile, reset its highlight. */
 		if (ABoardTile* Tile = Cast<ABoardTile>(ValidTarget))
 		{
-			Tile->RefreshHighlight();
+			Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
 		}
-		/* If the target was a piece, refresh that piece's tile's highlight. */
+		/* If the target was a piece, reset that piece's tile's highlight. */
 		else if (const AParentPiece* Piece = Cast<AParentPiece>(ValidTarget))
 		{
-			Piece->GetCurrentTile()->RefreshHighlight();
+			Piece->GetCurrentTile()->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
 		}
 		/* This can be iterated on if we add pieces that can target things other than tiles or pieces in the future. */
     }

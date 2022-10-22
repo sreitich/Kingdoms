@@ -40,7 +40,7 @@ protected:
 	/* Called when destroyed. */
 	virtual void NativeDestruct() override;
 
-	/* Wrapper for NativeDestruct, which resets the game's state before destroying this widget. */
+	/* Resets the player's state and selection data and resets tile highlights before destroying this widget. */
 	UFUNCTION()
 	void OnCancelClicked();
 

@@ -18,8 +18,8 @@ APyromancer::APyromancer()
 {
 }
 
-void APyromancer::OnActiveClicked()
-{
+// void APyromancer::OnActiveClicked()
+// {
 	// for (AActor* TileActor : GetActiveAbilityRange())
 	// {
 	// 	if (const ABoardTile* Tile = Cast<ABoardTile>(TileActor))
@@ -41,7 +41,7 @@ void APyromancer::OnActiveClicked()
 	// 		}
 	// 	}
 	// }
-}
+// }
 
 TArray<AActor*> APyromancer::GetValidActiveAbilityTargets()
 {
@@ -173,8 +173,6 @@ void APyromancer::StartActiveConfirmation(TArray<AActor*> Targets)
 		/* Update the widget's information. */
 		ConfirmationWidget->UpdateAttackPreviewInfo(this, Target);
 
-		UE_LOG(LogTemp, Error, TEXT("Called"));
-	
 		/* Highlight the pending tile. */
 		// Cast<ABoardTile>(Target->GetCurrentTile())->Highlight->SetMaterial(0, Target->GetCurrentTile()->Highlight_Target);
 	}

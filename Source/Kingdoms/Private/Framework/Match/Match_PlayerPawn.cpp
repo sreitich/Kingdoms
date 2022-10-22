@@ -390,6 +390,27 @@ void AMatch_PlayerPawn::Interact_SelectingTargetActiveAbility(FHitResult Interac
 			Targets.Add(SelectedTarget);
 
 			SelectedPiece->StartActiveConfirmation(Targets);
+
+			/* If the player already had as target selected, remove that target's selection reticle. */
+			if (IsValid(SelectedTile))
+			{
+				SelectedTile->bReticleControlledByCursor = true;
+				SelectedTile->UpdateReticle(false, true);
+			}
+
+			/* Save the new targets that the player currently has selected. */
+			if (const AParentPiece* TargetPiece = Cast<AParentPiece>(Targets[0]))
+			{
+				SelectedTile = TargetPiece->GetCurrentTile();
+			}
+			else if (ABoardTile* TargetTile = Cast<ABoardTile>(Targets[0]))
+			{
+				SelectedTile = TargetTile;
+			}
+
+			/* Place a persistent selection reticle over the newly selected target. */
+			SelectedTile->bReticleControlledByCursor = false;
+			SelectedTile->UpdateReticle(true, false);
 		}
 		else
 		{
