@@ -8,6 +8,10 @@
 #include "Blueprint/UserWidget.h"
 #include "MatchSetup_ArmyPresetWidget.generated.h"
 
+class UButton;
+class UMatchSetup_SelectArmy;
+class UTextBlock;
+
 /**
  * 
  */
@@ -28,7 +32,7 @@ public:
 
 	/* A reference to this widget's owning widget; used to update the parent widget's variables. */
 	UPROPERTY()
-	class UMatchSetup_SelectArmy* ParentWidget;
+	UMatchSetup_SelectArmy* ParentWidget;
 
 	/* Which player-created army preset this widget represents. */
 	FArmyPresetStruct ArmyPreset;
@@ -50,10 +54,10 @@ protected:
 	
 	/* Selects this army preset. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UButton* SelectButton;
+	UButton* SelectButton;
 
 	/* Displayed army name. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UTextBlock* ArmyName;
+	UTextBlock* ArmyName;
 	
 };

@@ -11,8 +11,7 @@
 #include "Pieces/Soldiers/Knight.h"
 #include "UserInterface/Match/Match_ActiveAbilityConfirmation.h"
 
-void UKnight_ActiveAbilityConfirmation::UpdateActionConfirmationInfo(AKnight* NewAbilityUser,
-                                                                     ABoardTile* NewTargetTile)
+void UKnight_ActiveAbilityConfirmation::UpdateActionConfirmationInfo(AKnight* NewAbilityUser, ABoardTile* NewTargetTile)
 {
 	/* Store a reference to the ability's user if it's valid. */
 	if (IsValid(NewAbilityUser))
@@ -21,10 +20,6 @@ void UKnight_ActiveAbilityConfirmation::UpdateActionConfirmationInfo(AKnight* Ne
 	/* Store a reference to the new one if it's valid. */
 	if (IsValid(NewTargetTile))
 	{
-		/* Remove the selection highlight from the old tile if there is one. */
-		if (IsValid(TargetTile))
-			TargetTile->Highlight->SetMaterial(0, TargetTile->Highlight_ValidMove);
-		
 		TargetTile = NewTargetTile;
 	}
 }
@@ -75,16 +70,6 @@ void UKnight_ActiveAbilityConfirmation::NativeDestruct()
 
 	/* Reset the player state. */
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
-
-	/* Clear the targeting indicators on the valid target tiles. */
-	for (AActor* ValidTarget : AbilityUser->GetValidActiveAbilityTargets())
-	{
-		/* If the target was a tile (which it should always be), refresh its highlight. */
-		if (ABoardTile* Tile = Cast<ABoardTile>(ValidTarget))
-		{
-			Tile->RefreshHighlight();
-		}
-	}
 }
 
 void UKnight_ActiveAbilityConfirmation::OnCancelClicked()

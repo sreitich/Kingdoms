@@ -50,11 +50,11 @@ public:
 
 	/* Calls the blueprint-implemented attack sequence with server authority. */
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void Server_Attack(const FAttackInfo InInfo, bool bMoveCamera);
+	void Server_Attack(FAttackInfo InInfo, bool bMoveCamera);
 
 	    /* Scripted attack sequence via blueprint. */
 	    UFUNCTION(BlueprintImplementableEvent)
-	    void BP_Attack(const FAttackInfo InInfo, bool bMoveCamera);
+	    void BP_Attack(FAttackInfo InInfo, bool bMoveCamera);
 
 			/* Calculates a target location and rotation and smoothly interpolates the player's camera to that location
 			 * and rotation. */

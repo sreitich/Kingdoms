@@ -90,12 +90,6 @@ void AMatch_GameStateBase::StartMatch()
         Piece->SetActorHiddenInGame(false);
     }
 
-    // /* Refresh each tile's highlight so that players see each other's piece highlights. */
-    // if (IsValid(BoardManager))
-    // {
-    //     BoardManager->RefreshBoard();
-    // }
-
 
     /* Only allow the server to begin the game. */
     if (HasAuthority())

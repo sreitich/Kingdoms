@@ -8,6 +8,9 @@
 #include "Blueprint/UserWidget.h"
 #include "MatchSetup_PlacePieces.generated.h"
 
+class UButton;
+class UScrollBox;
+
 /**
  * 
  */
@@ -64,10 +67,10 @@ protected:
 
 	/* Box containing the unplaced pieces in this army. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UScrollBox* PiecesBox;
+	UScrollBox* PiecesBox;
 
 	/* Button that attempts to start the match if both players have clicked it. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UButton* ReadyButton;
+	UButton* ReadyButton;
 
 };

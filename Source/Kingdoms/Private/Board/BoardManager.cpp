@@ -14,15 +14,6 @@ ABoardManager::ABoardManager()
 
 }
 
-void ABoardManager::RefreshBoard() const
-{
-	/* Refresh every tile's displayed highlight for the client that called the function. */
-	for (ABoardTile* Tile : AllTiles)
-	{
-		Tile->RefreshHighlight();
-	}
-}
-
 void ABoardManager::BeginPlay()
 {
 	Super::BeginPlay();

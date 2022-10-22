@@ -18,31 +18,6 @@ APyromancer::APyromancer()
 {
 }
 
-// void APyromancer::OnActiveClicked()
-// {
-	// for (AActor* TileActor : GetActiveAbilityRange())
-	// {
-	// 	if (const ABoardTile* Tile = Cast<ABoardTile>(TileActor))
-	// 	{
-	// 		/* If the tile is empty, it's in a valid range but isn't a valid target. */
-	// 		if (!IsValid(Tile->GetOccupyingPiece()))
-	// 		{
-	// 			Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidRange);
-	// 		}
-	// 		/* If the tile is occupied by a friendly piece, highlight it within range but invalid. */
-	// 		else if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetInstigator()->IsLocallyControlled())
-	// 		{
-	// 			Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidFriendlyRange);
-	// 		}
-	// 		/* If the tile is occupied by an enemy piece, it's a valid target. */
-	// 		else if (IsValid(Tile->GetOccupyingPiece()) && !Tile->GetOccupyingPiece()->GetInstigator()->IsLocallyControlled())
-	// 		{
-	// 			Tile->Highlight->SetMaterial(0, Tile->Highlight_ValidEnemy);
-	// 		}
-	// 	}
-	// }
-// }
-
 TArray<AActor*> APyromancer::GetValidActiveAbilityTargets()
 {
 	TArray<AActor*> ValidTargets;
@@ -180,17 +155,6 @@ void APyromancer::StartActiveConfirmation(TArray<AActor*> Targets)
 
 void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 {
-	/* Refresh the highlight of every tile except for the one with the target piece. */
-	for (AActor* Actor : GetActiveAbilityRange())
-	{
-		ABoardTile* Tile = Cast<ABoardTile>(Actor);
-		
-		if (IsValid(Tile) && Tile != Cast<AParentPiece>(Targets[0])->GetCurrentTile())
-		{
-			Tile->RefreshHighlight();
-		}
-	}
-		
 	/* Call the blueprint implementation of the ability, which begins the power-up phase. */
 	BP_OnActiveAbility(Cast<AParentPiece>(Targets[0]));
 

@@ -6,6 +6,11 @@
 #include "Blueprint/UserWidget.h"
 #include "MatchSetup_UnplacedPieceWidget.generated.h"
 
+class UDataTable;
+class UImage;
+class UPieceDragWidget;
+class UTextBlock;
+
 struct FPieceDataStruct;
 
 /**
@@ -48,14 +53,14 @@ protected:
 
 	/* Pointer to the piece data table, used to retrieve information to about the piece this widget represents. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data")
-	class UDataTable* PieceDataTable;
+	UDataTable* PieceDataTable;
 
 	/* Pointer to the represented piece's data in the piece data table. This gets defined when the widget is created. */
 	FPieceDataStruct* PieceData;
 
 	/* The class of the widget to be created when dragging this widget. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Drag")
-	TSubclassOf<class UPieceDragWidget> PieceDragWidgetClass;
+	TSubclassOf<UPieceDragWidget> PieceDragWidgetClass;
 
 
 /* Protected widgets. */
@@ -63,10 +68,10 @@ protected:
 
 	/* The displayed name of the piece that this widget represents. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UTextBlock* PieceName;
+	UTextBlock* PieceName;
 
 	/* The displayed image of the piece that this widget represents. Called a "CardPortrait" in files. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UImage* PieceImage;
+	UImage* PieceImage;
 
 };

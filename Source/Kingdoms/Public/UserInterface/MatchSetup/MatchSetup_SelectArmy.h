@@ -8,6 +8,9 @@
 #include "Blueprint/UserWidget.h"
 #include "MatchSetup_SelectArmy.generated.h"
 
+class UButton;
+class UHorizontalBox;
+
 /**
  * 
  */
@@ -36,7 +39,7 @@ public:
 
 	/* Button that selects the army and allows the player to start placing pieces. Needs to be accessible by army preset widgets. */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-    class UButton* SelectArmyButton;
+	UButton* SelectArmyButton;
 	
 
 /* Protected functions. */
@@ -55,6 +58,6 @@ protected:
 
 	/* Horizontal box containing all of the army preset widgets. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UHorizontalBox* ArmyListBox;
+	UHorizontalBox* ArmyListBox;
 
 };

@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "Match_AbilityInfo.generated.h"
 
+class UTextBlock;
+
 /**
  * 
  */
@@ -30,10 +32,10 @@ protected:
 
 	/* Displayed name of the hovered ability. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UTextBlock* DisplayedAbilityName;
+	UTextBlock* DisplayedAbilityName;
 
 	/* Displayed desciption of the hovered ability. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	class UTextBlock* DisplayedAbilityDescription;
+	UTextBlock* DisplayedAbilityDescription;
 
 };

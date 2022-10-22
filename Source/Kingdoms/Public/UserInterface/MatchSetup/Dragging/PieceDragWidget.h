@@ -6,6 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "PieceDragWidget.generated.h"
 
+class AParentPiece;
+class UUserWidget;
+
 /**
  * 
  */
@@ -27,15 +30,15 @@ public:
 
 	/* Class that this widget is responsible for spawning. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Classes")
-	TSubclassOf<class AParentPiece> ClassToSpawn;
+	TSubclassOf<AParentPiece> ClassToSpawn;
 	
 	/* The originally dragged card that this widget represents. */
 	UPROPERTY()
-	class UUserWidget* RepresentedWidget;
+	UUserWidget* RepresentedWidget;
 
 	/* The piece that this widget spawns and sets the location of. */
 	UPROPERTY()
-	class AParentPiece* SpawnedPiece;
+	AParentPiece* SpawnedPiece;
 
 
 /* Public widgets. */

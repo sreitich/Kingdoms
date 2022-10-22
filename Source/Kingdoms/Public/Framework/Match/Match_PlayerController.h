@@ -9,9 +9,16 @@
 #include "GameFramework/PlayerController.h"
 #include "Match_PlayerController.generated.h"
 
-class UServerCommunicationComponent;
-class AParentPiece;
 class ABoardTile;
+class AParentPiece;
+class UMatch_AttackConfirmation;
+class UMatch_AttackGraphic;
+class UMatch_BaseWidget;
+class UMatch_MoveConfirmation;
+class UMatch_PieceInfoWidget;
+class UMatchSetup_PlacePieces;
+class UMatchSetup_SelectArmy;
+class UServerCommunicationComponent;
 
 enum EAttackGraphicAnimation;
 
@@ -97,7 +104,7 @@ protected:
 
 	/* Handles communication between the server and the client. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Components)
-	class UServerCommunicationComponent* ServerCommunicationComponent;
+	UServerCommunicationComponent* ServerCommunicationComponent;
 
 
 /* Protected widget class types. */
@@ -130,19 +137,19 @@ private:
 
 	/* Army selection widget pointer. */
 	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
-	class UMatchSetup_SelectArmy* MatchSetup_SelectArmy = nullptr;
+	UMatchSetup_SelectArmy* MatchSetup_SelectArmy = nullptr;
 
 	/* Place pieces widget pointer. */
 	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
-	class UMatchSetup_PlacePieces* MatchSetup_PlacePieces = nullptr;
+	UMatchSetup_PlacePieces* MatchSetup_PlacePieces = nullptr;
 
 	/* Base widget pointer. */
 	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
-	class UMatch_BaseWidget* Match_BaseWidget = nullptr;
+	UMatch_BaseWidget* Match_BaseWidget = nullptr;
 
 	/* Friendly piece info widget pointer. */
 	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
-	class UMatch_PieceInfoWidget* Match_FriendlyPieceInfoWidget = nullptr;
+	UMatch_PieceInfoWidget* Match_FriendlyPieceInfoWidget = nullptr;
 
 	/* Enemy piece info widget pointer. */
 	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
@@ -150,17 +157,17 @@ private:
 
 	/* Move confirmation widget pointer. */
 	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
-	class UMatch_MoveConfirmation* Match_MoveConfirmation = nullptr;
+	UMatch_MoveConfirmation* Match_MoveConfirmation = nullptr;
 
 	/* Attack confirmation widget pointer. */
 	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
-	class UMatch_AttackConfirmation* Match_AttackConfirmation = nullptr;
+	UMatch_AttackConfirmation* Match_AttackConfirmation = nullptr;
 
 	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
-	class UMatch_AttackGraphic* Match_AttackGraphic = nullptr;
+	UMatch_AttackGraphic* Match_AttackGraphic = nullptr;
 
 	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
-	class UUserWidget* ActiveAbilityConfirmationWidget = nullptr;
+	UUserWidget* ActiveAbilityConfirmationWidget = nullptr;
 
 	/* Handles the match timer. */
 	FTimerHandle MatchTimeTimerHandle;

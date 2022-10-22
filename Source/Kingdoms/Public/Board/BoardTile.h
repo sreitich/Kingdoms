@@ -57,20 +57,6 @@ public:
 	void UpdateEmissiveHighlight(bool bReveal, float PlayRate, FLinearColor Color);
 
 
-	/* Rework cutoff */
-	
-
-	/* Enables the emissive highlight with a brightness interpolation.
-	 * DEPRECATED: The highlight texture has been completely replaced with the emissive highlight. */
-	// UFUNCTION(BlueprintImplementableEvent, Category="Board Tile")
-	// void EnableGlow(bool bReverse);
-
-	/* Sets the highlight depending on the occupying piece.
-	 * DEPRECATED: Tiles no longer highlight to signify occupation.  */
-	UFUNCTION(BlueprintCallable, Category="Board Tile")
-	void RefreshHighlight();	
-
-
 /* Public variables. */
 public:
 
@@ -131,14 +117,6 @@ public:
 	UArrowComponent* Arrow;
 
 
-
-
-	/* The highlight that indicates the occupied piece and valid tiles when moving or attacking.
-	 * DEPRECATED: This has been replaced by the emissive highlight component. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
-	UStaticMeshComponent* Highlight;
-
-
 /* Public assets. */
 public:
 
@@ -155,60 +133,11 @@ public:
 	FLinearColor ReticleColor_Selected;
 
 
-	// Rework cutoff
-	
-	
-	// /* Tile occupied by friendly piece. */
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	// UMaterialInstance* Highlight_Friendly;
-
-	// /* Indicates a friendly piece that can be the target of an action. */
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	// UMaterialInstance* Highlight_Friendly;
-
-	// /* Tile occupied by enemy piece. */
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	// UMaterialInstance* Highlight_Enemy;
-
-	/* Tile valid for the currently selected piece to move to. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	UMaterialInstance* Highlight_ValidMove;
-
-	/* Tile is in range but not valid for the current action. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	UMaterialInstance* Highlight_ValidRange;
-
-	/* Tile occupied by a friendly piece that is a valid target of an ability. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	UMaterialInstance* Highlight_ValidFriendly;
-
-	/* Tile is in range and occupied by a friendly piece but not valid for the current action. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	UMaterialInstance* Highlight_ValidFriendlyRange;
-
-	/* tile occupied by an enemy piece that is a valid target of an ability. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	UMaterialInstance* Highlight_ValidEnemy;
-
-	/* Tile is in range and occupied by a enemy piece but not valid for the current action. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	UMaterialInstance* Highlight_ValidEnemyRange;
-
-	/* Tile that the mouse is currently hovering over. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Assets")
-	UMaterialInstance* Highlight_Target;
-
-
 /* Protected functions. */
 protected:
 
 	/* Called when the game starts or when spawned. */
 	virtual void BeginPlay() override;
-
-	/* Refreshes this tile's highlight whenever its occupying piece changes.
-	 * DEPRECATED: Logic no longer needs to be called every time the occupying piece changes. */
-	UFUNCTION()
-	void OnRep_OccupyingPiece();
 
 
 /* Protected variables. */

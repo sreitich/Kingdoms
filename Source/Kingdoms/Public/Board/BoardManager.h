@@ -19,10 +19,6 @@ public:
 	/* Sets default values for this actor's properties. */
 	ABoardManager();
 
-	/* Refreshes the highlights of every tile on the board depending on their state on the server. */
-	UFUNCTION(BlueprintCallable)
-	void RefreshBoard() const;
-
 
 /* Public variables. */
 public:

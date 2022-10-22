@@ -90,7 +90,7 @@ struct FAttackInfo
 	
 	/* The piece initiating the attack. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class AParentPiece* Attacker = nullptr;
+	AParentPiece* Attacker = nullptr;
 
 	/* The target of the attack. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

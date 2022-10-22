@@ -53,7 +53,7 @@ public:
 
 	/* Public references to each player's start. Player 1's start is the first element, player 2's is the second, etc. */
 	UPROPERTY(Replicated, BlueprintReadOnly)
-	TArray<class AActor*> PlayerStarts;
+	TArray<AActor*> PlayerStarts;
 	
 	/* A global pointer to this level's tile manager. */
 	UPROPERTY(Replicated, BlueprintReadOnly)

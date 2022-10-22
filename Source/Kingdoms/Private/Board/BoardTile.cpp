@@ -6,7 +6,6 @@
 #include "Components/RectLightComponent.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
-#include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Pieces/ParentPiece.h"
 
@@ -33,10 +32,6 @@ ABoardTile::ABoardTile()
 	Checker->SetupAttachment(Body);
 	Checker->SetIsReplicated(false);
 
-	Highlight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Highlight"));
-	Highlight->SetupAttachment(Body);
-	Highlight->SetIsReplicated(true);
-
 	Reticle = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Reticle"));
 	Reticle->SetupAttachment(Body);
 	Reticle->SetIsReplicated(false);
@@ -56,35 +51,6 @@ void ABoardTile::BeginPlay()
 	/* Create a dynamic material for the reticle mesh, allowing the material's parameters to be changed during runtime. */
 	ReticleMaterial = UMaterialInstanceDynamic::Create(Reticle->GetMaterial(0), this);
 	Reticle->SetMaterial(0, ReticleMaterial);
-}
-
-void ABoardTile::OnRep_OccupyingPiece()
-{
-	// /* Don't replicate tile highlights during piece setup. Otherwise, players will see where each other's pieces are. */
-	// if (GetWorld()->GetGameState<AMatch_GameStateBase>()->GetCurrentMatchStatus() != E_SettingUpPieces ||
-	// 	(IsValid(OccupyingPiece) && OccupyingPiece->GetInstigator()->IsLocallyControlled()) || !IsValid(OccupyingPiece)) 
-	// {
-	// 	/* Refresh this tile's highlight whenever its occupying piece changes. */
-	// 	RefreshHighlight();
-	// }
-
-	// if (IsValid(LocalPlayerState) && IsValid(OccupyingPiece) && OccupyingPiece->GetInstigator()->IsLocallyControlled())
-	// {
-	// 	switch (LocalPlayerState->GetCurrentPlayerStatus())
-	// 	{
-	// 	/* If the player is placing their pieces, highlight the tiles of their pieces. Only do this locally. */
-	// 	case E_PlacingPieces:
-	// 		Highlight->SetMaterial(0, Highlight_Friendly);
-	// 		break;
-	// 	default:
-	// 		Highlight->SetMaterial(0, Highlight_Blank);
-	// 		break;
-	// 	}
-	// }
-	// else if (OccupyingPiece == nullptr)
-	// {
-	// 	Highlight->SetMaterial(0, Highlight_Blank);
-	// }
 }
 
 void ABoardTile::Tick(float DeltaTime)
@@ -174,28 +140,6 @@ void ABoardTile::UpdateReticle(bool bReveal, bool bYellow)
 	}
 }
 
-void ABoardTile::RefreshHighlight()
-{
-	// /* If this tile is occupied by a friendly piece... */
-	// if (IsValid(OccupyingPiece) && OccupyingPiece->GetInstigator()->IsLocallyControlled())
-	// {
-	// 	Highlight->SetMaterial(0, Highlight_Friendly);
-	// }
-	// /* If this tile is occupied by an enemy piece... */
-	// else if (IsValid(OccupyingPiece))
-	// {
-	// 	Highlight->SetMaterial(0, Highlight_Enemy);
-	// }
-	// /* If the tile is empty... */
-	// else
-	// {
-	// 	Highlight->SetMaterial(0, Highlight_Empty);
-	// }
-
-	/* Make the tile blank. */
-	// Highlight->SetMaterial(0, Highlight_Blank);
-}
-
 void ABoardTile::SetOccupyingPiece_Implementation(AParentPiece* NewOccupyingPiece)
 {
 	/* Make sure that the new occupying piece is valid or a null pointer to reset it. */
@@ -203,8 +147,5 @@ void ABoardTile::SetOccupyingPiece_Implementation(AParentPiece* NewOccupyingPiec
 	{
 		/* Change the occupying piece. Only the server can do this. */
 		OccupyingPiece = NewOccupyingPiece;
-	
-		/* The server won't call the OnRep function automatically. */
-		OnRep_OccupyingPiece();
 	}
 }
