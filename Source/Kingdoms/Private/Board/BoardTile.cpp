@@ -32,6 +32,10 @@ ABoardTile::ABoardTile()
 	Checker->SetupAttachment(Body);
 	Checker->SetIsReplicated(false);
 
+	Highlight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Highlight"));
+	Highlight->SetupAttachment(Body);
+	Highlight->SetIsReplicated(false);
+
 	Reticle = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Reticle"));
 	Reticle->SetupAttachment(Body);
 	Reticle->SetIsReplicated(false);

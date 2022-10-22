@@ -280,7 +280,7 @@ void AMatch_PlayerPawn::Interact_SelectingPiece(FHitResult InteractionHit)
 			SelectedEnemyPiece = InteractedPiece;
 
 			/* Strengthen the enemy piece's fresnel to indicate that it is currently selected. */
-			SelectedEnemyPiece->FlashHighlight(SelectedPiece->EnemyFresnelColor, 20.0f, 1.0f, 0.0f, true);
+			SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, 20.0f, 1.0f, 0.0f, true);
 		}
 
 		/* Update and reveal the corresponding piece info widget. Enable buttons if the selected piece is friendly so that they can perform actions. */

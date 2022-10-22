@@ -104,6 +104,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* Checker;
 
+	/* Crosshairs differentiating each tile. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
+	UStaticMeshComponent* Highlight;
+
 	/* The reticle indicating if the player is hovering over this tile. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* Reticle;
