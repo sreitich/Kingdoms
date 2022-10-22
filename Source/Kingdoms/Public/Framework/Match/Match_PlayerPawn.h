@@ -156,6 +156,14 @@ protected:
 	UPROPERTY()
 	AParentPiece* SelectedPiece = nullptr;
 
+	/* A pointer to the enemy piece that this player currently has selected. */
+	UPROPERTY()
+	AParentPiece* SelectedEnemyPiece = nullptr;
+
+	/* A pointer to the piece that the player is currently targeting for an action. */
+	UPROPERTY()
+	AParentPiece* SelectedTargetPiece = nullptr;
+
 	/* A pointer to the tile that this player currently has selected. */
 	UPROPERTY()
 	ABoardTile* SelectedTile = nullptr;
