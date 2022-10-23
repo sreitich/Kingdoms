@@ -18,19 +18,14 @@ void ABoardManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/* If I haven't set the array of every board tile, get all of the tiles in the level and add them to the array.
-	 * Warning: This runs the risk of the tiles being out of order. */
-	if (AllTiles.Num() == 0)
+	/* Automatically create the array of tiles in the correct order. */
+	TArray<AActor*> AllTileActors;
+	UGameplayStatics::GetAllActorsOfClass(this, ABoardTile::StaticClass(), AllTileActors);
+
+	for (AActor* Tile : AllTileActors)
 	{
-		UE_LOG(LogTemp, Error, TEXT("AllTiles for %s is not set."), *GetName());
-		
-		TArray<AActor*> AllTileActors;
-		UGameplayStatics::GetAllActorsOfClass(this, ABoardTile::StaticClass(), AllTileActors);
-	
-		for (AActor* Tile : AllTileActors)
-		{
-			AllTiles.Add(Cast<ABoardTile>(Tile));
-		}
+		AllTiles.Add(Cast<ABoardTile>(Tile));
 	}
-	
+
+	AllTiles.Sort();
 }

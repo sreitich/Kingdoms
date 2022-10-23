@@ -26,6 +26,10 @@ public:
 	/* Sets default values for this actor's properties. */
 	ABoardTile();
 
+	/* Board tiles are compared to each other with their coordinates. Y-coordinates are tested first. */
+	bool operator<(const ABoardTile& Other) const;
+	bool operator==(const ABoardTile& Other) const;
+	
 	/* Called every frame. */
 	virtual void Tick(float DeltaTime) override;
 

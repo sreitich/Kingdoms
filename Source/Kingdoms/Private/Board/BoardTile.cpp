@@ -48,6 +48,34 @@ ABoardTile::ABoardTile()
 	Arrow->SetupAttachment(Body);
 }
 
+bool ABoardTile::operator<(const ABoardTile& Other) const
+{
+	/* If a tile has a lesser Y-coordinate, then it will always be lesser. */
+	if (Coordinates.Y < Other.Coordinates.Y)
+	{
+		return true;
+	}
+	/* If a tile has a greater Y-coordinate, then it will never be lesser. */
+	else if (Coordinates.Y > Other.Coordinates.Y)
+	{
+		return false;
+	}
+	/* If a tile has the same Y-coordinates, then their difference is determined by their X-coordinates. */
+	else
+	{
+		return Coordinates.X < Other.Coordinates.X;
+	}
+}
+
+bool ABoardTile::operator==(const ABoardTile& Other) const
+{
+	/* If the coordinates are identical, then the tiles are the same. */
+	if (Coordinates.X == Other.Coordinates.X && Coordinates.Y == Other.Coordinates.Y)
+		return true;
+
+	return false;
+}
+
 void ABoardTile::BeginPlay()
 {
 	Super::BeginPlay();
