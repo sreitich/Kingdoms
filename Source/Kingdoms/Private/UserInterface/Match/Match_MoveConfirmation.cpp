@@ -54,7 +54,7 @@ void UMatch_MoveConfirmation::NativeConstruct()
 void UMatch_MoveConfirmation::OnConfirmClicked()
 {
     /* Reset the highlight of every tile that was highlighted. */
-    for (ABoardTile* Tile : PendingPiece->GetValidTiles())
+    for (ABoardTile* Tile : PendingPiece->GetValidMoveTiles())
     {
         Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
     }
@@ -83,7 +83,7 @@ void UMatch_MoveConfirmation::OnCancelClicked()
     /* Reset the highlight of every tile that was highlighted. */
     if (IsValid(PendingPiece))
     {
-        for (ABoardTile* Tile : PendingPiece->GetValidTiles())
+        for (ABoardTile* Tile : PendingPiece->GetValidMoveTiles())
         {
             Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
         }

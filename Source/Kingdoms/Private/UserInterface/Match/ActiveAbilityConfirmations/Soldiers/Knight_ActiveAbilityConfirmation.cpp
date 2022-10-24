@@ -42,7 +42,7 @@ void UKnight_ActiveAbilityConfirmation::OnConfirmClicked()
 	/* Reset the highlight of every tile that was highlighted. */
 	if (IsValid(AbilityUser))
 	{
-		for (ABoardTile* Tile : AbilityUser->GetValidTiles())
+		for (ABoardTile* Tile : AbilityUser->GetValidMoveTiles())
 		{
 			Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
 		}
@@ -82,7 +82,7 @@ void UKnight_ActiveAbilityConfirmation::OnCancelClicked()
 	/* Reset the highlight of every tile that was highlighted. */
 	if (IsValid(AbilityUser))
 	{
-		for (ABoardTile* Tile : AbilityUser->GetValidTiles())
+		for (ABoardTile* Tile : AbilityUser->GetValidMoveTiles())
 		{
 			Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
 		}

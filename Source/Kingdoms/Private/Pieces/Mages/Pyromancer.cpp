@@ -18,6 +18,62 @@ APyromancer::APyromancer()
 {
 }
 
+TArray<ABoardTile*> APyromancer::GetValidMoveTiles()
+{
+	/* This array of valid tiles is going to be returned. */
+	TArray<ABoardTile*> ValidTiles;
+
+	/* Get the board manager's array of every tile on the board. */
+	for (ABoardTile* Tile : GetWorld()->GetGameState<AMatch_GameStateBase>()->BoardManager->AllTiles)
+	{
+		/* If the tile's coordinates match with one of this piece's move patterns and the path to the tile is clear, it is a valid destination. */
+		if (TileIsInMoveRange(Tile) && PathToTileIsClear(Tile))
+		{
+			ValidTiles.Add(Tile);
+		}
+	}
+
+	return ValidTiles;
+}
+
+bool APyromancer::TileIsInMoveRange(ABoardTile* Tile)
+{
+	/* Make sure that a valid tile was passed. */
+	if (IsValid(Tile))
+	{
+		/* Store the given tile and current tile's coordinates in variables for readability. */
+		const int NewX = Tile->Coordinates.X, NewY = Tile->Coordinates.Y;
+		const int OldX = CurrentTile->Coordinates.X, OldY = CurrentTile->Coordinates.Y;
+	
+		/* Test if the tile's coordinates match with any of this piece's move patterns. */
+		if
+		(
+			/* Forward 1 */
+			(NewX == OldX && NewY == OldY + 1) ||
+			/* Backward 1 */
+			(NewX == OldX && NewY == OldY - 1) ||
+
+			/* Right 1 */
+			(NewX == OldX + 1 && NewY == OldY) ||
+			/* Left 1 */
+			(NewX == OldX - 1 && NewY == OldY) ||
+			/* Right 2 */
+			(NewX == OldX + 2 && NewY == OldY) ||
+			/* Left 2 */
+			(NewX == OldX - 2 && NewY == OldY) ||
+			/* Right 3 */
+			(NewX == OldX + 3 && NewY == OldY) ||
+			/* Left 3 */
+			(NewX == OldX - 3 && NewY == OldY)
+		)
+		{
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 TArray<AActor*> APyromancer::GetValidActiveAbilityTargets()
 {
 	TArray<AActor*> ValidTargets;
@@ -26,7 +82,8 @@ TArray<AActor*> APyromancer::GetValidActiveAbilityTargets()
 	{
 		if (ABoardTile* Tile = Cast<ABoardTile>(Actor))
 		{
-			if (IsValid(Tile->GetOccupyingPiece()) && !Tile->GetOccupyingPiece()->GetInstigator()->IsLocallyControlled())
+			/* Tiles can only be targeted if they're occupied by an enemy piece and the path to them is clear. */
+			if (IsValid(Tile->GetOccupyingPiece()) && !Tile->GetOccupyingPiece()->GetInstigator()->IsLocallyControlled() && PathToTileIsClear(Tile))
 			{
 				/* The player can select the piece or its tile. */
 				ValidTargets.Add(Cast<AActor>(Tile->GetOccupyingPiece()));

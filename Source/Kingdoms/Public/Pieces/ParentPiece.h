@@ -71,13 +71,17 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void Multicast_CreateModifierPopUp(int ValueChange, bool bStrength);
 
+	/* Returns true if there are no occupied tiles between this piece's current tile and a given tile. */
+	UFUNCTION()
+	bool PathToTileIsClear(ABoardTile* TargetTile);
+
 
 /* Public functions overridden by each piece. */
 public:
 
 	/* Returns all tiles that this piece can move to (not accounting for other pieces or pathfinding). Overridden by each piece. */
 	UFUNCTION(BlueprintPure, Category="Piece Range")
-	virtual TArray<ABoardTile*> GetValidTiles();
+	virtual TArray<ABoardTile*> GetValidMoveTiles();
 
 	/* Tests if the given tile's coordinates match any of this piece's movement patterns. Overridden by each piece. */
 	UFUNCTION(BlueprintPure, Category="Piece Range")
@@ -202,6 +206,14 @@ public:
 	/* This piece's unique identifier, set in-editor for each child piece. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Piece Info")
 	FName PieceID = "0-00";
+	
+	/* The default brightness of fresnel emissives. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Piece Info")
+	float DefaultFresnelStrength = 2.0f;
+
+	/* The brightness of fresnels when strengthened to indicate that this piece is selected. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Piece Info")
+	float StrengthenedFresnelStrength = 10.0f;
 
 	/* The widget to display when hovering over this piece's passive ability. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widgets")

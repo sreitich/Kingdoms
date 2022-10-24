@@ -26,7 +26,7 @@ public:
 	/* Sets default values for this actor's properties. */
 	ABoardTile();
 
-	/* Board tiles are compared to each other with their coordinates. Y-coordinates are tested first. */
+	/* Board tiles are compared to each other with their coordinates. Y-coordinates (rows) take priority. */
 	bool operator<(const ABoardTile& Other) const;
 	bool operator==(const ABoardTile& Other) const;
 	

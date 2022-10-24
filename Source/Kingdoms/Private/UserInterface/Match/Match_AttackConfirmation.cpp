@@ -77,7 +77,7 @@ void UMatch_AttackConfirmation::OnAttackClicked()
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->Server_Attack(AttackInfo, true);
 
 	/* Reset the highlight of every tile that was highlighted. */
-	for (ABoardTile* Tile : PendingFriendlyPiece->GetValidTiles())
+	for (ABoardTile* Tile : PendingFriendlyPiece->GetValidMoveTiles())
 	{
 		Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
 	}
@@ -97,7 +97,7 @@ void UMatch_AttackConfirmation::OnCancelClicked()
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
 
 	/* Reset the highlight of every tile that was highlighted. */
-	for (ABoardTile* Tile : PendingFriendlyPiece->GetValidTiles())
+	for (ABoardTile* Tile : PendingFriendlyPiece->GetValidMoveTiles())
 	{
 		Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
 	}

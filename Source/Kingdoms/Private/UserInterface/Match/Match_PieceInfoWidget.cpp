@@ -506,7 +506,7 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
     if (IsValid(DisplayedPiece))
     {
         /* Set a new highlight for every tile that this piece can move to to show the player their options. */
-        for (ABoardTile* Tile : DisplayedPiece->GetValidTiles())
+        for (ABoardTile* Tile : DisplayedPiece->GetValidMoveTiles())
         {
             /* If this tile is occupied by an enemy piece, highlight it as a valid attack target. */
             if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetAlignment() == E_Hostile)

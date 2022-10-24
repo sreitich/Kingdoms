@@ -17,6 +17,7 @@
 #include "UserDefinedData/PieceData_UserDefinedData.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 
 AParentPiece::AParentPiece()
 {
@@ -117,7 +118,7 @@ void AParentPiece::BeginPlay()
         }
 
 		/* Initialize the dynamic material's fresnel brightness with the default brightness. */
-		DynamicMaterial->SetScalarParameterValue(TEXT("Brightness"), DynamicMaterial->K2_GetScalarParameterValue(TEXT("Brightness")));
+		DynamicMaterial->SetScalarParameterValue(TEXT("Brightness"), DefaultFresnelStrength);
 	}
 
 	/* If the piece data table was found... */
@@ -257,7 +258,33 @@ void AParentPiece::Multicast_CreateModifierPopUp_Implementation(int ValueChange,
 	SpawnedPopUp->BP_ActivateModifierPopUp(SpawnLocation, ValueChange, true, 1.0f);
 }
 
-TArray<ABoardTile*> AParentPiece::GetValidTiles()
+bool AParentPiece::PathToTileIsClear(ABoardTile* TargetTile)
+{
+	/* Perform a line trace, checking for every tile between the current tile and the target tile within range. */
+	TArray<FHitResult> HitResults;
+	FCollisionQueryParams TraceParams = FCollisionQueryParams();
+	TraceParams.AddIgnoredActors(TArray<AActor*>({GetCurrentTile(), TargetTile}));
+	GetWorld()->LineTraceMultiByChannel(OUT HitResults, GetCurrentTile()->GetActorLocation(), TargetTile->GetActorLocation(), ECC_GameTraceChannel1, TraceParams);
+
+	/* Check every tile between the current tile and the target tile. If any of them are occupied by a piece, then the target tile can't be moved to. */
+	for (FHitResult HitResult : HitResults)
+	{
+		if (HitResult.bBlockingHit)
+		{
+			if (ABoardTile* HitTile = Cast<ABoardTile>(HitResult.GetActor()))
+			{
+				if (IsValid(HitTile->GetOccupyingPiece()))
+				{
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+TArray<ABoardTile*> AParentPiece::GetValidMoveTiles()
 {
 	/* This array of valid tiles is going to be returned. */
 	TArray<ABoardTile*> ValidTiles;
@@ -265,10 +292,9 @@ TArray<ABoardTile*> AParentPiece::GetValidTiles()
 	/* Get the board manager's array of every tile on the board. */
 	for (ABoardTile* Tile : GetWorld()->GetGameState<AMatch_GameStateBase>()->BoardManager->AllTiles)
 	{
-		/* If the tile's coordinates match with one of this piece's move patterns... */
-		if (TileIsInMoveRange(Tile))
+		/* If the tile's coordinates match with one of this piece's move patterns and the path to the tile is clear, it is a valid destination. */
+		if (TileIsInMoveRange(Tile) && PathToTileIsClear(Tile))
 		{
-			/* Add the tile to the array of valid tiles. */
 			ValidTiles.Add(Tile);
 		}
 	}
