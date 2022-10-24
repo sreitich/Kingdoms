@@ -23,6 +23,9 @@ public:
 /* Protected functions. */
 protected:
 
+	/* Called when the game starts or when created. */
+	virtual void NativeConstruct() override;
+
 	/* We need additional "fireball" ability code to execute before starting the attack. */
 	virtual void OnAttackClicked() override;
 

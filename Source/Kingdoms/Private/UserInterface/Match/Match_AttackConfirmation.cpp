@@ -96,10 +96,13 @@ void UMatch_AttackConfirmation::OnCancelClicked()
 	/* Clear the player's selected piece. */
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
 
-	/* Reset the highlight of every tile that was highlighted. */
-	for (ABoardTile* Tile : PendingFriendlyPiece->GetValidMoveTiles())
+	if (IsValid(PendingFriendlyPiece))
 	{
-		Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+		/* Reset the highlight of every tile that was highlighted. */
+		for (ABoardTile* Tile : PendingFriendlyPiece->GetValidMoveTiles())
+		{
+			Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+		}
 	}
 
 	/* Destroy this widget. */

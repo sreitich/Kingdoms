@@ -5,13 +5,23 @@
 
 #include "Board/BoardTile.h"
 #include "Components/RectLightComponent.h"
-#include "Framework/Match/Match_PlayerController.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
-#include "GameFramework/GameStateBase.h"
-#include "Kismet/GameplayStatics.h"
 #include "Pieces/ParentPiece.h"
 #include "Pieces/Mages/Pyromancer.h"
+
+#include "Kismet/GameplayStatics.h"
+#include "Components/Button.h"
+
+void UMatch_PyroActiveConfirmation::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	/* Bind the confirm button to activate the piece's active ability. */
+	AttackButton->OnClicked.AddDynamic(this, &UMatch_PyroActiveConfirmation::OnAttackClicked);
+	/* Bind the cancel button to reset the active ability action. */
+	CancelButton->OnClicked.AddDynamic(this, &UMatch_PyroActiveConfirmation::OnCancelClicked);
+}
 
 void UMatch_PyroActiveConfirmation::OnAttackClicked()
 {
@@ -44,6 +54,24 @@ void UMatch_PyroActiveConfirmation::OnCancelClicked()
 	/* Nullify the piece's pointer to its ability confirmation widget so it makes a new one next time. */
 	Cast<APyromancer>(PendingFriendlyPiece)->ConfirmationWidget = nullptr;
 
-	/* Reset the player state, clear the player's selection data, and reset tile highlights before destroying this widget. */
-	UMatch_AttackConfirmation::OnCancelClicked();
+	/* Reset the player state. */
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
+	/* Clear the player's selected piece. */
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
+
+	if (IsValid(PendingFriendlyPiece))
+	{
+		/* Reset the highlight of every tile that was highlighted. */
+		for (AActor* Target : PendingFriendlyPiece->GetValidActiveAbilityTargets())
+		{
+			if (ABoardTile* Tile = Cast<ABoardTile>(Target))
+				Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+		}
+	}
+
+	/* Nullify the piece's pointer to its ability confirmation widget so it makes a new one next time. */
+	// Cast<APyromancer>(PendingFriendlyPiece)->ConfirmationWidget = nullptr;
+
+	/* Destroy this widget. */
+	RemoveFromParent();
 }
