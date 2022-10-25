@@ -25,8 +25,8 @@ void UMatch_PyroActiveConfirmation::NativeConstruct()
 
 void UMatch_PyroActiveConfirmation::OnAttackClicked()
 {
-	/* Clear the player's selected piece. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
+	/* Clear the player's selected piece, selected enemy piece, and selected tile. */
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, true, false, true);
 
 	/* Reset the highlight of every tile that was highlighted. */
 	for (AActor* Target : PendingFriendlyPiece->GetValidActiveAbilityTargets())
@@ -56,8 +56,8 @@ void UMatch_PyroActiveConfirmation::OnCancelClicked()
 
 	/* Reset the player state. */
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
-	/* Clear the player's selected piece. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
+	/* Reset the player's selected piece, selected enemy piece, and selected tile. */
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, true, false, true);
 
 	if (IsValid(PendingFriendlyPiece))
 	{

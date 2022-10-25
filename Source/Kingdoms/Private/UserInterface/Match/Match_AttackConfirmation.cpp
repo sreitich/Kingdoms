@@ -83,7 +83,7 @@ void UMatch_AttackConfirmation::OnAttackClicked()
 	}
 
 	/* Remove all other widgets and reset the player's selections when starting the attack sequence. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, true, false, true);
 
 	/* Destroy this widget. */
 	this->RemoveFromParent();
@@ -94,7 +94,7 @@ void UMatch_AttackConfirmation::OnCancelClicked()
 	/* Reset the player state. */
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
 	/* Clear the player's selected piece. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, true, false, true);
 
 	if (IsValid(PendingFriendlyPiece))
 	{

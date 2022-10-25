@@ -17,6 +17,7 @@
 #include "UserDefinedData/PieceData_UserDefinedData.h"
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Framework/Match/Match_PlayerPawn.h"
 
 AMatch_PlayerController::AMatch_PlayerController()
 {
@@ -257,6 +258,15 @@ void AMatch_PlayerController::UpdateMoveConfirmationWidget(bool bDestroy, ABoard
         /* If the confirmation widget needs to be created... */
         else if (!bDestroy)
         {
+            /* If an attack confirmation widget is currently displayed, destroy it before switching to the move confirmation widget. */
+            if (Match_AttackConfirmation)
+            {
+                /* Reset the fresnel and highlight of the enemy that was selected. */
+                Cast<AMatch_PlayerPawn>(GetPawn())->ClearSelection(false, true, false, false);
+                Match_AttackConfirmation->RemoveFromParent();
+                Match_AttackConfirmation = nullptr;
+            }
+
             /* Create the widget. */
             Match_MoveConfirmation = CreateWidget<UMatch_MoveConfirmation>(GetWorld(), Match_MoveConfirmationClass, FName("Move Confirmation Widget"));
 
@@ -290,6 +300,15 @@ void AMatch_PlayerController::UpdateAttackConfirmationWidget(bool bDestroy, APar
         /* If the widget needs to be created... */
         else if (!bDestroy)
         {
+            /* If a move confirmation widget is currently displayed, destroy it before switching to the attack confirmation widget. */
+            if (Match_MoveConfirmation)
+            {
+                /* Reset the highlight of the tile that was selected. */
+                Cast<AMatch_PlayerPawn>(GetPawn())->ClearSelection(false, false, false, true);
+                Match_MoveConfirmation->RemoveFromParent();
+                Match_MoveConfirmation = nullptr;
+            }
+
             /* Create the widget. */
             Match_AttackConfirmation = CreateWidget<UMatch_AttackConfirmation>(GetWorld(), Match_AttackConfirmationClass, FName("Attack Confirmation Widget"));
 

@@ -68,8 +68,8 @@ void UMatch_ActiveAbilityConfirmation::OnCancelClicked()
 {
 	/* Reset the player state. */
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
-	/* Clear the player's selected piece. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
+	/* Reset the player's selected piece, selected target piece, and selected tile. */
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, false, true, true);
 
 	/* Clear targeting indicators the target depending on what class it was. */
     for (AActor* ValidTarget : AbilityUser->GetValidActiveAbilityTargets())

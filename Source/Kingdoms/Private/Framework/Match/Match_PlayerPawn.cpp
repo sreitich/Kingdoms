@@ -163,12 +163,12 @@ void AMatch_PlayerPawn::Interact_WaitingForTurn(FHitResult InteractionHit)
 	/* If anything else was clicked... */
 	else
 	{
-		/* Clear the currently selected piece and remove all piece-information pop-ups. */
-		ClearSelection(true);
+		/* Reset the currently selected actors and remove all piece-information pop-ups. */
+		ClearSelection(true, true, true, true);
 	}
 
 	/* If the player interacted with a valid piece and it has a valid player controller... */
-	if (InteractedPiece && GetController<AMatch_PlayerController>())
+	if (IsValid(InteractedPiece) && GetController<AMatch_PlayerController>())
 	{
 		/* Get this piece's alignment. */
 		const EAlignment Alignment = InteractedPiece->GetAlignment();
@@ -199,13 +199,13 @@ void AMatch_PlayerPawn::Interact_WaitingForTurn(FHitResult InteractionHit)
 		{
 			/* If the player already had an enemy piece selected, reset its fresnel. */
 			if (IsValid(SelectedEnemyPiece))
-				SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedPiece->DefaultFresnelStrength, 1.0, 0.0f, true);
+				SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedEnemyPiece->DefaultFresnelStrength, 1.0, 0.0f, true);
 
 			/* Update the selected enemy piece. */
 			SelectedEnemyPiece = InteractedPiece;
 
 			/* Strengthen the enemy piece's fresnel to indicate that it is currently selected. */
-			SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedPiece->StrengthenedFresnelStrength, 1.0f, 0.0f, true);
+			SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedEnemyPiece->StrengthenedFresnelStrength, 1.0f, 0.0f, true);
 		}
 
 		/* Update and reveal the corresponding piece info widget with no buttons. */
@@ -233,8 +233,8 @@ void AMatch_PlayerPawn::Interact_SelectingPiece(FHitResult InteractionHit)
 	/* If anything else was clicked... */
 	else
 	{
-		/* Clear the currently selected piece and remove all piece-information pop-ups. */
-		ClearSelection(true);
+		/* Reset the currently selected actors and remove all piece-information pop-ups. */
+		ClearSelection(true, true, true, true);
 	}
 
 	/* If the player interacted with a valid piece and the player has a valid player controller... */
@@ -308,8 +308,8 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 	/* If anything else was clicked... */
 	else
 	{
-		/* Clear the currently selected piece and remove all piece-information pop-ups. */
-		ClearSelection(true);
+		/* Reset the currently selected actors and remove all piece-information pop-ups. */
+		ClearSelection(true, true, true, true);
 	}
 
 	/* If the player interacted with a tile and the tile is valid... */
@@ -499,8 +499,8 @@ void AMatch_PlayerPawn::Interact_SelectingTargetPassiveAbility(FHitResult Intera
 	/* If anything else was clicked... */
 	else
 	{
-		/* Clear the currently selected piece and remove all piece-information pop-ups. */
-		ClearSelection(true);
+		/* Reset the currently selected actors and remove all piece-information pop-ups. */
+		ClearSelection(true, true, true, true);
 	}
 
 	/* If the interacted piece is valid for this action... */
@@ -520,7 +520,7 @@ void AMatch_PlayerPawn::Interact_Released()
 	}
 }
 
-void AMatch_PlayerPawn::ClearSelection(bool bDeselect)
+void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTargetPiece, bool bTile)
 {
 	/* If the player has a valid player controller... */
 	if (AMatch_PlayerController* PlayerController = Cast<AMatch_PlayerController>(GetController()))
@@ -531,64 +531,84 @@ void AMatch_PlayerPawn::ClearSelection(bool bDeselect)
 		/* Hide the enemy piece info widget. */
 		PlayerController->UpdatePieceInfoWidget(SelectedPiece, E_Hostile, false, true);
 
-		switch (GetPlayerState<AMatch_PlayerState>()->GetCurrentPlayerStatus())
-		{
-			/* Remove the move confirmation widget or attack confirmation widget and update the player's state if the
-			 * player was targeting a tile to move to. */
-			case E_SelectingTarget_Move:
-				PlayerController->UpdateMoveConfirmationWidget(true, nullptr, nullptr);
-				PlayerController->UpdateAttackConfirmationWidget(true, nullptr, nullptr);
-			break;
-			/* Remove the active ability confirmation widget. */
-			case E_SelectingTarget_ActiveAbility:
-				break;
-			/* Remove the passive ability confirmation widget. */
-			case E_SelectingTarget_PassiveAbility:
-				break;
-			/* If the player is connecting or placing their pieces, do nothing. This should never be called. */
-			default:
-				break;
-		}
+		/* I'm honestly not sure what this was doing. Widgets already get destroyed when necessary, so this shouldn't need to be in this function. */
+		// switch (GetPlayerState<AMatch_PlayerState>()->GetCurrentPlayerStatus())
+		// {
+		// 	/* Remove the move confirmation widget or attack confirmation widget and update the player's state if the
+		// 	 * player was targeting a tile to move to. */
+		// 	case E_SelectingTarget_Move:
+		// 		// PlayerController->UpdateMoveConfirmationWidget(true, nullptr, nullptr);
+		// 		// PlayerController->UpdateAttackConfirmationWidget(true, nullptr, nullptr);
+		// 		break;
+		// 	/* Remove the active ability confirmation widget. */
+		// 	case E_SelectingTarget_ActiveAbility:
+		// 		break;
+		// 	/* Remove the passive ability confirmation widget. */
+		// 	case E_SelectingTarget_PassiveAbility:
+		// 		break;
+		// 	/* If the player is connecting or placing their pieces, do nothing. This should never be called. */
+		// 	default:
+		// 		break;
+		// }
 	}
 
 	/* If the selected piece needs to be deselected... */
-	if (bDeselect && SelectedPiece != nullptr)
+	if (bPiece && IsValid(SelectedPiece))
 	{
-		/* Remove the piece's selection reticle and fresnel strength. */
+		/* Reset the piece's selection reticle. */
 		SelectedPiece->GetCurrentTile()->bReticleControlledByCursor = true;
 		SelectedPiece->GetCurrentTile()->UpdateReticle(false, true);
+		/* Reset the piece's fresnel. */
 		SelectedPiece->FlashHighlight(SelectedPiece->FriendlyFresnelColor, 4.0f, 1.0f, 0.0f, true);
-		/* Reset the currently selected piece if requested. */
+		/* Clear the pointer to the selected piece. */
 		SelectedPiece = nullptr;
+	}
 
-		/* If an enemy piece was selected, reset its fresnel and the pointer to it. */
-		if (IsValid(SelectedEnemyPiece))
-		{
-			SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, 4.0f, 1.0, 0.0f, true);
-			SelectedEnemyPiece = nullptr;
-		}
+	/* If the selected enemy piece needs to be deselected... */
+	if (bEnemyPiece && IsValid(SelectedEnemyPiece))
+	{
+		/* Reset the enemy piece's selection reticle. */
+		SelectedEnemyPiece->GetCurrentTile()->bReticleControlledByCursor = true;
+		SelectedEnemyPiece->GetCurrentTile()->UpdateReticle(false, true);
+		/* Reset the enemy piece's tile highlight. */
+		// SelectedEnemyPiece->GetCurrentTile()->UpdateEmissiveHighlight(false, 4.0f, SelectedEnemyPiece->GetCurrentTile()->Highlight_Enemy);
+		/* Reset the enemy piece's fresnel. */
+		SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, 4.0f, 1.0, 0.0f, true);
+		/* Clear the pointer to the selected enemy piece. */
+		SelectedEnemyPiece = nullptr;
+	}
 
-		/* If a target piece was selected, reset its fresnel and the pointer to it. */
-		if (IsValid(SelectedTargetPiece))
-		{
-			SelectedTargetPiece->FlashHighlight(SelectedTargetPiece->GetAlignment() == E_Friendly ? SelectedTargetPiece->FriendlyFresnelColor : SelectedTargetPiece->EnemyFresnelColor, 4.0f, 1.0, 0.0f, true);
-			SelectedTargetPiece = nullptr;
-		}
+	/* If the selected target piece needs to be deselected... */
+	if (bTargetPiece && IsValid(SelectedTargetPiece))
+	{
+		/* Reset the target piece's selection reticle. */
+		SelectedTargetPiece->GetCurrentTile()->bReticleControlledByCursor = true;
+		SelectedTargetPiece->GetCurrentTile()->UpdateReticle(false, true);
+		/* Reset the target piece's tile highlight. */
+		// SelectedEnemyPiece->GetCurrentTile()->UpdateEmissiveHighlight(false, 4.0f, SelectedTargetPiece->GetAlignment() == E_Friendly ? SelectedEnemyPiece->GetCurrentTile()->Highlight_Friendly : SelectedEnemyPiece->GetCurrentTile()->Highlight_Enemy);
+		/* Reset the target piece's fresnel. */
+		SelectedTargetPiece->FlashHighlight(SelectedTargetPiece->GetAlignment() == E_Friendly ? SelectedTargetPiece->FriendlyFresnelColor : SelectedTargetPiece->EnemyFresnelColor, 4.0f, 1.0, 0.0f, true);
+		/* Clear the pointer to the target piece. */
+		SelectedTargetPiece = nullptr;
+	}
 
-		/* If a tile was selected, reset its reticle and the pointer to it. */
-		if (IsValid(SelectedTile))
-		{
-			SelectedTile->bReticleControlledByCursor = true;
-			SelectedTile->UpdateReticle(false, true);
-			SelectedTile = nullptr;
-		}
+	/* If the selected tile needs to be deselected... */
+	if (bTile && IsValid(SelectedTile))
+	{
+		/* Reset the tile's selection reticle. */
+		SelectedTile->bReticleControlledByCursor = true;
+		SelectedTile->UpdateReticle(false, true);
+		/* Reset the tile's highlight. */
+		// SelectedTile->UpdateEmissiveHighlight(false, 4.0f, SelectedTile->Highlight_ValidUnoccupiedTile);
+		/* Clear the pointer to the selected tile. */
+		SelectedTile = nullptr;
 	}
 }
 
 void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo, bool bMoveCamera)
 {
-    /* Remove the piece info widgets and reset this player's selection. */
-    ClearSelection(true);
+	/* Reset the currently selected actors and remove all piece-information pop-ups. */
+    ClearSelection(true, true, true, true);
 
 	/* Call the blueprint implementation of the attack sequence with server authority. Blueprint-implementable events
 	 * can't be RPCs. */

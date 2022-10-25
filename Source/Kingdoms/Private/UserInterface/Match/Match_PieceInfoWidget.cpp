@@ -493,7 +493,7 @@ void UMatch_PieceInfoWidget::OnAbilityUnhovered()
 void UMatch_PieceInfoWidget::OnMoveClicked()
 {
     /* Clear the piece info widgets but keep the currently selected piece. */
-    GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false);
+    GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false, false, false, false);
 
     /* Instantly change the player status for the local client so that they don't have to wait for the server to update
      * their status before choosing a target. */
@@ -525,7 +525,7 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
 void UMatch_PieceInfoWidget::OnUseActiveClicked()
 {
     /* Clear the piece info widgets but keep the currently selected piece. */
-    GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false);
+    GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false, false, false, false);
 
     /* Instantly change the player status for the local client so that they don't have to wait for the server to update
     * their status before choosing targets. */

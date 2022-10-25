@@ -39,8 +39,8 @@ public:
 	UFUNCTION()
 	void Interact();
 
-		/* Clears the currently selected piece and removes all piece-information pop-ups. */
-		void ClearSelection(bool bDeselect);
+		/* Clears the currently selected friendly piece, enemy piece, target piece, and tile, and removes all piece-information pop-ups if requested. */
+		void ClearSelection(bool bPiece, bool bEnemyPiece, bool bTargetPiece, bool bTile);
 	
 	/* Smoothly rotates the piece to the target rotation over a short time period. If bMoveWhenFinished is true, the
 	 * piece is moved to the target tile when it finishes rotating. If bResetStateWhenFinished is true, the player's

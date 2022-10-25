@@ -36,8 +36,8 @@ void UKnight_ActiveAbilityConfirmation::NativeConstruct()
 
 void UKnight_ActiveAbilityConfirmation::OnConfirmClicked()
 {
-	/* Clear the player's selected piece. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
+	/* Reset the player's selected piece and selected tile. */
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, false, false, true);
 
 	/* Reset the highlight of every tile that was highlighted. */
 	if (IsValid(AbilityUser))
@@ -76,8 +76,8 @@ void UKnight_ActiveAbilityConfirmation::OnCancelClicked()
 {
 	/* Reset the player state. */
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
-	/* Clear the player's selected piece. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true);
+	/* Reset the player's selected piece and selected tile. */
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, false, false, true);
 
 	/* Reset the highlight of every tile that was highlighted. */
 	if (IsValid(AbilityUser))

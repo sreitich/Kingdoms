@@ -56,7 +56,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Board Tile")
 	void UpdateReticle(bool bReveal, bool bYellow);
 
-	/* Enables/disables the emissive highlight, interpolating its brightness to glow the given color. */
+	/* Enables/disables the emissive highlight, interpolating its brightness to glow the given color. Default play-rate
+	 * is 4.0f. */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Board Tile")
 	void UpdateEmissiveHighlight(bool bReveal, float PlayRate, FLinearColor Color);
 
