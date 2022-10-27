@@ -13,6 +13,7 @@
 #include "UserInterface/MatchSetup/Dragging/PieceDragWidget.h"
 
 #include "Camera/CameraComponent.h"
+#include "GameFramework/GameStateBase.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -164,7 +165,7 @@ void AMatch_PlayerPawn::Interact_WaitingForTurn(FHitResult InteractionHit)
 	else
 	{
 		/* Reset the currently selected actors and remove all piece-information pop-ups. */
-		ClearSelection(true, true, true, true);
+		ClearSelection(true, true, true, true, true);
 	}
 
 	/* If the player interacted with a valid piece and it has a valid player controller... */
@@ -234,7 +235,7 @@ void AMatch_PlayerPawn::Interact_SelectingPiece(FHitResult InteractionHit)
 	else
 	{
 		/* Reset the currently selected actors and remove all piece-information pop-ups. */
-		ClearSelection(true, true, true, true);
+		ClearSelection(true, true, true, true, true);
 	}
 
 	/* If the player interacted with a valid piece and the player has a valid player controller... */
@@ -309,7 +310,7 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 	else
 	{
 		/* Reset the currently selected actors and remove all piece-information pop-ups. */
-		ClearSelection(true, true, true, true);
+		ClearSelection(true, true, true, true, true);
 	}
 
 	/* If the player interacted with a tile and the tile is valid... */
@@ -500,7 +501,7 @@ void AMatch_PlayerPawn::Interact_SelectingTargetPassiveAbility(FHitResult Intera
 	else
 	{
 		/* Reset the currently selected actors and remove all piece-information pop-ups. */
-		ClearSelection(true, true, true, true);
+		ClearSelection(true, true, true, true, true);
 	}
 
 	/* If the interacted piece is valid for this action... */
@@ -520,36 +521,40 @@ void AMatch_PlayerPawn::Interact_Released()
 	}
 }
 
-void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTargetPiece, bool bTile)
+void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTargetPiece, bool bTile, bool bHidePieceInfoWidgets)
 {
-	/* If the player has a valid player controller... */
-	if (AMatch_PlayerController* PlayerController = Cast<AMatch_PlayerController>(GetController()))
+	/* If the piece info widgets should be hidden... */
+	if (bHidePieceInfoWidgets)
 	{
-		/* Hide the friendly piece info widget. */
-		PlayerController->UpdatePieceInfoWidget(SelectedPiece, E_Friendly, false, true);
+		/* If the player has a valid player controller... */
+		if (AMatch_PlayerController* PlayerController = Cast<AMatch_PlayerController>(GetController()))
+		{
+			/* Hide the friendly piece info widget. */
+			PlayerController->UpdatePieceInfoWidget(SelectedPiece, E_Friendly, false, true);
 
-		/* Hide the enemy piece info widget. */
-		PlayerController->UpdatePieceInfoWidget(SelectedPiece, E_Hostile, false, true);
+			/* Hide the enemy piece info widget. */
+			PlayerController->UpdatePieceInfoWidget(SelectedPiece, E_Hostile, false, true);
 
-		/* I'm honestly not sure what this was doing. Widgets already get destroyed when necessary, so this shouldn't need to be in this function. */
-		// switch (GetPlayerState<AMatch_PlayerState>()->GetCurrentPlayerStatus())
-		// {
-		// 	/* Remove the move confirmation widget or attack confirmation widget and update the player's state if the
-		// 	 * player was targeting a tile to move to. */
-		// 	case E_SelectingTarget_Move:
-		// 		// PlayerController->UpdateMoveConfirmationWidget(true, nullptr, nullptr);
-		// 		// PlayerController->UpdateAttackConfirmationWidget(true, nullptr, nullptr);
-		// 		break;
-		// 	/* Remove the active ability confirmation widget. */
-		// 	case E_SelectingTarget_ActiveAbility:
-		// 		break;
-		// 	/* Remove the passive ability confirmation widget. */
-		// 	case E_SelectingTarget_PassiveAbility:
-		// 		break;
-		// 	/* If the player is connecting or placing their pieces, do nothing. This should never be called. */
-		// 	default:
-		// 		break;
-		// }
+			/* I'm honestly not sure what this was doing. Widgets already get destroyed when necessary, so this shouldn't need to be in this function. */
+			// switch (GetPlayerState<AMatch_PlayerState>()->GetCurrentPlayerStatus())
+			// {
+			// 	/* Remove the move confirmation widget or attack confirmation widget and update the player's state if the
+			// 	 * player was targeting a tile to move to. */
+			// 	case E_SelectingTarget_Move:
+			// 		// PlayerController->UpdateMoveConfirmationWidget(true, nullptr, nullptr);
+			// 		// PlayerController->UpdateAttackConfirmationWidget(true, nullptr, nullptr);
+			// 		break;
+			// 	/* Remove the active ability confirmation widget. */
+			// 	case E_SelectingTarget_ActiveAbility:
+			// 		break;
+			// 	/* Remove the passive ability confirmation widget. */
+			// 	case E_SelectingTarget_PassiveAbility:
+			// 		break;
+			// 	/* If the player is connecting or placing their pieces, do nothing. This should never be called. */
+			// 	default:
+			// 		break;
+			// }
+		}
 	}
 
 	/* If the selected piece needs to be deselected... */
@@ -605,10 +610,29 @@ void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTarg
 	}
 }
 
+void AMatch_PlayerPawn::Client_DeselectPieceOrTile_Implementation(AParentPiece* PieceToDeselect, ABoardTile* TileToDeselect)
+{
+	/* Deselect the selected piece if given. */
+	if (IsValid(PieceToDeselect) && PieceToDeselect == SelectedPiece)
+	{ ClearSelection(true, false, false, false, false); }
+
+	/* Deselect the enemy piece if given. */
+	if (IsValid(PieceToDeselect) && PieceToDeselect == SelectedEnemyPiece)
+	{ ClearSelection(false, true, false, false, false); }
+
+	/* Deselect the target piece if given. */
+	if (IsValid(PieceToDeselect) && PieceToDeselect == SelectedTargetPiece)
+	{ ClearSelection(false, false, true, false, false); }
+
+	/* Deselect the tile if given. */
+	if (IsValid(TileToDeselect) && TileToDeselect == SelectedTile)
+	{ ClearSelection(false, false, false, true, false); }
+}
+
 void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo, bool bMoveCamera)
 {
 	/* Reset the currently selected actors and remove all piece-information pop-ups. */
-    ClearSelection(true, true, true, true);
+    ClearSelection(true, true, true, true, true);
 
 	/* Call the blueprint implementation of the attack sequence with server authority. Blueprint-implementable events
 	 * can't be RPCs. */
@@ -670,6 +694,32 @@ void AMatch_PlayerPawn::Server_SetResetAfterMove_Implementation(AParentPiece* Pi
 	}
 }
 
+void AMatch_PlayerPawn::KillPiece_Implementation(AParentPiece* PieceToKill, bool bPieceReplaced)
+{
+	/* Remove the killed piece from its owning player's collection of owned pieces. */
+	Cast<AMatch_PlayerState>(PieceToKill->GetInstigator()->GetPlayerState())->OwnedPieces.Remove(PieceToKill);
+
+	/* Reset the killed piece's tile if the killed piece was not replaced by the piece that killed it (i.e. as an attack action). */
+	if (bPieceReplaced)
+	{
+		PieceToKill->GetCurrentTile()->SetOccupyingPiece(nullptr);
+	}
+
+	/* Refresh each player's piece info widgets, hiding any that were displaying the killed piece, and deselect the
+	 * killed piece if it either player had it selected for any reason. */
+	for (const APlayerState* PlayerStatePtr : UGameplayStatics::GetGameState(this)->PlayerArray)
+	{
+		if (AMatch_PlayerPawn* PlayerPawnPtr = Cast<AMatch_PlayerPawn>(PlayerStatePtr->GetPawn()))
+		{
+			PlayerPawnPtr->Client_RefreshPieceInfoWidgets(PieceToKill, true);
+			PlayerPawnPtr->Client_DeselectPieceOrTile(PieceToKill, nullptr);
+		}
+	}
+
+	/* Destroy this piece. */
+	PieceToKill->Destroy();
+}
+
 void AMatch_PlayerPawn::Server_UseActiveAbility_Implementation(AParentPiece* AbilityUser, const TArray<AActor*>& Targets)
 {
 	/* Call the ability with server authority. */
@@ -677,8 +727,8 @@ void AMatch_PlayerPawn::Server_UseActiveAbility_Implementation(AParentPiece* Abi
 		AbilityUser->OnActiveAbility(Targets);
 }
 
-void AMatch_PlayerPawn::Client_RefreshPieceInfoWidgets_Implementation(AParentPiece* OtherPiece) const
+void AMatch_PlayerPawn::Client_RefreshPieceInfoWidgets_Implementation(AParentPiece* PieceToRefresh, bool bHide) const
 {
-	/* Refresh both piece info widgets if necessary. */
-	Cast<AMatch_PlayerController>(GetController())->RefreshPieceInfoWidgets(OtherPiece);
+	/* Refresh any piece info widget displaying the given piece. */
+	Cast<AMatch_PlayerController>(GetController())->RefreshPieceInfoWidgets(PieceToRefresh, bHide);
 }

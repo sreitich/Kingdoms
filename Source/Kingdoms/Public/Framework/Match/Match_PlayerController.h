@@ -67,9 +67,10 @@ public:
 	UFUNCTION(Category="User Interface")
 	void UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlignment Alignment, bool bEnableButtons, bool bHide) const;
 	
-		/* Refreshes both piece info widgets, if they have been created. */
+		/* Refreshes both piece info widgets, if they have been created. If bHide is true, hides any widget displaying
+		 * PieceToRefresh. */
 		UFUNCTION(Category="User Interface")
-		void RefreshPieceInfoWidgets(const AParentPiece* OtherPiece) const;
+		void RefreshPieceInfoWidgets(AParentPiece* PieceToRefresh, bool bHide) const;
 
 	/* Creates or destroys a move confirmation pop-up. */
 	UFUNCTION(Category="User Interface")

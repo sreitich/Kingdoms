@@ -232,15 +232,36 @@ void AMatch_PlayerController::UpdatePieceInfoWidget(AParentPiece *NewPiece, cons
     }
 }
 
-void AMatch_PlayerController::RefreshPieceInfoWidgets(const AParentPiece* OtherPiece) const
+void AMatch_PlayerController::RefreshPieceInfoWidgets(AParentPiece* PieceToRefresh, bool bHide) const
 {
-    /* Refresh the friendly piece info widget if the widget exists, if it's currently displaying the same piece as was given, and if it's currently visible. */
-    if (Match_BaseWidget && Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->GetDisplayedPiece() == OtherPiece && Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->GetVisibility() == ESlateVisibility::Visible)
-        Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->RefreshWidget();
-    
-    /* Refresh the enemy piece info widget if the widget exists, if it's currently displaying the same piece as was given, and if it's currently visible. */
-    if (Match_BaseWidget && Match_BaseWidget->GetPieceInfoWidget(E_Hostile)->GetDisplayedPiece() == OtherPiece && Match_BaseWidget->GetPieceInfoWidget(E_Hostile)->GetVisibility() == ESlateVisibility::Visible)
-        Match_BaseWidget->GetPieceInfoWidget(E_Hostile)->RefreshWidget();
+    /* If the friendly piece info widget exists, is currently displaying PieceToRefresh, and is currently visible... */
+    if (Match_BaseWidget && Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->GetDisplayedPiece() == PieceToRefresh && Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->GetVisibility() == ESlateVisibility::Visible)
+    {
+        /* Hide the widget if requested. */
+        if (bHide)
+        {
+            UpdatePieceInfoWidget(PieceToRefresh, E_Friendly, false, true);
+        }
+        /* Refresh the widget if it doesn't need to be hidden. */
+        else
+        {
+            Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->RefreshWidget();
+        }
+    }
+    /* If the enemy piece info widget exists, is currently displaying PieceToRefresh, and is currently visible... */
+    else if (Match_BaseWidget && Match_BaseWidget->GetPieceInfoWidget(E_Hostile)->GetDisplayedPiece() == PieceToRefresh && Match_BaseWidget->GetPieceInfoWidget(E_Hostile)->GetVisibility() == ESlateVisibility::Visible)
+    {
+        /* Hide the widget if requested. */
+        if (bHide)
+        {
+            UpdatePieceInfoWidget(PieceToRefresh, E_Hostile, false, true);
+        }
+        /* Refresh the widget if it doesn't need to be hidden. */
+        else
+        {
+            Match_BaseWidget->GetPieceInfoWidget(E_Hostile)->RefreshWidget();
+        }
+    }
 }
 
 void AMatch_PlayerController::UpdateMoveConfirmationWidget(bool bDestroy, ABoardTile *PendingTile, AParentPiece *PendingPiece)
@@ -262,7 +283,7 @@ void AMatch_PlayerController::UpdateMoveConfirmationWidget(bool bDestroy, ABoard
             if (Match_AttackConfirmation)
             {
                 /* Reset the fresnel and highlight of the enemy that was selected. */
-                Cast<AMatch_PlayerPawn>(GetPawn())->ClearSelection(false, true, false, false);
+                Cast<AMatch_PlayerPawn>(GetPawn())->ClearSelection(false, true, false, false, false);
                 Match_AttackConfirmation->RemoveFromParent();
                 Match_AttackConfirmation = nullptr;
             }
@@ -304,7 +325,7 @@ void AMatch_PlayerController::UpdateAttackConfirmationWidget(bool bDestroy, APar
             if (Match_MoveConfirmation)
             {
                 /* Reset the highlight of the tile that was selected. */
-                Cast<AMatch_PlayerPawn>(GetPawn())->ClearSelection(false, false, false, true);
+                Cast<AMatch_PlayerPawn>(GetPawn())->ClearSelection(false, false, false, true, false);
                 Match_MoveConfirmation->RemoveFromParent();
                 Match_MoveConfirmation = nullptr;
             }

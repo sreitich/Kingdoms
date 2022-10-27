@@ -40,8 +40,12 @@ public:
 	void Interact();
 
 		/* Clears the currently selected friendly piece, enemy piece, target piece, and tile, and removes all piece-information pop-ups if requested. */
-		void ClearSelection(bool bPiece, bool bEnemyPiece, bool bTargetPiece, bool bTile);
-	
+		void ClearSelection(bool bPiece, bool bEnemyPiece, bool bTargetPiece, bool bTile, bool bHidePieceInfoWidgets);
+
+		/* Deselects the given piece/tile if that piece/tile was selected for anything. */
+		UFUNCTION(Client, Reliable)
+		void Client_DeselectPieceOrTile(AParentPiece* PieceToDeselect, ABoardTile* TileToDeselect);
+
 	/* Smoothly rotates the piece to the target rotation over a short time period. If bMoveWhenFinished is true, the
 	 * piece is moved to the target tile when it finishes rotating. If bResetStateWhenFinished is true, the player's
 	 * state is reset after the piece finishes rotating. */
@@ -69,15 +73,19 @@ public:
 			 * pieces don't have an owning client, so they can't have server methods. */
 			UFUNCTION(Server, Reliable, BlueprintCallable, Category="Attacking")
 			void Server_SetResetAfterMove(AParentPiece* PieceToUpdate, bool bNewReset);
+
+			/* Destroys and cleans up the given piece. */
+			UFUNCTION(Server, Reliable, BlueprintCallable)
+			void KillPiece(AParentPiece* PieceToKill, bool bPieceReplaced);
 	
 	/* Calls active abilities with server authority. */
 	UFUNCTION(Server, Reliable)
 	void Server_UseActiveAbility(AParentPiece* AbilityUser, const TArray<AActor*>& Targets);
 
-	/* Refreshes both piece info widgets if they are displaying the same piece. The strength and armor need to be passed
-	 * in explicitly because they won't have had time to replicate yet when this is called. */
+	/* Refreshes any piece info widget that is currently displaying the given piece. If bHide is true, hides any widget
+	 currently displaying PieceToRefresh. */
 	UFUNCTION(Client, Reliable)
-	void Client_RefreshPieceInfoWidgets(AParentPiece* OtherPiece) const;
+	void Client_RefreshPieceInfoWidgets(AParentPiece* PieceToRefresh, bool bHide) const;
 
 
 /* Public variables. */
