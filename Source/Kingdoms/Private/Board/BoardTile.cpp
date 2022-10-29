@@ -138,12 +138,6 @@ void ABoardTile::OnBeginCursorOver(UPrimitiveComponent* Component)
 				/* This tile is only valid if its emissive highlight is currently visible. */
 				UpdateReticle(true, !EmissiveHighlight->IsVisible());
 
-			/* When a player is selecting a target for a passive ability, display a green reticle when hovering over a
-			 * valid target tile or piece and a yellow reticle over all other tiles. */
-			case E_SelectingTarget_PassiveAbility:
-				/* This tile is only valid if its emissive highlight is currently visible. */
-				UpdateReticle(true, !EmissiveHighlight->IsVisible());
-
 			/* If the player is in any other state, don't display a reticle. */
 			default:
 				break;

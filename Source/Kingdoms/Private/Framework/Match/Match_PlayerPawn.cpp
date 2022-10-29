@@ -110,10 +110,6 @@ void AMatch_PlayerPawn::Interact()
 			case E_SelectingTarget_ActiveAbility:
 				Interact_SelectingTargetActiveAbility(HitResult);
 				break;
-			/* If this player is selecting a target for a piece's passive ability... */
-			case E_SelectingTarget_PassiveAbility:
-				Interact_SelectingTargetPassiveAbility(HitResult);
-				break;
 			/* If the player is connecting or placing their pieces, do nothing. This should never be called. */
 			default:
 				break;
@@ -477,37 +473,6 @@ void AMatch_PlayerPawn::Interact_SelectingTargetActiveAbility(FHitResult Interac
 	else
 	{
 		/* "select a valid target" pop-up */
-	}
-}
-
-void AMatch_PlayerPawn::Interact_SelectingTargetPassiveAbility(FHitResult InteractionHit)
-{
-	/* Stores which piece to interact with when it's determined whether the player clicked a piece or an occupied tile. */
-	AParentPiece* InteractedPiece;
-
-	/* If a piece was clicked... */
-	if (Cast<AParentPiece>(InteractionHit.Actor))
-	{
-		/* Interact with the clicked piece. */
-		InteractedPiece = Cast<AParentPiece>(InteractionHit.Actor);
-	}
-	/* If a board tile was clicked... */
-	else if (Cast<ABoardTile>(InteractionHit.Actor))
-	{
-		/* Interact with the piece occupying the clicked tile. */
-		InteractedPiece = Cast<ABoardTile>(InteractionHit.Actor)->GetOccupyingPiece();
-	}
-	/* If anything else was clicked... */
-	else
-	{
-		/* Reset the currently selected actors and remove all piece-information pop-ups. */
-		ClearSelection(true, true, true, true, true);
-	}
-
-	/* If the interacted piece is valid for this action... */
-	if (true /* call a PieceIsValidPassiveAbility function on the selected piece */ )
-	{
-		/* Confirm action pop-up. */
 	}
 }
 

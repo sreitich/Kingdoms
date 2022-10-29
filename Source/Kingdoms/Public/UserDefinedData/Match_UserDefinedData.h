@@ -19,7 +19,6 @@ enum EPlayerStatus
 	E_SelectingAction					UMETA(DisplayName="Selecting Action"),
 	E_SelectingTarget_Move 				UMETA(DisplayName="Selecting Enemy Target for Movement or Attack"),
 	E_SelectingTarget_ActiveAbility		UMETA(DisplayName="Selecting Target for Active Ability"),
-	E_SelectingTarget_PassiveAbility	UMETA(DisplayName="Selecting Target for Passive Ability")
 };
 
 /* What state the match is currently in. */

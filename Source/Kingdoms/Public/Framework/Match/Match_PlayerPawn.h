@@ -133,9 +133,6 @@ protected:
 	/* Called whenever the player interacts while choosing a target for the currently selected piece's active ability. */
 	void Interact_SelectingTargetActiveAbility(FHitResult InteractionHit);
 
-	/* Called whenever the player interacts while choosing a target for the currently selected piece's passive ability. */
-	void Interact_SelectingTargetPassiveAbility(FHitResult InteractionHit);
-
 	/* Called when the player releases the "interact" button. Used to release pieces being dragged. */
 	UFUNCTION()
 	void Interact_Released();
