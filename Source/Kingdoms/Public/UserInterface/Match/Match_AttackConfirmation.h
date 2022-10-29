@@ -39,6 +39,10 @@ protected:
 	/* Called when the game starts or when created. */
 	virtual void NativeConstruct() override;
 
+		/* Binds functions to the "Attack" and "Cancel" buttons in the NativeConstruct function. This allows us to bind
+		 * different functions to the buttons for each child class by overriding this function, but not NativeConstruct. */
+		virtual void BindButtons();
+
 	/* Attacks the enemy piece at the target tile. Can be overridden by custom attack confirmation widgets. */
 	UFUNCTION()
 	virtual void OnAttackClicked();

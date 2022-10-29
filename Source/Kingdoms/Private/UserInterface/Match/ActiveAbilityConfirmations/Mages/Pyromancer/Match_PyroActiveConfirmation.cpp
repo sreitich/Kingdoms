@@ -13,10 +13,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/Button.h"
 
-void UMatch_PyroActiveConfirmation::NativeConstruct()
+void UMatch_PyroActiveConfirmation::BindButtons()
 {
-	Super::NativeConstruct();
-
 	/* Bind the confirm button to activate the piece's active ability. */
 	AttackButton->OnClicked.AddDynamic(this, &UMatch_PyroActiveConfirmation::OnAttackClicked);
 	/* Bind the cancel button to reset the active ability action. */

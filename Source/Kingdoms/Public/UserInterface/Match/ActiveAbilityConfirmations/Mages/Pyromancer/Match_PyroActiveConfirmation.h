@@ -23,8 +23,9 @@ public:
 /* Protected functions. */
 protected:
 
-	/* Called when the game starts or when created. */
-	virtual void NativeConstruct() override;
+	/* Bind the Pyromancer's OnAttackClicked and OnCancelClicked functions to the "Attack" and "Cancel" buttons,
+	 * overriding the default functions that are bound by the attack confirmation widget. */
+	virtual void BindButtons() override;
 
 	/* We need additional "fireball" ability code to execute before starting the attack. */
 	virtual void OnAttackClicked() override;

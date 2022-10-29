@@ -56,6 +56,13 @@ void UMatch_AttackConfirmation::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	/* Bind the correct functions to the "Attack" and "Cancel" buttons. The functions that these buttons are bound to
+	 * can be overridden in each child class. */
+	BindButtons();
+}
+
+void UMatch_AttackConfirmation::BindButtons()
+{
 	/* Bind the confirm attack button to execute the attack encounter. */
 	AttackButton->OnClicked.AddDynamic(this, &UMatch_AttackConfirmation::OnAttackClicked);
 	/* Bind the cancel button to reset the move action. */
