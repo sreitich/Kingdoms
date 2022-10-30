@@ -251,7 +251,7 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
                         ActiveButton->SetIsEnabled(false);
                     }
                     /* If this piece has limited active ability uses and doesn't have any uses left, disable the active ability button. */
-                    else if (PieceData->ActiveUses > 0 && DisplayedPiece->GetActiveUses() == 0)
+                    else if (PieceData->ActiveUses > 0 && NewPiece->GetActiveUses() == 0)
                     {
                         ActiveButton->SetIsEnabled(false);
                     }

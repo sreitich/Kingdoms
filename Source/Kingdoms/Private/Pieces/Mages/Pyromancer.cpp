@@ -227,6 +227,8 @@ void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 		{
 			/* Put the ability onto cooldown. */
 			SetActiveCD(PieceData->ActiveCD);
+			/* Decrement this ability's remaining uses. */
+			SetActiveUses(ActiveUses - 1);
 		}
 	}
 }
