@@ -213,7 +213,7 @@ public:
 
 	/* The brightness of fresnels when strengthened to indicate that this piece is selected. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Piece Info")
-	float StrengthenedFresnelStrength = 10.0f;
+	float StrengthenedFresnelStrength = 6.0f;
 
 	/* The widget to display when hovering over this piece's passive ability. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widgets")

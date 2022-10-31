@@ -70,7 +70,7 @@ protected:
 
 	/* Incrementally sets the passed number of uses bars to be empty (used). bActive determines which ability's bars to target. */
 	UFUNCTION(BlueprintImplementableEvent, Category="Updating Piece Info Widget")
-	void EmptyBars(bool bActive, int AmountUsed);
+	void EmptyBars(bool bReveal, bool bActive, int AmountUsed);
 
 
 	/* Creates and displays a list of all active strength modifiers. */

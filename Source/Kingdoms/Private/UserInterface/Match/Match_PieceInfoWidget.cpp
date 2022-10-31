@@ -237,37 +237,53 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
                     /* Reveal all of the active ability widgets. */
                     ActiveAbilityBox->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
-                    /* If the active ability's cooldown is active, display the cooldown and disable the active ability button. */
-                    if (NewPiece->GetActiveCD() > 0)
+                    /* If this piece's active ability has limited uses. */
+                    if (PieceData->ActiveUses > 0)
                     {
-                        /* Update and display the current cooldown. */
-                        DisplayedActiveCD->SetText(FText::FromString(FString::FromInt(NewPiece->GetActiveCD())));
-                        DisplayedActiveCD->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-                        /* Reveal the active cooldown indicator, greying out the active ability icon. Disable test visibility so that it doesn't block the button. */
-                        ActiveCooldownIndicator->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-                        /* Disable the "use active ability" button. */
-                        ActiveButton->SetIsEnabled(false);
+                        /* Reveal and update the usage bars. */
+                        EmptyBars(true, true, (PieceData->ActiveUses) - (NewPiece->GetActiveUses()));
                     }
-                    /* If this piece has limited active ability uses and doesn't have any uses left, disable the active ability button. */
-                    else if (PieceData->ActiveUses > 0 && NewPiece->GetActiveUses() == 0)
-                    {
-                        ActiveButton->SetIsEnabled(false);
-                    }
-                    /* If the active ability is not on a cooldown and is has remaining uses, hide the cooldown and enable the ability button. */
+                    /* If this piece's active ability has unlimited uses. */
                     else
                     {
-                        /* Hide the active cooldown indicator and the cooldown turn counter. */
-                        ActiveCooldownIndicator->SetVisibility(ESlateVisibility::Hidden);
-                        DisplayedActiveCD->SetVisibility(ESlateVisibility::Hidden);
+                        /* Hide the usage bars. */
+                        EmptyBars(false, true, 0);
+                    }
 
+                    /* If the active ability's cooldown is active. */
+                    if (NewPiece->GetActiveCD() > 0)
+                    {
+                        /* Don't display a cooldown counter if the piece doesn't have any more ability uses left. */
+                        if ((PieceData->ActiveUses > 0 && NewPiece->GetActiveUses() > 0) || PieceData->ActiveUses == 0)
+                        {
+                            /* Update and display the cooldown counter. */
+                            DisplayedActiveCD->SetText(FText::FromString(FString::FromInt(NewPiece->GetActiveCD())));
+                            DisplayedActiveCD->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+                        }
+                    }
+                    /* If the active ability is not on cooldown.    */
+                    else
+                    {
+                        /* Hide the cooldown counter. */
+                        DisplayedActiveCD->SetVisibility(ESlateVisibility::Hidden);
+                    }
+
+                    /* If this piece's active ability is not on cooldown, and either has limited uses and has uses left or has unlimited uses, then it can be used. */
+                    if (NewPiece->GetActiveCD() == 0 && ((PieceData->ActiveUses > 0 && NewPiece->GetActiveUses() > 0) || PieceData->ActiveUses == 0))
+                    {
+                        /* Hide the cooldown indicator (that doubles as the "no uses left" indicator). */
+                        ActiveCooldownIndicator->SetVisibility(ESlateVisibility::Hidden);
                         /* Enable the "use active ability" button. */
                         ActiveButton->SetIsEnabled(true);
                     }
-
-                    /* Update the number of uses remaining. */
-                    EmptyBars(true, (PieceData->ActiveUses) - (NewPiece->GetActiveUses()));
+                    /* If this ability can't be used. */
+                    else
+                    {
+                        /* Reveal the active cooldown indicator, greying out the ability icon. */
+                        ActiveCooldownIndicator->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+                        /* Disable the "use active ability" button. */
+                        ActiveButton->SetIsEnabled(false);
+                    }
                 }
                 /* If this piece doesn't have an active ability... */
                 else
@@ -302,7 +318,7 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
                     }
 
                     /* Update the number of uses remaining. */
-                    EmptyBars(false, (PieceData->PassiveUses) - (NewPiece->GetPassiveUses()));
+                    EmptyBars(true, false, (PieceData->PassiveUses) - (NewPiece->GetPassiveUses()));
                 }
                 /* If this piece doesn't have a passive ability... */
                 else
