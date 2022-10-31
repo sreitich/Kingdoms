@@ -150,13 +150,39 @@ void AParentPiece::BeginPlay()
 
 void AParentPiece::OnRep_CurrentStrength()
 {
-	/* Refresh any piece info widgets currently displaying this piece's statistics. */
+	/* Refresh any piece info widgets currently displaying this piece's info. */
 	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
 }
 
 void AParentPiece::OnRep_CurrentArmor()
 {
-	/* Refresh any piece info widgets currently displaying this piece's statistics. */
+	/* Refresh any piece info widgets currently displaying this piece's info. */
+	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
+}
+
+void AParentPiece::OnRep_PassiveCooldown()
+{
+	/* Refresh any piece info widgets currently displaying this piece's info. */
+	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
+}
+
+void AParentPiece::OnRep_PassiveUses()
+{
+	/* Refresh any piece info widgets currently displaying this piece's info. */
+	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
+
+}
+
+void AParentPiece::OnRep_ActiveCooldown()
+{
+	/* Refresh any piece info widgets currently displaying this piece's info. */
+	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
+
+}
+
+void AParentPiece::OnRep_ActiveUses()
+{
+	/* Refresh any piece info widgets currently displaying this piece's info. */
 	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
 }
 

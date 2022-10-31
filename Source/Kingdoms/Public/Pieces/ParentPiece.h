@@ -306,11 +306,29 @@ protected:
 	/* Called when the game starts or when spawned. */
 	virtual void BeginPlay() override;
 
+	/* Refreshes any piece info widget displaying this piece. */
 	UFUNCTION()
 	void OnRep_CurrentStrength();
 
+	/* Refreshes any piece info widget displaying this piece. */
 	UFUNCTION()
 	void OnRep_CurrentArmor();
+
+	/* Refreshes any piece info widget displaying this piece. */
+	UFUNCTION()
+	void OnRep_PassiveCooldown();
+
+	/* Refreshes any piece info widget displaying this piece. */
+	UFUNCTION()
+	void OnRep_PassiveUses();
+
+	/* Refreshes any piece info widget displaying this piece. */
+	UFUNCTION()
+	void OnRep_ActiveCooldown();
+
+	/* Refreshes any piece info widget displaying this piece. */
+	UFUNCTION()
+	void OnRep_ActiveUses();
 
 
 /* Protected constants and asset references. */
@@ -363,19 +381,19 @@ protected:
 	int CurrentArmor;
 
 	/* How long before this piece's passive ability can be used again. */
-	UPROPERTY(Replicated, EditAnywhere, Category="Piece Stats")
+	UPROPERTY(ReplicatedUsing=OnRep_PassiveCooldown, EditAnywhere, Category="Piece Stats")
 	int PassiveCD;
 
 	/* How many uses this piece's passive ability has left. */
-	UPROPERTY(Replicated, EditAnywhere, Category="Piece Stats")
+	UPROPERTY(ReplicatedUsing=OnRep_PassiveUses, EditAnywhere, Category="Piece Stats")
 	int PassiveUses;
 
 	/* How long before this piece's passive ability can be used again. */
-	UPROPERTY(Replicated, EditAnywhere, Category="Piece Stats")
+	UPROPERTY(ReplicatedUsing=OnRep_ActiveCooldown, EditAnywhere, Category="Piece Stats")
 	int ActiveCD;
 
 	/* How many uses this piece's active ability has left. */
-	UPROPERTY(Replicated, EditAnywhere, Category="Piece Stats")
+	UPROPERTY(Replicated=OnRep_ActiveUses, EditAnywhere, Category="Piece Stats")
 	int ActiveUses;
 
 };
