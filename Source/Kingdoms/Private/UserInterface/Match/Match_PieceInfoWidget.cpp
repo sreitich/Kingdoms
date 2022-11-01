@@ -479,7 +479,7 @@ void UMatch_PieceInfoWidget::OnPassiveHovered()
     if (PieceData && DisplayedPiece->PassiveAbilityInfoWidget)
     {
         /* Store whether the displayed piece is friendly or not so we don't have to keep checking. */
-        const EAlignment PieceAlignment = DisplayedPiece->GetAlignment() ? E_Friendly : E_Hostile;
+        const EAlignment PieceAlignment = DisplayedPiece->GetAlignment();
 
         /* Create a new ability info pop-up widget and update its information. */
         AbilityInfoPopup = Cast<UMatch_AbilityInfoPopup>(CreateWidget<UUserWidget>(GetWorld(), DisplayedPiece->PassiveAbilityInfoWidget, FName("Ability Info Pop-Up")));
@@ -489,7 +489,7 @@ void UMatch_PieceInfoWidget::OnPassiveHovered()
 
         /* Offset the widget based on the size of the ability icon. */
         UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(AbilityInfoPopup->AbilityInfoOverlay->Slot);
-        CanvasSlot->SetPosition(FVector2D(PassiveAbilityBackgroundButton->GetDesiredSize().X / 2.0f, -PassiveAbilityBackgroundButton->GetDesiredSize().Y / 2.0f));
+        CanvasSlot->SetPosition(FVector2D(PieceAlignment == E_Friendly ? PassiveAbilityBackgroundButton->GetDesiredSize().X - 20.0f : 20.0f, -PassiveAbilityBackgroundButton->GetDesiredSize().Y + 20.0f));
         /* Align the pop-up to the left if it's for a friendly piece. Align it to the right if it's for an enemy piece. */
         CanvasSlot->SetAlignment(PieceAlignment == E_Friendly ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
     }
