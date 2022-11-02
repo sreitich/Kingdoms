@@ -49,6 +49,9 @@ AParentPiece::AParentPiece()
 
 	/* Make the mesh invisible. The mesh only acts as a skeleton for the rest of the modular pieces to follow when animating. */
 	GetMesh()->SetVisibility(false, false);
+	/* Animate every other skeletal mesh even when the parent mesh is invisible. This allows the parent skeletal mesh to
+	 * animate everything else while remaining invisible. */
+	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 	
     /* Bind these functions to be called when this piece is hovered over. */
     GetMesh()->OnBeginCursorOver.AddDynamic(this, &AParentPiece::OnBeginCursorOver);

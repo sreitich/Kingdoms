@@ -237,11 +237,11 @@ public:
 
 	/* The color that friendly pieces will be highlighted in. */
 	UPROPERTY(EditDefaultsOnly, Category="Materials")
-	FLinearColor FriendlyFresnelColor = FColor(0.023529f, 0.423529f, 0.776471f, 1.0f);
+	FLinearColor FriendlyFresnelColor = FLinearColor(0.023529f, 0.423529f, 0.776471f, 1.0f);
 
 	/* The color that enemy pieces will be highlighted in. */
 	UPROPERTY(EditDefaultsOnly, Category="Materials")
-	FLinearColor EnemyFresnelColor = FColor(0.815686f, 0.015686f, 0.207843f, 1.0f);
+	FLinearColor EnemyFresnelColor = FLinearColor(0.815686f, 0.015686f, 0.207843f, 1.0f);
 
 	/* This piece's idle/walk blend space. Used to interpolate and play this piece's unique idle and walk animations. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
