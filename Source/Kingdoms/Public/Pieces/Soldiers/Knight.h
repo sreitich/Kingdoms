@@ -23,7 +23,7 @@ public:
 	AKnight();
 
 	/* Returns all tiles that this piece can move to. */
-	virtual TArray<ABoardTile*> GetValidMoveTiles() override;
+	// virtual TArray<ABoardTile*> GetValidMoveTiles() override;
 
 	/* Tests if the given tile's coordinates match any of this piece's movement patterns.. */
 	virtual bool TileIsInMoveRange(ABoardTile* Tile) override;

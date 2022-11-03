@@ -117,10 +117,6 @@ public:
 	virtual void OnActiveEffectEnded(TArray<AActor*> Targets);
 
 
-	/* Returns all actors that this piece's passive ability can target. Overridden by pieces with a passive ability. */
-	UFUNCTION(BlueprintPure, Category="Active Ability")
-	virtual TArray<AActor*> GetValidPassiveAbilityTargets();
-
 	/* Called when a piece's passive ability is triggered, if it has one. Overridden by pieces with a passive ability. */
 	UFUNCTION(Category="Passive Ability")
 	virtual void OnPassiveAbility(TArray<AActor*> Targets);

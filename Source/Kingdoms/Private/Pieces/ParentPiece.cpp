@@ -461,15 +461,6 @@ void AParentPiece::OnPassiveAbility(TArray<AActor*> Targets)
 	UE_LOG(LogTemp, Error, TEXT("Passive ability called on a piece without a passive ability."));
 }
 
-TArray<AActor*> AParentPiece::GetValidPassiveAbilityTargets()
-{
-	/* Not all pieces have passive abilities. */
-	UE_LOG(LogTemp, Error, TEXT("GetValidPassiveAbilityTargets called on a piece without a passive ability."));
-
-	/* Return an empty array. */
-	return TArray<AActor*>();
-}
-
 void AParentPiece::Server_SetCurrentTile_Implementation(ABoardTile* NewTile)
 {
 	/* Change the occupying piece. Only the server can do this. */
