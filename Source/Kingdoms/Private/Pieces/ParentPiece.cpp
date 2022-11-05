@@ -189,6 +189,11 @@ void AParentPiece::OnRep_ActiveUses()
 	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
 }
 
+void AParentPiece::OnMoveToTileCompleted()
+{
+	/* Piece finished moving to a new tile. */
+}
+
 void AParentPiece::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

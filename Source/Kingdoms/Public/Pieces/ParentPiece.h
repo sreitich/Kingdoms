@@ -19,6 +19,10 @@ class UMatch_AbilityInfoPopup;
 UCLASS()
 class KINGDOMS_API AParentPiece : public ACharacter
 {
+
+/* This piece's controller needs to access its members. */
+friend class APieceAIController;
+
 	GENERATED_BODY()
 	
 /* Public functions. */
@@ -325,6 +329,10 @@ protected:
 	/* Refreshes any piece info widget displaying this piece. */
 	UFUNCTION()
 	void OnRep_ActiveUses();
+
+	/* Called when this piece finishes moving to a new tile. */
+	UFUNCTION(BlueprintCallable)
+	virtual void OnMoveToTileCompleted();
 
 
 /* Protected constants and asset references. */

@@ -4,6 +4,7 @@
 #include "Pieces/Soldiers/Recruit.h"
 
 #include "Board/BoardTile.h"
+#include "Pieces/PieceAIController.h"
 
 ARecruit::ARecruit()
 {
@@ -34,6 +35,19 @@ bool ARecruit::TileIsInMoveRange(ABoardTile* Tile)
 			return true;
 		}
 	}
-	
+
 	return false;
+}
+
+void ARecruit::BeginPlay()
+{
+	Super::BeginPlay();
+
+}
+
+void ARecruit::OnMoveToTileCompleted()
+{
+	Super::OnMoveToTileCompleted();
+
+	
 }
