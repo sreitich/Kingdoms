@@ -115,10 +115,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Active Ability")
 	virtual void OnActiveAbility(TArray<AActor*> Targets);
 
-	/* If this piece's active ability has a lasting effect (e.g. a modifier), this is called when that effect ends.
-	 * Overridden by pieces with an active ability.*/
+	/* If one of this piece's ability has a lasting effect (e.g. a modifier), this is called when that effect ends.
+	 * Overridden by pieces with that need to perform code when an effect ends. */
 	UFUNCTION(BlueprintCallable, Category="Active Ability")
-	virtual void OnActiveEffectEnded(TArray<AActor*> Targets);
+	virtual void OnAbilityEffectEnded(TArray<AActor*> Targets);
 
 
 	/* Called when a piece's passive ability is triggered, if it has one. Overridden by pieces with a passive ability. */
@@ -154,6 +154,10 @@ public:
 	 * duration and stack the modifiers together. */
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
 	void Server_AddModifier(FModifier NewModifier, bool bActivatePopUp);
+
+	/* Remove a temporary modifier, activating a pop-up if requested. */
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
+	void Server_RemoveModifier(FModifier ModifierToRemove, bool bActivatePopUp);
 
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
 	void Server_DecrementModifierDurations();

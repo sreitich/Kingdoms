@@ -129,7 +129,6 @@ void AParentPiece::BeginPlay()
     {
         /* Get this piece's row from the piece data. */
         static const FString ContextString(TEXT("Piece Data Struct"));
-        // FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(GetPieceID(), ContextString, true);
         const FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(PieceID, ContextString, true);
 
 		/* If the data table row was found... */
@@ -436,10 +435,10 @@ void AParentPiece::OnActiveAbility(TArray<AActor*> Targets)
 	UE_LOG(LogTemp, Error, TEXT("OnActiveAbility called on a piece without an active ability."));
 }
 
-void AParentPiece::OnActiveEffectEnded(TArray<AActor*> Targets)
+void AParentPiece::OnAbilityEffectEnded(TArray<AActor*> Targets)
 {
-	/* Not all pieces have active abilities. */
-	UE_LOG(LogTemp, Error, TEXT("OnActiveEffectEnded called on a piece without an active ability."));
+	/* Not all pieces have abilities with effects. */
+	UE_LOG(LogTemp, Error, TEXT("OnAbilityEffectEnded called on a piece that does not implement OnAbilityEffectEnded."));
 }
 
 TArray<AActor*> AParentPiece::GetValidActiveAbilityTargets()
@@ -531,6 +530,29 @@ void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool
 		Multicast_CreateModifierPopUp(NewValue - OriginalValue, NewModifier.EffectedStat == FModifier::Strength);
 }
 
+void AParentPiece::Server_RemoveModifier_Implementation(FModifier ModifierToRemove, bool bActivatePopUp)
+{
+	/* Some pieces' abilities that have lasting effects (i.e. modifiers) need to execute code when that effect ends. */
+	const TArray<AActor*> Targets = { this };
+	if (AParentPiece* Piece = Cast<AParentPiece>(ModifierToRemove.SourceActor))
+		Piece->OnAbilityEffectEnded(Targets);
+
+	/* Remove the effect of the modifier from the stat it was modifying. */
+	if (ModifierToRemove.EffectedStat == FModifier::Strength)
+	{
+		CurrentStrength = FMath::Clamp(CurrentStrength - ModifierToRemove.Value, 0, 20);
+		OnRep_CurrentStrength();
+	}
+	else
+	{
+		CurrentArmor = FMath::Clamp(CurrentArmor - ModifierToRemove.Value, 0, 20);
+		OnRep_CurrentArmor();
+	}
+			
+	/* Remove this modifier from this piece. */
+	TemporaryModifiers.Remove(ModifierToRemove);
+}
+
 void AParentPiece::Server_DecrementModifierDurations_Implementation()
 {
 	/* For every modifier applied to this piece... */
@@ -542,29 +564,32 @@ void AParentPiece::Server_DecrementModifierDurations_Implementation()
 		/* If the modifier's duration has ended... */
 		if (NewRemainingDuration < 1)
 		{
-			/* Get a shortened reference to the currently iterated modifier for readability. */
-			const FModifier& Modifier = TemporaryModifiers[i];
-			
-			/* Call any ability-specific logic that needs to execute when an active ability's effect ends. if the source
-			 * of the modifier is a piece. */
-			const TArray<AActor*> Targets = { this };
-			if (AParentPiece* Piece = Cast<AParentPiece>(Modifier.SourceActor))
-				Piece->OnActiveEffectEnded(Targets);
+			/* Always activate pop-ups for abilities that are removed because their duration ends. */
+			Server_RemoveModifier(TemporaryModifiers[i], true);
 
-			/* Remove the effect of the modifier from the stat it was modifying. */
-			if (Modifier.EffectedStat == FModifier::Strength)
-			{
-				CurrentStrength = FMath::Clamp(CurrentStrength - Modifier.Value, 0, 20);
-				OnRep_CurrentStrength();
-			}
-			else
-			{
-				CurrentArmor = FMath::Clamp(CurrentArmor - Modifier.Value, 0, 20);
-				OnRep_CurrentArmor();
-			}
-			
-			/* Remove this modifier from this piece. */
-			TemporaryModifiers.RemoveAt(i);
+			// /* Get a shortened reference to the currently iterated modifier for readability. */
+			// const FModifier& Modifier = TemporaryModifiers[i];
+			//
+			// /* Call any ability-specific logic that needs to execute when an active ability's effect ends. if the source
+			//  * of the modifier is a piece. */
+			// const TArray<AActor*> Targets = { this };
+			// if (AParentPiece* Piece = Cast<AParentPiece>(Modifier.SourceActor))
+			// 	Piece->OnActiveEffectEnded(Targets);
+			//
+			// /* Remove the effect of the modifier from the stat it was modifying. */
+			// if (Modifier.EffectedStat == FModifier::Strength)
+			// {
+			// 	CurrentStrength = FMath::Clamp(CurrentStrength - Modifier.Value, 0, 20);
+			// 	OnRep_CurrentStrength();
+			// }
+			// else
+			// {
+			// 	CurrentArmor = FMath::Clamp(CurrentArmor - Modifier.Value, 0, 20);
+			// 	OnRep_CurrentArmor();
+			// }
+			//
+			// /* Remove this modifier from this piece. */
+			// TemporaryModifiers.RemoveAt(i);
 		}
 	}
 }

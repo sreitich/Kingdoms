@@ -44,7 +44,7 @@ public:
 		void BP_OnActiveAbility(AParentPiece* Target);
 
 	/* Stops the Pyromaner's flaming hands. */
-	virtual void OnActiveEffectEnded(TArray<AActor*> Targets) override;
+	virtual void OnAbilityEffectEnded(TArray<AActor*> Targets) override;
 
 
 /* Public variables. */

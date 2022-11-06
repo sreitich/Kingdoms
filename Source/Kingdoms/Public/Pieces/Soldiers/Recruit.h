@@ -8,6 +8,8 @@
 #include "Pieces/ParentPiece.h"
 #include "Recruit.generated.h"
 
+class ABoardTile;
+
 /**
  * 
  */
@@ -34,6 +36,9 @@ protected:
 
 	/* Triggers this piece's passive ability when it finishes moving to a new tile. */
 	virtual void OnMoveToTileCompleted() override;
+
+	/* Returns "true" if the given tile is laterally adjacent to this piece's tile. */
+	bool TileIsAdjacent(ABoardTile* Tile);
 
 
 /* Protected variables. */

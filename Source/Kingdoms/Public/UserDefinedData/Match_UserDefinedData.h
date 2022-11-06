@@ -157,7 +157,7 @@ struct FModifier
 	static const int Armor = 0;
 	static const int Strength = 1;
 
-	/* The actor (usually a piece) responsible for the modifier. */
+	/* The actor (usually a piece) that caused the modifier. */
 	UPROPERTY(BlueprintReadWrite)
 	AActor* SourceActor;
 
@@ -184,5 +184,14 @@ struct FModifier
 	/* The remaining turn duration of the modifier. */
 	UPROPERTY(BlueprintReadWrite)
 	int RemainingDuration;
+
+	/* Two modifiers are equal if they have the same source actor, source ability, and alignment to the target. */
+	bool operator==(const FModifier &Other) const
+	{
+		return
+			SourceActor == Other.SourceActor &&
+			SourceAbilityName == Other.SourceAbilityName &&
+			SourceAlignmentToTarget == Other.SourceAlignmentToTarget;
+	}
 
 };

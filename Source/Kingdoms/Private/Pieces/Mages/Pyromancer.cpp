@@ -233,7 +233,7 @@ void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 	}
 }
 
-void APyromancer::OnActiveEffectEnded(TArray<AActor*> Targets)
+void APyromancer::OnAbilityEffectEnded(TArray<AActor*> Targets)
 {
 	/* TO-DO: Toggle off the Pyromancer's flaming hands. */
 	// Cast<UAnimInstance_Parent>(GetMesh()->GetAnimInstance());

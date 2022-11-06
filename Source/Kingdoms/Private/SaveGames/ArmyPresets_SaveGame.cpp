@@ -17,4 +17,10 @@ UArmyPresets_SaveGame::UArmyPresets_SaveGame()
 	ArmyPresets[0].Pieces.Add(TEXT("S-01"));
 	ArmyPresets[0].Pieces.Add(TEXT("S-02"));
 	ArmyPresets[0].Pieces.Add(TEXT("M-01"));
+
+	/* 3 academy recruits. */
+	ArmyPresets[1].ArmyName = TEXT("Recruit test");
+	ArmyPresets[1].Pieces.Add(TEXT("S-02"));
+	ArmyPresets[1].Pieces.Add(TEXT("S-02"));
+	ArmyPresets[1].Pieces.Add(TEXT("S-02"));
 }
