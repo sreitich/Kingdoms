@@ -84,10 +84,13 @@ void AMatch_GameStateBase::StartMatch()
     TArray<AActor*> AllPieces;
     UGameplayStatics::GetAllActorsOfClass(GetWorld(), AParentPiece::StaticClass(), OUT AllPieces);
 
-    /* Unhide each piece so that players can now see each other's pieces. */
     for (AActor* Piece : AllPieces)
     {
+        /* Unhide each piece so that players can now see each other's pieces. */
         Piece->SetActorHiddenInGame(false);
+
+        /* Call piece-specific game-start code on every piece in the game. */
+        Cast<AParentPiece>(Piece)->OnGameStart();
     }
 
 

@@ -317,6 +317,12 @@ bool AParentPiece::PathToTileIsClear(ABoardTile* TargetTile)
 	return true;
 }
 
+void AParentPiece::OnGameStart()
+{
+	/* Not all pieces require code when the game starts.. */
+	// UE_LOG(LogTemp, Error, TEXT("OnGameStart called on a piece that does not implement OnGameStart."));
+}
+
 TArray<ABoardTile*> AParentPiece::GetValidMoveTiles()
 {
 	/* This array of valid tiles is going to be returned. */
@@ -438,7 +444,7 @@ void AParentPiece::OnActiveAbility(TArray<AActor*> Targets)
 void AParentPiece::OnAbilityEffectEnded(TArray<AActor*> Targets)
 {
 	/* Not all pieces have abilities with effects. */
-	UE_LOG(LogTemp, Error, TEXT("OnAbilityEffectEnded called on a piece that does not implement OnAbilityEffectEnded."));
+	// UE_LOG(LogTemp, Error, TEXT("OnAbilityEffectEnded called on a piece that does not implement OnAbilityEffectEnded."));
 }
 
 TArray<AActor*> AParentPiece::GetValidActiveAbilityTargets()

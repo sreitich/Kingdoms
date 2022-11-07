@@ -83,6 +83,12 @@ public:
 /* Public functions overridden by each piece. */
 public:
 
+	/* Called when the game starts, ensuring that all pieces are placed onto their starting tiles. Overridden by pieces
+	 * that require code to be executed when the game starts. */
+	UFUNCTION(Category="Piece Initialization")
+	virtual void OnGameStart();
+
+
 	/* Returns all tiles that this piece can move to (not accounting for other pieces or pathfinding). Overridden by each piece. */
 	UFUNCTION(BlueprintPure, Category="Piece Range")
 	virtual TArray<ABoardTile*> GetValidMoveTiles();
@@ -334,7 +340,8 @@ protected:
 	UFUNCTION()
 	void OnRep_ActiveUses();
 
-	/* Called when this piece finishes moving to a new tile. */
+	/* Called when this piece finishes moving to a new tile. Overridden by pieces that require code to be executed upon
+	 * moving to a new tile. */
 	UFUNCTION(BlueprintCallable)
 	virtual void OnMoveToTileCompleted();
 

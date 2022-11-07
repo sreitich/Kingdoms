@@ -11,6 +11,13 @@ ARecruit::ARecruit()
 {
 }
 
+void ARecruit::OnGameStart()
+{
+	/* Update this piece's passive ability modifier at the start of the game, in case it was placed adjacent to any
+	 * other recruits. */
+	OnMoveToTileCompleted();
+}
+
 bool ARecruit::TileIsInMoveRange(ABoardTile* Tile)
 {
 	/* Make sure that a valid tile was passed. */
@@ -48,45 +55,81 @@ void ARecruit::BeginPlay()
 
 void ARecruit::OnMoveToTileCompleted()
 {
-	Super::OnMoveToTileCompleted();
+	/* Remove this recruit from the adjacent recruit array of any recruits that are no longer adjacent to this one. Then
+	 * update the passive modifiers of those recruits with their new amounts of adjacent recruits. */	
+	TArray<ARecruit*> NoLongerAdjacentRecruits;
 
+	for (ARecruit* RecruitPtr : AdjacentRecruits)
+	{
+		if (!TileIsAdjacent(RecruitPtr->GetCurrentTile()))
+		{
+			RecruitPtr->AdjacentRecruits.Remove(this);
+			RecruitPtr->UpdatePassiveModifier(false);
+
+			/* Save the recruits that are no longer adjacent to this recruit. */
+			NoLongerAdjacentRecruits.Add(RecruitPtr);
+		}
+	}
+
+	/* Remove the recruits that are no longer adjacent from this recruit's array of adjacent recruits. */
+	for (ARecruit* RecruitPtr : NoLongerAdjacentRecruits)
+	{
+		AdjacentRecruits.Remove(RecruitPtr);
+	}
+
+
+	/* Get every recruit in the game. */
+	TArray<AActor*> AllRecruitActors;
+	TArray<ARecruit*> NewlyAdjacentRecruits;
+	UGameplayStatics::GetAllActorsOfClass(this, ARecruit::StaticClass(), AllRecruitActors);
+
+	/* Add any recruits that are now adjacent to the array of adjacent recruits. */
+	for (AActor* RecruitActor : AllRecruitActors)
+	{
+		if (ARecruit* RecruitPtr = Cast<ARecruit>(RecruitActor))
+		{
+			if (TileIsAdjacent(RecruitPtr->GetCurrentTile()) && !AdjacentRecruits.Contains(RecruitPtr))
+			{
+				AdjacentRecruits.Add(RecruitPtr);
+				NewlyAdjacentRecruits.Add(RecruitPtr);
+			}
+		}
+	}
+
+
+	/* Add this recruit to every newly-adjacent recruit's array of adjacent recruits, and update their passive ability
+	 * modifiers with their updated array. Trigger a modifier pop-up for each one. */
+	for (ARecruit* NewlyAdjacentRecruit : NewlyAdjacentRecruits)
+	{
+		NewlyAdjacentRecruit->AdjacentRecruits.Add(this);
+		NewlyAdjacentRecruit->UpdatePassiveModifier(true);
+	}
+
+	/* Update this recruit's passive modifier with its update array of adjacent recruits. Trigger a modifier pop-up. */
+	UpdatePassiveModifier(true);
+}
+
+void ARecruit::UpdatePassiveModifier(bool bTriggerPopUp)
+{
 	/* Get this piece's row from the piece data. */
 	static const FString ContextString(TEXT("Piece Data Struct"));
 	const FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(PieceID, ContextString, true);
 
 	if (PieceData)
 	{
-		/* Check every modifier to see if it's from this piece's passive ability. */
+		/* Find and remove the modifier caused by the recruit's passive ability, if there is one, either to update it or
+		 * to remove it indefinitely. Don't trigger a pop-up when a recruit loses its passive modifier. */
 		for (FModifier Modifier : TemporaryModifiers)
 		{
 			if (Modifier.SourceAbilityName == PieceData->PassiveName)
 			{
-				/* Remove the recruit's passive ability modifier to make a new one. */
-				// Server_RemoveModifier(Modifier, false);
+				Server_RemoveModifier(Modifier, false);
 				break;
 			}
 		}
 
-		/* Get every recruit in the game. */
-		TArray<AActor*> AllRecruitActors;
-		UGameplayStatics::GetAllActorsOfClass(this, ARecruit::StaticClass(), AllRecruitActors);
-
-		/* Increment AdjacentRecruitCount for every recruit adjacent to this one. */
-		int AdjacentRecruitCount = 0;
-
-		for (AActor* RecruitActor : AllRecruitActors)
-		{
-			if (const ARecruit* RecruitPtr = Cast<ARecruit>(RecruitActor))
-			{
-				if (TileIsAdjacent(RecruitPtr->GetCurrentTile()))
-				{
-					AdjacentRecruitCount++;
-				}
-			}
-		}
-
-		/* Create and add a new modifier based on how many recruits are adjacent to this one, if there were any. */
-		if (AdjacentRecruitCount > 0)
+		/* Add a new passive ability modifier depending on how many recruits are now adjacent to this one. */
+		if (AdjacentRecruits.Num() > 0)
 		{
 			const FModifier ModifierToAdd =
 			{
@@ -95,11 +138,11 @@ void ARecruit::OnMoveToTileCompleted()
 				PieceData->PieceName,
 				PieceData->PassiveName,
 				FModifier::Strength,
-				AdjacentRecruitCount,
+				AdjacentRecruits.Num(),
 				-1
 			};
 
-			Server_AddModifier(ModifierToAdd, false);
+			Server_AddModifier(ModifierToAdd, bTriggerPopUp);
 		}
 	}
 }

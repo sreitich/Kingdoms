@@ -97,10 +97,14 @@ void UMatch_Modifier::NativeConstruct()
 
 void UMatch_Modifier::NativeDestruct()
 {
-	Super::NativeDestruct();
-
 	/* Remove the source's highlight. */
 	HighlightSource(true);
+
+	/* Unbind the button's delegates. */
+	ModifierButton->OnHovered.RemoveAll(this);
+	ModifierButton->OnUnhovered.RemoveAll(this);
+
+	Super::NativeDestruct();
 }
 
 void UMatch_Modifier::OnModifierButtonHovered()

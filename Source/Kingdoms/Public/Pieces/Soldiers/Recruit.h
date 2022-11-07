@@ -24,6 +24,10 @@ public:
 	/* Sets default values for this character's properties. */
 	ARecruit();
 
+	/* Calls OnMoveToTileCompleted() so that Recruits placed onto the board adjacent to each other instantly receive
+	 * their passive modifier. */
+	virtual void OnGameStart() override;
+
 	/* Tests if the given tile's coordinates match any of this piece's movement patterns.. */
 	virtual bool TileIsInMoveRange(ABoardTile* Tile) override;
 
@@ -37,6 +41,9 @@ protected:
 	/* Triggers this piece's passive ability when it finishes moving to a new tile. */
 	virtual void OnMoveToTileCompleted() override;
 
+	/* Update the passive modifier depending on how many recruits are in the adjacent recruit array. */
+	void UpdatePassiveModifier(bool bTriggerPopUp);
+	
 	/* Returns "true" if the given tile is laterally adjacent to this piece's tile. */
 	bool TileIsAdjacent(ABoardTile* Tile);
 
@@ -46,4 +53,7 @@ protected:
 
 	UPROPERTY()
 	TArray<FModifier> ModifiersFromPassive;
+
+	UPROPERTY()
+	TArray<ARecruit*> AdjacentRecruits;
 };

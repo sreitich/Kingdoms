@@ -10,11 +10,6 @@ APieceAIController::APieceAIController()
 {
 }
 
-void APieceAIController::OnMoveToTileCompleted()
-{
-    MoveCompleted.Broadcast();
-}
-
 void APieceAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
     Super::OnMoveCompleted(RequestID, Result);
@@ -23,17 +18,5 @@ void APieceAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFoll
     {
         /* Reset the piece's rotation whenever it finishes moving. */
         Cast<AParentPiece>(GetPawn())->Server_ResetPieceRotation();
-    }
-}
-
-void APieceAIController::OnPossess(APawn* InPawn)
-{
-    Super::OnPossess(InPawn);
-
-    /* If this controller possessed a piece. */
-    if (AParentPiece* PossessedPiece = Cast<AParentPiece>(InPawn))
-    {
-        /* Bind the piece's OnMoveToTileCompleted to be called when it finishes moving to a new tile. */
-        MoveCompleted.AddDynamic(PossessedPiece, &AParentPiece::OnMoveToTileCompleted);
     }
 }
