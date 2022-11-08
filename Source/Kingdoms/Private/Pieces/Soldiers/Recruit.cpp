@@ -88,7 +88,7 @@ void ARecruit::OnMoveToTileCompleted()
 	{
 		if (ARecruit* RecruitPtr = Cast<ARecruit>(RecruitActor))
 		{
-			if (TileIsAdjacent(RecruitPtr->GetCurrentTile()) && !AdjacentRecruits.Contains(RecruitPtr))
+			if (TileIsAdjacent(RecruitPtr->GetCurrentTile()) && !AdjacentRecruits.Contains(RecruitPtr) && RecruitPtr->GetAlignment() == E_Friendly)
 			{
 				AdjacentRecruits.Add(RecruitPtr);
 				NewlyAdjacentRecruits.Add(RecruitPtr);
@@ -142,7 +142,7 @@ void ARecruit::UpdatePassiveModifier(bool bTriggerPopUp)
 				-1
 			};
 
-			Server_AddModifier(ModifierToAdd, bTriggerPopUp);
+			Server_AddModifier(ModifierToAdd, bTriggerPopUp, bTriggerPopUp);
 		}
 	}
 }

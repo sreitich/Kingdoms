@@ -61,7 +61,8 @@ public:
 	void Server_ResetPieceRotation();
 
 	/* Flashes a given highlight onto the piece at a given strength for a given amount of time. Normal brightness is 4.0.
-	 * Highlighted brightness is 20.0. Standard play-rate is 0.25. Standard duration is 0.5. */
+	 * Highlighted brightness is 20.0 for action/ability targets, 10.0 for effects/modifiers. Standard play-rate is
+	 * 0.25. Standard duration is 0.5. */
 	UFUNCTION(BlueprintCallable)
 	void FlashHighlight(FLinearColor Color, float Brightness, float PlayRate, float Duration, bool bIndefiniteDuration);
 
@@ -156,10 +157,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Modifiers")
 	FORCEINLINE TArray<FModifier> GetTemporaryModifiers() const { return TemporaryModifiers; }
 
-	/* Apply a new modifier ot this piece, activating a pop-up if requested. If the modifier already exists, reset the
-	 * duration and stack the modifiers together. */
+	/* Apply a new modifier ot this piece, activating a pop-up and flashing a piece highlight if requested. If the
+	 * modifier already exists, reset the duration and stack the modifiers together. */
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
-	void Server_AddModifier(FModifier NewModifier, bool bActivatePopUp);
+	void Server_AddModifier(FModifier NewModifier, bool bActivatePopUp, bool bFlashHighlight);
 
 	/* Remove a temporary modifier, activating a pop-up if requested. */
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")

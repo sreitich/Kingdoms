@@ -486,7 +486,7 @@ void AParentPiece::SetAttackInfo(FAttackInfo NewAttackInfo)
 	}
 }
 
-void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool bActivatePopUp)
+void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool bActivatePopUp, bool bFlashHighlight)
 {
 	/* Store the original strength or armor value to find out the final change that this modifier applies. */
 	const int OriginalValue = NewModifier.EffectedStat ? CurrentStrength : CurrentArmor;
@@ -534,6 +534,17 @@ void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool
 	/* Spawn a modifier pop-up if requested. */
 	if (bActivatePopUp)
 		Multicast_CreateModifierPopUp(NewValue - OriginalValue, NewModifier.EffectedStat == FModifier::Strength);
+
+	/* Flash a piece highlight if requested. */
+	if (bFlashHighlight)
+		FlashHighlight
+		(
+			NewModifier.Value > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
+			10.0f,
+			0.5f,
+			0.25f,
+			false
+		);
 }
 
 void AParentPiece::Server_RemoveModifier_Implementation(FModifier ModifierToRemove, bool bActivatePopUp)
