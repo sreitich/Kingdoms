@@ -44,10 +44,6 @@ void UServerCommunicationComponent::SpawnPiece_Server_Implementation(UClass* Cla
 			&PieceSpawnRotation,
 			SpawnParams
 		);
-
-		/* Play the pop-up animation for the actor. */
-		if (const auto SpawnedPieceAsPiece = Cast<AParentPiece>(SpawnedPiece))
-			SpawnedPieceAsPiece->Multicast_PlayPiecePopUp(0.15f, false);
 		
 		/* Add the spawned piece to this player's array of owned pieces. */
 		OwningPlayerController->GetPlayerState<AMatch_PlayerState>()->OwnedPieces.Add(SpawnedPiece);

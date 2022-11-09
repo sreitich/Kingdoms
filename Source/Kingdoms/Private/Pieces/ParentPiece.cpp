@@ -148,6 +148,12 @@ void AParentPiece::BeginPlay()
 			ActiveUses = PieceData->ActiveUses;
         }
 	}
+
+	/* If this piece was spawned during the game, play its pop-up animation. */
+	if (AMatch_PlayerPawn* InstigatingPawn = Cast<AMatch_PlayerPawn>(GetInstigator()))
+	{
+		InstigatingPawn->PlayPiecePopUp(this, 0.25f, false);
+	}
 }
 
 void AParentPiece::OnRep_CurrentStrength()
@@ -490,18 +496,20 @@ void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool
 {
 	/* Store the original strength or armor value to find out the final change that this modifier applies. */
 	const int OriginalValue = NewModifier.EffectedStat ? CurrentStrength : CurrentArmor;
-	int NewValue;
+	int NewValue = OriginalValue;
 
-	/* Set the new statistic, clamped so that it can't go below 0 or above 20. */
-	if (NewModifier.EffectedStat == FModifier::Strength)
+	/* Set the new strength statistic, clamped so that it can't go below 0 or above 20. */
+	if (NewModifier.StrengthChange != 0)
 	{
-		CurrentStrength = FMath::Clamp(CurrentStrength + NewModifier.Value, 0, 20);
+		CurrentStrength = FMath::Clamp(CurrentStrength + NewModifier.StrengthChange, 0, 20);
 		NewValue = CurrentStrength;
 		OnRep_CurrentStrength();
 	}
-	else
+
+	/* Set the new armor statistic, clamped so that it can't go below 0 or above 20. */
+	if (NewModifier.ArmorChange != 0)
 	{
-		CurrentArmor = FMath::Clamp(CurrentArmor + NewModifier.Value, 0, 20);
+		CurrentArmor = FMath::Clamp(CurrentArmor + NewModifier.ArmorChange, 0, 20);
 		NewValue = CurrentArmor;
 		OnRep_CurrentArmor();
 	}
@@ -512,7 +520,8 @@ void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool
 	{
 		if (TemporaryModifiers[i].SourceActor == NewModifier.SourceActor &&
 			TemporaryModifiers[i].SourceAbilityName == NewModifier.SourceAbilityName &&
-			TemporaryModifiers[i].EffectedStat == NewModifier.EffectedStat)
+			TemporaryModifiers[i].StrengthChange == NewModifier.StrengthChange &&
+			TemporaryModifiers[i].ArmorChange == NewModifier.ArmorChange)
 		{
 			RepeatIndex = i;
 			break;
@@ -523,7 +532,8 @@ void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool
 	if (RepeatIndex != -1)
 	{
 		TemporaryModifiers[RepeatIndex].RemainingDuration = NewModifier.RemainingDuration;
-		TemporaryModifiers[RepeatIndex].Value += NewModifier.Value;
+		TemporaryModifiers[RepeatIndex].StrengthChange += NewModifier.StrengthChange;
+		TemporaryModifiers[RepeatIndex].ArmorChange += NewModifier.ArmorChange;
 	}
 	/* If this modifier isn't already applied, apply it. */
 	else
@@ -535,16 +545,29 @@ void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool
 	if (bActivatePopUp)
 		Multicast_CreateModifierPopUp(NewValue - OriginalValue, NewModifier.EffectedStat == FModifier::Strength);
 
-	/* Flash a piece highlight if requested. */
+	/* Flash a piece highlight for each changed statistic if requested. */
 	if (bFlashHighlight)
-		FlashHighlight
-		(
-			NewModifier.Value > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
-			10.0f,
-			0.5f,
-			0.25f,
-			false
-		);
+	{
+		if (NewModifier.StrengthChange != 0)
+			FlashHighlight
+			(
+				NewModifier.StrengthChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
+				10.0f,
+				0.5f,
+				0.25f,
+				false
+			);
+
+		if (NewModifier.ArmorChange != 0)
+			FlashHighlight
+			(
+				NewModifier.ArmorChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
+				10.0f,
+				0.5f,
+				0.25f,
+				false
+			);
+	}
 }
 
 void AParentPiece::Server_RemoveModifier_Implementation(FModifier ModifierToRemove, bool bActivatePopUp)
@@ -554,15 +577,17 @@ void AParentPiece::Server_RemoveModifier_Implementation(FModifier ModifierToRemo
 	if (AParentPiece* Piece = Cast<AParentPiece>(ModifierToRemove.SourceActor))
 		Piece->OnAbilityEffectEnded(Targets);
 
-	/* Remove the effect of the modifier from the stat it was modifying. */
-	if (ModifierToRemove.EffectedStat == FModifier::Strength)
+	/* Remove the strength effect of the modifier from the piece it was modifying. */
+	if (ModifierToRemove.StrengthChange != 0)
 	{
-		CurrentStrength = FMath::Clamp(CurrentStrength - ModifierToRemove.Value, 0, 20);
+		CurrentStrength = FMath::Clamp(CurrentStrength - ModifierToRemove.StrengthChange, 0, 20);
 		OnRep_CurrentStrength();
 	}
-	else
+
+	/* Remove the armor effect of the modifier from the piece it was modifying. */
+	if (ModifierToRemove.ArmorChange != 0)
 	{
-		CurrentArmor = FMath::Clamp(CurrentArmor - ModifierToRemove.Value, 0, 20);
+		CurrentArmor = FMath::Clamp(CurrentArmor - ModifierToRemove.ArmorChange, 0, 20);
 		OnRep_CurrentArmor();
 	}
 			
@@ -575,38 +600,18 @@ void AParentPiece::Server_DecrementModifierDurations_Implementation()
 	/* For every modifier applied to this piece... */
 	for (int i = 0; i < TemporaryModifiers.Num(); i++)
 	{
-		/* Reduce the remaining duration by 1 turn. */
-		const int NewRemainingDuration = TemporaryModifiers[i].RemainingDuration--;
-
-		/* If the modifier's duration has ended... */
-		if (NewRemainingDuration < 1)
+		/* Don't decrement modifiers with an indefinite duration. */
+		if (!TemporaryModifiers[i].bIndefiniteDuration)
 		{
-			/* Always activate pop-ups for abilities that are removed because their duration ends. */
-			Server_RemoveModifier(TemporaryModifiers[i], true);
+			/* Reduce the remaining duration by 1 turn. */
+			const int NewRemainingDuration = TemporaryModifiers[i].RemainingDuration--;
 
-			// /* Get a shortened reference to the currently iterated modifier for readability. */
-			// const FModifier& Modifier = TemporaryModifiers[i];
-			//
-			// /* Call any ability-specific logic that needs to execute when an active ability's effect ends. if the source
-			//  * of the modifier is a piece. */
-			// const TArray<AActor*> Targets = { this };
-			// if (AParentPiece* Piece = Cast<AParentPiece>(Modifier.SourceActor))
-			// 	Piece->OnActiveEffectEnded(Targets);
-			//
-			// /* Remove the effect of the modifier from the stat it was modifying. */
-			// if (Modifier.EffectedStat == FModifier::Strength)
-			// {
-			// 	CurrentStrength = FMath::Clamp(CurrentStrength - Modifier.Value, 0, 20);
-			// 	OnRep_CurrentStrength();
-			// }
-			// else
-			// {
-			// 	CurrentArmor = FMath::Clamp(CurrentArmor - Modifier.Value, 0, 20);
-			// 	OnRep_CurrentArmor();
-			// }
-			//
-			// /* Remove this modifier from this piece. */
-			// TemporaryModifiers.RemoveAt(i);
+			/* If the modifier's duration has ended... */
+			if (NewRemainingDuration < 1)
+			{
+				/* Always activate pop-ups for abilities that are removed because their duration ends. */
+				Server_RemoveModifier(TemporaryModifiers[i], true);
+			}
 		}
 	}
 }

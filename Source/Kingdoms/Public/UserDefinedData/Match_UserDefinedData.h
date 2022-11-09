@@ -164,7 +164,7 @@ struct FModifier
 	/* The alignment of the actor responsible for the modifier, relative to the player whose piece is being modified. */
 	UPROPERTY(BlueprintReadWrite)
 	TEnumAsByte<EAlignment> SourceAlignmentToTarget;
-	
+
 	/* The name of the actor that caused the modifier. */
 	UPROPERTY(BlueprintReadWrite)
 	FString SourceName;
@@ -177,9 +177,17 @@ struct FModifier
 	UPROPERTY(BlueprintReadWrite)
 	int EffectedStat;
 
-	/* The net effect of the modifier. */
+	/* The net effect of the modifier on the affected piece's strength. */
 	UPROPERTY(BlueprintReadWrite)
-	int Value;
+	int StrengthChange;
+
+	/* The net effect of the modifier on the affected piece's armor. */
+	UPROPERTY(BlueprintReadWrite)
+	int ArmorChange;
+
+	/* Determines whether this modifier's duration is determined by a fixed duration or by a different condition. */
+	UPROPERTY(BlueprintReadWrite)
+	bool bIndefiniteDuration;
 
 	/* The remaining turn duration of the modifier. */
 	UPROPERTY(BlueprintReadWrite)
@@ -193,5 +201,4 @@ struct FModifier
 			SourceAbilityName == Other.SourceAbilityName &&
 			SourceAlignmentToTarget == Other.SourceAlignmentToTarget;
 	}
-
 };

@@ -139,6 +139,8 @@ void ARecruit::UpdatePassiveModifier(bool bTriggerPopUp)
 				PieceData->PassiveName,
 				FModifier::Strength,
 				AdjacentRecruits.Num(),
+				AdjacentRecruits.Num(),
+				true,
 				-1
 			};
 

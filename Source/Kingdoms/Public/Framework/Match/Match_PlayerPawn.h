@@ -46,6 +46,19 @@ public:
 		UFUNCTION(Client, Reliable)
 		void Client_DeselectPieceOrTile(AParentPiece* PieceToDeselect, ABoardTile* TileToDeselect);
 
+	/* Refreshes any piece info widget that is currently displaying the given piece. If bHide is true, hides any widget
+	 currently displaying PieceToRefresh. */
+	UFUNCTION(Client, Reliable)
+	void Client_RefreshPieceInfoWidgets(AParentPiece* PieceToRefresh, bool bHide) const;
+
+
+/* Public piece networking functions. */
+public:
+
+	/* Plays a piece pop-up animation, scaling up the piece's size from 0.0 to 1.0 over the given duration. */
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayPiecePopUp(AParentPiece* PieceToAnimate, float Duration, bool bReverse);
+
 	/* Smoothly rotates the piece to the target rotation over a short time period. If bMoveWhenFinished is true, the
 	 * piece is moved to the target tile when it finishes rotating. If bResetStateWhenFinished is true, the player's
 	 * state is reset after the piece finishes rotating. */
@@ -81,11 +94,6 @@ public:
 	/* Calls active abilities with server authority. */
 	UFUNCTION(Server, Reliable)
 	void Server_UseActiveAbility(AParentPiece* AbilityUser, const TArray<AActor*>& Targets);
-
-	/* Refreshes any piece info widget that is currently displaying the given piece. If bHide is true, hides any widget
-	 currently displaying PieceToRefresh. */
-	UFUNCTION(Client, Reliable)
-	void Client_RefreshPieceInfoWidgets(AParentPiece* PieceToRefresh, bool bHide) const;
 
 
 /* Public variables. */

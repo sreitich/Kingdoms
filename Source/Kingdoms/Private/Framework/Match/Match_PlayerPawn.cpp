@@ -594,6 +594,12 @@ void AMatch_PlayerPawn::Client_DeselectPieceOrTile_Implementation(AParentPiece* 
 	{ ClearSelection(false, false, false, true, false); }
 }
 
+void AMatch_PlayerPawn::Client_RefreshPieceInfoWidgets_Implementation(AParentPiece* PieceToRefresh, bool bHide) const
+{
+	/* Refresh any piece info widget displaying the given piece. */
+	Cast<AMatch_PlayerController>(GetController())->RefreshPieceInfoWidgets(PieceToRefresh, bHide);
+}
+
 void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo, bool bMoveCamera)
 {
 	/* Reset the currently selected actors and remove all piece-information pop-ups. */
@@ -690,10 +696,4 @@ void AMatch_PlayerPawn::Server_UseActiveAbility_Implementation(AParentPiece* Abi
 	/* Call the ability with server authority. */
 	if (IsValid(AbilityUser))
 		AbilityUser->OnActiveAbility(Targets);
-}
-
-void AMatch_PlayerPawn::Client_RefreshPieceInfoWidgets_Implementation(AParentPiece* PieceToRefresh, bool bHide) const
-{
-	/* Refresh any piece info widget displaying the given piece. */
-	Cast<AMatch_PlayerController>(GetController())->RefreshPieceInfoWidgets(PieceToRefresh, bHide);
 }

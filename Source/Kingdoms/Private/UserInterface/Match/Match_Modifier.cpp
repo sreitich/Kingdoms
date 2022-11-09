@@ -17,19 +17,19 @@ void UMatch_Modifier::UpdateDisplayedModifier(FModifier NewModifier, bool bAlign
 	/* The string that this modifier pop-up will display. */
 	FString NewModifierText;
 
-	/* Modifier value. */
-	if (ModifierInfo.Value > 0)
-	{
-		NewModifierText = "<Buff>+" + FString::FromInt(ModifierInfo.Value) + "</>";
-	}
-	else if (ModifierInfo.Value < 0)
-	{
-		NewModifierText = "<Debuff>" + FString::FromInt(ModifierInfo.Value) + "</>";
-	}
-	else
-	{
-		NewModifierText = "<NoEffect>+0</>";
-	}
+	// /* Modifier value. */
+	// if (ModifierInfo.Value > 0)
+	// {
+	// 	NewModifierText = "<Buff>+" + FString::FromInt(ModifierInfo.Value) + "</>";
+	// }
+	// else if (ModifierInfo.Value < 0)
+	// {
+	// 	NewModifierText = "<Debuff>" + FString::FromInt(ModifierInfo.Value) + "</>";
+	// }
+	// else
+	// {
+	// 	NewModifierText = "<NoEffect>+0</>";
+	// }
 
 
 	NewModifierText += " from ";
@@ -63,14 +63,17 @@ void UMatch_Modifier::UpdateDisplayedModifier(FModifier NewModifier, bool bAlign
 	NewModifierText += "<AbilityName>" + ModifierInfo.SourceAbilityName + "</> ";
 
 
-	/* Remaining duration. */
-	if (NewModifier.RemainingDuration > 1)
+	/* Remaining duration. Only display if piece has a definite duration. */
+	if (!NewModifier.bIndefiniteDuration)
 	{
-		NewModifierText += "<Duration>(</><DurationCount>" + FString::FromInt(NewModifier.RemainingDuration) + "</><Duration> turns remaining)</>";
-	}
-	else
-	{
-		NewModifierText += "<Duration>(</><DurationCount>1</><Duration> turn remaining)</>";
+		if (NewModifier.RemainingDuration > 1)
+		{
+			NewModifierText += "<Duration>(</><DurationCount>" + FString::FromInt(NewModifier.RemainingDuration) + "</><Duration> turns remaining)</>";
+		}
+		else
+		{
+			NewModifierText += "<Duration>(</><DurationCount>1</><Duration> turn remaining)</>";
+		}
 	}
 
 	/* Update the displayed text with the built string of modifier info. */
