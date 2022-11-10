@@ -499,26 +499,6 @@ void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTarg
 
 			/* Hide the enemy piece info widget. */
 			PlayerController->UpdatePieceInfoWidget(SelectedPiece, E_Hostile, false, true);
-
-			/* I'm honestly not sure what this was doing. Widgets already get destroyed when necessary, so this shouldn't need to be in this function. */
-			// switch (GetPlayerState<AMatch_PlayerState>()->GetCurrentPlayerStatus())
-			// {
-			// 	/* Remove the move confirmation widget or attack confirmation widget and update the player's state if the
-			// 	 * player was targeting a tile to move to. */
-			// 	case E_SelectingTarget_Move:
-			// 		// PlayerController->UpdateMoveConfirmationWidget(true, nullptr, nullptr);
-			// 		// PlayerController->UpdateAttackConfirmationWidget(true, nullptr, nullptr);
-			// 		break;
-			// 	/* Remove the active ability confirmation widget. */
-			// 	case E_SelectingTarget_ActiveAbility:
-			// 		break;
-			// 	/* Remove the passive ability confirmation widget. */
-			// 	case E_SelectingTarget_PassiveAbility:
-			// 		break;
-			// 	/* If the player is connecting or placing their pieces, do nothing. This should never be called. */
-			// 	default:
-			// 		break;
-			// }
 		}
 	}
 
@@ -529,7 +509,7 @@ void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTarg
 		SelectedPiece->GetCurrentTile()->bReticleControlledByCursor = true;
 		SelectedPiece->GetCurrentTile()->UpdateReticle(false, true);
 		/* Reset the piece's fresnel. */
-		SelectedPiece->FlashHighlight(SelectedPiece->FriendlyFresnelColor, 4.0f, 1.0f, 0.0f, true);
+		SelectedPiece->FlashHighlight(SelectedPiece->FriendlyFresnelColor, SelectedPiece->DefaultFresnelStrength, 1.0f, 0.0f, true);
 		/* Clear the pointer to the selected piece. */
 		SelectedPiece = nullptr;
 	}
@@ -540,10 +520,8 @@ void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTarg
 		/* Reset the enemy piece's selection reticle. */
 		SelectedEnemyPiece->GetCurrentTile()->bReticleControlledByCursor = true;
 		SelectedEnemyPiece->GetCurrentTile()->UpdateReticle(false, true);
-		/* Reset the enemy piece's tile highlight. */
-		// SelectedEnemyPiece->GetCurrentTile()->UpdateEmissiveHighlight(false, 4.0f, SelectedEnemyPiece->GetCurrentTile()->Highlight_Enemy);
 		/* Reset the enemy piece's fresnel. */
-		SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, 4.0f, 1.0, 0.0f, true);
+		SelectedPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedEnemyPiece->DefaultFresnelStrength, 1.0, 0.0f, true);
 		/* Clear the pointer to the selected enemy piece. */
 		SelectedEnemyPiece = nullptr;
 	}
@@ -554,10 +532,8 @@ void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTarg
 		/* Reset the target piece's selection reticle. */
 		SelectedTargetPiece->GetCurrentTile()->bReticleControlledByCursor = true;
 		SelectedTargetPiece->GetCurrentTile()->UpdateReticle(false, true);
-		/* Reset the target piece's tile highlight. */
-		// SelectedEnemyPiece->GetCurrentTile()->UpdateEmissiveHighlight(false, 4.0f, SelectedTargetPiece->GetAlignment() == E_Friendly ? SelectedEnemyPiece->GetCurrentTile()->Highlight_Friendly : SelectedEnemyPiece->GetCurrentTile()->Highlight_Enemy);
 		/* Reset the target piece's fresnel. */
-		SelectedTargetPiece->FlashHighlight(SelectedTargetPiece->GetAlignment() == E_Friendly ? SelectedTargetPiece->FriendlyFresnelColor : SelectedTargetPiece->EnemyFresnelColor, 4.0f, 1.0, 0.0f, true);
+		SelectedTargetPiece->FlashHighlight(SelectedTargetPiece->GetAlignment() == E_Friendly ? SelectedTargetPiece->FriendlyFresnelColor : SelectedTargetPiece->EnemyFresnelColor, SelectedTargetPiece->DefaultFresnelStrength, 1.0, 0.0f, true);
 		/* Clear the pointer to the target piece. */
 		SelectedTargetPiece = nullptr;
 	}
@@ -568,10 +544,18 @@ void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTarg
 		/* Reset the tile's selection reticle. */
 		SelectedTile->bReticleControlledByCursor = true;
 		SelectedTile->UpdateReticle(false, true);
-		/* Reset the tile's highlight. */
-		// SelectedTile->UpdateEmissiveHighlight(false, 4.0f, SelectedTile->Highlight_ValidUnoccupiedTile);
 		/* Clear the pointer to the selected tile. */
 		SelectedTile = nullptr;
+	}
+}
+
+void AMatch_PlayerPawn::Multicast_FlashHighlight_Implementation(AParentPiece* PieceToHighlight, FLinearColor Color,
+	float Brightness, float PlayRate, float Duration, bool bIndefiniteDuration)
+{
+	if (APieceAIController* ControllerPtr = Cast<APieceAIController>(PieceToHighlight->GetController()))
+	{
+		/* Call the FlashHighlight function with the given piece on each client. */
+		PieceToHighlight->FlashHighlight(Color, Brightness, PlayRate, Duration, bIndefiniteDuration);
 	}
 }
 

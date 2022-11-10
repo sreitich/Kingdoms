@@ -3,7 +3,6 @@
 
 #include "Pieces/PieceAIController.h"
 
-#include "Board/BoardTile.h"
 #include "Pieces/ParentPiece.h"
 
 APieceAIController::APieceAIController()

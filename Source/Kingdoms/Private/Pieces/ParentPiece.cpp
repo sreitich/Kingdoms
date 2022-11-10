@@ -17,12 +17,13 @@
 #include "UserDefinedData/PieceData_UserDefinedData.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "DrawDebugHelpers.h"
 
 AParentPiece::AParentPiece()
 {
  	/* Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it. */
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	/* Enable replication. */
 	bReplicates = true;
@@ -62,6 +63,9 @@ AParentPiece::AParentPiece()
 	GetCapsuleComponent()->CanCharacterStepUpOn = ECB_No;
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("PieceCapsule"));
 	GetMesh()->SetCollisionProfileName(TEXT("PieceMesh"));
+
+	/* Load the piece highlight curve from the content browser. */
+	PieceHighlightCurve = LoadObject<UCurveFloat>(nullptr, TEXT("/Game/Curves/PieceHighlightCurve.PieceHighlightCurve"));
 }
 
 void AParentPiece::BeginPlay()
@@ -154,6 +158,31 @@ void AParentPiece::BeginPlay()
 	{
 		InstigatingPawn->PlayPiecePopUp(this, 0.25f, false);
 	}
+
+	/* Set up the piece highlight timeline. */
+	if (PieceHighlightCurve)
+	{
+		FOnTimelineFloat HighlightTimelineCallback;
+		FOnTimelineEventStatic HighlightTimelineFinishedCallback;
+
+		HighlightTimelineCallback.BindUFunction(this, FName("HighlightTimelineTick"));
+		HighlightTimelineFinishedCallback.BindUFunction(this, FName("EndHighlight"));
+
+		HighlightTimeline.AddInterpFloat(PieceHighlightCurve, HighlightTimelineCallback);
+		HighlightTimeline.SetTimelineFinishedFunc(HighlightTimelineFinishedCallback);
+	}
+}
+
+void AParentPiece::HighlightTimelineTick(float Value)
+{
+	/* Interpolate the piece's highlight and brightness. */
+	DynamicMaterial->SetVectorParameterValue(FName("FresnelColor"), FMath::Lerp(OriginalHighlightColor, NewHighlightColor, Value));
+	DynamicMaterial->SetScalarParameterValue(FName("Brightness"), FMath::Lerp(OriginalHighlightBrightness, NewHighlightBrightness, Value));
+}
+
+void AParentPiece::EndHighlight()
+{
+	UE_LOG(LogTemp, Error, TEXT("FINISHED WOOOO"));
 }
 
 void AParentPiece::OnRep_CurrentStrength()
@@ -203,6 +232,7 @@ void AParentPiece::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	HighlightTimeline.TickTimeline(DeltaTime);
 }
 
 void AParentPiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -262,15 +292,19 @@ void AParentPiece::Server_ResetPieceRotation_Implementation()
 void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float PlayRate, float Duration, bool bIndefiniteDuration)
 {
 	/* Store the original color and brightness to restore after the flash. */
-	FLinearColor OriginalColor;
-	DynamicMaterial->GetVectorParameterValue(TEXT("FresnelColor"), OriginalColor);
-	float OriginalBrightness;
-	DynamicMaterial->GetScalarParameterValue(TEXT("Brightness"), OriginalBrightness);
+	DynamicMaterial->GetVectorParameterValue(TEXT("FresnelColor"), OriginalHighlightColor);
+	DynamicMaterial->GetScalarParameterValue(TEXT("Brightness"), OriginalHighlightBrightness);
 
-	/* Interpolates to the target color and brightness at the normal speed. Waits for the given duration,
-	 * then interpolates back to the original color and brightness. */
-	FlashHighlightTimeline(Color, Brightness, OriginalColor, OriginalBrightness, PlayRate,
-		Duration, bIndefiniteDuration);
+	/* Set the other parameters needed for the highlight timeline. */
+	NewHighlightColor = Color;
+	NewHighlightBrightness = Brightness;
+	HighlightPlayRate = PlayRate;
+	HighlightDuration = Duration;
+	bIndefiniteHighlightDuration = bIndefiniteDuration;
+
+	/* Interpolates to the target color and brightness at the give rate. If bIndefiniteDuration is false, waits for the
+	 * given duration, then interpolates back to the original color and brightness. */
+	HighlightTimeline.PlayFromStart();
 }
 
 void AParentPiece::Multicast_CreateModifierPopUp_Implementation(int ValueChange, bool bStrength)
@@ -545,28 +579,40 @@ void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool
 	if (bActivatePopUp)
 		Multicast_CreateModifierPopUp(NewValue - OriginalValue, NewModifier.EffectedStat == FModifier::Strength);
 
-	/* Flash a piece highlight for each changed statistic if requested. */
+	/* Flash a piece highlight for each changed statistic on all clients if requested. */
 	if (bFlashHighlight)
 	{
 		if (NewModifier.StrengthChange != 0)
-			FlashHighlight
-			(
-				NewModifier.StrengthChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
-				10.0f,
-				0.5f,
-				0.25f,
-				false
-			);
+		{
+			if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetInstigator()))
+			{
+				PawnPtr->Multicast_FlashHighlight
+				(
+					this,
+					NewModifier.StrengthChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
+					10.0f,
+					0.5f,
+					0.25f,
+					false
+				);
+			}
+		}
 
 		if (NewModifier.ArmorChange != 0)
-			FlashHighlight
-			(
-				NewModifier.ArmorChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
-				10.0f,
-				0.5f,
-				0.25f,
-				false
-			);
+		{
+			if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetInstigator()))
+			{
+				PawnPtr->Multicast_FlashHighlight
+				(
+					this,
+					NewModifier.ArmorChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
+					10.0f,
+					0.5f,
+					0.25f,
+					false
+				);
+			}
+		}
 	}
 }
 

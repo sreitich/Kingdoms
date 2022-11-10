@@ -8,15 +8,16 @@
 #include "GameFramework/Pawn.h"
 #include "Match_PlayerPawn.generated.h"
 
+class UCameraComponent;
 class UInputComponent;
 class UMaterialInterface;
+class UPieceNetworkingComponent;
 class USceneComponent;
 class USpringArmComponent;
-class UCameraComponent;
 
-class UPieceDragWidget;
-class AParentPiece;
 class ABoardTile;
+class AParentPiece;
+class UPieceDragWidget;
 
 UCLASS()
 class KINGDOMS_API AMatch_PlayerPawn : public APawn
@@ -59,6 +60,12 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlayPiecePopUp(AParentPiece* PieceToAnimate, float Duration, bool bReverse);
 
+
+
+	/* Flashes a given highlight onto a given piece on all clients */
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void Multicast_FlashHighlight(AParentPiece* PieceToHighlight, FLinearColor Color, float Brightness, float PlayRate, float Duration, bool bIndefiniteDuration);
+	
 	/* Smoothly rotates the piece to the target rotation over a short time period. If bMoveWhenFinished is true, the
 	 * piece is moved to the target tile when it finishes rotating. If bResetStateWhenFinished is true, the player's
 	 * state is reset after the piece finishes rotating. */

@@ -6,6 +6,8 @@
 #include "UserDefinedData/Match_UserDefinedData.h"
 #include "UserDefinedData/PieceData_UserDefinedData.h"
 
+#include "Components/TimelineComponent.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "ParentPiece.generated.h"
@@ -144,6 +146,10 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Current Tile")
 	void Server_SetCurrentTile(ABoardTile* NewTile);
 
+	/* Getter for DynamicMaterial. */
+	UFUNCTION(BlueprintPure, Category="Materials")
+	FORCEINLINE UMaterialInstanceDynamic* GetDynamicMaterial() const { return DynamicMaterial; }
+
 	/* Getter for AttackInfo. */
 	UFUNCTION(BlueprintPure, Category="Is Attacking?")
 	FORCEINLINE FAttackInfo GetAttackInfo() const { return AttackInfo; }
@@ -239,6 +245,20 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
 	bool bActiveAbilityLoops = false;
 
+	/* Highlight timeline variables. */
+	float HighlightCurveValue;
+	float HighlightTimelineValue;
+	FTimeline HighlightTimeline;
+
+	/* Parameters of the highlight timeline. */
+	FLinearColor OriginalHighlightColor;
+	FLinearColor NewHighlightColor;
+	float OriginalHighlightBrightness;
+	float NewHighlightBrightness;
+	float HighlightPlayRate;
+	float HighlightDuration;
+	bool bIndefiniteHighlightDuration;
+
 
 /* Public constants and asset references. */
 public:
@@ -246,6 +266,9 @@ public:
 	/* Pointer to the piece data table, used to retrieve this piece's statistics. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data")
 	UDataTable* PieceDataTable;
+
+	UPROPERTY(EditAnywhere, Category="Curves")
+	UCurveFloat* PieceHighlightCurve;
 
 	/* The color that friendly pieces will be highlighted in. */
 	UPROPERTY(EditDefaultsOnly, Category="Materials")
@@ -317,6 +340,15 @@ protected:
 
 	/* Called when the game starts or when spawned. */
 	virtual void BeginPlay() override;
+
+	/* Called every tick of the piece highlight timeline to update the piece's highlight. */
+	UFUNCTION()
+	void HighlightTimelineTick(float Value);
+
+	/* If the current piece highlight is NOT indefinite, waits for the given duration before reversing to the original
+	 * highlight. */
+	UFUNCTION()
+	void EndHighlight();
 
 	/* Refreshes any piece info widget displaying this piece. */
 	UFUNCTION()
