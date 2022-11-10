@@ -13,6 +13,7 @@
 #include "UserInterface/MatchSetup/Dragging/PieceDragWidget.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/PieceNetworkingComponent.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -39,6 +40,8 @@ AMatch_PlayerPawn::AMatch_PlayerPawn()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
+
+	PieceNetworkingComponent = CreateDefaultSubobject<UPieceNetworkingComponent>(TEXT("Piece Networking Component"));
 }
 
 void AMatch_PlayerPawn::BeginPlay()
