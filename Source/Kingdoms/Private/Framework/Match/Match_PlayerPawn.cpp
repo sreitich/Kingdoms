@@ -521,7 +521,7 @@ void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTarg
 		SelectedEnemyPiece->GetCurrentTile()->bReticleControlledByCursor = true;
 		SelectedEnemyPiece->GetCurrentTile()->UpdateReticle(false, true);
 		/* Reset the enemy piece's fresnel. */
-		SelectedPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedEnemyPiece->DefaultFresnelStrength, 1.0, 0.0f, true);
+		SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedEnemyPiece->DefaultFresnelStrength, 1.0, 0.0f, true);
 		/* Clear the pointer to the selected enemy piece. */
 		SelectedEnemyPiece = nullptr;
 	}
@@ -552,11 +552,8 @@ void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTarg
 void AMatch_PlayerPawn::Multicast_FlashHighlight_Implementation(AParentPiece* PieceToHighlight, FLinearColor Color,
 	float Brightness, float PlayRate, float Duration, bool bIndefiniteDuration)
 {
-	if (APieceAIController* ControllerPtr = Cast<APieceAIController>(PieceToHighlight->GetController()))
-	{
-		/* Call the FlashHighlight function with the given piece on each client. */
-		PieceToHighlight->FlashHighlight(Color, Brightness, PlayRate, Duration, bIndefiniteDuration);
-	}
+	/* Call the FlashHighlight function with the given piece on each client. */
+	PieceToHighlight->FlashHighlight(Color, Brightness, PlayRate, Duration, bIndefiniteDuration);
 }
 
 void AMatch_PlayerPawn::Client_DeselectPieceOrTile_Implementation(AParentPiece* PieceToDeselect, ABoardTile* TileToDeselect)

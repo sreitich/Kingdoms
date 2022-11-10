@@ -249,6 +249,7 @@ public:
 	float HighlightCurveValue;
 	float HighlightTimelineValue;
 	FTimeline HighlightTimeline;
+	TEnumAsByte<ETimelineDirection::Type> HighlightTimelineDirection;
 
 	/* Parameters of the highlight timeline. */
 	FLinearColor OriginalHighlightColor;
@@ -345,10 +346,13 @@ protected:
 	UFUNCTION()
 	void HighlightTimelineTick(float Value);
 
-	/* If the current piece highlight is NOT indefinite, waits for the given duration before reversing to the original
-	 * highlight. */
+	/* If the current piece highlight is NOT indefinite, waits for the given duration before calling HighlightDurationEnd. */
 	UFUNCTION()
-	void EndHighlight();
+	void HighlightFadeInEnd();
+
+	/* Reverses the current piece highlight. */
+	UFUNCTION()
+	void HighlightDurationEnd();
 
 	/* Refreshes any piece info widget displaying this piece. */
 	UFUNCTION()

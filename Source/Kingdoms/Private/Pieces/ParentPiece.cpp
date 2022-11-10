@@ -166,7 +166,7 @@ void AParentPiece::BeginPlay()
 		FOnTimelineEventStatic HighlightTimelineFinishedCallback;
 
 		HighlightTimelineCallback.BindUFunction(this, FName("HighlightTimelineTick"));
-		HighlightTimelineFinishedCallback.BindUFunction(this, FName("EndHighlight"));
+		HighlightTimelineFinishedCallback.BindUFunction(this, FName("HighlightFadeInEnd"));
 
 		HighlightTimeline.AddInterpFloat(PieceHighlightCurve, HighlightTimelineCallback);
 		HighlightTimeline.SetTimelineFinishedFunc(HighlightTimelineFinishedCallback);
@@ -176,13 +176,26 @@ void AParentPiece::BeginPlay()
 void AParentPiece::HighlightTimelineTick(float Value)
 {
 	/* Interpolate the piece's highlight and brightness. */
-	DynamicMaterial->SetVectorParameterValue(FName("FresnelColor"), FMath::Lerp(OriginalHighlightColor, NewHighlightColor, Value));
-	DynamicMaterial->SetScalarParameterValue(FName("Brightness"), FMath::Lerp(OriginalHighlightBrightness, NewHighlightBrightness, Value));
+	DynamicMaterial->SetVectorParameterValue(FName("FresnelColor"), FMath::CInterpTo(OriginalHighlightColor, NewHighlightColor, Value, 1.0f));
+	DynamicMaterial->SetScalarParameterValue(FName("Brightness"), FMath::FInterpTo(OriginalHighlightBrightness, NewHighlightBrightness, Value, 1.0f));
 }
 
-void AParentPiece::EndHighlight()
+void AParentPiece::HighlightFadeInEnd()
 {
-	UE_LOG(LogTemp, Error, TEXT("FINISHED WOOOO"));
+	/* If this highlight has a definite duration and just finished highlighting, wait for the given duration. */
+	if (!bIndefiniteHighlightDuration && HighlightTimelineDirection == ETimelineDirection::Forward)
+	{
+		/* Call HighlightDurationEnd() after the given duration. */
+		FTimerHandle HighlightDurationHandle;
+		GetWorldTimerManager().SetTimer(HighlightDurationHandle, this, &AParentPiece::HighlightDurationEnd, HighlightDuration, false);
+	}
+}
+
+void AParentPiece::HighlightDurationEnd()
+{
+	/* Reverse the highlight to its original color and brightness. */
+	HighlightTimelineDirection = ETimelineDirection::Backward;
+	HighlightTimeline.ReverseFromEnd();
 }
 
 void AParentPiece::OnRep_CurrentStrength()
@@ -304,6 +317,7 @@ void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float Pl
 
 	/* Interpolates to the target color and brightness at the give rate. If bIndefiniteDuration is false, waits for the
 	 * given duration, then interpolates back to the original color and brightness. */
+	HighlightTimelineDirection = ETimelineDirection::Forward;
 	HighlightTimeline.PlayFromStart();
 }
 

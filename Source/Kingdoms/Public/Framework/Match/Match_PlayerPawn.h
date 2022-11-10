@@ -126,6 +126,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
 	UCameraComponent* Camera;
 
+	/* Allows player pawn to manage networking for pieces, since pieces don't have owning connections. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
+	UPieceNetworkingComponent* PieceNetworkingComponent;
+
+
 
 /* Protected functions. */
 protected:
