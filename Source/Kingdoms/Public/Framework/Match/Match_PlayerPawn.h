@@ -56,9 +56,9 @@ public:
 /* Public piece networking functions. */
 public:
 
-	/* Plays a piece pop-up animation, scaling up the piece's size from 0.0 to 1.0 over the given duration. */
-	UFUNCTION(BlueprintImplementableEvent)
-	void PlayPiecePopUp(AParentPiece* PieceToAnimate, float Duration, bool bReverse);
+	// /* Plays a piece pop-up animation, scaling up the piece's size from 0.0 to 1.0 over the given duration. */
+	// UFUNCTION(BlueprintImplementableEvent)
+	// void PlayPiecePopUp(AParentPiece* PieceToAnimate, float Duration, bool bReverse);
 
 
 
@@ -69,8 +69,8 @@ public:
 	/* Smoothly rotates the piece to the target rotation over a short time period. If bMoveWhenFinished is true, the
 	 * piece is moved to the target tile when it finishes rotating. If bResetStateWhenFinished is true, the player's
 	 * state is reset after the piece finishes rotating. */
-	UFUNCTION(BlueprintImplementableEvent)
-	void InterpolatePieceRotation(AParentPiece* PieceToRotate, ABoardTile* NewTile, FRotator CurrentRot, FRotator TargetRot, bool bMoveWhenFinished, bool bResetStateWhenFinished);
+	// UFUNCTION(BlueprintImplementableEvent)
+	// void InterpolatePieceRotation(AParentPiece* PieceToRotate, ABoardTile* NewTile, FRotator CurrentRot, FRotator TargetRot, bool bMoveWhenFinished, bool bResetStateWhenFinished);
 
 	/* Calls the blueprint-implemented attack sequence with server authority. */
 	UFUNCTION(Server, Reliable, BlueprintCallable)
@@ -101,6 +101,14 @@ public:
 	/* Calls active abilities with server authority. */
 	UFUNCTION(Server, Reliable)
 	void Server_UseActiveAbility(AParentPiece* AbilityUser, const TArray<AActor*>& Targets);
+
+
+/* Public accessors. */
+public:
+
+	/* Returns this pawn's piece networking component, allowing other classes to call networked piece-related functions. */
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE UPieceNetworkingComponent* GetPieceNetworkingComponent() const { return PieceNetworkingComponent; }
 
 
 /* Public variables. */

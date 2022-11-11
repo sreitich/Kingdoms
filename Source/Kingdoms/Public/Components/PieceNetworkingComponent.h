@@ -2,10 +2,13 @@
 
 #pragma once
 
+#include "Components/TimelineComponent.h"
+
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "PieceNetworkingComponent.generated.h"
 
+class AParentPiece;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class KINGDOMS_API UPieceNetworkingComponent : public UActorComponent
@@ -25,5 +28,4 @@ protected:
 	/* Called when the game starts. */
 	virtual void BeginPlay() override;
 
-		
 };

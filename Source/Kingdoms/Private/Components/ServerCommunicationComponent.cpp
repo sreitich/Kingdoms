@@ -79,8 +79,7 @@ void UServerCommunicationComponent::Server_MovePieceToTile_Implementation(AParen
 	ABoardTile* NewTile, bool bResetStateWhenFinished)
 {
 	/* Rotate the piece towards its destination. When it finishes rotating, it calls MovePieceToTile. */
-	Cast<AMatch_PlayerPawn>(PieceToMove->GetInstigator())->InterpolatePieceRotation(
-		PieceToMove,
+	PieceToMove->InterpolatePieceRotation(
 		NewTile,
 		PieceToMove->GetActorRotation(),
 		UKismetMathLibrary::FindLookAtRotation(PieceToMove->GetCurrentTile()->GetActorLocation(), NewTile->GetActorLocation()),

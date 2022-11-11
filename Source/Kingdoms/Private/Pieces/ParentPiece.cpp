@@ -9,6 +9,7 @@
 #include "Board/ModifierBoardPopup.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/PopUpLocationComponent.h"
+#include "Components/PieceNetworkingComponent.h"
 #include "Framework/Match/Match_GameStateBase.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
@@ -19,6 +20,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "DrawDebugHelpers.h"
+#include "Components/ServerCommunicationComponent.h"
+#include "Framework/Match/Match_PlayerController.h"
 
 AParentPiece::AParentPiece()
 {
@@ -64,6 +67,12 @@ AParentPiece::AParentPiece()
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("PieceCapsule"));
 	GetMesh()->SetCollisionProfileName(TEXT("PieceMesh"));
 
+	/* Load the piece pop-up curve from the content browser. */
+	PiecePopUpCurve = LoadObject<UCurveFloat>(nullptr, TEXT("/Game/Curves/PiecePopUpCurve.PiecePopUpCurve"));
+
+	/* Load the piece rotation curve from the content browser. */
+	PieceRotationCurve = LoadObject<UCurveFloat>(nullptr, TEXT("/Game/Curves/PieceRotationCurve.PieceRotationCurve"));
+	
 	/* Load the piece highlight curve from the content browser. */
 	PieceHighlightCurve = LoadObject<UCurveFloat>(nullptr, TEXT("/Game/Curves/PieceHighlightCurve.PieceHighlightCurve"));
 }
@@ -154,9 +163,30 @@ void AParentPiece::BeginPlay()
 	}
 
 	/* If this piece was spawned during the game, play its pop-up animation. */
-	if (AMatch_PlayerPawn* InstigatingPawn = Cast<AMatch_PlayerPawn>(GetInstigator()))
+	if (const AMatch_PlayerPawn* InstigatingPawn = Cast<AMatch_PlayerPawn>(GetInstigator()))
 	{
-		InstigatingPawn->PlayPiecePopUp(this, 0.25f, false);
+		PlayPiecePopUp(0.25f, false);
+	}
+
+	/* Set up the piece pop-up timeline. */
+	if (PiecePopUpCurve)
+	{
+		FOnTimelineFloat PopUpTimelineCallback;
+		PopUpTimelineCallback.BindUFunction(this, FName("PopUpTimelineTick"));
+		PopUpTimeline.AddInterpFloat(PiecePopUpCurve, PopUpTimelineCallback);
+	}
+
+	/* Set up the piece rotation timeline. */
+	if (PieceRotationCurve)
+	{
+		FOnTimelineFloat RotationTimelineCallback;
+		FOnTimelineEventStatic RotationTimelineFinishedCallback;
+
+		RotationTimelineCallback.BindUFunction(this, FName("RotationTimelineTick"));
+		RotationTimelineFinishedCallback.BindUFunction(this, FName("RotationTimelineEnd"));
+
+		RotationTimeline.AddInterpFloat(PieceRotationCurve, RotationTimelineCallback);
+		RotationTimeline.SetTimelineFinishedFunc(RotationTimelineFinishedCallback);
 	}
 
 	/* Set up the piece highlight timeline. */
@@ -166,21 +196,53 @@ void AParentPiece::BeginPlay()
 		FOnTimelineEventStatic HighlightTimelineFinishedCallback;
 
 		HighlightTimelineCallback.BindUFunction(this, FName("HighlightTimelineTick"));
-		HighlightTimelineFinishedCallback.BindUFunction(this, FName("HighlightFadeInEnd"));
+		HighlightTimelineFinishedCallback.BindUFunction(this, FName("HighlightTimelineEnd"));
 
 		HighlightTimeline.AddInterpFloat(PieceHighlightCurve, HighlightTimelineCallback);
 		HighlightTimeline.SetTimelineFinishedFunc(HighlightTimelineFinishedCallback);
 	}
 }
 
+void AParentPiece::PopUpTimelineTick(float Value)
+{
+	/* Set the piece's size to the current value of the timeline. */
+	GetMesh()->SetRelativeScale3D(FVector(Value));
+}
+
+void AParentPiece::RotationTimelineTick(float Value)
+{
+	/* Rotate the actor towards the target rotation. */
+	SetActorRotation(FMath::RInterpTo(OriginalRotationRot, TargetRotationRot, Value, 1.0f));
+
+	/* If the piece is rotating in order to move to a new location, start moving to the new tile when the piece is
+	 * halfway through its rotation. This just gives the movement a smoother feel. */
+	if (bRotationMoveWhenFinished && Value > 0.5 && !bRotationStartedMoving)
+	{
+		/* Only move the piece once. */
+		bRotationStartedMoving = true;
+
+		Cast<AMatch_PlayerController>(Cast<AMatch_PlayerPawn>(GetInstigator())->GetController())->GetServerCommunicationComponent()->MovePieceToTile
+		(
+			this,
+			RotationNewTile,
+			bRotationResetStateWhenFinished
+		);
+	}
+}
+
+void AParentPiece::RotationTimelineEnd()
+{
+	bRotationStartedMoving = false;
+}
+
 void AParentPiece::HighlightTimelineTick(float Value)
 {
 	/* Interpolate the piece's highlight and brightness. */
-	DynamicMaterial->SetVectorParameterValue(FName("FresnelColor"), FMath::CInterpTo(OriginalHighlightColor, NewHighlightColor, Value, 1.0f));
-	DynamicMaterial->SetScalarParameterValue(FName("Brightness"), FMath::FInterpTo(OriginalHighlightBrightness, NewHighlightBrightness, Value, 1.0f));
+	DynamicMaterial->SetVectorParameterValue(FName("FresnelColor"), FMath::CInterpTo(OriginalHighlightColor, TargetHighlightColor, Value, 1.0f));
+	DynamicMaterial->SetScalarParameterValue(FName("Brightness"), FMath::FInterpTo(OriginalHighlightBrightness, TargetHighlightBrightness, Value, 1.0f));
 }
 
-void AParentPiece::HighlightFadeInEnd()
+void AParentPiece::HighlightTimelineEnd()
 {
 	/* If this highlight has a definite duration and just finished highlighting, wait for the given duration. */
 	if (!bIndefiniteHighlightDuration && HighlightTimelineDirection == ETimelineDirection::Forward)
@@ -245,6 +307,9 @@ void AParentPiece::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	/* Tick active timelines. */
+	PopUpTimeline.TickTimeline(DeltaTime);
+	RotationTimeline.TickTimeline(DeltaTime);
 	HighlightTimeline.TickTimeline(DeltaTime);
 }
 
@@ -284,10 +349,26 @@ void AParentPiece::OnEndCursorOver(UPrimitiveComponent* Component)
 		CurrentTile->OnEndCursorOver(Component);
 }
 
-void AParentPiece::Multicast_PlayPiecePopUp_Implementation(float Duration, bool bReverse)
+void AParentPiece::PlayPiecePopUp(float Duration, bool bReverse)
 {
-	/* Call a pop-up animation with the given parameters for each client. */
-	PlayPiecePopUp_BP(Duration, bReverse);
+	/* Set the necessary rate of the timeline in order for it to be the given duration. 1.0 (the default duration) /
+	 * Duration (the desired duration) = the desired rate (distance/time=speed). */
+	PopUpTimeline.SetPlayRate(1.0f / Duration);
+	PopUpTimeline.PlayFromStart();
+}
+
+void AParentPiece::InterpolatePieceRotation(ABoardTile* NewTile, FRotator OriginalRot, FRotator TargetRot,
+	bool bMoveWhenFinished, bool bResetStateWhenFinished)
+{
+	/* Set the parameters needed for the piece rotation timeline. */
+	RotationNewTile = NewTile;
+	OriginalRotationRot = OriginalRot;
+	TargetRotationRot = TargetRot;
+	bRotationMoveWhenFinished = bMoveWhenFinished;
+	bRotationResetStateWhenFinished = bResetStateWhenFinished;
+
+	/* Play the timeline from the start. */
+	RotationTimeline.PlayFromStart();
 }
 
 void AParentPiece::Server_ResetPieceRotation_Implementation()
@@ -299,7 +380,7 @@ void AParentPiece::Server_ResetPieceRotation_Implementation()
 	/* Get the player start that spawned this piece's owning player. */
 	const AActor* PlayerStart = GameStatePtr->PlayerStarts[PlayerIndex - 1];
 	/* Interpolate this actor's rotation to the rotation that its owning player was spawned at. */
-	Cast<AMatch_PlayerPawn>(GetInstigator())->InterpolatePieceRotation(this, nullptr, GetActorRotation(),PlayerStart->GetActorRotation(), false, false);
+	InterpolatePieceRotation(nullptr, GetActorRotation(),PlayerStart->GetActorRotation(), false, false);
 }
 
 void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float PlayRate, float Duration, bool bIndefiniteDuration)
@@ -309,8 +390,8 @@ void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float Pl
 	DynamicMaterial->GetScalarParameterValue(TEXT("Brightness"), OriginalHighlightBrightness);
 
 	/* Set the other parameters needed for the highlight timeline. */
-	NewHighlightColor = Color;
-	NewHighlightBrightness = Brightness;
+	TargetHighlightColor = Color;
+	TargetHighlightBrightness = Brightness;
 	HighlightPlayRate = PlayRate;
 	HighlightDuration = Duration;
 	bIndefiniteHighlightDuration = bIndefiniteDuration;

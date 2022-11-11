@@ -51,16 +51,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE EAlignment GetAlignment() const { return GetInstigator()->IsLocallyControlled() ? E_Friendly : E_Hostile; }
 
-	/* Plays a pop-up animation on each client, quickly scaling up the piece's size from 0.0 to 1.0, over a given duration. */
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_PlayPiecePopUp(float Duration, bool bReverse);
+	/* Plays a piece pop-up animation, scaling up the piece's size from 0.0 to 1.0 over the given duration. */
+	UFUNCTION(BlueprintCallable)
+	void PlayPiecePopUp(float Duration, bool bReverse);
 
-		UFUNCTION(BlueprintImplementableEvent)
-		void PlayPiecePopUp_BP(float Duration, bool bReverse);
+	/* Smoothly rotates the piece to the target rotation over a short time period. If bMoveWhenFinished is true, the
+	 * piece is moved to the target tile when it finishes rotating. If bResetStateWhenFinished is true, the player's
+	 * state is reset after the piece finishes rotating. */
+	UFUNCTION(BlueprintCallable)
+	void InterpolatePieceRotation(ABoardTile* NewTile, FRotator OriginalRot, FRotator TargetRot, bool bMoveWhenFinished, bool bResetStateWhenFinished);
 
-	/* Rotates this piece to the rotation it was spawned with, facing away from its owner's starting position. */
-	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void Server_ResetPieceRotation();
+		/* Rotates this piece to the rotation it was spawned with, facing away from its owner's starting position. */
+		UFUNCTION(Server, Reliable, BlueprintCallable)
+		void Server_ResetPieceRotation();
 
 	/* Flashes a given highlight onto the piece at a given strength for a given amount of time. Normal brightness is 4.0.
 	 * Highlighted brightness is 20.0 for action/ability targets, 10.0 for effects/modifiers. Standard play-rate is
@@ -73,6 +76,7 @@ public:
 		UFUNCTION(BlueprintImplementableEvent)
 		void FlashHighlightTimeline(FLinearColor NewColor, float NewBrightness, FLinearColor OriginalColor, float
 			OriginalBrightness, float PlayRate, float Duration, bool bIndefiniteDuration);
+
 
 	/* Spawns and animates a modifier pop-up with the appropriate information at this piece's pop-up location. */
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
@@ -245,21 +249,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
 	bool bActiveAbilityLoops = false;
 
-	/* Highlight timeline variables. */
-	float HighlightCurveValue;
-	float HighlightTimelineValue;
-	FTimeline HighlightTimeline;
-	TEnumAsByte<ETimelineDirection::Type> HighlightTimelineDirection;
-
-	/* Parameters of the highlight timeline. */
-	FLinearColor OriginalHighlightColor;
-	FLinearColor NewHighlightColor;
-	float OriginalHighlightBrightness;
-	float NewHighlightBrightness;
-	float HighlightPlayRate;
-	float HighlightDuration;
-	bool bIndefiniteHighlightDuration;
-
 
 /* Public constants and asset references. */
 public:
@@ -268,6 +257,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data")
 	UDataTable* PieceDataTable;
 
+	/* The curve used for pieces' pop-up animations. */
+	UPROPERTY(EditAnywhere, Category="Curves")
+	UCurveFloat* PiecePopUpCurve;
+
+	/* The curve used to smoothly rotate pieces. */
+	UPROPERTY(EditAnywhere, Category="Curves")
+	UCurveFloat* PieceRotationCurve;
+	
+	/* The curve used for highlighting pieces. */
 	UPROPERTY(EditAnywhere, Category="Curves")
 	UCurveFloat* PieceHighlightCurve;
 
@@ -342,17 +340,33 @@ protected:
 	/* Called when the game starts or when spawned. */
 	virtual void BeginPlay() override;
 
+
+	/* Called every tick of the pop-up timeline to update the target piece's transform. */
+	UFUNCTION()
+	void PopUpTimelineTick(float Value);
+
+
+	/* Called every tick of the piece rotation timeline to update the piece's rotation. */
+	UFUNCTION()
+	void RotationTimelineTick(float Value);
+
+	/* Called at the end of the piece rotation timeline to reset the variables used throughout the timeline. */
+	UFUNCTION()
+	void RotationTimelineEnd();
+
+
 	/* Called every tick of the piece highlight timeline to update the piece's highlight. */
 	UFUNCTION()
 	void HighlightTimelineTick(float Value);
 
 	/* If the current piece highlight is NOT indefinite, waits for the given duration before calling HighlightDurationEnd. */
 	UFUNCTION()
-	void HighlightFadeInEnd();
+	void HighlightTimelineEnd();
 
 	/* Reverses the current piece highlight. */
 	UFUNCTION()
 	void HighlightDurationEnd();
+
 
 	/* Refreshes any piece info widget displaying this piece. */
 	UFUNCTION()
@@ -382,6 +396,36 @@ protected:
 	 * moving to a new tile. */
 	UFUNCTION(BlueprintCallable)
 	virtual void OnMoveToTileCompleted();
+
+
+/* Protected variables. */
+protected:
+
+	/* Piece pop-up animation timeline variables. */
+	FTimeline PopUpTimeline;
+
+	/* Piece rotation timeline variables. */
+	FTimeline RotationTimeline;
+	bool bRotationStartedMoving;
+	/* Rotation timeline parameters. */
+	UPROPERTY()
+	ABoardTile* RotationNewTile;
+	FRotator OriginalRotationRot;
+	FRotator TargetRotationRot;
+	bool bRotationMoveWhenFinished;
+	bool bRotationResetStateWhenFinished;
+
+	/* Highlight timeline variables. */
+	FTimeline HighlightTimeline;
+	TEnumAsByte<ETimelineDirection::Type> HighlightTimelineDirection;
+	/* Highlight timeline parameters. */
+	FLinearColor OriginalHighlightColor;
+	FLinearColor TargetHighlightColor;
+	float OriginalHighlightBrightness;
+	float TargetHighlightBrightness;
+	float HighlightPlayRate;
+	float HighlightDuration;
+	bool bIndefiniteHighlightDuration;
 
 
 /* Protected constants and asset references. */
