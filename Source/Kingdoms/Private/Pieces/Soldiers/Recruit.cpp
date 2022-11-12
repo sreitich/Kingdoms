@@ -4,6 +4,8 @@
 #include "Pieces/Soldiers/Recruit.h"
 
 #include "Board/BoardTile.h"
+#include "Components/PieceNetworkingComponent.h"
+#include "Framework/Match/Match_PlayerPawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Pieces/PieceAIController.h"
 
@@ -144,7 +146,7 @@ void ARecruit::UpdatePassiveModifier(bool bTriggerPopUp)
 				-1
 			};
 
-			Server_AddModifier(ModifierToAdd, bTriggerPopUp, bTriggerPopUp);
+			Cast<AMatch_PlayerPawn>(GetInstigator())->GetPieceNetworkingComponent()->Server_AddModifier(this, ModifierToAdd, bTriggerPopUp, bTriggerPopUp);
 		}
 	}
 }

@@ -163,14 +163,9 @@ public:
 	void SetAttackInfo(FAttackInfo NewAttackInfo);
 
 
-	/* Getter for TemporaryModifiers. */
+	/* Getter for TemporaryModifiers. Returns a reference. */
 	UFUNCTION(BlueprintCallable, Category="Modifiers")
-	FORCEINLINE TArray<FModifier> GetTemporaryModifiers() const { return TemporaryModifiers; }
-
-	/* Apply a new modifier ot this piece, activating a pop-up and flashing a piece highlight if requested. If the
-	 * modifier already exists, reset the duration and stack the modifiers together. */
-	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
-	void Server_AddModifier(FModifier NewModifier, bool bActivatePopUp, bool bFlashHighlight);
+	FORCEINLINE TArray<FModifier>& GetTemporaryModifiers() { return TemporaryModifiers; }
 
 	/* Remove a temporary modifier, activating a pop-up if requested. */
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
@@ -368,6 +363,11 @@ protected:
 	void HighlightDurationEnd();
 
 
+	/* Updates this piece's strength and armor. This lets the strength and armor variables stay protected, so they can
+	 * only be updated by applying modifiers. */
+	UFUNCTION()
+	void OnRep_TemporaryModifiers();
+	
 	/* Refreshes any piece info widget displaying this piece. */
 	UFUNCTION()
 	void OnRep_CurrentStrength();
@@ -462,7 +462,7 @@ protected:
 	FAttackInfo AttackInfo;
 
 	/* Every modifier currently applied to this piece's statistics. */
-	UPROPERTY(Replicated, EditInstanceOnly, BlueprintReadWrite, Category="Piece Info")
+	UPROPERTY(ReplicatedUsing=OnRep_TemporaryModifiers, EditInstanceOnly, BlueprintReadWrite, Category="Piece Info")
 	TArray<FModifier> TemporaryModifiers;
 
 

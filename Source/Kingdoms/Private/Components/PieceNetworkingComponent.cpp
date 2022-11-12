@@ -2,6 +2,9 @@
 
 
 #include "Components/PieceNetworkingComponent.h"
+#include "Framework/Match/Match_PlayerPawn.h"
+
+#include "Pieces/ParentPiece.h"
 
 UPieceNetworkingComponent::UPieceNetworkingComponent()
 {
@@ -11,8 +14,93 @@ UPieceNetworkingComponent::UPieceNetworkingComponent()
 
 }
 
+void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* PieceToModify, FModifier NewModifier,
+	bool bActivatePopUp, bool bFlashHighlight)
+{
+	/* Store the original strength or armor value to find out the final change that this modifier applies. */
+	const int OriginalValue = NewModifier.EffectedStat ? PieceToModify->GetCurrentStrength() : PieceToModify->GetCurrentArmor();
+	int NewValue = OriginalValue;
+
+	/* Save the new strength value to determine the modifier pop-up value. */
+	if (NewModifier.StrengthChange != 0)
+		NewValue = FMath::Clamp(PieceToModify->GetCurrentStrength() + NewModifier.StrengthChange, 0, 20);
+
+	/* Save the new armor value to determine the modifier pop-up value. */
+	if (NewModifier.ArmorChange != 0)
+		NewValue = FMath::Clamp(PieceToModify->GetCurrentArmor() + NewModifier.ArmorChange, 0, 20);
+
+	/* Get the target piece's current temporary modifiers. */
+	TArray<FModifier> &TemporaryModifiers = PieceToModify->GetTemporaryModifiers();
+	
+	/* Check if this modifier is already applied. */
+	int RepeatIndex = -1;
+	for (int i = 0; i < TemporaryModifiers.Num(); i++)
+	{
+		if (TemporaryModifiers[i].SourceActor == NewModifier.SourceActor &&
+			TemporaryModifiers[i].SourceAbilityName == NewModifier.SourceAbilityName &&
+			TemporaryModifiers[i].StrengthChange == NewModifier.StrengthChange &&
+			TemporaryModifiers[i].ArmorChange == NewModifier.ArmorChange)
+		{
+			RepeatIndex = i;
+			break;
+		}
+	}
+
+	/* If this modifier is already applied, reset its duration and stack the values together. */
+	if (RepeatIndex != -1)
+	{
+		TemporaryModifiers[RepeatIndex].RemainingDuration = NewModifier.RemainingDuration;
+		TemporaryModifiers[RepeatIndex].StrengthChange += NewModifier.StrengthChange;
+		TemporaryModifiers[RepeatIndex].ArmorChange += NewModifier.ArmorChange;
+	}
+	/* If this modifier isn't already applied, apply it. */
+	else
+	{
+		TemporaryModifiers.Add(NewModifier);
+	}
+
+	/* Spawn a modifier pop-up if requested. */
+	if (bActivatePopUp)
+		PieceToModify->Multicast_CreateModifierPopUp(NewValue - OriginalValue, NewModifier.EffectedStat == FModifier::Strength);
+
+	/* Flash a piece highlight for each changed statistic on all clients if requested. */
+	if (bFlashHighlight)
+	{
+		if (NewModifier.StrengthChange != 0)
+		{
+			if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
+			{
+				PawnPtr->Multicast_FlashHighlight
+				(
+					PieceToModify,
+					NewModifier.StrengthChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
+					10.0f,
+					0.5f,
+					0.25f,
+					false
+				);
+			}
+		}
+
+		if (NewModifier.ArmorChange != 0)
+		{
+			if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
+			{
+				PawnPtr->Multicast_FlashHighlight
+				(
+					PieceToModify,
+					NewModifier.ArmorChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
+					10.0f,
+					0.5f,
+					0.25f,
+					false
+				);
+			}
+		}
+	}
+}
+
 void UPieceNetworkingComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }

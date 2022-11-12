@@ -260,6 +260,34 @@ void AParentPiece::HighlightDurationEnd()
 	HighlightTimeline.ReverseFromEnd();
 }
 
+void AParentPiece::OnRep_TemporaryModifiers()
+{
+	/* Get the most recently added modifier. */
+	const FModifier NewModifier = TemporaryModifiers.Last(0);
+
+	/* Store the original strength or armor value to find out the final change that this modifier applies. */
+	const int OriginalValue = NewModifier.EffectedStat ? CurrentStrength : CurrentArmor;
+	int NewValue = OriginalValue;
+
+	/* Set the new strength statistic, clamped so that it can't go below 0 or above 20. */
+	if (NewModifier.StrengthChange != 0)
+	{
+		CurrentStrength = FMath::Clamp(CurrentStrength + NewModifier.StrengthChange, 0, 20);
+		NewValue = CurrentStrength;
+		OnRep_CurrentStrength();
+	}
+
+	/* Set the new armor statistic, clamped so that it can't go below 0 or above 20. */
+	if (NewModifier.ArmorChange != 0)
+	{
+		CurrentArmor = FMath::Clamp(CurrentArmor + NewModifier.ArmorChange, 0, 20);
+		NewValue = CurrentArmor;
+		OnRep_CurrentArmor();
+	}
+
+	
+}
+
 void AParentPiece::OnRep_CurrentStrength()
 {
 	/* Refresh any piece info widgets currently displaying this piece's info. */
@@ -621,96 +649,6 @@ void AParentPiece::SetAttackInfo(FAttackInfo NewAttackInfo)
 	}
 }
 
-void AParentPiece::Server_AddModifier_Implementation(FModifier NewModifier, bool bActivatePopUp, bool bFlashHighlight)
-{
-	/* Store the original strength or armor value to find out the final change that this modifier applies. */
-	const int OriginalValue = NewModifier.EffectedStat ? CurrentStrength : CurrentArmor;
-	int NewValue = OriginalValue;
-
-	/* Set the new strength statistic, clamped so that it can't go below 0 or above 20. */
-	if (NewModifier.StrengthChange != 0)
-	{
-		CurrentStrength = FMath::Clamp(CurrentStrength + NewModifier.StrengthChange, 0, 20);
-		NewValue = CurrentStrength;
-		OnRep_CurrentStrength();
-	}
-
-	/* Set the new armor statistic, clamped so that it can't go below 0 or above 20. */
-	if (NewModifier.ArmorChange != 0)
-	{
-		CurrentArmor = FMath::Clamp(CurrentArmor + NewModifier.ArmorChange, 0, 20);
-		NewValue = CurrentArmor;
-		OnRep_CurrentArmor();
-	}
-
-	/* Check if this modifier is already applied. */
-	int RepeatIndex = -1;
-	for (int i = 0; i < TemporaryModifiers.Num(); i++)
-	{
-		if (TemporaryModifiers[i].SourceActor == NewModifier.SourceActor &&
-			TemporaryModifiers[i].SourceAbilityName == NewModifier.SourceAbilityName &&
-			TemporaryModifiers[i].StrengthChange == NewModifier.StrengthChange &&
-			TemporaryModifiers[i].ArmorChange == NewModifier.ArmorChange)
-		{
-			RepeatIndex = i;
-			break;
-		}
-	}
-
-	/* If this modifier is already applied, reset its duration and stack the values together. */
-	if (RepeatIndex != -1)
-	{
-		TemporaryModifiers[RepeatIndex].RemainingDuration = NewModifier.RemainingDuration;
-		TemporaryModifiers[RepeatIndex].StrengthChange += NewModifier.StrengthChange;
-		TemporaryModifiers[RepeatIndex].ArmorChange += NewModifier.ArmorChange;
-	}
-	/* If this modifier isn't already applied, apply it. */
-	else
-	{
-		TemporaryModifiers.Add(NewModifier);
-	}
-
-	/* Spawn a modifier pop-up if requested. */
-	if (bActivatePopUp)
-		Multicast_CreateModifierPopUp(NewValue - OriginalValue, NewModifier.EffectedStat == FModifier::Strength);
-
-	/* Flash a piece highlight for each changed statistic on all clients if requested. */
-	if (bFlashHighlight)
-	{
-		if (NewModifier.StrengthChange != 0)
-		{
-			if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetInstigator()))
-			{
-				PawnPtr->Multicast_FlashHighlight
-				(
-					this,
-					NewModifier.StrengthChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
-					10.0f,
-					0.5f,
-					0.25f,
-					false
-				);
-			}
-		}
-
-		if (NewModifier.ArmorChange != 0)
-		{
-			if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetInstigator()))
-			{
-				PawnPtr->Multicast_FlashHighlight
-				(
-					this,
-					NewModifier.ArmorChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
-					10.0f,
-					0.5f,
-					0.25f,
-					false
-				);
-			}
-		}
-	}
-}
-
 void AParentPiece::Server_RemoveModifier_Implementation(FModifier ModifierToRemove, bool bActivatePopUp)
 {
 	/* Some pieces' abilities that have lasting effects (i.e. modifiers) need to execute code when that effect ends. */
@@ -756,6 +694,15 @@ void AParentPiece::Server_DecrementModifierDurations_Implementation()
 		}
 	}
 }
+
+// bool AParentPiece::SetCurrentStrength(int NewStrength)
+// {
+// 	
+// }
+//
+// bool AParentPiece::SetCurrentArmor(int NewArmor)
+// {
+// }
 
 bool AParentPiece::SetPassiveCD(int NewPassiveCD)
 {
