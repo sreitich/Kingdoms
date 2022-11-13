@@ -29,6 +29,7 @@ void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* 
 	if (NewModifier.ArmorChange != 0)
 		NewValue = FMath::Clamp(PieceToModify->GetCurrentArmor() + NewModifier.ArmorChange, 0, 20);
 
+
 	/* Get the target piece's current temporary modifiers. */
 	TArray<FModifier> &TemporaryModifiers = PieceToModify->GetTemporaryModifiers();
 	
@@ -36,10 +37,7 @@ void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* 
 	int RepeatIndex = -1;
 	for (int i = 0; i < TemporaryModifiers.Num(); i++)
 	{
-		if (TemporaryModifiers[i].SourceActor == NewModifier.SourceActor &&
-			TemporaryModifiers[i].SourceAbilityName == NewModifier.SourceAbilityName &&
-			TemporaryModifiers[i].StrengthChange == NewModifier.StrengthChange &&
-			TemporaryModifiers[i].ArmorChange == NewModifier.ArmorChange)
+		if (TemporaryModifiers[i] == NewModifier)
 		{
 			RepeatIndex = i;
 			break;
@@ -56,15 +54,17 @@ void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* 
 	/* If this modifier isn't already applied, apply it. */
 	else
 	{
-		TArray<FModifier> OldTemporaryModifiers = TemporaryModifiers;
+		const TArray<FModifier> OldTemporaryModifiers = TemporaryModifiers;
 		TemporaryModifiers.Add(NewModifier);
 		/* Manually call the OnRep for the server. */
 		PieceToModify->OnRep_TemporaryModifiers(OldTemporaryModifiers);
 	}
 
+
 	/* Spawn a modifier pop-up if requested. */
 	if (bActivatePopUp)
 		PieceToModify->Multicast_CreateModifierPopUp(NewValue - OriginalValue, NewModifier.EffectedStat == FModifier::Strength);
+
 
 	/* Flash a piece highlight for each changed statistic on all clients if requested. */
 	if (bFlashHighlight)
@@ -103,31 +103,77 @@ void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* 
 	}
 }
 
-// void UPieceNetworkingComponent::Server_RemoveModifier_Implementation(AParentPiece* TargetPiece, FModifier ModifierToRemove, bool bActivatePopUp,
-// 	bool bFlashHighlight)
-// {
-// 	/* Some pieces' abilities that have lasting effects (i.e. modifiers) need to execute code when that effect ends. */
-// 	const TArray<AActor*> Targets = { TargetPiece };
-// 	if (AParentPiece* Piece = Cast<AParentPiece>(ModifierToRemove.SourceActor))
-// 		Piece->OnAbilityEffectEnded(Targets);
-//
-// 	/* Remove the strength effect of the modifier from the piece it was modifying. */
-// 	if (ModifierToRemove.StrengthChange != 0)
-// 	{
-// 		CurrentStrength = FMath::Clamp(CurrentStrength - ModifierToRemove.StrengthChange, 0, 20);
-// 		OnRep_CurrentStrength();
-// 	}
-//
-// 	/* Remove the armor effect of the modifier from the piece it was modifying. */
-// 	if (ModifierToRemove.ArmorChange != 0)
-// 	{
-// 		CurrentArmor = FMath::Clamp(CurrentArmor - ModifierToRemove.ArmorChange, 0, 20);
-// 		OnRep_CurrentArmor();
-// 	}
-// 			
-// 	/* Remove this modifier from this piece. */
-// 	TemporaryModifiers.Remove(ModifierToRemove);
-// }
+void UPieceNetworkingComponent::Server_RemoveModifier_Implementation(AParentPiece* TargetPiece, FModifier ModifierToRemove, bool bActivatePopUp,
+	bool bFlashHighlight)
+{
+	/* Store the original strength or armor value to find out the final change that this modifier applies. */
+	const int OriginalValue = ModifierToRemove.EffectedStat ? TargetPiece->GetCurrentStrength() : TargetPiece->GetCurrentArmor();
+	int NewValue = OriginalValue;
+
+	/* Save the new strength value to determine the modifier pop-up value. */
+	if (ModifierToRemove.StrengthChange != 0)
+		NewValue = FMath::Clamp(TargetPiece->GetCurrentStrength() - ModifierToRemove.StrengthChange, 0, 20);
+
+	/* Save the new armor value to determine the modifier pop-up value. */
+	if (ModifierToRemove.ArmorChange != 0)
+		NewValue = FMath::Clamp(TargetPiece->GetCurrentArmor() - ModifierToRemove.ArmorChange, 0, 20);
+
+
+	/* Some pieces' abilities that have lasting effects (i.e. modifiers) need to execute code when that effect ends. */
+	const TArray<AActor*> Targets = { TargetPiece };
+	if (AParentPiece* Piece = Cast<AParentPiece>(ModifierToRemove.SourceActor))
+		Piece->OnAbilityEffectEnded(Targets);
+
+
+	/* Remove the given modifier from the target piece, if it exists. */
+	TArray<FModifier> &TemporaryModifiers = TargetPiece->GetTemporaryModifiers();
+	const TArray<FModifier> OldTemporaryModifiers = TemporaryModifiers;
+	TargetPiece->GetTemporaryModifiers().Remove(ModifierToRemove);
+	/* Manually call the OnRep for the server. */
+	TargetPiece->OnRep_TemporaryModifiers(OldTemporaryModifiers);
+
+
+	/* Spawn a modifier pop-up if requested. */
+	if (bActivatePopUp)
+		TargetPiece->Multicast_CreateModifierPopUp(NewValue - OriginalValue, ModifierToRemove.EffectedStat == FModifier::Strength);
+
+
+	/* Flash a piece highlight for each changed statistic on all clients if requested. */
+	if (bFlashHighlight)
+	{
+		if (ModifierToRemove.StrengthChange != 0)
+		{
+			if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
+			{
+				PawnPtr->Multicast_FlashHighlight
+				(
+					TargetPiece,
+					ModifierToRemove.StrengthChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
+					10.0f,
+					0.5f,
+					0.25f,
+					false
+				);
+			}
+		}
+
+		if (ModifierToRemove.ArmorChange != 0)
+		{
+			if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
+			{
+				PawnPtr->Multicast_FlashHighlight
+				(
+					TargetPiece,
+					ModifierToRemove.ArmorChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
+					10.0f,
+					0.5f,
+					0.25f,
+					false
+				);
+			}
+		}
+	}
+}
 
 void UPieceNetworkingComponent::BeginPlay()
 {

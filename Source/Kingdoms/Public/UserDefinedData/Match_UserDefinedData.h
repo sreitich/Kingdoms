@@ -148,6 +148,7 @@ struct FCameraInterpolationInfo
 	bool bReverse;
 };
 
+/* Information used to modify a piece's statistics as a result of an ability or effect. */
 USTRUCT(BlueprintType)
 struct FModifier
 {

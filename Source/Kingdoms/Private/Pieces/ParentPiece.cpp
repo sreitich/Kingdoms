@@ -276,26 +276,43 @@ void AParentPiece::OnRep_TemporaryModifiers(TArray<FModifier> OldTemporaryModifi
 			// const int OriginalValue = NewModifier.EffectedStat ? CurrentStrength : CurrentArmor;
 			// int NewValue = OriginalValue;
 
-			/* Set the new strength statistic, clamped so that it can't go below 0 or above 20. */
+			/* Set the new strength statistic, clamped so that it can't go above 20. */
 			if (NewModifier.StrengthChange != 0)
 			{
 				CurrentStrength = FMath::Clamp(CurrentStrength + NewModifier.StrengthChange, 0, 20);
-				/* Manually call OnRep on the server. */
+				/* Manually call the OnRep on the server. */
 				OnRep_CurrentStrength();
 			}
 
-			/* Set the new armor statistic, clamped so that it can't go below 0 or above 20. */
+			/* Set the new armor statistic, clamped so that it can't go above 20. */
 			if (NewModifier.ArmorChange != 0)
 			{
 				CurrentArmor = FMath::Clamp(CurrentArmor + NewModifier.ArmorChange, 0, 20);
-				/* Manually call OnRep on the server. */
+				/* Manually call the OnRep on the server. */
 				OnRep_CurrentArmor();
 			}
 		}
 		/* A modifier was removed. */
 		else if (TemporaryModifiers.Num() < OldTemporaryModifiers.Num())
 		{
-			
+			/* Get the modifier that was just removed. */
+			const FModifier RemovedModifier = OldTemporaryModifiers.Last(0);
+
+			/* Set the new strength statistic, clamped so that it can't go below 0. */
+			if (RemovedModifier.StrengthChange != 0)
+			{
+				CurrentStrength = FMath::Clamp(CurrentStrength - RemovedModifier.StrengthChange, 0, 20);
+				/* Manually call the OnRep on the server. */
+				OnRep_CurrentStrength();
+			}
+
+			/* Set the new armor statistic, clamped so that it can't go below 0. */
+			if (RemovedModifier.ArmorChange != 0)
+			{
+				CurrentArmor = FMath::Clamp(CurrentArmor - RemovedModifier.ArmorChange, 0, 20);
+				/* Manually call the OnRep on the server. */
+				OnRep_CurrentArmor();
+			}
 		}
 	}
 }
@@ -661,30 +678,30 @@ void AParentPiece::SetAttackInfo(FAttackInfo NewAttackInfo)
 	}
 }
 
-void AParentPiece::Server_RemoveModifier_Implementation(FModifier ModifierToRemove, bool bActivatePopUp)
-{
-	/* Some pieces' abilities that have lasting effects (i.e. modifiers) need to execute code when that effect ends. */
-	const TArray<AActor*> Targets = { this };
-	if (AParentPiece* Piece = Cast<AParentPiece>(ModifierToRemove.SourceActor))
-		Piece->OnAbilityEffectEnded(Targets);
-
-	/* Remove the strength effect of the modifier from the piece it was modifying. */
-	if (ModifierToRemove.StrengthChange != 0)
-	{
-		CurrentStrength = FMath::Clamp(CurrentStrength - ModifierToRemove.StrengthChange, 0, 20);
-		OnRep_CurrentStrength();
-	}
-
-	/* Remove the armor effect of the modifier from the piece it was modifying. */
-	if (ModifierToRemove.ArmorChange != 0)
-	{
-		CurrentArmor = FMath::Clamp(CurrentArmor - ModifierToRemove.ArmorChange, 0, 20);
-		OnRep_CurrentArmor();
-	}
-			
-	/* Remove this modifier from this piece. */
-	TemporaryModifiers.Remove(ModifierToRemove);
-}
+// void AParentPiece::Server_RemoveModifier_Implementation(FModifier ModifierToRemove, bool bActivatePopUp)
+// {
+// 	/* Some pieces' abilities that have lasting effects (i.e. modifiers) need to execute code when that effect ends. */
+// 	const TArray<AActor*> Targets = { this };
+// 	if (AParentPiece* Piece = Cast<AParentPiece>(ModifierToRemove.SourceActor))
+// 		Piece->OnAbilityEffectEnded(Targets);
+//
+// 	/* Remove the strength effect of the modifier from the piece it was modifying. */
+// 	if (ModifierToRemove.StrengthChange != 0)
+// 	{
+// 		CurrentStrength = FMath::Clamp(CurrentStrength - ModifierToRemove.StrengthChange, 0, 20);
+// 		OnRep_CurrentStrength();
+// 	}
+//
+// 	/* Remove the armor effect of the modifier from the piece it was modifying. */
+// 	if (ModifierToRemove.ArmorChange != 0)
+// 	{
+// 		CurrentArmor = FMath::Clamp(CurrentArmor - ModifierToRemove.ArmorChange, 0, 20);
+// 		OnRep_CurrentArmor();
+// 	}
+// 			
+// 	/* Remove this modifier from this piece. */
+// 	TemporaryModifiers.Remove(ModifierToRemove);
+// }
 
 void AParentPiece::Server_DecrementModifierDurations_Implementation()
 {
@@ -701,7 +718,7 @@ void AParentPiece::Server_DecrementModifierDurations_Implementation()
 			if (NewRemainingDuration < 1)
 			{
 				/* Always activate pop-ups for abilities that are removed because their duration ends. */
-				Server_RemoveModifier(TemporaryModifiers[i], true);
+				Cast<AMatch_PlayerPawn>(GetInstigator())->GetPieceNetworkingComponent()->Server_RemoveModifier(this, TemporaryModifiers[i], true, true);
 			}
 		}
 	}

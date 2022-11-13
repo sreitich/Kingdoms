@@ -125,7 +125,7 @@ void ARecruit::UpdatePassiveModifier(bool bTriggerPopUp)
 		{
 			if (Modifier.SourceAbilityName == PieceData->PassiveName)
 			{
-				Server_RemoveModifier(Modifier, false);
+				Cast<AMatch_PlayerPawn>(GetInstigator())->GetPieceNetworkingComponent()->Server_RemoveModifier(this, Modifier, false, false);
 				break;
 			}
 		}
