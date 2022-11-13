@@ -260,32 +260,44 @@ void AParentPiece::HighlightDurationEnd()
 	HighlightTimeline.ReverseFromEnd();
 }
 
-void AParentPiece::OnRep_TemporaryModifiers()
+void AParentPiece::OnRep_TemporaryModifiers(TArray<FModifier> OldTemporaryModifiers)
 {
-	/* Get the most recently added modifier. */
-	const FModifier NewModifier = TemporaryModifiers.Last(0);
-
-	/* Store the original strength or armor value to find out the final change that this modifier applies. */
-	const int OriginalValue = NewModifier.EffectedStat ? CurrentStrength : CurrentArmor;
-	int NewValue = OriginalValue;
-
-	/* Set the new strength statistic, clamped so that it can't go below 0 or above 20. */
-	if (NewModifier.StrengthChange != 0)
+	/* Apply the effects of the added or removed modifier on the server. */
+	if (HasAuthority())
 	{
-		CurrentStrength = FMath::Clamp(CurrentStrength + NewModifier.StrengthChange, 0, 20);
-		NewValue = CurrentStrength;
-		OnRep_CurrentStrength();
-	}
+		/* A modifier was added. */
+		if (TemporaryModifiers.Num() > OldTemporaryModifiers.Num())
+		{
+			/* Get the most recently added modifier. */
+			const FModifier NewModifier = TemporaryModifiers.Last(0);
 
-	/* Set the new armor statistic, clamped so that it can't go below 0 or above 20. */
-	if (NewModifier.ArmorChange != 0)
-	{
-		CurrentArmor = FMath::Clamp(CurrentArmor + NewModifier.ArmorChange, 0, 20);
-		NewValue = CurrentArmor;
-		OnRep_CurrentArmor();
-	}
+			// /* Store the original strength or armor value to find out the final change that this modifier applies. Not
+			// sure if we need this yet. */
+			// const int OriginalValue = NewModifier.EffectedStat ? CurrentStrength : CurrentArmor;
+			// int NewValue = OriginalValue;
 
-	
+			/* Set the new strength statistic, clamped so that it can't go below 0 or above 20. */
+			if (NewModifier.StrengthChange != 0)
+			{
+				CurrentStrength = FMath::Clamp(CurrentStrength + NewModifier.StrengthChange, 0, 20);
+				/* Manually call OnRep on the server. */
+				OnRep_CurrentStrength();
+			}
+
+			/* Set the new armor statistic, clamped so that it can't go below 0 or above 20. */
+			if (NewModifier.ArmorChange != 0)
+			{
+				CurrentArmor = FMath::Clamp(CurrentArmor + NewModifier.ArmorChange, 0, 20);
+				/* Manually call OnRep on the server. */
+				OnRep_CurrentArmor();
+			}
+		}
+		/* A modifier was removed. */
+		else if (TemporaryModifiers.Num() < OldTemporaryModifiers.Num())
+		{
+			
+		}
+	}
 }
 
 void AParentPiece::OnRep_CurrentStrength()
@@ -694,15 +706,6 @@ void AParentPiece::Server_DecrementModifierDurations_Implementation()
 		}
 	}
 }
-
-// bool AParentPiece::SetCurrentStrength(int NewStrength)
-// {
-// 	
-// }
-//
-// bool AParentPiece::SetCurrentArmor(int NewArmor)
-// {
-// }
 
 bool AParentPiece::SetPassiveCD(int NewPassiveCD)
 {

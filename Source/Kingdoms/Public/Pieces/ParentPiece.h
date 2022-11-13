@@ -167,6 +167,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Modifiers")
 	FORCEINLINE TArray<FModifier>& GetTemporaryModifiers() { return TemporaryModifiers; }
 
+	/* Updates this piece's strength and armor. This lets the strength and armor variables stay protected, so they can
+	 * only be updated by applying modifiers. */
+	UFUNCTION()
+	void OnRep_TemporaryModifiers(TArray<FModifier> OldTemporaryModifiers);
+
 	/* Remove a temporary modifier, activating a pop-up if requested. */
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
 	void Server_RemoveModifier(FModifier ModifierToRemove, bool bActivatePopUp);
@@ -362,11 +367,6 @@ protected:
 	UFUNCTION()
 	void HighlightDurationEnd();
 
-
-	/* Updates this piece's strength and armor. This lets the strength and armor variables stay protected, so they can
-	 * only be updated by applying modifiers. */
-	UFUNCTION()
-	void OnRep_TemporaryModifiers();
 	
 	/* Refreshes any piece info widget displaying this piece. */
 	UFUNCTION()

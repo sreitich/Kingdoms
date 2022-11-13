@@ -26,6 +26,10 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
 	void Server_AddModifier(AParentPiece* PieceToModify, FModifier NewModifier, bool bActivatePopUp, bool bFlashHighlight);
 
+	// /* Remove an existing modifier from this piece, activating a pop-up and flashing a highlight if requested. */
+	// UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
+	// void Server_RemoveModifier(AParentPiece* TargetPiece, FModifier ModifierToRemove, bool bActivatePopUp, bool bFlashHighlight);
+
 
 /* Protected functions. */
 protected:

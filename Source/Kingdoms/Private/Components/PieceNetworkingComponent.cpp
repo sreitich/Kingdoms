@@ -56,7 +56,10 @@ void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* 
 	/* If this modifier isn't already applied, apply it. */
 	else
 	{
+		TArray<FModifier> OldTemporaryModifiers = TemporaryModifiers;
 		TemporaryModifiers.Add(NewModifier);
+		/* Manually call the OnRep for the server. */
+		PieceToModify->OnRep_TemporaryModifiers(OldTemporaryModifiers);
 	}
 
 	/* Spawn a modifier pop-up if requested. */
@@ -99,6 +102,32 @@ void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* 
 		}
 	}
 }
+
+// void UPieceNetworkingComponent::Server_RemoveModifier_Implementation(AParentPiece* TargetPiece, FModifier ModifierToRemove, bool bActivatePopUp,
+// 	bool bFlashHighlight)
+// {
+// 	/* Some pieces' abilities that have lasting effects (i.e. modifiers) need to execute code when that effect ends. */
+// 	const TArray<AActor*> Targets = { TargetPiece };
+// 	if (AParentPiece* Piece = Cast<AParentPiece>(ModifierToRemove.SourceActor))
+// 		Piece->OnAbilityEffectEnded(Targets);
+//
+// 	/* Remove the strength effect of the modifier from the piece it was modifying. */
+// 	if (ModifierToRemove.StrengthChange != 0)
+// 	{
+// 		CurrentStrength = FMath::Clamp(CurrentStrength - ModifierToRemove.StrengthChange, 0, 20);
+// 		OnRep_CurrentStrength();
+// 	}
+//
+// 	/* Remove the armor effect of the modifier from the piece it was modifying. */
+// 	if (ModifierToRemove.ArmorChange != 0)
+// 	{
+// 		CurrentArmor = FMath::Clamp(CurrentArmor - ModifierToRemove.ArmorChange, 0, 20);
+// 		OnRep_CurrentArmor();
+// 	}
+// 			
+// 	/* Remove this modifier from this piece. */
+// 	TemporaryModifiers.Remove(ModifierToRemove);
+// }
 
 void UPieceNetworkingComponent::BeginPlay()
 {
