@@ -172,14 +172,6 @@ public:
 	UFUNCTION()
 	void OnRep_TemporaryModifiers(TArray<FModifier> OldTemporaryModifiers);
 
-	// /* Remove a temporary modifier, activating a pop-up if requested. */
-	// UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
-	// void Server_RemoveModifier(FModifier ModifierToRemove, bool bActivatePopUp);
-
-	/* Decrements the remaining durations of this piece's modifiers if they don't have an indefinite duration. */
-	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
-	void Server_DecrementModifierDurations();
-
 
 	/* Getter for CurrentStrength. */
 	UFUNCTION(BlueprintPure, Category="Piece Stats")

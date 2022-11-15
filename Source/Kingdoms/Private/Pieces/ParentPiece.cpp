@@ -678,52 +678,6 @@ void AParentPiece::SetAttackInfo(FAttackInfo NewAttackInfo)
 	}
 }
 
-// void AParentPiece::Server_RemoveModifier_Implementation(FModifier ModifierToRemove, bool bActivatePopUp)
-// {
-// 	/* Some pieces' abilities that have lasting effects (i.e. modifiers) need to execute code when that effect ends. */
-// 	const TArray<AActor*> Targets = { this };
-// 	if (AParentPiece* Piece = Cast<AParentPiece>(ModifierToRemove.SourceActor))
-// 		Piece->OnAbilityEffectEnded(Targets);
-//
-// 	/* Remove the strength effect of the modifier from the piece it was modifying. */
-// 	if (ModifierToRemove.StrengthChange != 0)
-// 	{
-// 		CurrentStrength = FMath::Clamp(CurrentStrength - ModifierToRemove.StrengthChange, 0, 20);
-// 		OnRep_CurrentStrength();
-// 	}
-//
-// 	/* Remove the armor effect of the modifier from the piece it was modifying. */
-// 	if (ModifierToRemove.ArmorChange != 0)
-// 	{
-// 		CurrentArmor = FMath::Clamp(CurrentArmor - ModifierToRemove.ArmorChange, 0, 20);
-// 		OnRep_CurrentArmor();
-// 	}
-// 			
-// 	/* Remove this modifier from this piece. */
-// 	TemporaryModifiers.Remove(ModifierToRemove);
-// }
-
-void AParentPiece::Server_DecrementModifierDurations_Implementation()
-{
-	/* For every modifier applied to this piece... */
-	for (int i = 0; i < TemporaryModifiers.Num(); i++)
-	{
-		/* Don't decrement modifiers with an indefinite duration. */
-		if (!TemporaryModifiers[i].bIndefiniteDuration)
-		{
-			/* Reduce the remaining duration by 1 turn. */
-			const int NewRemainingDuration = TemporaryModifiers[i].RemainingDuration--;
-
-			/* If the modifier's duration has ended... */
-			if (NewRemainingDuration < 1)
-			{
-				/* Always activate pop-ups for abilities that are removed because their duration ends. */
-				Cast<AMatch_PlayerPawn>(GetInstigator())->GetPieceNetworkingComponent()->Server_RemoveModifier(this, TemporaryModifiers[i], true, true);
-			}
-		}
-	}
-}
-
 bool AParentPiece::SetPassiveCD(int NewPassiveCD)
 {
 	/* Make sure that the server is calling this. */

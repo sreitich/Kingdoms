@@ -5,6 +5,7 @@
 
 #include "Board/BoardManager.h"
 #include "Board/BoardTile.h"
+#include "Components/PieceNetworkingComponent.h"
 #include "Framework/Match/Match_PlayerController.h"
 #include "Framework/Match/Match_PlayerState.h"
 #include "Framework/Match/Match_PlayerPawn.h"
@@ -146,6 +147,39 @@ void AMatch_GameStateBase::BeginPlay()
 
 void AMatch_GameStateBase::OnRep_CurrentMatchStatus()
 {
+}
+
+void AMatch_GameStateBase::Server_DecrementModifierDurations_Implementation()
+{
+    /* Get every piece in the game. */
+    TArray<AActor*> AllPieceActors;
+    UGameplayStatics::GetAllActorsOfClass(this, AParentPiece::StaticClass(), OUT AllPieceActors);
+
+    /* Iterate through every piece. */
+    for (AActor* PieceActor : AllPieceActors)
+    {
+        /* Get the piece actor as a piece. */
+        if (AParentPiece* Piece = Cast<AParentPiece>(PieceActor))
+        {
+            /* For every modifier applied to this piece... */
+            for (int i = 0; i < Piece->GetTemporaryModifiers().Num(); i++)
+            {
+                /* Check if the iterated modifier has an indefinite duration. These modifiers' durations don't get decremented. */
+                if (!Piece->GetTemporaryModifiers()[i].bIndefiniteDuration)
+                {
+                    /* Reduce the modifier's remaining duration by 1 turn. */
+                    const int NewRemainingDuration = Piece->GetTemporaryModifiers()[i].RemainingDuration - 1;
+
+                    /* If the modifier's duration has now ended, remove it. */
+                    if (NewRemainingDuration < 1)
+                    {
+                        /* Always activate pop-ups for abilities that are removed as a result of their duration ending. */
+                        Cast<AMatch_PlayerPawn>(Piece->GetInstigator())->GetPieceNetworkingComponent()->Server_RemoveModifier(Piece, Piece->GetTemporaryModifiers()[i], true, true);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void AMatch_GameStateBase::SetMatchStatus_Implementation(EMatchStatus NewMatchStatus)

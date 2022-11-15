@@ -89,6 +89,10 @@ protected:
 	UFUNCTION()
 	void OnRep_CurrentMatchStatus();
 
+	/* Decrements the remaining durations of each piece's modifiers if they don't have an indefinite duration. */
+	UFUNCTION(Server, Reliable, BlueprintCallable) // Remove the BlueprintCallable specifier after turns are implemented
+	void Server_DecrementModifierDurations();
+
 
 /* Protected variables */
 protected:
