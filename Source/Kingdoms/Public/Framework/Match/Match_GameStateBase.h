@@ -36,8 +36,8 @@ public:
 	bool CheckReadyToStart();
 
 	/* Initiates the game for all clients and begins the match on the server once both players have set up their pieces. */
-	UFUNCTION()
-	void StartMatch();
+	UFUNCTION(Server, Reliable)
+	void Server_StartMatch();
 
 	/* Getter for CurrentMatchStatus. */
 	UFUNCTION(BlueprintPure, Category="Match Status")
@@ -108,6 +108,9 @@ private:
 
 /* Private variables. */
 private:
+
+	/* Prevents the match from starting multiple times. */
+	bool bMatchStarted;
 
 	/* Handles the match timer. */
 	FTimerHandle MatchTimeTimerHandle;

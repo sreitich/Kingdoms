@@ -34,8 +34,18 @@ void AMatch_PlayerState::SetReadyToPlay_Server_Implementation(bool bReady)
 {
     bReadyToPlay = bReady;
 
-    /* OnRep won't call automatically on server. */
-    OnRep_ReadyToPlay();
+    /* Get the game state. */
+    AMatch_GameStateBase* MatchGameState = GetWorld()->GetGameState<AMatch_GameStateBase>();
+
+    /* If all players are ready to start... */
+    if (MatchGameState && MatchGameState->CheckReadyToStart())
+    {
+        /* Start the match on each client with the server. */
+        MatchGameState->Server_StartMatch();
+    }
+    
+    // /* OnRep won't call automatically on server. */
+    // OnRep_ReadyToPlay();
 }
 
 void AMatch_PlayerState::SetLocalPlayerStatus(EPlayerStatus NewPlayerStatus)
@@ -87,8 +97,12 @@ void AMatch_PlayerState::OnRep_ReadyToPlay()
     /* If all players are ready to start... */
     if (MatchGameState && MatchGameState->CheckReadyToStart())
     {
-        /* Start the match on each client with the server. */
-        MatchGameState->StartMatch();
+        /* Only the server can start the game. */
+        if (HasAuthority())
+        {
+            /* Start the match on each client with the server. */
+            MatchGameState->Server_StartMatch();
+        }
     }
 }
 

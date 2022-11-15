@@ -61,22 +61,22 @@ void ARecruit::OnMoveToTileCompleted()
 	 * update the passive modifiers of those recruits with their new amounts of adjacent recruits. */	
 	TArray<ARecruit*> NoLongerAdjacentRecruits;
 
-	for (ARecruit* RecruitPtr : AdjacentRecruits)
+	for (ARecruit* RecruitPtr1 : AdjacentRecruits)
 	{
-		if (!TileIsAdjacent(RecruitPtr->GetCurrentTile()))
+		if (!TileIsAdjacent(RecruitPtr1->GetCurrentTile()))
 		{
-			RecruitPtr->AdjacentRecruits.Remove(this);
-			RecruitPtr->UpdatePassiveModifier(false);
+			RecruitPtr1->AdjacentRecruits.Remove(this);
+			RecruitPtr1->UpdatePassiveModifier(false);
 
 			/* Save the recruits that are no longer adjacent to this recruit. */
-			NoLongerAdjacentRecruits.Add(RecruitPtr);
+			NoLongerAdjacentRecruits.Add(RecruitPtr1);
 		}
 	}
 
 	/* Remove the recruits that are no longer adjacent from this recruit's array of adjacent recruits. */
-	for (ARecruit* RecruitPtr : NoLongerAdjacentRecruits)
+	for (ARecruit* RecruitPtr2 : NoLongerAdjacentRecruits)
 	{
-		AdjacentRecruits.Remove(RecruitPtr);
+		AdjacentRecruits.Remove(RecruitPtr2);
 	}
 
 
@@ -90,7 +90,10 @@ void ARecruit::OnMoveToTileCompleted()
 	{
 		if (ARecruit* RecruitPtr = Cast<ARecruit>(RecruitActor))
 		{
-			if (TileIsAdjacent(RecruitPtr->GetCurrentTile()) && !AdjacentRecruits.Contains(RecruitPtr) && RecruitPtr->GetAlignment() == E_Friendly)
+			/* A recruit can trigger the passive ability if it is laterally adjacent, became adjacent with the most
+			 * recent move, and has the same instigator (i.e. is friendly). The IsFriendly() function doesn't work on
+			 * clients here for some reason. */
+			if (TileIsAdjacent(RecruitPtr->GetCurrentTile()) && !AdjacentRecruits.Contains(RecruitPtr) && RecruitPtr->GetInstigator() == GetInstigator())
 			{
 				AdjacentRecruits.Add(RecruitPtr);
 				NewlyAdjacentRecruits.Add(RecruitPtr);
