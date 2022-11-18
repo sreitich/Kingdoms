@@ -146,7 +146,9 @@ void ARecruit::UpdatePassiveModifier(bool bTriggerPopUp)
 				AdjacentRecruits.Num(),
 				AdjacentRecruits.Num(),
 				true,
-				-1
+				-1,
+				false,
+				false
 			};
 
 			Cast<AMatch_PlayerPawn>(GetInstigator())->GetPieceNetworkingComponent()->Server_AddModifier(this, ModifierToAdd, bTriggerPopUp, bTriggerPopUp);

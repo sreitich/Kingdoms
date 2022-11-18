@@ -194,6 +194,14 @@ struct FModifier
 	UPROPERTY(BlueprintReadWrite)
 	int RemainingDuration;
 
+	/* Tracks if this modifier's strength modification pop-up has been played yet. Set this to true to avoid playing strength pop-ups. */
+	UPROPERTY(BlueprintReadWrite)
+	bool bStrPopUpPlayed = true;
+
+	/* Tracks if this modifier's armor modification pop-up has been played yet. Set this to true to avoid playing armor pop-ups. */
+	UPROPERTY(BlueprintReadWrite)
+	bool bArmPopUpPlayed = true;
+
 	/* Two modifiers are equal if they have the same source actor, source ability, and alignment to the target. */
 	bool operator==(const FModifier &Other) const
 	{

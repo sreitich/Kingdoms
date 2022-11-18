@@ -15,7 +15,7 @@ UPieceNetworkingComponent::UPieceNetworkingComponent()
 }
 
 void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* PieceToModify, FModifier NewModifier,
-	bool bActivatePopUp, bool bFlashHighlight)
+	bool bActivatePopUps, bool bFlashHighlight)
 {
 	/* Store the original strength or armor value to find out the final change that this modifier applies. */
 	const int OriginalValue = NewModifier.EffectedStat ? PieceToModify->GetCurrentStrength() : PieceToModify->GetCurrentArmor();
@@ -29,9 +29,12 @@ void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* 
 	if (NewModifier.ArmorChange != 0)
 		NewValue = FMath::Clamp(PieceToModify->GetCurrentArmor() + NewModifier.ArmorChange, 0, 20);
 
+	/* Set whether the new modifier will trigger pop-ups when added. */
+	NewModifier.bArmPopUpPlayed = !bActivatePopUps;
+	NewModifier.bStrPopUpPlayed = !bActivatePopUps;
 
 	/* Get the target piece's current temporary modifiers. */
-	TArray<FModifier> &TemporaryModifiers = PieceToModify->GetTemporaryModifiers();
+	TArray<FModifier>& TemporaryModifiers = PieceToModify->GetTemporaryModifiers();
 	
 	/* Check if this modifier is already applied. */
 	int RepeatIndex = -1;
@@ -62,48 +65,48 @@ void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* 
 
 
 	/* Spawn a modifier pop-up if requested. */
-	if (bActivatePopUp)
-		PieceToModify->Multicast_CreateModifierPopUp(NewValue - OriginalValue, NewModifier.EffectedStat == FModifier::Strength);
+	// if (bActivatePopUps)
+	// 	PieceToModify->Multicast_CreateModifierPopUp(NewValue - OriginalValue, NewModifier.EffectedStat == FModifier::Strength);
 
 
-	/* Flash a piece highlight for each changed statistic on all clients if requested. */
-	if (bFlashHighlight)
-	{
-		if (NewModifier.StrengthChange != 0)
-		{
-			if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
-			{
-				PawnPtr->Multicast_FlashHighlight
-				(
-					PieceToModify,
-					NewModifier.StrengthChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
-					10.0f,
-					0.5f,
-					0.25f,
-					false
-				);
-			}
-		}
-
-		if (NewModifier.ArmorChange != 0)
-		{
-			if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
-			{
-				PawnPtr->Multicast_FlashHighlight
-				(
-					PieceToModify,
-					NewModifier.ArmorChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
-					10.0f,
-					0.5f,
-					0.25f,
-					false
-				);
-			}
-		}
-	}
+	// /* Flash a piece highlight for each changed statistic on all clients if requested. */
+	// if (bFlashHighlight)
+	// {
+	// 	if (NewModifier.StrengthChange != 0)
+	// 	{
+	// 		if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
+	// 		{
+	// 			PawnPtr->Multicast_FlashHighlight
+	// 			(
+	// 				PieceToModify,
+	// 				NewModifier.StrengthChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
+	// 				10.0f,
+	// 				0.5f,
+	// 				0.25f,
+	// 				false
+	// 			);
+	// 		}
+	// 	}
+	//
+	// 	if (NewModifier.ArmorChange != 0)
+	// 	{
+	// 		if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
+	// 		{
+	// 			PawnPtr->Multicast_FlashHighlight
+	// 			(
+	// 				PieceToModify,
+	// 				NewModifier.ArmorChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
+	// 				10.0f,
+	// 				0.5f,
+	// 				0.25f,
+	// 				false
+	// 			);
+	// 		}
+	// 	}
+	// }
 }
 
-void UPieceNetworkingComponent::Server_RemoveModifier_Implementation(AParentPiece* TargetPiece, FModifier ModifierToRemove, bool bActivatePopUp,
+void UPieceNetworkingComponent::Server_RemoveModifier_Implementation(AParentPiece* TargetPiece, FModifier ModifierToRemove, bool bActivatePopUps,
 	bool bFlashHighlight)
 {
 	/* Store the original strength or armor value to find out the final change that this modifier applies. */
@@ -133,46 +136,46 @@ void UPieceNetworkingComponent::Server_RemoveModifier_Implementation(AParentPiec
 	TargetPiece->OnRep_TemporaryModifiers(OldTemporaryModifiers);
 
 
-	/* Spawn a modifier pop-up if requested. */
-	if (bActivatePopUp)
-		TargetPiece->Multicast_CreateModifierPopUp(NewValue - OriginalValue, ModifierToRemove.EffectedStat == FModifier::Strength);
-
-
-	/* Flash a piece highlight for each changed statistic on all clients if requested. */
-	if (bFlashHighlight)
-	{
-		if (ModifierToRemove.StrengthChange != 0)
-		{
-			if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
-			{
-				PawnPtr->Multicast_FlashHighlight
-				(
-					TargetPiece,
-					ModifierToRemove.StrengthChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
-					10.0f,
-					0.5f,
-					0.25f,
-					false
-				);
-			}
-		}
-
-		if (ModifierToRemove.ArmorChange != 0)
-		{
-			if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
-			{
-				PawnPtr->Multicast_FlashHighlight
-				(
-					TargetPiece,
-					ModifierToRemove.ArmorChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
-					10.0f,
-					0.5f,
-					0.25f,
-					false
-				);
-			}
-		}
-	}
+	// /* Spawn a modifier pop-up if requested. */
+	// if (bActivatePopUp)
+	// 	TargetPiece->Multicast_CreateModifierPopUp(NewValue - OriginalValue, ModifierToRemove.EffectedStat == FModifier::Strength);
+	//
+	//
+	// /* Flash a piece highlight for each changed statistic on all clients if requested. */
+	// if (bFlashHighlight)
+	// {
+	// 	if (ModifierToRemove.StrengthChange != 0)
+	// 	{
+	// 		if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
+	// 		{
+	// 			PawnPtr->Multicast_FlashHighlight
+	// 			(
+	// 				TargetPiece,
+	// 				ModifierToRemove.StrengthChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
+	// 				10.0f,
+	// 				0.5f,
+	// 				0.25f,
+	// 				false
+	// 			);
+	// 		}
+	// 	}
+	//
+	// 	if (ModifierToRemove.ArmorChange != 0)
+	// 	{
+	// 		if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
+	// 		{
+	// 			PawnPtr->Multicast_FlashHighlight
+	// 			(
+	// 				TargetPiece,
+	// 				ModifierToRemove.ArmorChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
+	// 				10.0f,
+	// 				0.5f,
+	// 				0.25f,
+	// 				false
+	// 			);
+	// 		}
+	// 	}
+	// }
 }
 
 void UPieceNetworkingComponent::BeginPlay()

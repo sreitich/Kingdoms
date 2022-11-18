@@ -80,7 +80,7 @@ public:
 
 	/* Spawns and animates a modifier pop-up with the appropriate information at this piece's pop-up location. */
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void Multicast_CreateModifierPopUp(int ValueChange, bool bStrength);
+	void Multicast_CreateModifierPopUp(int ValueChange, bool bStrength, bool bFlashHighlight);
 
 	/* Returns true if there are no occupied tiles between this piece's current tile and a given tile. */
 	UFUNCTION()
@@ -229,6 +229,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Piece Info")
 	float StrengthenedFresnelStrength = 6.0f;
 
+	/* The brightness of fresnels when strengthened to indicate a buff or debuff. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Piece Info")
+	float FlashFresnelStrength = 10.0f;
+	
 	/* The widget to display when hovering over this piece's passive ability. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widgets")
 	TSubclassOf<UUserWidget> PassiveAbilityInfoWidget;
@@ -240,6 +244,22 @@ public:
 	/* Determines whether this piece's active ability animation is looped or not. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
 	bool bActiveAbilityLoops = false;
+
+	/* Tracks whether a modifier's pop-up animation is currently playing. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Modifiers")
+	bool bIsModifierPopUpPlaying = false;
+
+	/* How long modifier pop-ups last for. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Modifiers")
+	float ModifierPopUpDuration = 1.0f;
+
+	/* The play-rate of the highlight timeline when indicating modifiers. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Modifiers")
+	float ModifierFlashPlayRate = 0.5f;
+
+	/* How long modifier flashes last for. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Modifiers")
+	float ModifierFlashDuration = 0.25f;
 
 
 /* Public constants and asset references. */
@@ -269,6 +289,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Materials")
 	FLinearColor EnemyFresnelColor = FLinearColor(0.815686f, 0.015686f, 0.207843f, 1.0f);
 
+	/* The color that this piece flashes when gaining a buff. */
+	UPROPERTY(EditDefaultsOnly, Category="Highlights")
+	FLinearColor BuffColor = FLinearColor(0.0f, 1.0f, 0.0f, 1.0f);
+
+	/* The color that this piece flashes when gaining a debuff or losing a buff. */
+	UPROPERTY(EditDefaultsOnly, Category="Highlights")
+	FLinearColor DebuffColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	
 	/* This piece's idle/walk blend space. Used to interpolate and play this piece's unique idle and walk animations. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
 	UBlendSpaceBase* IdleWalkBS;
@@ -482,7 +510,7 @@ protected:
 	int ActiveCD;
 
 	/* How many uses this piece's active ability has left. */
-	UPROPERTY(Replicated=OnRep_ActiveUses, EditAnywhere, Category="Piece Stats")
+	UPROPERTY(ReplicatedUsing=OnRep_ActiveUses, EditAnywhere, Category="Piece Stats")
 	int ActiveUses;
 
 };

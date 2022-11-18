@@ -89,8 +89,12 @@ protected:
 	UFUNCTION()
 	void OnRep_CurrentMatchStatus();
 
+	/* Reveals every piece to both players after the match starts. */
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_RevealAllPieces();
+
 	/* Decrements the remaining durations of each piece's modifiers if they don't have an indefinite duration. */
-	UFUNCTION(Server, Reliable, BlueprintCallable) // Remove the BlueprintCallable specifier after turns are implemented
+	UFUNCTION(Server, Reliable)
 	void Server_DecrementModifierDurations();
 
 

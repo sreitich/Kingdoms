@@ -24,11 +24,11 @@ public:
 	/* Apply a new modifier ot this piece, activating a pop-up and flashing a piece highlight if requested. If the
 	 * modifier already exists, reset the duration and stack the modifiers together. */
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
-	void Server_AddModifier(AParentPiece* PieceToModify, FModifier NewModifier, bool bActivatePopUp, bool bFlashHighlight);
+	void Server_AddModifier(AParentPiece* PieceToModify, FModifier NewModifier, bool bActivatePopUps, bool bFlashHighlight);
 
 	/* Remove an existing modifier from this piece, activating a pop-up and flashing a highlight if requested. */
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
-	void Server_RemoveModifier(AParentPiece* TargetPiece, FModifier ModifierToRemove, bool bActivatePopUp, bool bFlashHighlight);
+	void Server_RemoveModifier(AParentPiece* TargetPiece, FModifier ModifierToRemove, bool bActivatePopUps, bool bFlashHighlight);
 
 
 /* Protected functions. */

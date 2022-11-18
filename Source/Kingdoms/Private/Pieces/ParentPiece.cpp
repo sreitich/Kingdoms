@@ -268,18 +268,25 @@ void AParentPiece::OnRep_TemporaryModifiers(TArray<FModifier> OldTemporaryModifi
 		/* A modifier was added. */
 		if (TemporaryModifiers.Num() > OldTemporaryModifiers.Num())
 		{
-			/* Get the most recently added modifier. */
-			const FModifier NewModifier = TemporaryModifiers.Last(0);
-
-			// /* Store the original strength or armor value to find out the final change that this modifier applies. Not
-			// sure if we need this yet. */
-			// const int OriginalValue = NewModifier.EffectedStat ? CurrentStrength : CurrentArmor;
-			// int NewValue = OriginalValue;
+			/* Get a reference to the most recently added modifier. */
+			FModifier& NewModifier = TemporaryModifiers.Last(0);
 
 			/* Set the new strength statistic, clamped so that it can't go above 20. */
 			if (NewModifier.StrengthChange != 0)
 			{
 				CurrentStrength = FMath::Clamp(CurrentStrength + NewModifier.StrengthChange, 0, 20);
+
+				/* Create a strength modifier pop-up and highlight if this modifier's strength pop-up hasn't been played and there isn't a pop-up already playing. */
+				if (!NewModifier.bStrPopUpPlayed && !bIsModifierPopUpPlaying)
+				{
+					Multicast_CreateModifierPopUp(NewModifier.StrengthChange, true, true);
+
+					/* Prevent this modifier from playing another strength pop-up. */
+					NewModifier.bStrPopUpPlayed = true;
+					/* Prevent another pop-up from being played before this one finishes. */
+					bIsModifierPopUpPlaying = true;
+				}
+
 				/* Manually call the OnRep on the server. */
 				OnRep_CurrentStrength();
 			}
@@ -288,6 +295,18 @@ void AParentPiece::OnRep_TemporaryModifiers(TArray<FModifier> OldTemporaryModifi
 			if (NewModifier.ArmorChange != 0)
 			{
 				CurrentArmor = FMath::Clamp(CurrentArmor + NewModifier.ArmorChange, 0, 20);
+
+				/* Create a armor modifier pop-up and highlight if this modifier's armor pop-up hasn't been played and there isn't a pop-up already playing. */
+				if (!NewModifier.bArmPopUpPlayed && !bIsModifierPopUpPlaying)
+				{
+					Multicast_CreateModifierPopUp(NewModifier.ArmorChange, false, true);
+
+					/* Prevent this modifier from playing another armor pop-up. */
+					NewModifier.bArmPopUpPlayed = true;
+					/* Prevent another pop-up from being played before this one finishes. */
+					bIsModifierPopUpPlaying = true;
+				}
+
 				/* Manually call the OnRep on the server. */
 				OnRep_CurrentArmor();
 			}
@@ -459,7 +478,7 @@ void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float Pl
 	HighlightTimeline.PlayFromStart();
 }
 
-void AParentPiece::Multicast_CreateModifierPopUp_Implementation(int ValueChange, bool bStrength)
+void AParentPiece::Multicast_CreateModifierPopUp_Implementation(int ValueChange, bool bStrength, bool bFlashHighlight)
 {
 	/* Define additional spawn parameters. */
 	FActorSpawnParameters SpawnParams;
@@ -480,7 +499,19 @@ void AParentPiece::Multicast_CreateModifierPopUp_Implementation(int ValueChange,
 	));
 
 	/* Activate the pop-up. */
-	SpawnedPopUp->BP_ActivateModifierPopUp(SpawnLocation, ValueChange, true, 1.0f);
+	SpawnedPopUp->BP_ActivateModifierPopUp(SpawnLocation, ValueChange, bStrength, ModifierPopUpDuration);
+
+	/* Flash a modifier highlight if requested. */
+	if (bFlashHighlight)
+		Cast<AMatch_PlayerPawn>(GetInstigator())->Multicast_FlashHighlight
+		(
+			this,
+			ValueChange > 0 ? BuffColor : DebuffColor,
+			FlashFresnelStrength,
+			ModifierFlashPlayRate,
+			ModifierFlashDuration,
+			false
+		);
 }
 
 bool AParentPiece::PathToTileIsClear(ABoardTile* TargetTile)

@@ -18,8 +18,11 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void BP_ActivateModifierPopUp(FVector Location, int ValueChange, bool bStrength, float Duration);
 
-		/* Reverses the pop-up animation and destroys this pop-up. */
-		UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-		void BP_DestroyModifierPopUp();
 
+/* Protected functions. */
+protected:
+
+	/* Called when this pop-up finishes playing. Used to play queued pop-ups so that multiple ones don't play at the same time. */
+	UFUNCTION(BlueprintCallable)
+	void OnModifierPopUpFinished();
 };

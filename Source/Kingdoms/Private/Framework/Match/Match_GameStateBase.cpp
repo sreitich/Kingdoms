@@ -88,18 +88,8 @@ void AMatch_GameStateBase::Server_StartMatch_Implementation()
     /* Prevent the match from starting again. */
     bMatchStarted = true;
 
-    /* Get every piece on the board. */
-    TArray<AActor*> AllPieces;
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AParentPiece::StaticClass(), OUT AllPieces);
-
-    for (AActor* Piece : AllPieces)
-    {
-        /* Unhide each piece so that players can now see each other's pieces. */
-        Piece->SetActorHiddenInGame(false);
-
-        /* Call piece-specific game-start code on every piece in the game. */
-        Cast<AParentPiece>(Piece)->OnGameStart();
-    }
+    /* Reveal all pieces for all players. */
+    Multicast_RevealAllPieces();
 
     /* For every player state... */
     for (APlayerState* PlayerState : PlayerArray)
@@ -147,6 +137,22 @@ void AMatch_GameStateBase::BeginPlay()
 
 void AMatch_GameStateBase::OnRep_CurrentMatchStatus()
 {
+}
+
+void AMatch_GameStateBase::Multicast_RevealAllPieces_Implementation()
+{
+    /* Get every piece on the board. */
+    TArray<AActor*> AllPieces;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AParentPiece::StaticClass(), OUT AllPieces);
+
+    for (AActor* Piece : AllPieces)
+    {
+        /* Unhide each piece so that players can now see each other's pieces. */
+        Piece->SetActorHiddenInGame(false);
+
+        /* Call piece-specific game-start code on every piece in the game. */
+        Cast<AParentPiece>(Piece)->OnGameStart();
+    }
 }
 
 void AMatch_GameStateBase::Server_DecrementModifierDurations_Implementation()
