@@ -17,6 +17,8 @@ UPieceNetworkingComponent::UPieceNetworkingComponent()
 void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* PieceToModify, FModifier NewModifier,
 	bool bActivatePopUps, bool bFlashHighlight)
 {
+	// UE_LOG(LogTemp, Error, TEXT("Modifier added to %s."), *PieceToModify->GetName());
+	
 	/* Store the original strength or armor value to find out the final change that this modifier applies. */
 	const int OriginalValue = NewModifier.EffectedStat ? PieceToModify->GetCurrentStrength() : PieceToModify->GetCurrentArmor();
 	int NewValue = OriginalValue;
@@ -50,6 +52,8 @@ void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* 
 	/* If this modifier is already applied, reset its duration and stack the values together. */
 	if (RepeatIndex != -1)
 	{
+		UE_LOG(LogTemp, Error, TEXT("Found a repeat modifier"));
+
 		TemporaryModifiers[RepeatIndex].RemainingDuration = NewModifier.RemainingDuration;
 		TemporaryModifiers[RepeatIndex].StrengthChange += NewModifier.StrengthChange;
 		TemporaryModifiers[RepeatIndex].ArmorChange += NewModifier.ArmorChange;
@@ -62,48 +66,6 @@ void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* 
 		/* Manually call the OnRep for the server. */
 		PieceToModify->OnRep_TemporaryModifiers(OldTemporaryModifiers);
 	}
-
-
-	/* Spawn a modifier pop-up if requested. */
-	// if (bActivatePopUps)
-	// 	PieceToModify->Multicast_CreateModifierPopUp(NewValue - OriginalValue, NewModifier.EffectedStat == FModifier::Strength);
-
-
-	// /* Flash a piece highlight for each changed statistic on all clients if requested. */
-	// if (bFlashHighlight)
-	// {
-	// 	if (NewModifier.StrengthChange != 0)
-	// 	{
-	// 		if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
-	// 		{
-	// 			PawnPtr->Multicast_FlashHighlight
-	// 			(
-	// 				PieceToModify,
-	// 				NewModifier.StrengthChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
-	// 				10.0f,
-	// 				0.5f,
-	// 				0.25f,
-	// 				false
-	// 			);
-	// 		}
-	// 	}
-	//
-	// 	if (NewModifier.ArmorChange != 0)
-	// 	{
-	// 		if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
-	// 		{
-	// 			PawnPtr->Multicast_FlashHighlight
-	// 			(
-	// 				PieceToModify,
-	// 				NewModifier.ArmorChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
-	// 				10.0f,
-	// 				0.5f,
-	// 				0.25f,
-	// 				false
-	// 			);
-	// 		}
-	// 	}
-	// }
 }
 
 void UPieceNetworkingComponent::Server_RemoveModifier_Implementation(AParentPiece* TargetPiece, FModifier ModifierToRemove, bool bActivatePopUps,
@@ -134,48 +96,6 @@ void UPieceNetworkingComponent::Server_RemoveModifier_Implementation(AParentPiec
 	TargetPiece->GetTemporaryModifiers().Remove(ModifierToRemove);
 	/* Manually call the OnRep for the server. */
 	TargetPiece->OnRep_TemporaryModifiers(OldTemporaryModifiers);
-
-
-	// /* Spawn a modifier pop-up if requested. */
-	// if (bActivatePopUp)
-	// 	TargetPiece->Multicast_CreateModifierPopUp(NewValue - OriginalValue, ModifierToRemove.EffectedStat == FModifier::Strength);
-	//
-	//
-	// /* Flash a piece highlight for each changed statistic on all clients if requested. */
-	// if (bFlashHighlight)
-	// {
-	// 	if (ModifierToRemove.StrengthChange != 0)
-	// 	{
-	// 		if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
-	// 		{
-	// 			PawnPtr->Multicast_FlashHighlight
-	// 			(
-	// 				TargetPiece,
-	// 				ModifierToRemove.StrengthChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
-	// 				10.0f,
-	// 				0.5f,
-	// 				0.25f,
-	// 				false
-	// 			);
-	// 		}
-	// 	}
-	//
-	// 	if (ModifierToRemove.ArmorChange != 0)
-	// 	{
-	// 		if (AMatch_PlayerPawn* PawnPtr = Cast<AMatch_PlayerPawn>(GetOuter()))
-	// 		{
-	// 			PawnPtr->Multicast_FlashHighlight
-	// 			(
-	// 				TargetPiece,
-	// 				ModifierToRemove.ArmorChange > 0 ? FLinearColor(0.0f, 1.0f, 0.0f) : FLinearColor(1.0f, 0.0f, 0.0f),
-	// 				10.0f,
-	// 				0.5f,
-	// 				0.25f,
-	// 				false
-	// 			);
-	// 		}
-	// 	}
-	// }
 }
 
 void UPieceNetworkingComponent::BeginPlay()

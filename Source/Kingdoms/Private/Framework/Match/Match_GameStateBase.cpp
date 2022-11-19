@@ -88,8 +88,17 @@ void AMatch_GameStateBase::Server_StartMatch_Implementation()
     /* Prevent the match from starting again. */
     bMatchStarted = true;
 
+
     /* Reveal all pieces for all players. */
     Multicast_RevealAllPieces();
+
+
+    /* Call piece-specific game-start code on every piece in the game. */
+    TArray<AActor*> AllPieces;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AParentPiece::StaticClass(), OUT AllPieces);
+    for (AActor* Piece : AllPieces)
+        Cast<AParentPiece>(Piece)->OnGameStart();
+
 
     /* For every player state... */
     for (APlayerState* PlayerState : PlayerArray)
@@ -149,9 +158,6 @@ void AMatch_GameStateBase::Multicast_RevealAllPieces_Implementation()
     {
         /* Unhide each piece so that players can now see each other's pieces. */
         Piece->SetActorHiddenInGame(false);
-
-        /* Call piece-specific game-start code on every piece in the game. */
-        Cast<AParentPiece>(Piece)->OnGameStart();
     }
 }
 

@@ -61,22 +61,22 @@ void ARecruit::OnMoveToTileCompleted()
 	 * update the passive modifiers of those recruits with their new amounts of adjacent recruits. */	
 	TArray<ARecruit*> NoLongerAdjacentRecruits;
 
-	for (ARecruit* RecruitPtr1 : AdjacentRecruits)
+	for (ARecruit* RecruitPtr : AdjacentRecruits)
 	{
-		if (!TileIsAdjacent(RecruitPtr1->GetCurrentTile()))
+		if (!TileIsAdjacent(RecruitPtr->GetCurrentTile()))
 		{
-			RecruitPtr1->AdjacentRecruits.Remove(this);
-			RecruitPtr1->UpdatePassiveModifier(false);
+			RecruitPtr->AdjacentRecruits.Remove(this);
+			RecruitPtr->UpdatePassiveModifier(false);
 
 			/* Save the recruits that are no longer adjacent to this recruit. */
-			NoLongerAdjacentRecruits.Add(RecruitPtr1);
+			NoLongerAdjacentRecruits.Add(RecruitPtr);
 		}
 	}
 
 	/* Remove the recruits that are no longer adjacent from this recruit's array of adjacent recruits. */
-	for (ARecruit* RecruitPtr2 : NoLongerAdjacentRecruits)
+	for (ARecruit* RecruitPtr : NoLongerAdjacentRecruits)
 	{
-		AdjacentRecruits.Remove(RecruitPtr2);
+		AdjacentRecruits.Remove(RecruitPtr);
 	}
 
 
@@ -102,16 +102,23 @@ void ARecruit::OnMoveToTileCompleted()
 	}
 
 
-	/* Add this recruit to every newly-adjacent recruit's array of adjacent recruits, and update their passive ability
-	 * modifiers with their updated array. Trigger a modifier pop-up for each one. */
-	for (ARecruit* NewlyAdjacentRecruit : NewlyAdjacentRecruits)
+	/* Don't change other recruits' modifiers if this is the game just started. Every recruit manages its modifiers initially. */
+	if (bPlaced)
 	{
-		NewlyAdjacentRecruit->AdjacentRecruits.Add(this);
-		NewlyAdjacentRecruit->UpdatePassiveModifier(true);
+		/* Add this recruit to every newly-adjacent recruit's array of adjacent recruits, and update their passive ability
+		 * modifiers with their updated array. Trigger a modifier pop-up for each recruit.. */
+		for (ARecruit* NewlyAdjacentRecruit : NewlyAdjacentRecruits)
+		{
+			NewlyAdjacentRecruit->AdjacentRecruits.Add(this);
+			NewlyAdjacentRecruit->UpdatePassiveModifier(true);
+		}
 	}
 
 	/* Update this recruit's passive modifier with its update array of adjacent recruits. Trigger a modifier pop-up. */
 	UpdatePassiveModifier(true);
+
+	/* After the game starts, always trigger other recruits' pop-ups. */
+	bPlaced = true;
 }
 
 void ARecruit::UpdatePassiveModifier(bool bTriggerPopUp)

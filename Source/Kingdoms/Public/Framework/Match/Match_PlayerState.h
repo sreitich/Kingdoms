@@ -61,10 +61,6 @@ public:
 /* Protected functions. */
 protected:
 
-	/* Removes place pieces widgets and starts match if all players are now ready. */
-	UFUNCTION()
-	void OnRep_ReadyToPlay();
-
 	/* Player's available actions change with the player status. */
 	UFUNCTION()
 	void OnRep_CurrentPlayerStatus();
@@ -74,7 +70,7 @@ protected:
 protected:
 
 	/* Tracks when the player has placed their pieces and is ready to start the match. */
-	UPROPERTY(ReplicatedUsing=OnRep_ReadyToPlay, VisibleAnywhere)
+	UPROPERTY(Replicated, VisibleAnywhere)
 	bool bReadyToPlay = false;
 
 	/* Determines the current available actions for this player. */

@@ -32,6 +32,15 @@ public:
 	virtual bool TileIsInMoveRange(ABoardTile* Tile) override;
 
 
+/* Public variables. */
+public:
+
+	/* Used to identify when a piece is being placed for the first time, so that recruits don't trigger each other's
+	 * pop-ups when the game starts. */
+	UPROPERTY()
+	bool bPlaced = false;
+
+
 /* Protected functions. */
 protected:
 
