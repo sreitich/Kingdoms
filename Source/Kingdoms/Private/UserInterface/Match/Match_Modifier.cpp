@@ -4,32 +4,58 @@
 #include "UserInterface/Match/Match_Modifier.h"
 
 #include "Board/BoardTile.h"
-#include "Components/Button.h"
-#include "Components/RichTextBlock.h"
 #include "Pieces/ParentPiece.h"
 #include "UserDefinedData/Match_UserDefinedData.h"
 #include "UserDefinedData/PieceData_UserDefinedData.h"
+#include "UserInterface/Match/Match_ModifierList.h"
+#include "UserInterface/Match/Match_PieceInfoWidget.h"
 
-void UMatch_Modifier::UpdateDisplayedModifier(FModifier NewModifier, bool bAlignedLeft)
+#include "Components/Button.h"
+#include "Components/RichTextBlock.h"
+
+
+void UMatch_Modifier::UpdateDisplayedModifier(UMatch_ModifierList* InParentModifierList, FModifier NewModifier, bool bAlignedLeft)
 {
+	/* Save this modifier widget's parent modifier list widget. */
+	ParentModifierList = InParentModifierList;
 	/* Save the information of the modifier that this widget represents. */
 	ModifierInfo = NewModifier;
 	/* The string that this modifier pop-up will display. */
-	FString NewModifierText;
+	FString NewModifierText = "";
 
-	// /* Modifier value. */
-	// if (ModifierInfo.Value > 0)
-	// {
-	// 	NewModifierText = "<Buff>+" + FString::FromInt(ModifierInfo.Value) + "</>";
-	// }
-	// else if (ModifierInfo.Value < 0)
-	// {
-	// 	NewModifierText = "<Debuff>" + FString::FromInt(ModifierInfo.Value) + "</>";
-	// }
-	// else
-	// {
-	// 	NewModifierText = "<NoEffect>+0</>";
-	// }
+	/* Modifier strength value. */
+	if (ModifierInfo.StrengthChange != 0)
+	{
+		// Strength buff.
+		if (ModifierInfo.StrengthChange > 0)
+			NewModifierText += "<Buff>+" + FString::FromInt(ModifierInfo.StrengthChange) + "S</>";
+		// Strength debuff.
+		else
+			NewModifierText += "<Debuff>" + FString::FromInt(ModifierInfo.StrengthChange) + "S</>";
+	}
+
+
+	/* Add an "and" if the modifier affects both stats. */
+	if (ModifierInfo.StrengthChange != 0 && ModifierInfo.ArmorChange != 0)
+		NewModifierText += " and ";
+
+
+	if (ModifierInfo.ArmorChange != 0)
+	{
+		// Armor buff.
+		if (ModifierInfo.ArmorChange > 0)
+			NewModifierText += "<Buff>+" + FString::FromInt(ModifierInfo.ArmorChange) + "A</>";
+		// Armor debuff.
+		else
+			NewModifierText += "<Debuff>" + FString::FromInt(ModifierInfo.ArmorChange) + "A</>";
+	}
+
+
+	/* Display active modifiers even if they don't have any effects. */
+	if (ModifierInfo.StrengthChange == 0 && ModifierInfo.ArmorChange == 0)
+	{
+		NewModifierText += "<NoEffect>+0S</> and <NoEffect>+0A</>";
+	}
 
 
 	NewModifierText += " from ";
@@ -40,23 +66,21 @@ void UMatch_Modifier::UpdateDisplayedModifier(FModifier NewModifier, bool bAlign
 	{
 		NewModifierText += "<Dead>eliminated</> ";
 	}
-	
 
-	/* Source's alignment and piece's name. */
+
+	/* Source's alignment and name. */
 	if (ModifierInfo.SourceAlignmentToTarget == E_Neutral)
 	{
-		NewModifierText += "<NeutralName>";
+		NewModifierText += "<NeutralName>" + ModifierInfo.SourceName + "'s</> ";
 	}
 	else if (ModifierInfo.SourceActor->GetInstigator()->IsLocallyControlled())
 	{
-		NewModifierText += "<FriendlyName>friendly ";
+		NewModifierText += "<FriendlyPrefix>friendly</> <FriendlyName>" + ModifierInfo.SourceName + "'s</> ";
 	}
 	else
 	{
-		NewModifierText += "<EnemyName>enemy ";
+		NewModifierText += "<EnemyPrefix>enemy</> <EnemyName>" + ModifierInfo.SourceName + "'s</> ";
 	}
-
-	NewModifierText += ModifierInfo.SourceName + "'s</> ";
 
 
 	/* Ability name. */
@@ -100,7 +124,7 @@ void UMatch_Modifier::NativeConstruct()
 
 void UMatch_Modifier::NativeDestruct()
 {
-	/* Remove the source's highlight. */
+	/* Remove the source's highlight unless the source is the currently selected piece. */
 	HighlightSource(true);
 
 	/* Unbind the button's delegates. */
@@ -127,11 +151,27 @@ void UMatch_Modifier::HighlightSource(bool bRemoveHighlight) const
 	/* If the actor responsible for this modifier is a piece, highlight it or remove the highlight. */
 	if (AParentPiece* SourcePiece = Cast<AParentPiece>(ModifierInfo.SourceActor))
 	{
+		/* Set the brightness that the piece's highlight will be set to. */
+		float Brightness = 0.0f;
+
+		/* If the piece is being highlighted. */
+		if (!bRemoveHighlight)
+			Brightness = SourcePiece->FlashFresnelStrength * 1.5f;
+		/* If the piece's highlight is being removed. */
+		else
+			/* If the piece is currently selected by the player. */
+			if (ParentModifierList->GetSpawningPieceInfoWidget()->GetDisplayedPiece() == ModifierInfo.SourceActor)
+				Brightness = SourcePiece->SelectedFresnelStrength;
+			/* If the piece is not currently selected by the player. */
+			else
+				Brightness = SourcePiece->DefaultFresnelStrength;
+
+		/* Set the piece's requested highlight. */
 		SourcePiece->FlashHighlight
 		(
 			SourcePiece->GetAlignment() == E_Friendly ? SourcePiece->FriendlyFresnelColor : SourcePiece->EnemyFresnelColor,
-			bRemoveHighlight ? 2.0f : 20.0f,
-			0.5f,
+			Brightness,
+			HighlightSourceRate,
 			0.0f,
 			true
 		);

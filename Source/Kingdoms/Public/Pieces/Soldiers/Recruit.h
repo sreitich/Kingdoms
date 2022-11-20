@@ -65,4 +65,10 @@ protected:
 
 	UPROPERTY()
 	TArray<ARecruit*> AdjacentRecruits;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Passive Ability")
+	int PassiveStrengthBuffPerPiece;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Passive Ability")
+	int PassiveArmorBuffPerPiece;
 };

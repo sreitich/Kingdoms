@@ -9,6 +9,7 @@
 #include "Match_Modifier.generated.h"
 
 class UButton;
+class UMatch_ModifierList;
 class URichTextBlock;
 
 class UDataTable;
@@ -26,8 +27,9 @@ class KINGDOMS_API UMatch_Modifier : public UUserWidget
 /* Public functions. */
 public:
 
+	/* Updates the text displayed by this modifier widget and the piece that it highlights when hovered. */
 	UFUNCTION(BlueprintCallable)
-	void UpdateDisplayedModifier(FModifier NewModifier, bool bAlignedLeft);
+	void UpdateDisplayedModifier(UMatch_ModifierList* InParentModifierList, FModifier NewModifier, bool bAlignedLeft);
 
 
 /* Protected functions. */
@@ -55,9 +57,16 @@ protected:
 /* Protected variables. */
 protected:
 
+	UPROPERTY()
+	UMatch_ModifierList* ParentModifierList;
+
 	/* Stores the information of the modifier that this widget represents. */
 	UPROPERTY()
 	FModifier ModifierInfo;
+
+	/* The play-rate for highlighting or un-highlighting a source piece. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Piece Info")
+	float HighlightSourceRate = 0.5f;
 
 
 /* Protected widgets. */

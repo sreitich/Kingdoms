@@ -193,7 +193,7 @@ void AMatch_PlayerPawn::Interact_WaitingForTurn(FHitResult InteractionHit)
 			SelectedPiece->GetCurrentTile()->UpdateReticle(true, false);
 
 			/* Strengthen the new piece's fresnel to indicate that it is currently selected. */
-			SelectedPiece->FlashHighlight(SelectedPiece->FriendlyFresnelColor, SelectedPiece->StrengthenedFresnelStrength, 1.0f, 0.0f, true);
+			SelectedPiece->FlashHighlight(SelectedPiece->FriendlyFresnelColor, SelectedPiece->SelectedFresnelStrength, 1.0f, 0.0f, true);
 		}
 		else if (Alignment == E_Hostile)
 		{
@@ -205,7 +205,7 @@ void AMatch_PlayerPawn::Interact_WaitingForTurn(FHitResult InteractionHit)
 			SelectedEnemyPiece = InteractedPiece;
 
 			/* Strengthen the enemy piece's fresnel to indicate that it is currently selected. */
-			SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedEnemyPiece->StrengthenedFresnelStrength, 1.0f, 0.0f, true);
+			SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedEnemyPiece->SelectedFresnelStrength, 1.0f, 0.0f, true);
 		}
 
 		/* Update and reveal the corresponding piece info widget with no buttons. */
@@ -268,7 +268,7 @@ void AMatch_PlayerPawn::Interact_SelectingPiece(FHitResult InteractionHit)
 			SelectedPiece->GetCurrentTile()->UpdateReticle(true, false);
 
 			/* Strengthen this piece's fresnel to indicate that it is currently selected. */
-			SelectedPiece->FlashHighlight(SelectedPiece->FriendlyFresnelColor, SelectedPiece->StrengthenedFresnelStrength, 1.0f, 0.0f, true);
+			SelectedPiece->FlashHighlight(SelectedPiece->FriendlyFresnelColor, SelectedPiece->SelectedFresnelStrength, 1.0f, 0.0f, true);
 		}
 		/* If the piece is an enemy piece... */
 		else if (Alignment == E_Hostile)
@@ -280,7 +280,7 @@ void AMatch_PlayerPawn::Interact_SelectingPiece(FHitResult InteractionHit)
 			SelectedEnemyPiece = InteractedPiece;
 
 			/* Strengthen the enemy piece's fresnel to indicate that it is currently selected. */
-			SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedEnemyPiece->StrengthenedFresnelStrength, 1.0f, 0.0f, true);
+			SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedEnemyPiece->SelectedFresnelStrength, 1.0f, 0.0f, true);
 		}
 
 		/* Update and reveal the corresponding piece info widget. Enable buttons if the selected piece is friendly so that they can perform actions. */
@@ -354,7 +354,7 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 					SelectedEnemyPiece = SelectedTile->GetOccupyingPiece();
 
 					/* Strengthen the enemy piece's fresnel to indicate that it is currently selected. */
-					SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedPiece->StrengthenedFresnelStrength, 1.0f, 0.0f, true);
+					SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedPiece->SelectedFresnelStrength, 1.0f, 0.0f, true);
 				}
 			}
 		}
@@ -464,7 +464,7 @@ void AMatch_PlayerPawn::Interact_SelectingTargetActiveAbility(FHitResult Interac
 				SelectedTargetPiece = TargetPiece;
 
 				/* Strengthen the enemy piece's fresnel to indicate that it is currently selected. */
-				SelectedTargetPiece->FlashHighlight(SelectedTargetPiece->GetAlignment() == E_Friendly ? SelectedTargetPiece->FriendlyFresnelColor : SelectedTargetPiece->EnemyFresnelColor, SelectedPiece->StrengthenedFresnelStrength, 1.0f, 0.0f, true);
+				SelectedTargetPiece->FlashHighlight(SelectedTargetPiece->GetAlignment() == E_Friendly ? SelectedTargetPiece->FriendlyFresnelColor : SelectedTargetPiece->EnemyFresnelColor, SelectedPiece->SelectedFresnelStrength, 1.0f, 0.0f, true);
 			}
 		}
 		else

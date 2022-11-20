@@ -227,7 +227,7 @@ public:
 
 	/* The brightness of fresnels when strengthened to indicate that this piece is selected. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Piece Info")
-	float StrengthenedFresnelStrength = 6.0f;
+	float SelectedFresnelStrength = 6.0f;
 
 	/* The brightness of fresnels when strengthened to indicate a buff or debuff. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Piece Info")
