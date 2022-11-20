@@ -8,22 +8,20 @@
 #include "Framework/Match/Match_PlayerState.h"
 #include "Pieces/ParentPiece.h"
 #include "UserDefinedData/PieceData_UserDefinedData.h"
-#include "UserInterface/Match/Match_AbilityInfo.h"
 
-#include "Runtime/UMG/Public/Components/CanvasPanelSlot.h"
-#include "Runtime/UMG/Public/UMG.h"
+#include "UserInterface/Match/Match_AbilityInfo.h"
 #include "UserInterface/Match/Match_AbilityInfoPopup.h"
 #include "UserInterface/Match/Match_ModifierList.h"
 
+#include "Components/Overlay.h"
+#include "Runtime/UMG/Public/UMG.h"
+#include "Runtime/UMG/Public/Components/CanvasPanelSlot.h"
+
 void UMatch_PieceInfoWidget::NativeConstruct()
 {
-    /* Bind the stat buttons to create modifier lists. */
-    StrengthButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnStrengthHovered);
-    ArmorButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnArmorHovered);
-
-    /* Bind the stat buttons to destroy the modifier lists. */
-    StrengthButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnStrengthUnhovered);
-    ArmorButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnArmorUnhovered);
+    /* Bind the stats button to create modifier lists. */
+    StatsButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnStatsHovered);
+    StatsButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnStatsUnhovered);
 
     /* Bind the ability buttons to create an ability info widget pop-up. */
     ActiveAbilityBackgroundButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnActiveHovered);
@@ -401,54 +399,40 @@ void UMatch_PieceInfoWidget::RefreshWidget()
     UpdatePieceInfoWidget(DisplayedPiece, DisplayedPiece->GetAlignment(), MoveButton->GetVisibility() == ESlateVisibility::Visible);
 }
 
-void UMatch_PieceInfoWidget::OnStrengthHovered()
+bool UMatch_PieceInfoWidget::AreStatsHovered() const
 {
-    /* Get a list of every strength modifier applied to the currently displayed piece. */
-    TArray<FModifier> StrengthModifiers;
-    for (FModifier Modifier : DisplayedPiece->GetTemporaryModifiers())
-    {
-        if (Modifier.EffectedStat == FModifier::Strength)
-        {
-            StrengthModifiers.Add(Modifier);
-        }
-    }
+    return StatsButton->IsHovered();
+}
 
-    /* If this piece has any active strength modifiers... */
-    if (StrengthModifiers.Num() > 0 && ModifierListClass)
+void UMatch_PieceInfoWidget::OnStatsHovered()
+{
+    /* Get the currently displayed piece's active modifiers and alignment. */
+    const TArray<FModifier> ActiveModifiers = DisplayedPiece->GetTemporaryModifiers();
+    const EAlignment PieceAlignment = DisplayedPiece->GetAlignment();
+
+    /* If this piece has any currently active modifiers. */
+    if (ActiveModifiers.Num() > 0 && ModifierListClass)
     {
-        /* Store the alignment of the piece so we don't have to keep checking. */
-        const EAlignment PieceAlignment = DisplayedPiece->GetAlignment();
-        
-        /* Create and populate a list of active strength modifiers. */
+        /* Create and populate a list of modifier widgets. */
         ModifierList = Cast<UMatch_ModifierList>(CreateWidget<UUserWidget>(GetWorld(), ModifierListClass, FName("Modifier List Widget")));
-        /* Attach the widget to the displayed strength text. */
-        StrengthModifierListWrapper->AddChild(ModifierList);
+        ModifierList->PopulateModifierList(this, ActiveModifiers, PieceAlignment == E_Friendly);
 
-        /* Populate the modifier list with all active strength modifiers. */
-        ModifierList->PopulateModifierList(this, StrengthModifiers, PieceAlignment == E_Friendly);
+        /* Attach the list to the stats button. */
+        ModifierListWrapper->AddChild(ModifierList);
 
-        /* Offset the widget based on the size of the strength text depending on whether or not the displayed piece is friendly. */
+        /* Offset the widget based on the size of the statistics overlay and whether or not the displayed piece is friendly. */
         UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(ModifierList->ModifierListOverlay->Slot);
-        CanvasSlot->SetPosition(FVector2D(PieceAlignment == E_Friendly ? DisplayedStrength->GetDesiredSize().X - 20.0f : 20.0f, -DisplayedStrength->GetDesiredSize().Y + 20.0f));
+        CanvasSlot->SetPosition(FVector2D(PieceAlignment == E_Friendly ? StatsButtonOverlay->GetDesiredSize().X - 20.0f : 20.0f, -StatsButtonOverlay->GetDesiredSize().Y + 20.0f));
+
         /* Align the pop-up to the left if it's for a friendly piece. Align it to the right if it's for an enemy piece. */
         CanvasSlot->SetAlignment(PieceAlignment == E_Friendly ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
     }
 }
 
-void UMatch_PieceInfoWidget::OnArmorHovered()
+void UMatch_PieceInfoWidget::OnStatsUnhovered()
 {
-}
-
-void UMatch_PieceInfoWidget::OnStrengthUnhovered()
-{
-    /* Destroy the modifier list widget if the player isn't hovering over it or the strength widget. */
-    BP_OnStatUnhovered();
-}
-
-void UMatch_PieceInfoWidget::OnArmorUnhovered()
-{
-    /* Destroy the modifier list widget if the player isn't hovering over it or the strength widget. */
-    BP_OnStatUnhovered();
+    /* Destroy the list of current stat modifiers. */
+    BP_OnStatsUnhovered();
 }
 
 void UMatch_PieceInfoWidget::OnActiveHovered()

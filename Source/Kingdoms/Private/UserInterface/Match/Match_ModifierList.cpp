@@ -40,7 +40,10 @@ void UMatch_ModifierList::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
 
-	PieceInfoWidget->ModifierList = nullptr;
-	
-	RemoveFromParent();
+    /* Destroy the modifier list if the player is not hovering over the piece's stats. */
+	if (!PieceInfoWidget->AreStatsHovered())
+	{
+		PieceInfoWidget->ModifierList = nullptr;
+		RemoveFromParent();
+	}
 }

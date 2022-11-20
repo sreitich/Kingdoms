@@ -14,6 +14,7 @@ class UButton;
 class UCanvasPanel;
 class UDataTable;
 class UImage;
+class UOverlay;
 class USizeBox;
 class UTextBlock;
 class UTexture2D;
@@ -49,6 +50,10 @@ public:
 	UFUNCTION()
 	FORCEINLINE AParentPiece* GetDisplayedPiece() const { return DisplayedPiece; }
 
+	/* Returns true if the player is currently hovering over this piece's stats. */
+	UFUNCTION()
+	bool AreStatsHovered() const;
+
 
 /* Protected functions. */
 protected:
@@ -73,25 +78,17 @@ protected:
 	void EmptyBars(bool bReveal, bool bActive, int AmountUsed);
 
 
-	/* Creates and displays a list of all active strength modifiers. */
+	/* Creates and displays a list of all current stat modifiers. */
 	UFUNCTION()
-	void OnStrengthHovered();
+	void OnStatsHovered();
 
-	/* Creates and displays a list of all active armor modifiers. */
+	/* Calls BP_OnStatsUnhovered to destroy the list of current stat modifiers. */
 	UFUNCTION()
-	void OnArmorHovered();
+	void OnStatsUnhovered();
 
-	/* Destroys the list of all active strength modifiers. */
-	UFUNCTION()
-	void OnStrengthUnhovered();
-
-	/* Destroys the list of all active armor modifiers. */
-	UFUNCTION()
-	void OnArmorUnhovered();
-
-		/* Adds a delay before checking if the modifier list is being hovered before trying to destroy it. */
-		UFUNCTION(BlueprintImplementableEvent)
-		void BP_OnStatUnhovered();
+		/* Destroys the list of current stat modifiers. */
+		UFUNCTION(BlueprintImplementableEvent, Category="Modifiers")
+		void BP_OnStatsUnhovered();
 
 	/* Displays and updates ability info pop-up with this piece's active ability info. */
 	UFUNCTION()
@@ -201,29 +198,25 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UTextBlock* DisplayedPieceClass;
 
+	/* Contains the stats button layered on top of the strength and armor boxes. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UOverlay* StatsButtonOverlay;
+	
+	/* Displays a list of current stat modifiers when hovered over. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* StatsButton;
+
+	/* Widget that the modifier list pop-up is parented to. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	USizeBox* ModifierListWrapper;
+
 	/* This piece's current strength (including modifiers). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UTextBlock* DisplayedStrength;
 
-	/* Displays a list of active strength modifiers when hovered over. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* StrengthButton;
-
-	/* Widget that the strength modifier list pop-up is parented to */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	USizeBox* StrengthModifierListWrapper;
-
 	/* This piece's current armor (including modifiers). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UTextBlock* DisplayedArmor;
-
-	/* Displays a list of active armor modifiers when hovered over. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* ArmorButton;
-
-	/* Widget that the armor modifier list pop-up is parented to */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	USizeBox* ArmorModifierListWrapper;
 
 	/* Contains all of the active ability widgets. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
