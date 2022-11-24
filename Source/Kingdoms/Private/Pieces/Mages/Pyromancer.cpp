@@ -212,6 +212,9 @@ void APyromancer::StartActiveConfirmation(TArray<AActor*> Targets)
 
 void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 {
+	/* Updates the player's turn progress. */
+	Super::OnActiveAbility(Targets);
+
 	/* Call the blueprint implementation of the ability, which begins the power-up phase. */
 	BP_OnActiveAbility(Cast<AParentPiece>(Targets[0]));
 

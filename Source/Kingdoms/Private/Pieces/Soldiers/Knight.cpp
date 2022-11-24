@@ -13,24 +13,6 @@ AKnight::AKnight()
 {
 }
 
-// TArray<ABoardTile*> AKnight::GetValidMoveTiles()
-// {
-// 	/* This array of valid tiles is going to be returned. */
-// 	TArray<ABoardTile*> ValidTiles;
-//
-// 	/* Get the board manager's array of every tile on the board. */
-// 	for (ABoardTile* Tile : GetWorld()->GetGameState<AMatch_GameStateBase>()->BoardManager->AllTiles)
-// 	{
-// 		/* If the tile's coordinates match with one of this piece's move patterns and the path to the tile is clear, it is a valid destination. */
-// 		if (TileIsInMoveRange(Tile) && PathToTileIsClear(Tile))
-// 		{
-// 			ValidTiles.Add(Tile);
-// 		}
-// 	}
-//
-// 	return ValidTiles;
-// }
-
 bool AKnight::TileIsInMoveRange(ABoardTile* Tile)
 {
 	/* Make sure that a valid tile was passed. */
@@ -100,6 +82,9 @@ void AKnight::StartActiveConfirmation(TArray<AActor*> Targets)
 
 void AKnight::OnActiveAbility(TArray<AActor*> Targets)
 {
+	/* Updates the player's turn progress. */
+	Super::OnActiveAbility(Targets);
+
 	/* Call the blueprint implementation of "Dash." */
 	if (ABoardTile* TargetTile = Cast<ABoardTile>(Targets[0]))
 		BP_OnActiveAbility(Cast<ABoardTile>(TargetTile));

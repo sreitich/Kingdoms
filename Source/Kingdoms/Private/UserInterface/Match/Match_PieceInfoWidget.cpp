@@ -209,6 +209,19 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
                 }
 
 
+                /* Reveal and enable the move button if buttons are enabled and a move action can be used. */
+                if (bEnableButtons)
+                {
+                    MoveButton->SetVisibility(ESlateVisibility::Visible);
+                    MoveButton->SetIsEnabled(!GetOwningPlayerState<AMatch_PlayerState>()->GetMoveActionUsed());
+                }
+                /* Hide the move button if buttons are not enabled. */
+                else
+                {
+                    MoveButton->SetVisibility(ESlateVisibility::Collapsed);
+                }
+
+
                 /* If this piece has both a passive and active ability... */
                 if (PieceData && PieceData->PassiveName != "" && PieceData->ActiveName != "")
                 {
@@ -235,20 +248,31 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
                     /* Reveal all of the active ability widgets. */
                     ActiveAbilityBox->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
-                    /* If this piece's active ability has limited uses. */
+                    /* Reveal and enable the ability button if buttons are enabled and an ability action can be used. */
+                    if (bEnableButtons)
+                    {
+                        ActiveButton->SetVisibility(ESlateVisibility::Visible);
+                        ActiveButton->SetIsEnabled(!GetOwningPlayerState<AMatch_PlayerState>()->GetAbilityActionUsed());
+                    }
+                    /* Hide the ability button if buttons are not enabled. */
+                    else
+                    {
+                        ActiveButton->SetVisibility(ESlateVisibility::Collapsed);
+                    }
+
+                    /* Reveal and update the usage bars if this piece's active ability has limited uses. */
                     if (PieceData->ActiveUses > 0)
                     {
-                        /* Reveal and update the usage bars. */
-                        EmptyBars(true, true, (PieceData->ActiveUses) - (NewPiece->GetActiveUses()));
+                        EmptyBars(true, true, PieceData->ActiveUses - NewPiece->GetActiveUses());
                     }
-                    /* If this piece's active ability has unlimited uses. */
+                    /* Hide the usage bars if this piece's active ability has unlimited uses. */
                     else
                     {
                         /* Hide the usage bars. */
                         EmptyBars(false, true, 0);
                     }
 
-                    /* If the active ability's cooldown is active. */
+                    /* Update the cooldown timer if the active ability's cooldown is active. */
                     if (NewPiece->GetActiveCD() > 0)
                     {
                         /* Don't display a cooldown counter if the piece doesn't have any more ability uses left. */
@@ -259,10 +283,9 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
                             DisplayedActiveCD->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
                         }
                     }
-                    /* If the active ability is not on cooldown.    */
+                    /* Hide the cooldown counter if the active ability is not on cooldown.    */
                     else
                     {
-                        /* Hide the cooldown counter. */
                         DisplayedActiveCD->SetVisibility(ESlateVisibility::Hidden);
                     }
 
@@ -271,8 +294,8 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
                     {
                         /* Hide the cooldown indicator (that doubles as the "no uses left" indicator). */
                         ActiveCooldownIndicator->SetVisibility(ESlateVisibility::Hidden);
-                        /* Enable the "use active ability" button. */
-                        ActiveButton->SetIsEnabled(true);
+                        // /* Enable the "use active ability" button. */
+                        // ActiveButton->SetIsEnabled(true);
                     }
                     /* If this ability can't be used. */
                     else
@@ -288,6 +311,8 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
                 {
                     /* Hide all of the active ability widgets. */
                     ActiveAbilityBox->SetVisibility(ESlateVisibility::Collapsed);
+                    /* Hide the active ability button. */
+                    ActiveButton->SetVisibility(ESlateVisibility::Collapsed);
                 }
 
 
@@ -325,21 +350,6 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
                     PassiveAbilityBox->SetVisibility(ESlateVisibility::Collapsed);
                 }
             }
-        }
-
-        /* If buttons need to be enabled for the user... */
-        if (bEnableButtons)
-        {
-            /* Enable and reveal the buttons. */
-            MoveButton->SetVisibility(ESlateVisibility::Visible);
-            ActiveButton->SetVisibility(ESlateVisibility::Visible);
-        }
-        /* If buttons need to be disabled for the user... */
-        else
-        {
-            /* Disable and hide the buttons. */
-            MoveButton->SetVisibility(ESlateVisibility::Hidden);
-            ActiveButton->SetVisibility(ESlateVisibility::Hidden);
         }
 
         /* If the selected piece is friendly... */

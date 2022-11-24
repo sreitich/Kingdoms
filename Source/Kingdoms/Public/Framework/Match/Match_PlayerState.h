@@ -45,6 +45,24 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Player Status")
 	void Server_SetPlayerStatus(EPlayerStatus NewPlayerStatus);
 
+	/* Getter for bMoveActionUsed. */
+	UFUNCTION(BlueprintPure, Category="Turn Progress")
+	FORCEINLINE bool GetMoveActionUsed() const { return bMoveActionUsed; }
+
+	/* Server-side setter for bMoveActionUsed. Turn progress can only be reset by changing the player's state. This
+	 * function can only be used to set bMoveActionUsed to true, assuming that the player is in a valid state. */
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Turn Progress")
+	void Server_SetMoveActionUsed(bool bNewMoveActionUsed);
+
+	/* Getter for bAbilityActionUsed. */
+	UFUNCTION(BlueprintPure, Category="Turn Progress")
+	FORCEINLINE bool GetAbilityActionUsed() const { return bAbilityActionUsed; }
+
+	/* Server-side setter for bAbilityActionUsed. Turn progress can only be reset by changing the player's state. This
+	 * function can only be used to set bAbilityActionUsed to true, assuming that the player is in a valid state. */
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Turn Progress")
+	void Server_SetAbilityActionUsed(bool bNewAbilityActionUsed);
+
 
 /* Public variables. */
 public:
@@ -61,9 +79,17 @@ public:
 /* Protected functions. */
 protected:
 
-	/* Player's available actions change with the player status. */
+	/* Calls additional logic in when. */
 	UFUNCTION()
-	void OnRep_CurrentPlayerStatus();
+	void OnRep_CurrentPlayerStatus(EPlayerStatus OldPlayerStatus);
+
+	/* Updates the player's turn progress UI and allows them to end their turn. */
+	UFUNCTION()
+	void OnRep_MoveActionUsed();
+
+	/* Updates the player's turn progress UI and prompts them to end their turn. */
+	UFUNCTION()
+	void OnRep_AbilityActionUsed();
 
 
 /* Protected variables. */
@@ -74,7 +100,15 @@ protected:
 	bool bReadyToPlay = false;
 
 	/* Determines the current available actions for this player. */
-	UPROPERTY(ReplicatedUsing=OnRep_CurrentPlayerStatus, VisibleAnywhere)
+	UPROPERTY(Replicated, VisibleAnywhere)
 	TEnumAsByte<EPlayerStatus> CurrentPlayerStatus;
+
+	/* Tracks whether the player has used their move/attack action for this turn. */
+	UPROPERTY(ReplicatedUsing=OnRep_MoveActionUsed, VisibleAnywhere)
+	bool bMoveActionUsed;
+
+	/* Tracks whether the player has used their move/attack action for this turn. */
+	UPROPERTY(ReplicatedUsing=OnRep_AbilityActionUsed, VisibleAnywhere)
+	bool bAbilityActionUsed;
 
 };

@@ -660,8 +660,9 @@ void AParentPiece::StartActiveConfirmation(TArray<AActor*> Targets)
 
 void AParentPiece::OnActiveAbility(TArray<AActor*> Targets)
 {
-	/* Not all pieces have active abilities. */
-	UE_LOG(LogTemp, Error, TEXT("OnActiveAbility called on a piece without an active ability."));
+	/* Record that the player used their ability action for this turn, preventing them from using another active ability
+	 * until their next turn. */
+	Cast<AMatch_PlayerPawn>(GetInstigator())->GetPlayerState<AMatch_PlayerState>()->Server_SetAbilityActionUsed(true);
 }
 
 void AParentPiece::OnAbilityEffectEnded(TArray<AActor*> Targets)

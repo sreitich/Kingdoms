@@ -55,12 +55,13 @@ void UMatch_MoveConfirmation::OnConfirmClicked()
 {
     /* Reset the highlight of every tile that was highlighted. */
     for (ABoardTile* Tile : PendingPiece->GetValidMoveTiles())
-    {
         Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
-    }
     
     /* Remove all other widgets and reset the player's selected piece and selected tile when this piece starts moving. */
     GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, false, false, true, true);
+
+    /* Record that the player has used their move action for this turn, preventing them from using another move action until their next turn. */
+    GetOwningPlayerState<AMatch_PlayerState>()->Server_SetMoveActionUsed(true);
 
     /* Reset this piece's rotation after it finishes moving. */
     Cast<AMatch_PlayerPawn>(GetOwningPlayerPawn())->Server_SetResetAfterMove(PendingPiece, true);

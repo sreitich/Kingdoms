@@ -23,7 +23,7 @@ public:
 	/* Called every frame. */
 	virtual void Tick(float DeltaTime) override;
 
-	/* Choose the correct player start for  */
+	/* Choose the correct player start to spawn new players. */
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 

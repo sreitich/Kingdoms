@@ -28,6 +28,8 @@ void AMatch_PlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
     DOREPLIFETIME(AMatch_PlayerState, CurrentPlayerStatus);
     DOREPLIFETIME(AMatch_PlayerState, OwnedPieces);
     DOREPLIFETIME(AMatch_PlayerState, bReadyToPlay);
+    DOREPLIFETIME(AMatch_PlayerState, bMoveActionUsed);
+    DOREPLIFETIME(AMatch_PlayerState, bAbilityActionUsed);
 }
 
 void AMatch_PlayerState::SetReadyToPlay_Server_Implementation(bool bReady)
@@ -48,6 +50,42 @@ void AMatch_PlayerState::SetReadyToPlay_Server_Implementation(bool bReady)
 void AMatch_PlayerState::SetLocalPlayerStatus(EPlayerStatus NewPlayerStatus)
 {
     CurrentPlayerStatus = NewPlayerStatus;
+}
+
+void AMatch_PlayerState::Server_SetMoveActionUsed_Implementation(bool bNewMoveActionUsed)
+{
+    /* Players' action uses start as false by default and are only changed by updating their state. This function can
+     * only be used to prevent players from taking more move actions, if the player is in a valid state. */
+    if (bNewMoveActionUsed &&
+        (CurrentPlayerStatus == E_SelectingPiece ||
+        CurrentPlayerStatus == E_SelectingAction ||
+        CurrentPlayerStatus == E_SelectingTarget_Move ||
+        CurrentPlayerStatus == E_SelectingTarget_ActiveAbility))
+    {
+        bMoveActionUsed = true;
+
+        /* The server does not call the OnRep automatically. */
+        OnRep_MoveActionUsed();
+    }
+
+
+}
+
+void AMatch_PlayerState::Server_SetAbilityActionUsed_Implementation(bool bNewAbilityActionUsed)
+{
+    /* Players' action uses start as false by default and are only changed by updating their state. This function can
+     * only be used to prevent players from taking more move actions, if the player is in a valid state. */
+    if (bNewAbilityActionUsed &&
+        (CurrentPlayerStatus == E_SelectingPiece ||
+        CurrentPlayerStatus == E_SelectingAction ||
+        CurrentPlayerStatus == E_SelectingTarget_Move ||
+        CurrentPlayerStatus == E_SelectingTarget_ActiveAbility))
+    {
+        bAbilityActionUsed = true;
+
+        /* The server does not call the OnRep automatically. */
+        OnRep_AbilityActionUsed();
+    }
 }
 
 void AMatch_PlayerState::Server_SetPlayerStatus_Implementation(EPlayerStatus NewPlayerStatus)
@@ -83,10 +121,30 @@ void AMatch_PlayerState::Server_SetPlayerStatus_Implementation(EPlayerStatus New
      *      - From Selecting Target Active
      */
 
+    const EPlayerStatus OldPlayerStatus = CurrentPlayerStatus;
+
     CurrentPlayerStatus = NewPlayerStatus;
+
+    /* OnRep is not called on the server. */
+    OnRep_CurrentPlayerStatus(OldPlayerStatus);
 }
 
-void AMatch_PlayerState::OnRep_CurrentPlayerStatus()
+void AMatch_PlayerState::OnRep_CurrentPlayerStatus(EPlayerStatus OldPlayerStatus)
 {
-    
+    /* If the player was waiting for their turn and they are now selecting a piece, reset their turn progress. */
+    if (OldPlayerStatus == E_WaitingForTurn && CurrentPlayerStatus == E_SelectingPiece)
+    {
+        bMoveActionUsed = false;
+        bAbilityActionUsed = false;
+    }
+}
+
+void AMatch_PlayerState::OnRep_MoveActionUsed()
+{
+    UE_LOG(LogTemp, Error, TEXT("Move rep called."));
+}
+
+void AMatch_PlayerState::OnRep_AbilityActionUsed()
+{
+    UE_LOG(LogTemp, Error, TEXT("Ability rep called."));
 }
