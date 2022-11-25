@@ -208,6 +208,15 @@ void AMatch_PlayerController::UpdateActionIndicator(bool bUsed, bool bMoveAction
     }
 }
 
+void AMatch_PlayerController::UpdateEndTurnButton(bool bEnable) const
+{
+    /* Only execute on local client and if the base widget is initialized. */
+    if (IsLocalPlayerController() && Match_BaseWidget)
+    {
+        Match_BaseWidget->UpdateEndTurnButton(bEnable);
+    }
+}
+
 void AMatch_PlayerController::UpdatePieceInfoWidget(AParentPiece *NewPiece, const EAlignment Alignment, const bool bEnableButtons, const bool bHide) const
 {
     /* Only execute on local client. I added this check a long time ago but I think it's actually redundant... I'm scared to remove it though. */

@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Match_BaseWidget.generated.h"
 
+class UButton;
 class UMatch_PieceInfoWidget;
 class UMatch_TurnProgressWidget;
 class UTextBlock;
@@ -39,12 +40,20 @@ public:
 	UFUNCTION()
 	FORCEINLINE UMatch_TurnProgressWidget* GetTurnProgressWidget() const { return TurnProgressWidget; }
 
+	/* Enables or disables the end turn button. */
+	UFUNCTION()
+	void UpdateEndTurnButton(bool bEnable);
+
 
 /* Protected functions. */
 protected:
 
 	/* Called after the underlying slate widget is constructed. */
 	virtual void NativeConstruct() override;
+
+	/* Ends the player's turn if it's their turn. */
+	UFUNCTION()
+	void OnEndTurnClicked();
 
 
 /* Protected widgets. */
@@ -73,5 +82,9 @@ protected:
 	/* Displays this player's current turn progress. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UMatch_TurnProgressWidget* TurnProgressWidget;
+
+	/* Allows the player to end their turn. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* EndTurnButton;
 
 };

@@ -3,14 +3,12 @@
 
 #include "UserInterface/Match/Match_BaseWidget.h"
 
-#include "UserInterface/Match/Match_PieceInfoWidget.h"
+#include "Framework/Match/Match_GameStateBase.h"
+#include "Framework/Match/Match_PlayerState.h"
 #include "Pieces/ParentPiece.h"
+#include "UserInterface/Match/Match_PieceInfoWidget.h"
 
 #include "Runtime/UMG/Public/UMG.h"
-#include "Blueprint/WidgetBlueprintLibrary.h"
-#include "Board/BoardTile.h"
-#include "Kismet/GameplayStatics.h"
-#include "UserInterface/Match/Match_MoveConfirmation.h"
 
 #define OUT
 
@@ -69,8 +67,28 @@ UMatch_PieceInfoWidget* UMatch_BaseWidget::GetPieceInfoWidget(EAlignment Alignme
     return nullptr;
 }
 
+void UMatch_BaseWidget::UpdateEndTurnButton(bool bEnable)
+{
+    /* Enable or disable the end turn button. */
+    EndTurnButton->SetIsEnabled(bEnable);
+}
+
 void UMatch_BaseWidget::NativeConstruct()
 {
     Super::NativeConstruct();
 
+    /* Bind the end turn button to end the player's turn when clicked. */
+    EndTurnButton->OnClicked.AddDynamic(this, &UMatch_BaseWidget::OnEndTurnClicked);
+}
+
+void UMatch_BaseWidget::OnEndTurnClicked()
+{
+    if (AMatch_PlayerState* PlayerStatePtr = GetOwningPlayerState<AMatch_PlayerState>())
+    {
+        /* End this player's turn and start the next player's turn through the game state. */
+        PlayerStatePtr->Server_EndTurn();
+
+        /* Disable this button. */
+        EndTurnButton->SetIsEnabled(false);
+    }
 }

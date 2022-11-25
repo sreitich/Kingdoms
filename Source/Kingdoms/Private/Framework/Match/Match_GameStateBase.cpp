@@ -83,6 +83,30 @@ bool AMatch_GameStateBase::CheckReadyToStart()
     return true;
 }
 
+void AMatch_GameStateBase::Server_EndTurn_Implementation(AMatch_PlayerState* CurrentPlayer)
+{
+    /* Get the player whose turn we're switching to. */
+    AMatch_PlayerState* NewPlayer = nullptr;
+    for (APlayerState* PlayerStatePtr : PlayerArray)
+    {
+        if (PlayerStatePtr != CurrentPlayer)
+        {
+            NewPlayer = Cast<AMatch_PlayerState>(PlayerStatePtr);
+        }
+    }
+
+    /* End the last player's turn, which will reset their used actions and action indicators. */
+    if (IsValid(CurrentPlayer))
+        CurrentPlayer->Server_SetPlayerStatus(E_WaitingForTurn);
+
+    /* Decrement the modifier durations for the player whose turn just ended. */
+    Server_DecrementModifierDurations(CurrentPlayer);
+
+    /* Start the next player's turn. */
+    if (IsValid(NewPlayer))
+        NewPlayer->Server_SetPlayerStatus(E_SelectingPiece);
+}
+
 void AMatch_GameStateBase::Server_StartMatch_Implementation()
 {
     /* Prevent the match from starting again. */
@@ -161,7 +185,7 @@ void AMatch_GameStateBase::Multicast_RevealAllPieces_Implementation()
     }
 }
 
-void AMatch_GameStateBase::Server_DecrementModifierDurations_Implementation()
+void AMatch_GameStateBase::Server_DecrementModifierDurations_Implementation(AMatch_PlayerState* OwningPlayer)
 {
     /* Get every piece in the game. */
     TArray<AActor*> AllPieceActors;
@@ -170,23 +194,27 @@ void AMatch_GameStateBase::Server_DecrementModifierDurations_Implementation()
     /* Iterate through every piece. */
     for (AActor* PieceActor : AllPieceActors)
     {
-        /* Get the piece actor as a piece. */
-        if (AParentPiece* Piece = Cast<AParentPiece>(PieceActor))
+        /* Only decrement the modifier durations of the given player's pieces. */
+        if (PieceActor->GetInstigator() == OwningPlayer->GetPawn())
         {
-            /* For every modifier applied to this piece... */
-            for (int i = 0; i < Piece->GetTemporaryModifiers().Num(); i++)
+            /* Get the piece actor as a piece. */
+            if (AParentPiece* Piece = Cast<AParentPiece>(PieceActor))
             {
-                /* Check if the iterated modifier has an indefinite duration. These modifiers' durations don't get decremented. */
-                if (!Piece->GetTemporaryModifiers()[i].bIndefiniteDuration)
+                /* For every modifier applied to this piece... */
+                for (int i = 0; i < Piece->GetTemporaryModifiers().Num(); i++)
                 {
-                    /* Reduce the modifier's remaining duration by 1 turn. */
-                    const int NewRemainingDuration = Piece->GetTemporaryModifiers()[i].RemainingDuration - 1;
-
-                    /* If the modifier's duration has now ended, remove it. */
-                    if (NewRemainingDuration < 1)
+                    /* Check if the iterated modifier has an indefinite duration. These modifiers' durations don't get decremented. */
+                    if (!Piece->GetTemporaryModifiers()[i].bIndefiniteDuration)
                     {
-                        /* Always activate pop-ups for abilities that are removed as a result of their duration ending. */
-                        Cast<AMatch_PlayerPawn>(Piece->GetInstigator())->GetPieceNetworkingComponent()->Server_RemoveModifier(Piece, Piece->GetTemporaryModifiers()[i], true, true);
+                        /* Reduce the modifier's remaining duration by 1 turn. */
+                        const int NewRemainingDuration = Piece->GetTemporaryModifiers()[i].RemainingDuration - 1;
+
+                        /* If the modifier's duration has now ended, remove it. */
+                        if (NewRemainingDuration < 1)
+                        {
+                            /* Always activate pop-ups for abilities that are removed as a result of their duration ending. */
+                            Cast<AMatch_PlayerPawn>(Piece->GetInstigator())->GetPieceNetworkingComponent()->Server_RemoveModifier(Piece, Piece->GetTemporaryModifiers()[i], true, true);
+                        }
                     }
                 }
             }

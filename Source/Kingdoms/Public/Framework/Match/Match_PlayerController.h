@@ -67,6 +67,10 @@ public:
 	UFUNCTION(Category="User Interface")
 	void UpdateActionIndicator(bool bUsed, bool bMoveAction) const;
 
+	/* Enables or disables the end turn button. */
+	UFUNCTION(Category="User Interface")
+	void UpdateEndTurnButton(bool bEnable) const;
+
 	/* Reveals and updates or hides one of the piece info widgets. */
 	UFUNCTION(Category="User Interface")
 	void UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlignment Alignment, bool bEnableButtons, bool bHide) const;

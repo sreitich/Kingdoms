@@ -9,6 +9,7 @@
 #include "Match_GameStateBase.generated.h"
 
 class ABoardManager;
+class AMatch_PlayerState;
 
 /**
  * 
@@ -38,6 +39,10 @@ public:
 	/* Initiates the game for all clients and begins the match on the server once both players have set up their pieces. */
 	UFUNCTION(Server, Reliable)
 	void Server_StartMatch();
+
+	/* Switches the current turn from the given player to the other player. */
+	UFUNCTION(Server, Reliable)
+	void Server_EndTurn(AMatch_PlayerState* CurrentPlayer);
 
 	/* Getter for CurrentMatchStatus. */
 	UFUNCTION(BlueprintPure, Category="Match Status")
@@ -95,7 +100,7 @@ protected:
 
 	/* Decrements the remaining durations of each piece's modifiers if they don't have an indefinite duration. */
 	UFUNCTION(Server, Reliable)
-	void Server_DecrementModifierDurations();
+	void Server_DecrementModifierDurations(AMatch_PlayerState* OwningPlayer);
 
 
 /* Protected variables */

@@ -9,6 +9,7 @@
 
 #include "Net/UnrealNetwork.h"
 #include "Engine/Engine.h"
+#include "Kismet/GameplayStatics.h"
 
 AMatch_PlayerState::AMatch_PlayerState()
 {
@@ -30,6 +31,15 @@ void AMatch_PlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
     DOREPLIFETIME(AMatch_PlayerState, bReadyToPlay);
     DOREPLIFETIME(AMatch_PlayerState, bMoveActionUsed);
     DOREPLIFETIME(AMatch_PlayerState, bAbilityActionUsed);
+}
+
+void AMatch_PlayerState::Server_EndTurn_Implementation()
+{
+    /* End this player's turn and start the next player's turn. */
+    if (AMatch_GameStateBase* GameStatePtr = Cast<AMatch_GameStateBase>(UGameplayStatics::GetGameState(this)))
+    {
+        GameStatePtr->Server_EndTurn(this);
+    }
 }
 
 void AMatch_PlayerState::SetReadyToPlay_Server_Implementation(bool bReady)
@@ -67,8 +77,6 @@ void AMatch_PlayerState::Server_SetMoveActionUsed_Implementation(bool bNewMoveAc
         /* The server does not call the OnRep automatically. */
         OnRep_MoveActionUsed();
     }
-
-
 }
 
 void AMatch_PlayerState::Server_SetAbilityActionUsed_Implementation(bool bNewAbilityActionUsed)
@@ -121,6 +129,8 @@ void AMatch_PlayerState::Server_SetPlayerStatus_Implementation(EPlayerStatus New
      *      - From Selecting Target Active
      */
 
+    // If we go to selecting piece from waiting for turn, refresh our piece info widget
+
     const EPlayerStatus OldPlayerStatus = CurrentPlayerStatus;
 
     CurrentPlayerStatus = NewPlayerStatus;
@@ -132,10 +142,17 @@ void AMatch_PlayerState::Server_SetPlayerStatus_Implementation(EPlayerStatus New
 void AMatch_PlayerState::OnRep_CurrentPlayerStatus(EPlayerStatus OldPlayerStatus)
 {
     /* If the player was waiting for their turn and they are now selecting a piece, reset their turn progress. */
-    if (OldPlayerStatus == E_WaitingForTurn && CurrentPlayerStatus == E_SelectingPiece)
+    if (CurrentPlayerStatus == E_SelectingPiece && OldPlayerStatus == E_WaitingForTurn)
     {
         bMoveActionUsed = false;
         bAbilityActionUsed = false;
+
+        /* Manually call OnReps if this is the server. */
+        if (HasAuthority())
+        {
+            OnRep_MoveActionUsed();
+            OnRep_AbilityActionUsed();
+        }
     }
 }
 
@@ -144,6 +161,15 @@ void AMatch_PlayerState::OnRep_MoveActionUsed()
     /* Update the turn progress indicators to indicate whether the move action has been used. */
     if (const AMatch_PlayerController* PlayerControllerPtr = GetPawn()->GetController<AMatch_PlayerController>())
         PlayerControllerPtr->UpdateActionIndicator(bMoveActionUsed, true);
+
+    /* Enable the end turn button to allow the player to end their turn after using a move action. */
+    if (bMoveActionUsed)
+    {
+        if (const AMatch_PlayerController* PlayerControllerPtr = GetPawn()->GetController<AMatch_PlayerController>())
+        {
+            PlayerControllerPtr->UpdateEndTurnButton(true);
+        }
+    }
 }
 
 void AMatch_PlayerState::OnRep_AbilityActionUsed()

@@ -91,6 +91,9 @@ void UMatch_AttackConfirmation::OnAttackClicked()
 
 	/* Remove all other widgets and reset the player's selections when starting the attack sequence. */
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, true, false, true, true);
+	
+	/* Record that the player has used their move action for this turn, preventing them from using another move action until their next turn. */
+	GetOwningPlayerState<AMatch_PlayerState>()->Server_SetMoveActionUsed(true);
 
 	/* Destroy this widget. */
 	this->RemoveFromParent();
