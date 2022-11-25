@@ -18,6 +18,7 @@
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Framework/Match/Match_PlayerPawn.h"
+#include "UserInterface/Match/Match_TurnProgressWidget.h"
 
 AMatch_PlayerController::AMatch_PlayerController()
 {
@@ -195,6 +196,15 @@ void AMatch_PlayerController::UpdateMapName(FName NewName) const
     {
         /* Get the map name from the game state and display it on the base widget. */
         Match_BaseWidget->UpdateMapName(GetWorld()->GetGameState<AMatch_GameStateBase>()->MapName);
+    }
+}
+
+void AMatch_PlayerController::UpdateActionIndicator(bool bUsed, bool bMoveAction) const
+{
+    /* Only execute on local client and if the base widget is initialized. */
+    if (IsLocalPlayerController() && Match_BaseWidget)
+    {
+        Match_BaseWidget->GetTurnProgressWidget()->UpdateActionIndicator(bUsed, bMoveAction);
     }
 }
 

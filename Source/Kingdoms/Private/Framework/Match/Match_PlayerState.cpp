@@ -141,10 +141,14 @@ void AMatch_PlayerState::OnRep_CurrentPlayerStatus(EPlayerStatus OldPlayerStatus
 
 void AMatch_PlayerState::OnRep_MoveActionUsed()
 {
-    UE_LOG(LogTemp, Error, TEXT("Move rep called."));
+    /* Update the turn progress indicators to indicate whether the move action has been used. */
+    if (const AMatch_PlayerController* PlayerControllerPtr = GetPawn()->GetController<AMatch_PlayerController>())
+        PlayerControllerPtr->UpdateActionIndicator(bMoveActionUsed, true);
 }
 
 void AMatch_PlayerState::OnRep_AbilityActionUsed()
 {
-    UE_LOG(LogTemp, Error, TEXT("Ability rep called."));
+    /* Update the turn progress indicators to indicate whether the ability action has been used. */
+    if (const AMatch_PlayerController* PlayerControllerPtr = GetPawn()->GetController<AMatch_PlayerController>())
+        PlayerControllerPtr->UpdateActionIndicator(bAbilityActionUsed, false);
 }

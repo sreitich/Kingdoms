@@ -7,6 +7,7 @@
 #include "Match_BaseWidget.generated.h"
 
 class UMatch_PieceInfoWidget;
+class UMatch_TurnProgressWidget;
 class UTextBlock;
 
 enum EAlignment;
@@ -33,6 +34,10 @@ public:
 	/* Returns a reference to the corresponding piece info widget. */
 	UFUNCTION()
 	UMatch_PieceInfoWidget* GetPieceInfoWidget(EAlignment Alignment) const;
+
+	/* Returns a reference to the turn progress widget. */
+	UFUNCTION()
+	FORCEINLINE UMatch_TurnProgressWidget* GetTurnProgressWidget() const { return TurnProgressWidget; }
 
 
 /* Protected functions. */
@@ -64,5 +69,9 @@ protected:
 	/* Displays info about the currently-selected enemy piece. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UMatch_PieceInfoWidget* EnemyPieceInfoWidget;
+
+	/* Displays this player's current turn progress. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UMatch_TurnProgressWidget* TurnProgressWidget;
 
 };

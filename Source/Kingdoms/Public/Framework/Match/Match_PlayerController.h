@@ -63,6 +63,10 @@ public:
 	UFUNCTION(Category="User Interface")
 	void UpdateMapName(FName NewName) const;
 
+	/* Updates the requested action indicator to indicate whether or not an action has been used. */
+	UFUNCTION(Category="User Interface")
+	void UpdateActionIndicator(bool bUsed, bool bMoveAction) const;
+
 	/* Reveals and updates or hides one of the piece info widgets. */
 	UFUNCTION(Category="User Interface")
 	void UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlignment Alignment, bool bEnableButtons, bool bHide) const;
