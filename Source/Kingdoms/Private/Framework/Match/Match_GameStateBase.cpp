@@ -99,8 +99,9 @@ void AMatch_GameStateBase::Server_EndTurn_Implementation(AMatch_PlayerState* Cur
     if (IsValid(CurrentPlayer))
         CurrentPlayer->Server_SetPlayerStatus(E_WaitingForTurn);
 
-    /* Decrement the modifier durations for the player whose turn just ended. */
+    /* Decrement the modifier durations and ability cooldowns for the player whose turn just ended. */
     Server_DecrementModifierDurations(CurrentPlayer);
+    Server_DecrementAbilityCooldowns(CurrentPlayer);
 
     /* Start the next player's turn. */
     if (IsValid(NewPlayer))
@@ -205,18 +206,36 @@ void AMatch_GameStateBase::Server_DecrementModifierDurations_Implementation(AMat
                 {
                     /* Check if the iterated modifier has an indefinite duration. These modifiers' durations don't get decremented. */
                     if (!Piece->GetTemporaryModifiers()[i].bIndefiniteDuration)
-                    {
                         /* Reduce the modifier's remaining duration by 1 turn. */
-                        const int NewRemainingDuration = Piece->GetTemporaryModifiers()[i].RemainingDuration - 1;
-
-                        /* If the modifier's duration has now ended, remove it. */
-                        if (NewRemainingDuration < 1)
-                        {
-                            /* Always activate pop-ups for abilities that are removed as a result of their duration ending. */
-                            Cast<AMatch_PlayerPawn>(Piece->GetInstigator())->GetPieceNetworkingComponent()->Server_RemoveModifier(Piece, Piece->GetTemporaryModifiers()[i], true, true);
-                        }
-                    }
+                        Cast<AMatch_PlayerPawn>(Piece->GetInstigator())->GetPieceNetworkingComponent()->Server_AdjustModifierDuration(Piece, Piece->GetTemporaryModifiers()[i], -1, true, true);
                 }
+            }
+        }
+    }
+}
+
+void AMatch_GameStateBase::Server_DecrementAbilityCooldowns_Implementation(AMatch_PlayerState* OwningPlayer)
+{
+    /* Get every piece in the game. */
+    TArray<AActor*> AllPieceActors;
+    UGameplayStatics::GetAllActorsOfClass(this, AParentPiece::StaticClass(), OUT AllPieceActors);
+
+    /* Iterate through every piece. */
+    for (AActor* PieceActor : AllPieceActors)
+    {
+        /* Only decrement the ability cooldowns of the given player's pieces. */
+        if (PieceActor->GetInstigator() == OwningPlayer->GetPawn())
+        {
+            /* Get the piece actor as a piece. */
+            if (AParentPiece* Piece = Cast<AParentPiece>(PieceActor))
+            {
+                /* Decrement the piece's active cooldown if it's active. */
+                if (Piece->GetActiveCD() > 0)
+                    Piece->SetActiveCD(Piece->GetActiveCD() - 1);
+
+                /* Decrement the piece's passive cooldown if it's active. */
+                if (Piece->GetPassiveCD() > 0)
+                    Piece->SetPassiveCD(Piece->GetPassiveCD() - 1);
             }
         }
     }

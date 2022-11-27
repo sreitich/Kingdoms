@@ -30,6 +30,10 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
 	void Server_RemoveModifier(AParentPiece* TargetPiece, FModifier ModifierToRemove, bool bActivatePopUps, bool bFlashHighlight);
 
+	/* Changes the given modifier's duration by the given amount. */
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
+	void Server_AdjustModifierDuration(AParentPiece* TargetPiece, FModifier ModifierToDecrement, int AmountToChange, bool bActivatePopUps, bool bFlashHighlight);
+
 
 /* Protected functions. */
 protected:

@@ -17,8 +17,6 @@ UPieceNetworkingComponent::UPieceNetworkingComponent()
 void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* PieceToModify, FModifier NewModifier,
 	bool bActivatePopUps, bool bFlashHighlight)
 {
-	// UE_LOG(LogTemp, Error, TEXT("Modifier added to %s."), *PieceToModify->GetName());
-	
 	/* Store the original strength or armor value to find out the final change that this modifier applies. */
 	const int OriginalValue = NewModifier.EffectedStat ? PieceToModify->GetCurrentStrength() : PieceToModify->GetCurrentArmor();
 	int NewValue = OriginalValue;
@@ -52,8 +50,6 @@ void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* 
 	/* If this modifier is already applied, reset its duration and stack the values together. */
 	if (RepeatIndex != -1)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Found a repeat modifier"));
-
 		TemporaryModifiers[RepeatIndex].RemainingDuration = NewModifier.RemainingDuration;
 		TemporaryModifiers[RepeatIndex].StrengthChange += NewModifier.StrengthChange;
 		TemporaryModifiers[RepeatIndex].ArmorChange += NewModifier.ArmorChange;
@@ -68,8 +64,8 @@ void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* 
 	}
 }
 
-void UPieceNetworkingComponent::Server_RemoveModifier_Implementation(AParentPiece* TargetPiece, FModifier ModifierToRemove, bool bActivatePopUps,
-	bool bFlashHighlight)
+void UPieceNetworkingComponent::Server_RemoveModifier_Implementation(AParentPiece* TargetPiece, FModifier ModifierToRemove,
+	bool bActivatePopUps, bool bFlashHighlight)
 {
 	/* Store the original strength or armor value to find out the final change that this modifier applies. */
 	const int OriginalValue = ModifierToRemove.EffectedStat ? TargetPiece->GetCurrentStrength() : TargetPiece->GetCurrentArmor();
@@ -96,6 +92,34 @@ void UPieceNetworkingComponent::Server_RemoveModifier_Implementation(AParentPiec
 	TargetPiece->GetTemporaryModifiers().Remove(ModifierToRemove);
 	/* Manually call the OnRep for the server. */
 	TargetPiece->OnRep_TemporaryModifiers(OldTemporaryModifiers);
+
+	// Flash pop-ups
+}
+
+void UPieceNetworkingComponent::Server_AdjustModifierDuration_Implementation(AParentPiece* TargetPiece,
+	FModifier ModifierToAdjust, int AmountToChange, bool bActivatePopUps, bool bFlashHighlight)
+{
+	TArray<FModifier> &TemporaryModifiers = TargetPiece->GetTemporaryModifiers();
+
+	/* Find the modifier to adjust in the piece's list of active modifiers. */
+	for (int i = 0; i < TemporaryModifiers.Num(); i++)
+	{
+		if (ModifierToAdjust == TemporaryModifiers[i])
+		{
+			/* If the modifier to adjust has a definite duration. */
+			if (!TemporaryModifiers[i].bIndefiniteDuration)
+			{
+				/* Change the given modifier's duration by the given amount. */
+				TemporaryModifiers[i].RemainingDuration += AmountToChange;
+
+				/* If the modifier's new duration is less than or equal to 0, remove it. */
+				if (TemporaryModifiers[i].RemainingDuration < 1)
+					Server_RemoveModifier(TargetPiece, ModifierToAdjust, bActivatePopUps, bFlashHighlight);
+
+				break;
+			}
+		}
+	}
 }
 
 void UPieceNetworkingComponent::BeginPlay()

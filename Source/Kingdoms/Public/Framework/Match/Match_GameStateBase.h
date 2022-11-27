@@ -102,6 +102,10 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void Server_DecrementModifierDurations(AMatch_PlayerState* OwningPlayer);
 
+	/* Decrements any active cooldowns for pieces owned by the given player. */
+	UFUNCTION(Server, Reliable)
+	void Server_DecrementAbilityCooldowns(AMatch_PlayerState* OwningPlayer);
+
 
 /* Protected variables */
 protected:

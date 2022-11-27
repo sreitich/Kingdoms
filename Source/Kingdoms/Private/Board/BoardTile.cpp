@@ -102,7 +102,7 @@ void ABoardTile::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 void ABoardTile::OnBeginCursorOver(UPrimitiveComponent* Component)
 {
 	/* Only update this tile's reticle if it is being controlled by cursor events and if the player's input is enabled. */
-	if (bReticleControlledByCursor && UGameplayStatics::GetPlayerPawn(this, 0)->InputEnabled())
+	if (bReticleControlledByCursor && IsValid(UGameplayStatics::GetPlayerPawn(this, 0)) && UGameplayStatics::GetPlayerPawn(this, 0)->InputEnabled())
 	{
 		if (const AMatch_PlayerState* LocalPlayerState = Cast<AMatch_PlayerState>(UGameplayStatics::GetPlayerPawn(this, 0)->GetPlayerState()))
 		{
