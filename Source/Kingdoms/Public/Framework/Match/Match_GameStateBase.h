@@ -44,6 +44,10 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_EndTurn(AMatch_PlayerState* CurrentPlayer);
 
+	/* Ends the match with one winner and one loser. */
+	UFUNCTION(Server, Reliable)
+	void Server_EndMatch(AMatch_PlayerState* Winner);
+
 	/* Getter for CurrentMatchStatus. */
 	UFUNCTION(BlueprintPure, Category="Match Status")
 	FORCEINLINE EMatchStatus GetCurrentMatchStatus() const { return CurrentMatchStatus; }

@@ -695,6 +695,11 @@ void AParentPiece::OnPassiveAbility(TArray<AActor*> Targets)
 	UE_LOG(LogTemp, Error, TEXT("Passive ability called on a piece without a passive ability."));
 }
 
+void AParentPiece::OnDeath(AActor* Killer)
+{
+	/* No default logic. */
+}
+
 void AParentPiece::Server_SetCurrentTile_Implementation(ABoardTile* NewTile)
 {
 	/* Change the occupying piece. Only the server can do this. */

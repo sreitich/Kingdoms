@@ -83,6 +83,11 @@ bool AMatch_GameStateBase::CheckReadyToStart()
     return true;
 }
 
+void AMatch_GameStateBase::Server_EndMatch_Implementation(AMatch_PlayerState* Winner)
+{
+    UE_LOG(LogTemp, Error, TEXT("Match ended. %s wins!"), *Winner->GetName());
+}
+
 void AMatch_GameStateBase::Server_EndTurn_Implementation(AMatch_PlayerState* CurrentPlayer)
 {
     /* Get the player whose turn we're switching to. */

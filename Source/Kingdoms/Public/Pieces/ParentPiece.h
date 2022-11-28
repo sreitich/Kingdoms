@@ -139,6 +139,11 @@ public:
 	virtual void OnPassiveAbility(TArray<AActor*> Targets);
 
 
+	/* Called when this piece is killed by an attack or ability. */
+	UFUNCTION(Category="Death")
+	virtual void OnDeath(AActor* Killer);
+
+
 /* Public accessors and mutators. */
 public:
 	
