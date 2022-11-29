@@ -84,6 +84,7 @@ void AParentPiece::BeginPlay()
 	/* Set this piece's skeletal meshes to use a dynamic material instance so that its parameters (like the fresnel) can
 	 * be changed during runtime. */
 	DynamicMaterial = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(0), this);
+	GetMesh()->SetMaterial(0, DynamicMaterial);
 	TArray<USceneComponent*> MeshChildren;
 	GetMesh()->GetChildrenComponents(true, MeshChildren);
 	for (USceneComponent* SkeletalMesh : MeshChildren)

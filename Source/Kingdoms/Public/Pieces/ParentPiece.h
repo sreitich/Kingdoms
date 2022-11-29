@@ -71,13 +71,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void FlashHighlight(FLinearColor Color, float Brightness, float PlayRate, float Duration, bool bIndefiniteDuration);
 
-		/* Fades to the target fresnel color and brightness at the given speed. Then waits for the duration and returns
-		 * to the original color and brightness. */
-		UFUNCTION(BlueprintImplementableEvent)
-		void FlashHighlightTimeline(FLinearColor NewColor, float NewBrightness, FLinearColor OriginalColor, float
-			OriginalBrightness, float PlayRate, float Duration, bool bIndefiniteDuration);
-
-
 	/* Spawns and animates a modifier pop-up with the appropriate information at this piece's pop-up location. */
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void Multicast_CreateModifierPopUp(int ValueChange, bool bStrength, bool bFlashHighlight);
