@@ -13,5 +13,14 @@ UCLASS()
 class KINGDOMS_API AKing : public AParentCommanderPiece
 {
 	GENERATED_BODY()
+
+/* Public functions. */
+public:
+
+	/* Sets default values for this character's properties. */
+	AKing();
+
+	/* Tests if the given tile's coordinates match any of this piece's movement patterns. */
+	virtual bool TileIsInMoveRange(ABoardTile* Tile) override;
 	
 };
