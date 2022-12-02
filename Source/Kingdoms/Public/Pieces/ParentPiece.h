@@ -327,9 +327,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
 	UAnimSequenceBase* PassiveAbilityAnimation;
 
-	/* The particle effect to spawn when this piece is damaged. */
+	/* The particle effect to spawn on opponent pieces when this piece attacks them. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Effects")
-	UParticleSystem* DamagedParticle;
+	UParticleSystem* DamagingParticle;
 
 	/* Which mesh component to play the damage particle effect on. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Effects")
