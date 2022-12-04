@@ -55,7 +55,7 @@ void UMatch_MoveConfirmation::OnConfirmClicked()
 {
     /* Reset the highlight of every tile that was highlighted. */
     for (ABoardTile* Tile : PendingPiece->GetValidMoveTiles())
-        Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+        Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
     
     /* Remove all other widgets and reset the player's selected piece and selected tile when this piece starts moving. */
     GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, false, false, true, true);
@@ -86,7 +86,7 @@ void UMatch_MoveConfirmation::OnCancelClicked()
     {
         for (ABoardTile* Tile : PendingPiece->GetValidMoveTiles())
         {
-            Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+            Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
         }
     }
 

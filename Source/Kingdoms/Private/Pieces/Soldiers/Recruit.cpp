@@ -158,7 +158,7 @@ void ARecruit::UpdatePassiveModifier(bool bTriggerPopUp)
 				false
 			};
 
-			Cast<AMatch_PlayerPawn>(GetInstigator())->GetPieceNetworkingComponent()->Server_AddModifier(this, ModifierToAdd, bTriggerPopUp, bTriggerPopUp);
+			Cast<AMatch_PlayerPawn>(GetInstigator())->GetPieceNetworkingComponent()->Server_AddModifier(this, ModifierToAdd, bTriggerPopUp);
 		}
 	}
 }

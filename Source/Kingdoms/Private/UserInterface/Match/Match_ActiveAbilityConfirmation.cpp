@@ -10,14 +10,14 @@
 #include "Framework/Match/Match_PlayerState.h"
 #include "Pieces/ParentPiece.h"
 
-void UMatch_ActiveAbilityConfirmation::UpdateActionConfirmationInfo(AParentPiece* NewAbilityUser, AActor* Target)
+void UMatch_ActiveAbilityConfirmation::UpdateActionConfirmationInfo(AParentPiece* NewAbilityUser, TArray<AActor*> Targets)
 {
 	/* Update the user of the ability this widget is confirming, if the given one is valid. */
 	if (IsValid(NewAbilityUser))	
 		AbilityUser = NewAbilityUser;
 
 	/* Set this ability's target. */
-	PendingTarget = Target;
+	PendingTargets = Targets;
 }
 
 bool UMatch_ActiveAbilityConfirmation::SetAbilityUser(AParentPiece* NewAbilityUser)
@@ -32,12 +32,23 @@ bool UMatch_ActiveAbilityConfirmation::SetAbilityUser(AParentPiece* NewAbilityUs
 	return false;
 }
 
-bool UMatch_ActiveAbilityConfirmation::SetPendingTarget(AActor* NewTarget)
+bool UMatch_ActiveAbilityConfirmation::SetPendingTargets(TArray<AActor*> NewTargets)
 {
-	/* Update the pending target and return true if the given target is valid. */
-	if (IsValid(NewTarget))
+	/* Ensure that all of the given targets are valid. */
+	bool bIsValid = true;
+	for (const AActor* ActorPtr : NewTargets)
 	{
-		PendingTarget = NewTarget;
+		if (!IsValid(ActorPtr))
+		{
+			bIsValid = false;
+			break;
+		}
+	}
+
+	/* Update the pending target and return true if the given targets are valid. */
+	if (bIsValid)
+	{
+		PendingTargets = NewTargets;
 		return true;
 	}
 
@@ -56,9 +67,9 @@ void UMatch_ActiveAbilityConfirmation::NativeConstruct()
 
 void UMatch_ActiveAbilityConfirmation::OnConfirmClicked()
 {
-	/* Activate the selected piece's active ability if the selected piece is valid. */
+	/* Activate the selected piece's active ability from the server if there is a valid reference to it. */
 	if (IsValid(AbilityUser))
-		// AbilityUser->OnActiveAbility(PendingTarget);
+		Cast<AMatch_PlayerPawn>(GetOwningPlayerPawn())->Server_UseActiveAbility(AbilityUser, PendingTargets);
 
 	/* Act as if the widget was cancelled, resetting the player's state and removing all highlighted valid targets.*/
 	OnCancelClicked();
@@ -77,15 +88,18 @@ void UMatch_ActiveAbilityConfirmation::OnCancelClicked()
 		/* If the target was a tile, reset its highlight. */
 		if (ABoardTile* Tile = Cast<ABoardTile>(ValidTarget))
 		{
-			Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+			Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
 		}
 		/* If the target was a piece, reset that piece's tile's highlight. */
 		else if (const AParentPiece* Piece = Cast<AParentPiece>(ValidTarget))
 		{
-			Piece->GetCurrentTile()->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+			Piece->GetCurrentTile()->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
 		}
 		/* This can be iterated on if we add pieces that can target things other than tiles or pieces in the future. */
     }
+
+	/* Nullify the piece's pointer to its active ability confirmation widget so it makes a new one next time. */
+	AbilityUser->ActiveAbilityConfirmationWidget = nullptr;
 
 	/* Destroy this widget. */
 	RemoveFromParent();

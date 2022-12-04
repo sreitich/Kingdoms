@@ -634,12 +634,12 @@ void AParentPiece::OnActiveClicked()
 					/* If this ability only targets tiles, highlight the target tile yellow. */
 					if (PieceData->bActiveTargetsTiles)
 					{
-						Tile->UpdateEmissiveHighlight(true, 4.0f, Tile->Highlight_ValidUnoccupiedTile);
+						Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_ValidUnoccupiedTile);
 					}
 					/* If this ability targets pieces, highlight the target tile depending on the piece alignment. */
 					else if (IsValid(Tile->GetOccupyingPiece()) && !PieceData->bActiveTargetsTiles)
 					{
-						Tile->UpdateEmissiveHighlight(true, 4.0f, Tile->GetOccupyingPiece()->GetAlignment() == E_Friendly ? Tile->Highlight_Friendly : Tile->Highlight_Enemy);
+						Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->GetOccupyingPiece()->GetLocalAlignment() == E_Friendly ? Tile->Highlight_Friendly : Tile->Highlight_Enemy);
 					}
 				}
 			}
@@ -648,7 +648,7 @@ void AParentPiece::OnActiveClicked()
 		else if (const AParentPiece* Piece = Cast<AParentPiece>(Target))
 		{
 			ABoardTile* const TargetPieceTile = Piece->GetCurrentTile();
-			TargetPieceTile->UpdateEmissiveHighlight(true, 4.0f, Piece->GetAlignment() == E_Friendly ? TargetPieceTile->Highlight_Friendly : TargetPieceTile->Highlight_Enemy);
+			TargetPieceTile->UpdateEmissiveHighlight(true, TargetPieceTile->DefaultHighlightPlayRate, Piece->GetLocalAlignment() == E_Friendly ? TargetPieceTile->Highlight_Friendly : TargetPieceTile->Highlight_Enemy);
 		}
 		/* This can be iterated on if we add pieces that can target things other than tiles or pieces in the future. */
 	}
@@ -664,6 +664,24 @@ void AParentPiece::OnActiveAbility(TArray<AActor*> Targets)
 	/* Record that the player used their ability action for this turn, preventing them from using another active ability
 	 * until their next turn. */
 	Cast<AMatch_PlayerPawn>(GetInstigator())->GetPlayerState<AMatch_PlayerState>()->Server_SetAbilityActionUsed(true);
+
+	/* Get this piece's piece data to trigger its cooldown and decrement its uses as needed. */
+	if (PieceDataTable)
+	{
+		static const FString ContextString(TEXT("Piece Data Struct"));
+		const FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(PieceID, ContextString, true);
+
+		if (PieceData)
+		{
+			/* Put the ability onto cooldown if it has one. */
+			if (PieceData->ActiveCD > 0)
+				SetActiveCD(PieceData->ActiveCD);
+
+			/* Decrement this ability's remaining uses if it has limited uses. */
+			if (PieceData->ActiveUses > 0)
+				SetActiveUses(ActiveUses - 1);
+		}
+	}
 }
 
 void AParentPiece::OnAbilityEffectEnded(TArray<AActor*> Targets)

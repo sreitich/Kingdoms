@@ -15,7 +15,7 @@ UPieceNetworkingComponent::UPieceNetworkingComponent()
 }
 
 void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* PieceToModify, FModifier NewModifier,
-	bool bActivatePopUps, bool bFlashHighlight)
+	bool bActivatePopUps)
 {
 	/* Store the original strength or armor value to find out the final change that this modifier applies. */
 	const int OriginalValue = NewModifier.EffectedStat ? PieceToModify->GetCurrentStrength() : PieceToModify->GetCurrentArmor();

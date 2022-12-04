@@ -49,7 +49,7 @@ public:
 
 	/* Returns this piece's alignment relative to the local player. */
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE EAlignment GetAlignment() const { return GetInstigator()->IsLocallyControlled() ? E_Friendly : E_Hostile; }
+	FORCEINLINE EAlignment GetLocalAlignment() const { return GetInstigator()->IsLocallyControlled() ? E_Friendly : E_Hostile; }
 
 	/* Plays a piece pop-up animation, scaling up the piece's size from 0.0 to 1.0 over the given duration. */
 	UFUNCTION(BlueprintCallable)
@@ -116,8 +116,9 @@ public:
 	/* Called when the player selects a target to display and update a confirmation pop-up specific to that ability. */
 	UFUNCTION(Category="ActiveAbility")
 	virtual void StartActiveConfirmation(TArray<AActor*> Targets);
-	
-	/* Called when a piece uses an active ability, if it has one. Overridden by pieces with an active ability. */
+
+	/* Called when a piece uses an active ability, if it has one. Called on server by default. Default implementation
+	 * triggers cool-downs and decrements uses as needed. Overridden by pieces with an active ability. */
 	UFUNCTION(BlueprintCallable, Category="Active Ability")
 	virtual void OnActiveAbility(TArray<AActor*> Targets);
 
@@ -258,6 +259,11 @@ public:
 	/* How long modifier flashes last for. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Modifiers")
 	float ModifierFlashDuration = 0.25f;
+
+	/* A reference to this piece's active ability confirmation widget, if it has one. Prevents the widget from being
+	 * created multiple times. */
+	UPROPERTY()
+	UUserWidget* ActiveAbilityConfirmationWidget;
 
 
 /* Public constants and asset references. */

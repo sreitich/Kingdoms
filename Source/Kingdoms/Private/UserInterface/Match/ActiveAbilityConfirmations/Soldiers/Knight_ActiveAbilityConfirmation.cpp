@@ -44,7 +44,7 @@ void UKnight_ActiveAbilityConfirmation::OnConfirmClicked()
 	{
 		for (ABoardTile* Tile : AbilityUser->GetValidMoveTiles())
 		{
-			Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+			Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
 		}
 	}
 
@@ -58,7 +58,7 @@ void UKnight_ActiveAbilityConfirmation::OnConfirmClicked()
 
 	/* Clear these variables manually when this widget is destroyed. */
 	TargetTile = nullptr;
-	AbilityUser->ConfirmationWidget = nullptr;
+	AbilityUser->ActiveAbilityConfirmationWidget = nullptr;
 
 	/* Destroy this widget after the ability is confirmed. */
 	RemoveFromParent();
@@ -84,12 +84,12 @@ void UKnight_ActiveAbilityConfirmation::OnCancelClicked()
 	{
 		for (ABoardTile* Tile : AbilityUser->GetValidMoveTiles())
 		{
-			Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+			Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
 		}
 	}
 
 	/* Nullify the piece's pointer to its ability confirmation widget so it makes a new one next time. */
-	AbilityUser->ConfirmationWidget = nullptr;
+	AbilityUser->ActiveAbilityConfirmationWidget = nullptr;
 
 	/* Destroy this widget. */
 	RemoveFromParent();

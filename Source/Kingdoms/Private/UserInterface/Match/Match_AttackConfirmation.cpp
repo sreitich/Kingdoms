@@ -86,7 +86,7 @@ void UMatch_AttackConfirmation::OnAttackClicked()
 	/* Reset the highlight of every tile that was highlighted. */
 	for (ABoardTile* Tile : PendingFriendlyPiece->GetValidMoveTiles())
 	{
-		Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+		Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
 	}
 
 	/* Remove all other widgets and reset the player's selections when starting the attack sequence. */
@@ -111,7 +111,7 @@ void UMatch_AttackConfirmation::OnCancelClicked()
 		/* Reset the highlight of every tile that was highlighted. */
 		for (ABoardTile* Tile : PendingFriendlyPiece->GetValidMoveTiles())
 		{
-			Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+			Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
 		}
 	}
 

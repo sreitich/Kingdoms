@@ -169,7 +169,7 @@ void UMatch_Modifier::HighlightSource(bool bRemoveHighlight) const
 		/* Set the piece's requested highlight. */
 		SourcePiece->FlashHighlight
 		(
-			SourcePiece->GetAlignment() == E_Friendly ? SourcePiece->FriendlyFresnelColor : SourcePiece->EnemyFresnelColor,
+			SourcePiece->GetLocalAlignment() == E_Friendly ? SourcePiece->FriendlyFresnelColor : SourcePiece->EnemyFresnelColor,
 			Brightness,
 			HighlightSourceRate,
 			0.0f,

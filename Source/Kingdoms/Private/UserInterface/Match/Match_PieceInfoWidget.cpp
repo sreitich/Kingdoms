@@ -406,7 +406,7 @@ void UMatch_PieceInfoWidget::PlayOpenCloseAnim(bool bOpen, float StartTime, int3
 void UMatch_PieceInfoWidget::RefreshWidget()
 {
     /* Refresh the information in this widget. */
-    UpdatePieceInfoWidget(DisplayedPiece, DisplayedPiece->GetAlignment(), MoveButton->GetVisibility() == ESlateVisibility::Visible);
+    UpdatePieceInfoWidget(DisplayedPiece, DisplayedPiece->GetLocalAlignment(), MoveButton->GetVisibility() == ESlateVisibility::Visible);
 }
 
 bool UMatch_PieceInfoWidget::AreStatsHovered() const
@@ -418,7 +418,7 @@ void UMatch_PieceInfoWidget::OnStatsHovered()
 {
     /* Get the currently displayed piece's active modifiers and alignment. */
     const TArray<FModifier> ActiveModifiers = DisplayedPiece->GetTemporaryModifiers();
-    const EAlignment PieceAlignment = DisplayedPiece->GetAlignment();
+    const EAlignment PieceAlignment = DisplayedPiece->GetLocalAlignment();
 
     /* If this piece has any currently active modifiers. */
     if (ActiveModifiers.Num() > 0 && ModifierListClass)
@@ -451,7 +451,7 @@ void UMatch_PieceInfoWidget::OnActiveHovered()
     if (PieceData && DisplayedPiece->ActiveAbilityInfoWidget)
     {
         /* Store whether the displayed piece is friendly or not so we don't have to keep checking. */
-        const EAlignment PieceAlignment = DisplayedPiece->GetAlignment();
+        const EAlignment PieceAlignment = DisplayedPiece->GetLocalAlignment();
 
         /* Create a new ability info pop-up widget and update its information. */
         AbilityInfoPopup = Cast<UMatch_AbilityInfoPopup>(CreateWidget<UUserWidget>(GetWorld(), DisplayedPiece->ActiveAbilityInfoWidget, FName("Ability Info Pop-Up")));
@@ -473,7 +473,7 @@ void UMatch_PieceInfoWidget::OnPassiveHovered()
     if (PieceData && DisplayedPiece->PassiveAbilityInfoWidget)
     {
         /* Store whether the displayed piece is friendly or not so we don't have to keep checking. */
-        const EAlignment PieceAlignment = DisplayedPiece->GetAlignment();
+        const EAlignment PieceAlignment = DisplayedPiece->GetLocalAlignment();
 
         /* Create a new ability info pop-up widget and update its information. */
         AbilityInfoPopup = Cast<UMatch_AbilityInfoPopup>(CreateWidget<UUserWidget>(GetWorld(), DisplayedPiece->PassiveAbilityInfoWidget, FName("Ability Info Pop-Up")));
@@ -519,14 +519,14 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
         for (ABoardTile* Tile : DisplayedPiece->GetValidMoveTiles())
         {
             /* If this tile is occupied by an enemy piece, highlight it as a valid attack target. */
-            if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetAlignment() == E_Hostile)
+            if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetLocalAlignment() == E_Hostile)
             {
-                Tile->UpdateEmissiveHighlight(true, 4.0f, Tile->Highlight_Enemy);
+                Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_Enemy);
             }
             /* If the tile is empty, highlight it as a valid target destination. */
             else if (!IsValid(Tile->GetOccupyingPiece()))
             {
-                Tile->UpdateEmissiveHighlight(true, 4.0f, Tile->Highlight_ValidUnoccupiedTile);
+                Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_ValidUnoccupiedTile);
             }
         }
     }

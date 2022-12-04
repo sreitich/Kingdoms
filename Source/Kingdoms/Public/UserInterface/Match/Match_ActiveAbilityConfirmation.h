@@ -23,7 +23,7 @@ public:
 
 	/* Updates the widget's displayed and internal information. Only used when creating this widget. */
 	UFUNCTION()
-	void UpdateActionConfirmationInfo(AParentPiece* NewAbilityUser, AActor* Target);
+	void UpdateActionConfirmationInfo(AParentPiece* NewAbilityUser, TArray<AActor*> Targets);
 
 	/* Getter for AbilityUser. */
 	UFUNCTION(BlueprintPure, Category="Ability User")
@@ -34,17 +34,17 @@ public:
 	bool SetAbilityUser(AParentPiece* NewAbilityUser);
 
 	/* Getter for PendingTarget. */
-	UFUNCTION(BlueprintPure, Category="Pending Target")
-	FORCEINLINE AActor* GetPendingTarget() const { return PendingTarget; };
+	UFUNCTION(BlueprintPure, Category="Pending Targets")
+	FORCEINLINE TArray<AActor*> GetPendingTargets() const { return PendingTargets; };
 
 	/* Setter for PendingTarget. */
-	UFUNCTION(BlueprintCallable, Category="Pending Target")
-	bool SetPendingTarget(AActor* NewTarget);
+	UFUNCTION(BlueprintCallable, Category="Pending Targets")
+	bool SetPendingTargets(TArray<AActor*> NewTargets);
 
 	/* Resets the "use active ability" action. Public to be used by the player controller for proper
 	 * cleanup when deselecting a piece while selecting a target. */
 	UFUNCTION()
-	void OnCancelClicked();
+	virtual void OnCancelClicked();
 
 
 /* Protected functions. */
@@ -55,7 +55,7 @@ protected:
 
 	/* Moves the selected piece to the selected tile. */
 	UFUNCTION()
-	void OnConfirmClicked();
+	virtual void OnConfirmClicked();
 
 
 /* Protected variables. */
@@ -65,10 +65,10 @@ protected:
 	UPROPERTY()
 	AParentPiece* AbilityUser;
 
-	/* The actor this ability is targeting. Different abilities target different types of actors, so this needs to be a pointer to
+	/* The actors this ability is targeting. Different abilities target different types of actors, so this needs to be a pointer to
 	 * generic AActors. This could be changed to a TArray to support multiple targets, but no abilities currently have more than one target. */
 	UPROPERTY()
-	AActor* PendingTarget;
+	TArray<AActor*> PendingTargets;
 
 
 /* Protected widgets. */

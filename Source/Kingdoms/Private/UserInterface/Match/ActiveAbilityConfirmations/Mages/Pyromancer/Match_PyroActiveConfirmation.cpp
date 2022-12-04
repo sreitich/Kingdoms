@@ -30,7 +30,7 @@ void UMatch_PyroActiveConfirmation::OnAttackClicked()
 	for (AActor* Target : PendingFriendlyPiece->GetValidActiveAbilityTargets())
 	{
 		if (ABoardTile* Tile = Cast<ABoardTile>(Target))
-			Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+			Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
 	}
 
 	/* Activate this piece's active ability if there is a valid reference to it. */
@@ -63,7 +63,7 @@ void UMatch_PyroActiveConfirmation::OnCancelClicked()
 		for (AActor* Target : PendingFriendlyPiece->GetValidActiveAbilityTargets())
 		{
 			if (ABoardTile* Tile = Cast<ABoardTile>(Target))
-				Tile->UpdateEmissiveHighlight(false, 4.0f, Tile->EmissiveHighlight->GetLightColor());
+				Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
 		}
 	}
 

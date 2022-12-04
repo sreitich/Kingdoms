@@ -171,7 +171,7 @@ void AMatch_PlayerPawn::Interact_WaitingForTurn(FHitResult InteractionHit)
 	if (IsValid(InteractedPiece) && GetController<AMatch_PlayerController>())
 	{
 		/* Get this piece's alignment. */
-		const EAlignment Alignment = InteractedPiece->GetAlignment();
+		const EAlignment Alignment = InteractedPiece->GetLocalAlignment();
 
 		/* Select the piece if it's friendly. */
 		if (Alignment == E_Friendly)
@@ -241,7 +241,7 @@ void AMatch_PlayerPawn::Interact_SelectingPiece(FHitResult InteractionHit)
 	if (IsValid(InteractedPiece) && GetController<AMatch_PlayerController>())
 	{
 		/* Get this piece's alignment. */
-		const EAlignment Alignment = InteractedPiece->GetAlignment();
+		const EAlignment Alignment = InteractedPiece->GetLocalAlignment();
 		
 		/* If the piece is friendly... */
 		if (Alignment == E_Friendly)
@@ -319,12 +319,12 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 		if (IsValid(InteractedTile->GetOccupyingPiece()))
 		{
 			/* If the interacted tile's piece is friendly... */
-			if (InteractedTile->GetOccupyingPiece()->GetAlignment() == E_Friendly)
+			if (InteractedTile->GetOccupyingPiece()->GetLocalAlignment() == E_Friendly)
 			{
 				/* Cannot move to occupied piece pop-up. */
 			}
 			/* If the interacted tile is occupied by an enemy piece... */
-			else if (InteractedTile->GetOccupyingPiece()->GetAlignment() == E_Hostile)
+			else if (InteractedTile->GetOccupyingPiece()->GetLocalAlignment() == E_Hostile)
 			{
 				/* If this player has a valid player controller... */
 				if (AMatch_PlayerController* ControllerPtr = GetController<AMatch_PlayerController>())
@@ -458,13 +458,13 @@ void AMatch_PlayerPawn::Interact_SelectingTargetActiveAbility(FHitResult Interac
 			{
 				/* If the player already had a target piece selected, reset its fresnel. */
 				if (IsValid(SelectedTargetPiece))
-					SelectedTargetPiece->FlashHighlight(SelectedTargetPiece->GetAlignment() == E_Friendly ? SelectedTargetPiece->FriendlyFresnelColor : SelectedTargetPiece->EnemyFresnelColor, SelectedPiece->DefaultFresnelStrength, 1.0, 0.0f, true);
+					SelectedTargetPiece->FlashHighlight(SelectedTargetPiece->GetLocalAlignment() == E_Friendly ? SelectedTargetPiece->FriendlyFresnelColor : SelectedTargetPiece->EnemyFresnelColor, SelectedPiece->DefaultFresnelStrength, 1.0, 0.0f, true);
 
 				/* Update the selected target piece. */
 				SelectedTargetPiece = TargetPiece;
 
 				/* Strengthen the enemy piece's fresnel to indicate that it is currently selected. */
-				SelectedTargetPiece->FlashHighlight(SelectedTargetPiece->GetAlignment() == E_Friendly ? SelectedTargetPiece->FriendlyFresnelColor : SelectedTargetPiece->EnemyFresnelColor, SelectedPiece->SelectedFresnelStrength, 1.0f, 0.0f, true);
+				SelectedTargetPiece->FlashHighlight(SelectedTargetPiece->GetLocalAlignment() == E_Friendly ? SelectedTargetPiece->FriendlyFresnelColor : SelectedTargetPiece->EnemyFresnelColor, SelectedPiece->SelectedFresnelStrength, 1.0f, 0.0f, true);
 			}
 		}
 		else
@@ -536,7 +536,7 @@ void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTarg
 		SelectedTargetPiece->GetCurrentTile()->bReticleControlledByCursor = true;
 		SelectedTargetPiece->GetCurrentTile()->UpdateReticle(false, true);
 		/* Reset the target piece's fresnel. */
-		SelectedTargetPiece->FlashHighlight(SelectedTargetPiece->GetAlignment() == E_Friendly ? SelectedTargetPiece->FriendlyFresnelColor : SelectedTargetPiece->EnemyFresnelColor, SelectedTargetPiece->DefaultFresnelStrength, 1.0, 0.0f, true);
+		SelectedTargetPiece->FlashHighlight(SelectedTargetPiece->GetLocalAlignment() == E_Friendly ? SelectedTargetPiece->FriendlyFresnelColor : SelectedTargetPiece->EnemyFresnelColor, SelectedTargetPiece->DefaultFresnelStrength, 1.0, 0.0f, true);
 		/* Clear the pointer to the target piece. */
 		SelectedTargetPiece = nullptr;
 	}

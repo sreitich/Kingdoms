@@ -38,11 +38,4 @@ public:
 		UFUNCTION(BlueprintImplementableEvent)
 		void BP_OnActiveAbility(ABoardTile* Target);
 
-
-/* Public variables. */
-public:
-
-	UPROPERTY()
-	class UKnight_ActiveAbilityConfirmation* ConfirmationWidget;
-
 };

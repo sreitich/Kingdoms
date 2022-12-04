@@ -212,28 +212,11 @@ void APyromancer::StartActiveConfirmation(TArray<AActor*> Targets)
 
 void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 {
-	/* Updates the player's turn progress. */
+	/* Updates the player's turn progress, trigger the ability cooldown, and decrement the ability's limited uses. */
 	Super::OnActiveAbility(Targets);
 
 	/* Call the blueprint implementation of the ability, which begins the power-up phase. */
 	BP_OnActiveAbility(Cast<AParentPiece>(Targets[0]));
-
-	/* If the piece data table was found... */
-	if (PieceDataTable)
-	{
-		/* Get this piece's row from the piece data. */
-		static const FString ContextString(TEXT("Piece Data Struct"));
-		const FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(PieceID, ContextString, true);
-
-		/* If the data table row was found... */
-		if (PieceData)
-		{
-			/* Put the ability onto cooldown. */
-			SetActiveCD(PieceData->ActiveCD);
-			/* Decrement this ability's remaining uses. */
-			SetActiveUses(ActiveUses - 1);
-		}
-	}
 }
 
 void APyromancer::OnAbilityEffectEnded(TArray<AActor*> Targets)
