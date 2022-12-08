@@ -9,10 +9,6 @@
 
 void AParentCommanderPiece::OnDeath(AActor* Killer)
 {
-	Super::OnDeath(Killer);
-
-	// May need a wrapper RPC with an owning connection to call this
-
 	/* Iterate through every player state to find the other player, whose commander didn't die. */
 	if (AMatch_GameStateBase* GameStatePtr = Cast<AMatch_GameStateBase>(UGameplayStatics::GetGameState(this)))
 	{

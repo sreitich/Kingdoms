@@ -499,8 +499,8 @@ void AParentPiece::Multicast_CreateModifierPopUp_Implementation(int ValueChange,
 		SpawnParams
 	));
 
-	/* Activate the pop-up. */
-	SpawnedPopUp->BP_ActivateModifierPopUp(SpawnLocation, ValueChange, bStrength, ModifierPopUpDuration);
+	/* Activate the pop-up. The pop-up follows this piece. */
+	SpawnedPopUp->BP_ActivateModifierPopUp(this, SpawnLocation, ValueChange, bStrength, ModifierPopUpDuration, true);
 
 	/* Flash a modifier highlight if requested. */
 	if (bFlashHighlight)

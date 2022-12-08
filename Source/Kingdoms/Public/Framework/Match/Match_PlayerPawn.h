@@ -84,7 +84,7 @@ public:
 
 			/* Destroys and cleans up the given piece. */
 			UFUNCTION(Server, Reliable, BlueprintCallable)
-			void KillPiece(AParentPiece* PieceToKill, bool bPieceReplaced);
+			void KillPiece(AParentPiece* PieceToKill, AActor* Killer, bool bPieceReplaced);
 	
 	/* Calls active abilities with server authority. */
 	UFUNCTION(Server, Reliable)

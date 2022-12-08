@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "ModifierBoardPopup.generated.h"
 
+class AParentPiece;
+
 UCLASS()
 class KINGDOMS_API AModifierBoardPopup : public AActor
 {
@@ -14,9 +16,10 @@ class KINGDOMS_API AModifierBoardPopup : public AActor
 /* Public functions. */
 public:	
 
-	/* Updates, displays, and animates this modifier pop-up. */
+	/* Updates, displays, and animates this modifier pop-up at the given location. If a valid actor is passed in and
+	 * bFollowActor is true, the pop-up will follow the actor's pop-up location component. */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void BP_ActivateModifierPopUp(FVector Location, int ValueChange, bool bStrength, float Duration);
+	void BP_ActivateModifierPopUp(AActor* BaseActor, FVector Location, int ValueChange, bool bStrength, float Duration, bool bFollowActor);
 
 
 /* Protected functions. */

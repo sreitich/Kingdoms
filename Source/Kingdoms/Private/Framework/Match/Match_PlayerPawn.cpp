@@ -649,8 +649,11 @@ void AMatch_PlayerPawn::Server_SetResetAfterMove_Implementation(AParentPiece* Pi
 	}
 }
 
-void AMatch_PlayerPawn::KillPiece_Implementation(AParentPiece* PieceToKill, bool bPieceReplaced)
+void AMatch_PlayerPawn::KillPiece_Implementation(AParentPiece* PieceToKill, AActor* Killer, bool bPieceReplaced)
 {
+	/* Call any piece-specific logic that needs to occur when this piece dies. */
+	PieceToKill->OnDeath(Killer);
+
 	/* Remove the killed piece from its owning player's collection of owned pieces. */
 	Cast<AMatch_PlayerState>(PieceToKill->GetInstigator()->GetPlayerState())->OwnedPieces.Remove(PieceToKill);
 
