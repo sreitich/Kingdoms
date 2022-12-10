@@ -38,6 +38,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Pending Piece")
 	bool SetPendingPiece(AParentPiece* NewPendingPiece);
 
+	/* Enables/disables for the confirmation button. */
+	UFUNCTION(BlueprintCallable, Category="Confirm Button")
+	void SetConfirmButtonIsEnabled(bool bConfirmIsEnabled);
+
 	/* Resets the move action. Public to be used by the player controller for proper
 	 * cleanup when deselecting a piece while selecting a move destination. */
 	UFUNCTION()

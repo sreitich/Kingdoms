@@ -364,8 +364,8 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 			/* Make sure that this pawn's controller is valid. */
 			if (AMatch_PlayerController* ControllerPtr = GetController<AMatch_PlayerController>())
 			{
-				/* Create and update the move confirmation pop-up. */
-				ControllerPtr->UpdateMoveConfirmationWidget(false, InteractedTile, SelectedPiece);
+				/* Update the move confirmation pop-up. */
+				ControllerPtr->UpdateMoveConfirmationWidget(InteractedTile, SelectedPiece);
 
 				/* If the player already had a tile selected, remove that tile's selection reticle. */
 				if (IsValid(SelectedTile))

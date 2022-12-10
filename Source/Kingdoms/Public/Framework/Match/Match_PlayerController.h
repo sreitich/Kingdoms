@@ -82,7 +82,11 @@ public:
 
 	/* Creates or destroys a move confirmation pop-up. */
 	UFUNCTION(Category="User Interface")
-	void UpdateMoveConfirmationWidget(bool bDestroy, ABoardTile* PendingTile, AParentPiece* PendingPiece);
+	void CreateMoveConfirmationWidget(bool bDestroy, AParentPiece* PendingPiece);
+
+	/* Updates the pending tile and piece of the displayed move confirmation widget. */
+	UFUNCTION(Category="User Interface")
+	void UpdateMoveConfirmationWidget(ABoardTile* PendingTile, AParentPiece* PendingPiece);
 
 	/* Creates or destroys an attack confirmation pop-up. */
 	UFUNCTION(Category="User Interface")

@@ -283,22 +283,22 @@ void AMatch_PlayerController::RefreshPieceInfoWidgets(AParentPiece* PieceToRefre
     }
 }
 
-void AMatch_PlayerController::UpdateMoveConfirmationWidget(bool bDestroy, ABoardTile *PendingTile, AParentPiece *PendingPiece)
+void AMatch_PlayerController::CreateMoveConfirmationWidget(bool bDestroy, AParentPiece* PendingPiece)
 {
     /* Only execute on local client. */
     if (IsLocalPlayerController())
     {
-        /* If the confirmation widget needs to be destroyed and the widget exists... */
+        /* Destroy the confirmation widget if requested and if it exists. */
         if (bDestroy && Match_MoveConfirmation)
         {
             /* Remove the widget as if the "cancel" button were pressed. This destroys the widget. */
             Match_MoveConfirmation->OnCancelClicked();
             Match_MoveConfirmation = nullptr;
         }
-        /* If the confirmation widget needs to be created... */
+        /* Create the confirmation widget if requested. */
         else if (!bDestroy)
         {
-            /* If an attack confirmation widget is currently displayed, destroy it before switching to the move confirmation widget. */
+            /* If an attack confirmation widget is currently displayed, destroy it before switching to the new move confirmation widget. */
             if (Match_AttackConfirmation)
             {
                 /* Reset the fresnel and highlight of the enemy that was selected. */
@@ -307,19 +307,34 @@ void AMatch_PlayerController::UpdateMoveConfirmationWidget(bool bDestroy, ABoard
                 Match_AttackConfirmation = nullptr;
             }
 
-            /* Create the widget. */
+            /* Create the move confirmation widget. */
             Match_MoveConfirmation = CreateWidget<UMatch_MoveConfirmation>(GetWorld(), Match_MoveConfirmationClass, FName("Move Confirmation Widget"));
 
-            /* If the widget was created successfully... */
+            /* If the widget was created successfully, set which piece it will move and add it to the viewport. */
             if (Match_MoveConfirmation)
             {
-                /* Update the widget's pending tile and piece. */
-                Match_MoveConfirmation->SetPendingTile(PendingTile);
                 Match_MoveConfirmation->SetPendingPiece(PendingPiece);
-
-                /* Add this widget to the viewport. */
                 Match_MoveConfirmation->AddToViewport(0);
             }
+        }
+    }
+}
+
+void AMatch_PlayerController::UpdateMoveConfirmationWidget(ABoardTile* PendingTile, AParentPiece* PendingPiece)
+{
+    /* Only execute on local client. */
+    if (IsLocalPlayerController())
+    {
+        /* If a valid widget is displayed, update its variables. */
+        if (Match_MoveConfirmation)
+        {
+            /* Update the widget's pending tile and piece. */
+            Match_MoveConfirmation->SetPendingTile(PendingTile);
+            Match_MoveConfirmation->SetPendingPiece(PendingPiece);
+
+            /* Enable the confirmation button if the new piece and tile are valid. */
+            if (IsValid(PendingTile) && IsValid(PendingPiece))
+                Match_MoveConfirmation->SetConfirmButtonIsEnabled(true);
         }
     }
 }

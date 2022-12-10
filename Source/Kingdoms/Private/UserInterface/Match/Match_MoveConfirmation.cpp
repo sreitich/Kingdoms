@@ -41,6 +41,12 @@ bool UMatch_MoveConfirmation::SetPendingPiece(AParentPiece* NewPendingPiece)
     return false;
 }
 
+void UMatch_MoveConfirmation::SetConfirmButtonIsEnabled(bool bConfirmIsEnabled)
+{
+    /* Enable/disable the confirmation button. */
+    ConfirmButton->SetIsEnabled(bConfirmIsEnabled);
+}
+
 void UMatch_MoveConfirmation::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -89,6 +95,11 @@ void UMatch_MoveConfirmation::OnCancelClicked()
             Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
         }
     }
+
+    /* Clear this widget's information and disable the confirmation button. */
+    PendingPiece = nullptr;
+    PendingTile = nullptr;
+    ConfirmButton->SetIsEnabled(false);
 
     /* Destroy this widget. */
     RemoveFromParent();

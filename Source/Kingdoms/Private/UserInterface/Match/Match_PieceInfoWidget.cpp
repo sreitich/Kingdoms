@@ -14,6 +14,7 @@
 #include "UserInterface/Match/Match_ModifierList.h"
 
 #include "Components/Overlay.h"
+#include "Framework/Match/Match_PlayerController.h"
 #include "Runtime/UMG/Public/UMG.h"
 #include "Runtime/UMG/Public/Components/CanvasPanelSlot.h"
 
@@ -512,6 +513,9 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
     /* Set the player's state to be selecting a place to move. */
     GetOwningPlayerState<AMatch_PlayerState>(false)->Server_SetPlayerStatus(E_SelectingTarget_Move);
 
+    /* Create a new move confirmation widget. */
+    GetOwningPlayer<AMatch_PlayerController>()->CreateMoveConfirmationWidget(false, DisplayedPiece);
+    
     /* Make sure that there's a valid displayed piece. */
     if (IsValid(DisplayedPiece))
     {
