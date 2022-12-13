@@ -47,6 +47,43 @@ void UMatch_MoveConfirmation::SetConfirmButtonIsEnabled(bool bConfirmIsEnabled)
     ConfirmButton->SetIsEnabled(bConfirmIsEnabled);
 }
 
+void UMatch_MoveConfirmation::DestroyWidget(bool bReset)
+{
+    AMatch_PlayerPawn* PlayerPawnPtr = GetOwningPlayerPawn<AMatch_PlayerPawn>();
+    
+    /* Reset the player's state and highlighted tiles if requested. */
+    if (bReset)
+    {
+        /* Reset the player state. */
+        PlayerPawnPtr->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);    /* Reset the player's selected piece and selected tile. */
+
+        /* Reset the highlight of every tile that was highlighted. */
+        if (IsValid(PendingPiece))
+        {
+            for (ABoardTile* Tile : PendingPiece->GetValidMoveTiles())
+            {
+                Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
+            }
+        }
+
+        /* Reset the player's selected piece and selected tile. */
+        PlayerPawnPtr->ClearSelection(true, false, false, true, false);
+    }
+    /* Just reset the player's selected tile if bReset is false. This is typically only used when switching to an attack widget. */
+    else
+    {
+        PlayerPawnPtr->ClearSelection(false, false, false, true, false);
+    }
+
+    /* Clear this widget's information and disable the confirmation button. */
+    PendingPiece = nullptr;
+    PendingTile = nullptr;
+    ConfirmButton->SetIsEnabled(false);
+
+    /* Destroy this widget. */
+    RemoveFromParent();
+}
+
 void UMatch_MoveConfirmation::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -82,25 +119,6 @@ void UMatch_MoveConfirmation::OnConfirmClicked()
 
 void UMatch_MoveConfirmation::OnCancelClicked()
 {
-    /* Reset the player state. */
-    GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
-    /* Reset the player's selected piece and selected tile. */
-    GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, false, false, true, false);
-
-    /* Reset the highlight of every tile that was highlighted. */
-    if (IsValid(PendingPiece))
-    {
-        for (ABoardTile* Tile : PendingPiece->GetValidMoveTiles())
-        {
-            Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
-        }
-    }
-
-    /* Clear this widget's information and disable the confirmation button. */
-    PendingPiece = nullptr;
-    PendingTile = nullptr;
-    ConfirmButton->SetIsEnabled(false);
-
-    /* Destroy this widget. */
-    RemoveFromParent();
+    /* Destroy this widget and reset the player and all tiles. */
+    DestroyWidget(true);
 }

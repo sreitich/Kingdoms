@@ -52,6 +52,42 @@ void UMatch_AttackConfirmation::UpdateAttackPreviewInfo(AParentPiece* FriendlyPi
 	}
 }
 
+void UMatch_AttackConfirmation::DestroyWidget(bool bReset)
+{
+	AMatch_PlayerPawn* PlayerPawnPtr = GetOwningPlayerPawn<AMatch_PlayerPawn>();
+
+	/* Reset the player state and highlighted tiles if requested. */
+	if (bReset)
+	{
+		/* Reset the player state. */
+		PlayerPawnPtr->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
+
+		/* Reset the highlight of every tile that was highlighted. */
+		if (IsValid(PendingFriendlyPiece))
+		{
+			for (ABoardTile* Tile : PendingFriendlyPiece->GetValidMoveTiles())
+			{
+				Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
+			}
+		}
+
+		/* Clear the player's selected piece and selected enemy piece. */
+		PlayerPawnPtr->ClearSelection(true, true, false, true, false);
+	}
+    /* Just reset the player's selected tile if bReset is false. This is typically only used when switching to a move widget. */
+	else
+	{
+		PlayerPawnPtr->ClearSelection(false, true, false, true, false);
+	}
+
+	/* Clear this widget's information. */
+	PendingFriendlyPiece = nullptr;
+	PendingEnemyPiece = nullptr;
+
+	/* Destroy this widget. */
+	RemoveFromParent();
+}
+
 void UMatch_AttackConfirmation::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -101,20 +137,6 @@ void UMatch_AttackConfirmation::OnAttackClicked()
 
 void UMatch_AttackConfirmation::OnCancelClicked()
 {
-	/* Reset the player state. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
-	/* Clear the player's selected piece. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, true, false, true, false);
-
-	if (IsValid(PendingFriendlyPiece))
-	{
-		/* Reset the highlight of every tile that was highlighted. */
-		for (ABoardTile* Tile : PendingFriendlyPiece->GetValidMoveTiles())
-		{
-			Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
-		}
-	}
-
-	/* Destroy this widget. */
-	RemoveFromParent();
+    /* Destroy this widget and reset the player and all tiles. */
+	DestroyWidget(true);
 }

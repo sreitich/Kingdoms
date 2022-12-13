@@ -42,10 +42,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Confirm Button")
 	void SetConfirmButtonIsEnabled(bool bConfirmIsEnabled);
 
-	/* Resets the move action. Public to be used by the player controller for proper
-	 * cleanup when deselecting a piece while selecting a move destination. */
+	/* Cleans up and destroys this widget. Resets the player and all tiles if bReset is true. */
 	UFUNCTION()
-	void OnCancelClicked();
+	void DestroyWidget(bool bReset);
 
 
 /* Protected functions. */
@@ -57,6 +56,10 @@ protected:
 	/* Moves the selected piece to the selected tile. */
 	UFUNCTION()
 	void OnConfirmClicked();
+
+	/* Destroys this widget and resets the player and all tiles. */
+	UFUNCTION()
+	void OnCancelClicked();
 
 
 /* Protected variables. */

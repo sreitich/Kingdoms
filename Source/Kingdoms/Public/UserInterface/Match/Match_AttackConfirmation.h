@@ -27,10 +27,9 @@ public:
 	UFUNCTION()
 	void UpdateAttackPreviewInfo(AParentPiece* FriendlyPiece, AParentPiece* EnemyPiece);
 
-	/* Resets the move action. Public to be used by the player controller when deselecting a piece while selecting a
-	 * move destination. */
+	/* Cleans up and destroys this widget. Resets the player and all tiles if bReset is true. */
 	UFUNCTION()
-	virtual void OnCancelClicked();
+	void DestroyWidget(bool bReset);
 
 
 /* Protected functions. */
@@ -46,6 +45,10 @@ protected:
 	/* Attacks the enemy piece at the target tile. Can be overridden by custom attack confirmation widgets. */
 	UFUNCTION()
 	virtual void OnAttackClicked();
+
+	/* Destroys this widget and resets the player and all tiles. */
+	UFUNCTION()
+	virtual void OnCancelClicked();
 
 
 /* Protected variables. */

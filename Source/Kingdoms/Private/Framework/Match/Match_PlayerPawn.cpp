@@ -308,8 +308,10 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 	/* If anything else was clicked... */
 	else
 	{
+		/* Do nothing. */
+		
 		/* Reset the currently selected actors and remove all piece-information pop-ups. */
-		ClearSelection(true, true, true, true, true);
+		// ClearSelection(true, true, true, true, true);
 	}
 
 	/* If the player interacted with a tile and the tile is valid... */
@@ -348,13 +350,13 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 
 					/* If the player already had an enemy piece selected, reset its fresnel. */
 					if (IsValid(SelectedEnemyPiece))
-						SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedPiece->DefaultFresnelStrength, 1.0, 0.0f, true);
+						SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedEnemyPiece->DefaultFresnelStrength, 1.0, 0.0f, true);
 
 					/* Update the selected enemy piece. */
 					SelectedEnemyPiece = SelectedTile->GetOccupyingPiece();
 
 					/* Strengthen the enemy piece's fresnel to indicate that it is currently selected. */
-					SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedPiece->SelectedFresnelStrength, 1.0f, 0.0f, true);
+					SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedEnemyPiece->SelectedFresnelStrength, 1.0f, 0.0f, true);
 				}
 			}
 		}
@@ -364,7 +366,8 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 			/* Make sure that this pawn's controller is valid. */
 			if (AMatch_PlayerController* ControllerPtr = GetController<AMatch_PlayerController>())
 			{
-				/* Update the move confirmation pop-up. */
+				/* Create a new a move confirmation pop-up if it hasn't been created yet and update it. */
+				ControllerPtr->CreateMoveConfirmationWidget(false, SelectedPiece);
 				ControllerPtr->UpdateMoveConfirmationWidget(InteractedTile, SelectedPiece);
 
 				/* If the player already had a tile selected, remove that tile's selection reticle. */
