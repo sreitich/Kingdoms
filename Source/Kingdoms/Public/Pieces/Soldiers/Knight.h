@@ -25,11 +25,18 @@ public:
 	/* Tests if the given tile's coordinates match any of this piece's movement patterns. */
 	virtual bool TileIsInMoveRange(ABoardTile* Tile) override;
 
+	/* Creates an updates the knight's active ability confirmation widget. */
+	virtual void OnActiveClicked() override;
+
+	/* Updates the knight's active ability confirmation widget. */
+	virtual void Piece_UpdateActiveConfirmation(TArray<AActor*> Targets) override;
+
 	/* Valid targets for "Dash" ability. */
 	virtual TArray<AActor*> GetValidActiveAbilityTargets() override;
 
-	/* Creates a confirmation widget. */
-	virtual void StartActiveConfirmation(TArray<AActor*> Targets) override;
+		/* Returns all tiles within the active ability's range. This is currently unused because "Dash" uses the
+		 * Knight's movement range. */
+		virtual TArray<ABoardTile*> GetActiveAbilityRange() override;
 
 	/* Implementation of "Dash" ability. */
 	virtual void OnActiveAbility(TArray<AActor*> Targets) override;

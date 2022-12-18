@@ -51,6 +51,31 @@ bool AKnight::TileIsInMoveRange(ABoardTile* Tile)
 	return false;
 }
 
+void AKnight::OnActiveClicked()
+{
+	/* Highlight valid tiles. */
+	Super::OnActiveClicked();
+
+	/* Create an instance of this piece's active ability confirmation widget. */
+	ActiveAbilityConfirmationWidget = CreateWidget<UKnight_ActiveAbilityConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
+
+	/* Update the active ability confirmation widget and add it to the viewport if it was created successfully. */
+	if (ActiveAbilityConfirmationWidget)
+	{
+		Cast<UKnight_ActiveAbilityConfirmation>(ActiveAbilityConfirmationWidget)->Widget_UpdateActiveConfirmation(this, TArray<AActor*>());
+		ActiveAbilityConfirmationWidget->AddToViewport();
+	}
+}
+
+void AKnight::Piece_UpdateActiveConfirmation(TArray<AActor*> Targets)
+{
+	/* Update the active ability confirmation widget if it has been created. */
+	if (ActiveAbilityConfirmationWidget)
+	{
+		Cast<UKnight_ActiveAbilityConfirmation>(ActiveAbilityConfirmationWidget)->Widget_UpdateActiveConfirmation(this, Targets);
+	}
+}
+
 TArray<AActor*> AKnight::GetValidActiveAbilityTargets()
 {
 	TArray<AActor*> ValidTargets;
@@ -66,18 +91,10 @@ TArray<AActor*> AKnight::GetValidActiveAbilityTargets()
 	return ValidTargets;
 }
 
-void AKnight::StartActiveConfirmation(TArray<AActor*> Targets)
+TArray<ABoardTile*> AKnight::GetActiveAbilityRange()
 {
-	/* If the confirmation widget hasn't been created yet, create it. */
-	if (!ActiveAbilityConfirmationWidget)
-	{
-		/* Create an ability confirmation widget. */
-		ActiveAbilityConfirmationWidget = CreateWidget<UKnight_ActiveAbilityConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
-		ActiveAbilityConfirmationWidget->AddToViewport(0);
-	}
-
-	/* Update the widget's information. */
-	Cast<UKnight_ActiveAbilityConfirmation>(ActiveAbilityConfirmationWidget)->UpdateActionConfirmationInfo(this, Cast<ABoardTile>(Targets[0]));
+	/* The Knight uses the same range as its movement. */
+	return GetValidMoveTiles();
 }
 
 void AKnight::OnActiveAbility(TArray<AActor*> Targets)

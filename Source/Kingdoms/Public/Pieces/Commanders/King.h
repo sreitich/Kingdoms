@@ -24,7 +24,7 @@ public:
 	virtual bool TileIsInMoveRange(ABoardTile* Tile) override;
 
 	/* Returns all friendly pieces (ability has infinite range). */
-	virtual TArray<AActor*> GetActiveAbilityRange() override;
+	virtual TArray<ABoardTile*> GetActiveAbilityRange() override;
 
 	/* Returns all friendly pieces (all friendly pieces are valid). */
 	virtual TArray<AActor*> GetValidActiveAbilityTargets() override;

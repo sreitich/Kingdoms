@@ -55,7 +55,7 @@ void UMatch_MoveConfirmation::DestroyWidget(bool bReset)
     if (bReset)
     {
         /* Reset the player state. */
-        PlayerPawnPtr->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);    /* Reset the player's selected piece and selected tile. */
+        PlayerPawnPtr->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
 
         /* Reset the highlight of every tile that was highlighted. */
         if (IsValid(PendingPiece))
@@ -66,8 +66,8 @@ void UMatch_MoveConfirmation::DestroyWidget(bool bReset)
             }
         }
 
-        /* Reset the player's selected piece and selected tile. */
-        PlayerPawnPtr->ClearSelection(true, false, false, true, false);
+        /* Reset the player's selected piece and selected tile and hide the piece info widgets. */
+        PlayerPawnPtr->ClearSelection(true, false, false, true, true);
     }
     /* Just reset the player's selected tile if bReset is false. This is typically only used when switching to an attack widget. */
     else
@@ -96,13 +96,6 @@ void UMatch_MoveConfirmation::NativeConstruct()
 
 void UMatch_MoveConfirmation::OnConfirmClicked()
 {
-    /* Reset the highlight of every tile that was highlighted. */
-    for (ABoardTile* Tile : PendingPiece->GetValidMoveTiles())
-        Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
-    
-    /* Remove all other widgets and reset the player's selected piece and selected tile when this piece starts moving. */
-    GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, false, false, true, true);
-
     /* Record that the player has used their move action for this turn, preventing them from using another move action until their next turn. */
     GetOwningPlayerState<AMatch_PlayerState>()->Server_SetMoveActionUsed(true);
 
@@ -113,12 +106,14 @@ void UMatch_MoveConfirmation::OnConfirmClicked()
     Cast<AMatch_PlayerController>(PendingPiece->GetInstigator()->GetController())->
         GetServerCommunicationComponent()->Server_MovePieceToTile(PendingPiece, PendingTile, true);
 
-    /* Destroy this widget. */
-    RemoveFromParent();
+    /* Destroy this widget through the player controller to clean up references. */
+    if (AMatch_PlayerController* PlayerControllerPtr = Cast<AMatch_PlayerController>(GetOwningPlayer()))
+        PlayerControllerPtr->CreateMoveConfirmationWidget(true, nullptr);
 }
 
 void UMatch_MoveConfirmation::OnCancelClicked()
 {
-    /* Destroy this widget and reset the player and all tiles. */
-    DestroyWidget(true);
+    /* Destroy this widget through the player controller to clean up references. */
+    if (AMatch_PlayerController* PlayerControllerPtr = Cast<AMatch_PlayerController>(GetOwningPlayer()))
+        PlayerControllerPtr->CreateMoveConfirmationWidget(true, nullptr);
 }

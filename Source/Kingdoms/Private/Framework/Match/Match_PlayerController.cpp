@@ -336,8 +336,7 @@ void AMatch_PlayerController::UpdateMoveConfirmationWidget(ABoardTile* PendingTi
     }
 }
 
-void AMatch_PlayerController::UpdateAttackConfirmationWidget(bool bDestroy, AParentPiece* FriendlyPiece,
-    AParentPiece* EnemyPiece)
+void AMatch_PlayerController::CreateAttackConfirmationWidget(bool bDestroy, AParentPiece* FriendlyPiece)
 {
     /* Only execute on local client. */
     if (IsLocalPlayerController())
@@ -366,9 +365,23 @@ void AMatch_PlayerController::UpdateAttackConfirmationWidget(bool bDestroy, APar
                 Match_AttackConfirmation->AddToViewport(0);
         }
 
-        /* If the widget was created successfully or already existed, update its information. */
+        /* If the widget was created successfully or already existed, update its friendly piece information, hide its
+         * enemy piece information, and disable the confirmation option. */
         if (Match_AttackConfirmation)
+            Match_AttackConfirmation->UpdateAttackPreviewInfo(FriendlyPiece, nullptr);
+    }
+}
+
+void AMatch_PlayerController::UpdateAttackConfirmationWidget(AParentPiece* FriendlyPiece, AParentPiece* EnemyPiece)
+{
+    /* Only execute on local client. */
+    if (IsLocalPlayerController())
+    {
+        /* If a valid widget is currently displayed, update it. */
+        if (Match_AttackConfirmation)
+        {
             Match_AttackConfirmation->UpdateAttackPreviewInfo(FriendlyPiece, EnemyPiece);
+        }
     }
 }
 

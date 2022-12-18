@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "UserInterface/Match/Match_ActiveAbilityConfirmation.h"
 #include "Knight_ActiveAbilityConfirmation.generated.h"
 
 class ABoardTile;
@@ -15,7 +15,7 @@ class UButton;
  * 
  */
 UCLASS()
-class KINGDOMS_API UKnight_ActiveAbilityConfirmation : public UUserWidget
+class KINGDOMS_API UKnight_ActiveAbilityConfirmation : public UMatch_ActiveAbilityConfirmation
 {
 	GENERATED_BODY()
 
@@ -23,49 +23,51 @@ class KINGDOMS_API UKnight_ActiveAbilityConfirmation : public UUserWidget
 public:
 
 	/* Gets references to the user of this ability and the target of this ability. */
-	UFUNCTION()
-	void UpdateActionConfirmationInfo(AKnight* NewAbilityUser, ABoardTile* NewTargetTile);
+	// UFUNCTION()
+	// virtual void UpdateActiveConfirmation(AParentPiece* NewPieceUsingAbilityNewPieceUsingAbility, TArray<AActor*> Targets) override;
+
+	// void UpdateActionConfirmationInfo(AKnight* NewAbilityUser, ABoardTile* NewTargetTile);
 
 
 /* Protected functions. */
 protected:
 
 	/* Called when the game starts or when created. */
-	virtual void NativeConstruct() override;
+	// virtual void NativeConstruct() override;
 
 	/* Activates the ability using the current user and target. */
-	UFUNCTION()
-	void OnConfirmClicked();
-
-	/* Called when destroyed. */
-	virtual void NativeDestruct() override;
+	// UFUNCTION()
+	// virtual void OnConfirmClicked() override;
 
 	/* Resets the player's state and selection data and resets tile highlights before destroying this widget. */
-	UFUNCTION()
-	void OnCancelClicked();
+	// UFUNCTION()
+	// virtual void OnCancelClicked() override;
+
+	/* Called when destroyed. */
+	// virtual void NativeDestruct() override;
 
 
 /* Protected variables. */
 protected:
 
-	/* A reference to the piece that will execute this ability. */
-	UPROPERTY()
-	AKnight* AbilityUser;
+	// /* A reference to the piece that will execute this ability. */
+	// UPROPERTY()
+	// AKnight* AbilityUser;
 
-	/* A reference to the target of this ability. */
-	UPROPERTY()
-	ABoardTile* TargetTile;
+	// /* A reference to the target of this ability. */
+	// UPROPERTY()
+	// ABoardTile* TargetTile;
 
 
 /* Protected widgets. */
 protected:
 
-	/* Button that activates this ability. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* ConfirmButton;
-
-	/* Button that cancels this ability. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* CancelButton;
+	// /* Button that activates this ability. */
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	// UButton* ConfirmButton;
+	//
+	// /* Button that cancels this ability. */
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	// UButton* CancelButton;
 
 };

@@ -21,17 +21,18 @@ class KINGDOMS_API UMatch_ActiveAbilityConfirmation : public UUserWidget
 /* Public functions. */
 public:
 
-	/* Updates the widget's displayed and internal information. Only used when creating this widget. */
+	/* Updates this widget. Default implementation updates the ability-using piece and the targets if the given ones are
+	 * valid. If invalid targets were given, disables the "confirm" button. Otherwise, enables it. */
 	UFUNCTION()
-	void UpdateActionConfirmationInfo(AParentPiece* NewAbilityUser, TArray<AActor*> Targets);
+	virtual void Widget_UpdateActiveConfirmation(AParentPiece* NewPieceUsingAbilityNewPieceUsingAbility, TArray<AActor*> Targets);
 
 	/* Getter for AbilityUser. */
 	UFUNCTION(BlueprintPure, Category="Ability User")
-	FORCEINLINE AParentPiece* GetAbilityUser() const { return AbilityUser; }
+	FORCEINLINE AParentPiece* GetPieceUsingAbility() const { return PieceUsingAbility; }
 
-	/* Setter for AbilityUser. */
+	/* Setter for PieceUsingAbility. */
 	UFUNCTION(BlueprintCallable, Category="Ability User")
-	bool SetAbilityUser(AParentPiece* NewAbilityUser);
+	bool SetPieceUsingAbility(AParentPiece* NewPieceUsingAbility);
 
 	/* Getter for PendingTarget. */
 	UFUNCTION(BlueprintPure, Category="Pending Targets")
@@ -41,10 +42,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Pending Targets")
 	bool SetPendingTargets(TArray<AActor*> NewTargets);
 
-	/* Resets the "use active ability" action. Public to be used by the player controller for proper
-	 * cleanup when deselecting a piece while selecting a target. */
+	/* Cleans up and destroys this widget. Resets the player's state, all selected actors, and all tiles if bReset is true. */
 	UFUNCTION()
-	virtual void OnCancelClicked();
+	void DestroyWidget(bool bReset);
 
 
 /* Protected functions. */
@@ -57,13 +57,17 @@ protected:
 	UFUNCTION()
 	virtual void OnConfirmClicked();
 
+	/* Destroys this widget and resets the player and all tiles. */
+	UFUNCTION()
+	virtual void OnCancelClicked();
+
 
 /* Protected variables. */
 protected:
 
 	/* The piece whose active ability is being used. */
 	UPROPERTY()
-	AParentPiece* AbilityUser;
+	AParentPiece* PieceUsingAbility;
 
 	/* The actors this ability is targeting. Different abilities target different types of actors, so this needs to be a pointer to
 	 * generic AActors. This could be changed to a TArray to support multiple targets, but no abilities currently have more than one target. */

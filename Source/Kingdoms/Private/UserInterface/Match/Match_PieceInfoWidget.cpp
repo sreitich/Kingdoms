@@ -59,6 +59,8 @@ void UMatch_PieceInfoWidget::ClosingAnimFinished()
 
 bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlignment Alignment, bool bEnableButtons)
 {
+    UE_LOG(LogTemp, Error, TEXT("enable buttons: %i"), int(bEnableButtons));
+    
     /* Tracks whether any displayed information has actually changed. */
     bool bInfoChanged = false;
 

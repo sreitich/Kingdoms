@@ -332,7 +332,8 @@ void AMatch_PlayerPawn::Interact_SelectingTargetMove(FHitResult InteractionHit)
 				if (AMatch_PlayerController* ControllerPtr = GetController<AMatch_PlayerController>())
 				{
 					/* Create and update the attack confirmation pop-up. */
-					ControllerPtr->UpdateAttackConfirmationWidget(false, SelectedPiece, InteractedTile->GetOccupyingPiece());
+					ControllerPtr->CreateAttackConfirmationWidget(false, SelectedPiece);
+					ControllerPtr->UpdateAttackConfirmationWidget(SelectedPiece, InteractedTile->GetOccupyingPiece());
 
 					/* If the player already had a tile selected, remove that tile's selection reticle. */
 					if (IsValid(SelectedTile))
@@ -416,11 +417,13 @@ void AMatch_PlayerPawn::Interact_SelectingTargetActiveAbility(FHitResult Interac
 		if (bTargetIsValid)
 		{
 			/* No abilities currently require the player to select multiple pieces. If this ability had multiple
-			 * targets, this function is skipped over. */
+			 * targets, this function would be skipped over. */
 			TArray<AActor*> Targets = TArray<AActor*>();
 			Targets.Add(SelectedTarget);
 
-			SelectedPiece->StartActiveConfirmation(Targets);
+			/* Call the necessary logic for the current piece when a target is selected. This usually just updates the
+			 * confirmation widget. */
+			SelectedPiece->OnTargetSelected(Targets);
 
 			/* If the player already had as target selected, remove that target's selection reticle. */
 			if (IsValid(SelectedTile))

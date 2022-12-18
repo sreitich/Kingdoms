@@ -8,9 +8,12 @@
 
 class AParentPiece;
 
-class UImage;
-class UTextBlock;
 class UButton;
+class UDataTable;
+class UImage;
+class URichTextBlock;
+class UTextBlock;
+class UTexture2D;
 
 /**
  * 
@@ -42,6 +45,16 @@ protected:
 		 * different functions to the buttons for each child class by overriding this function, but not NativeConstruct. */
 		virtual void BindButtons();
 
+	/* Hides or reveals the displayed enemy's information and picture. Used when an attack confirmation widget does not
+	 * have a target enemy piece selected. */
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetEnemyInfoIsHidden(bool bHide);
+
+	/* Updates the result preview text. Overrides need conditions for the pending enemy piece being valid and null.
+	 * Default implementation assumes a two-way attack. */
+	UFUNCTION()
+	virtual void UpdateResultPreviewText() const;
+
 	/* Attacks the enemy piece at the target tile. Can be overridden by custom attack confirmation widgets. */
 	UFUNCTION()
 	virtual void OnAttackClicked();
@@ -53,10 +66,6 @@ protected:
 
 /* Protected variables. */
 protected:
-
-	/* Pointer to the piece data table, used to retrieve information to display. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data")
-	class UDataTable* PieceDataTable;
 	
 	/* References to the friendly and enemy pieces in this attack. */
 	UPROPERTY()
@@ -64,6 +73,18 @@ protected:
 
 	UPROPERTY()
 	AParentPiece* PendingEnemyPiece;
+
+
+/* Protected assets. */
+protected:
+
+	/* Pointer to the piece data table, used to retrieve information to display. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Data")
+	UDataTable* PieceDataTable;
+
+	/* The preview image that displays when a target enemy piece has not been selected yet. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Assets")
+	UTexture2D* UnknownEnemyImage;
 
 
 /* Protected widgets. */
@@ -98,7 +119,7 @@ protected:
 	
 	/* The outcome of this fight. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UTextBlock* DisplayedResult;
+	URichTextBlock* DisplayedResult;
 
 	/* Confirmation buttons. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))

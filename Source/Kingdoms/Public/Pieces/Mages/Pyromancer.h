@@ -31,10 +31,11 @@ public:
 	virtual TArray<AActor*> GetValidActiveAbilityTargets() override;
 
 		/* Returns all of the tiles within the fireball's range, regardless of if they have valid target pieces. */
-		virtual TArray<AActor*> GetActiveAbilityRange() override;
+		virtual TArray<ABoardTile*> GetActiveAbilityRange() override;
 
+	// FIX THIS
 	/* Creates a confirmation widget. */
-	virtual void StartActiveConfirmation(TArray<AActor*> Targets) override;
+	// virtual void StartActiveConfirmation() override;
 
 	/* Implementation of "Fireball" ability. */
 	virtual void OnActiveAbility(TArray<AActor*> Targets) override;

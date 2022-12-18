@@ -88,9 +88,13 @@ public:
 	UFUNCTION(Category="User Interface")
 	void UpdateMoveConfirmationWidget(ABoardTile* PendingTile, AParentPiece* PendingPiece);
 
-	/* Creates or destroys an attack confirmation pop-up. */
+	/* Creates or destroys a move confirmation pop-up. */
 	UFUNCTION(Category="User Interface")
-	void UpdateAttackConfirmationWidget(bool bDestroy, AParentPiece* FriendlyPiece, AParentPiece* EnemyPiece);
+	void CreateAttackConfirmationWidget(bool bDestroy, AParentPiece* FriendlyPiece);
+
+	/* Updates the pending friendly and pending enemy pieces and the displayed information for the attack. */
+	UFUNCTION(Category="User Interface")
+	void UpdateAttackConfirmationWidget(AParentPiece* FriendlyPiece, AParentPiece* EnemyPiece);
 
 	/* Creates or destroys an attack graphic. */
 	UFUNCTION(BlueprintCallable, Category="User Interface")
@@ -100,6 +104,7 @@ public:
 		UFUNCTION(BlueprintCallable, Category="User Interface")
 		void PlayAttackGraphicAnimation(EAttackGraphicAnimation AttackGraphicAnim);
 
+	// DEPRECATED
 	/* Sets a reference to or destroys an active ability confirmation pop-up. The pop-up is created by the piece that it corresponds to. */
 	UFUNCTION(Category="BlueprintInterface")
 	void UpdateActiveAbilityConfirmationWidget(bool bDestroy, UUserWidget* NewConfirmationWidget);

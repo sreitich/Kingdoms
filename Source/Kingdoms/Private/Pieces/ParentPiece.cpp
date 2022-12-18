@@ -20,8 +20,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "DrawDebugHelpers.h"
+#include "Blueprint/UserWidget.h"
 #include "Components/ServerCommunicationComponent.h"
 #include "Framework/Match/Match_PlayerController.h"
+#include "UserInterface/Match/Match_ActiveAbilityConfirmation.h"
 
 AParentPiece::AParentPiece()
 {
@@ -654,9 +656,16 @@ void AParentPiece::OnActiveClicked()
 	}
 }
 
-void AParentPiece::StartActiveConfirmation(TArray<AActor*> Targets)
+void AParentPiece::OnTargetSelected(TArray<AActor*> Targets)
 {
-	UE_LOG(LogTemp, Error, TEXT("StartActiveConfirmation called on a piece without an active ability."));
+	/* Update this piece's active ability confirmation widget. */
+	Piece_UpdateActiveConfirmation(Targets);
+}
+
+void AParentPiece::Piece_UpdateActiveConfirmation(TArray<AActor*> Targets)
+{
+	/* Not all pieces have active abilities. */
+	UE_LOG(LogTemp, Error, TEXT("Piece_UpdateActiveConfirmation called on a piece without an active ability."));
 }
 
 void AParentPiece::OnActiveAbility(TArray<AActor*> Targets)
@@ -699,13 +708,13 @@ TArray<AActor*> AParentPiece::GetValidActiveAbilityTargets()
 	return TArray<AActor*>();
 }
 
-TArray<AActor*> AParentPiece::GetActiveAbilityRange()
+TArray<ABoardTile*> AParentPiece::GetActiveAbilityRange()
 {
 	/* Not all pieces have active abilities. */
 	UE_LOG(LogTemp, Error, TEXT("GetActiveAbilityRange called on a piece without an active ability."));
 
 	/* Return an empty array. */
-	return TArray<AActor*>();
+	return TArray<ABoardTile*>();
 }
 
 void AParentPiece::OnPassiveAbility(TArray<AActor*> Targets)

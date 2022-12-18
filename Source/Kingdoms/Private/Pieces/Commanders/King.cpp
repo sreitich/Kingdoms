@@ -4,6 +4,7 @@
 #include "Pieces/Commanders/King.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Board/BoardManager.h"
 #include "Board/BoardTile.h"
 #include "Components/PieceNetworkingComponent.h"
 #include "Framework/Match/Match_PlayerPawn.h"
@@ -54,8 +55,24 @@ bool AKing::TileIsInMoveRange(ABoardTile* Tile)
 	return false;
 }
 
-TArray<AActor*> AKing::GetActiveAbilityRange()
+TArray<ABoardTile*> AKing::GetActiveAbilityRange()
 {
+	/* Get and return every tile since this ability has infinite range. */
+	TArray<AActor*> AllTileActors;
+	TArray<ABoardTile*> AllTiles;
+	UGameplayStatics::GetAllActorsOfClass(this, ABoardTile::StaticClass(), OUT AllTileActors);
+
+	/* Cast every tile actor to a board tile to return the correct type. */
+	for (AActor* Tile : AllTileActors)
+		if (ABoardTile* CastTile = Cast<ABoardTile>(Tile))
+			AllTiles.Add(CastTile);
+	
+	return AllTiles;
+}
+
+TArray<AActor*> AKing::GetValidActiveAbilityTargets()
+{
+	/* This ability has infinite range and all friendly pieces are valid targets. */
 	TArray<AActor*> AllPiecesActors;
 	TArray<AActor*> AllFriendlyPieces;
 
@@ -74,12 +91,6 @@ TArray<AActor*> AKing::GetActiveAbilityRange()
 	}
 
 	return AllFriendlyPieces;
-}
-
-TArray<AActor*> AKing::GetValidActiveAbilityTargets()
-{
-	/* This ability has infinite range and all friendly pieces are valid targets. */
-	return GetActiveAbilityRange();
 }
 
 void AKing::OnActiveClicked()
@@ -110,7 +121,7 @@ void AKing::OnActiveClicked()
 	const TArray<AActor*> Targets = GetValidActiveAbilityTargets();
 	
 	/* Update the widget's information. */
-	Cast<UKing_ActiveAbilityConfirmation>(ActiveAbilityConfirmationWidget)->UpdateActionConfirmationInfo(this, Targets);
+	Cast<UKing_ActiveAbilityConfirmation>(ActiveAbilityConfirmationWidget)->Widget_UpdateActiveConfirmation(this, Targets);
 }
 
 void AKing::OnActiveAbility(TArray<AActor*> Targets)

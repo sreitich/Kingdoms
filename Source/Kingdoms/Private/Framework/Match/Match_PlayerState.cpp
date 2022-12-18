@@ -9,6 +9,7 @@
 
 #include "Net/UnrealNetwork.h"
 #include "Engine/Engine.h"
+#include "Framework/Match/Match_PlayerPawn.h"
 #include "Kismet/GameplayStatics.h"
 
 AMatch_PlayerState::AMatch_PlayerState()
@@ -141,7 +142,7 @@ void AMatch_PlayerState::Server_SetPlayerStatus_Implementation(EPlayerStatus New
 
 void AMatch_PlayerState::OnRep_CurrentPlayerStatus(EPlayerStatus OldPlayerStatus)
 {
-    /* If the player was waiting for their turn and they are now selecting a piece, reset their turn progress. */
+    /* If the player was waiting for their turn and they are now selecting a piece, reset their turn progress and refresh their piece info widget. */
     if (CurrentPlayerStatus == E_SelectingPiece && OldPlayerStatus == E_WaitingForTurn)
     {
         bMoveActionUsed = false;
@@ -153,6 +154,9 @@ void AMatch_PlayerState::OnRep_CurrentPlayerStatus(EPlayerStatus OldPlayerStatus
             OnRep_MoveActionUsed();
             OnRep_AbilityActionUsed();
         }
+
+        /* The first parameter currently isn't used with this function call, but I might change that if there are problems. */
+        // GetPawn<AMatch_PlayerPawn>()->Client_RefreshPieceInfoWidgets(nullptr, false);
     }
 }
 
