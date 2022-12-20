@@ -55,7 +55,7 @@ void UMatch_MoveConfirmation::DestroyWidget(bool bReset)
     if (bReset)
     {
         /* Reset the player state. */
-        PlayerPawnPtr->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
+        PlayerPawnPtr->GetPlayerState<AMatch_PlayerState>()->SetPlayerStatus(E_SelectingPiece);
 
         /* Reset the highlight of every tile that was highlighted. */
         if (IsValid(PendingPiece))
@@ -97,7 +97,7 @@ void UMatch_MoveConfirmation::NativeConstruct()
 void UMatch_MoveConfirmation::OnConfirmClicked()
 {
     /* Record that the player has used their move action for this turn, preventing them from using another move action until their next turn. */
-    GetOwningPlayerState<AMatch_PlayerState>()->Server_SetMoveActionUsed(true);
+    GetOwningPlayerState<AMatch_PlayerState>()->SetMoveActionUsed();
 
     /* Reset this piece's rotation after it finishes moving. */
     Cast<AMatch_PlayerPawn>(GetOwningPlayerPawn())->Server_SetResetAfterMove(PendingPiece, true);

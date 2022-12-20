@@ -249,7 +249,7 @@ void AMatch_PlayerPawn::Interact_SelectingPiece(FHitResult InteractionHit)
 			/* If a piece has not been selected yet, update the player's status to be selecting an action within a piece info widget. */
 		    if (SelectedPiece == nullptr)
 		    {
-			    Cast<AMatch_PlayerState>(GetPlayerState())->Server_SetPlayerStatus(E_SelectingAction);
+			    Cast<AMatch_PlayerState>(GetPlayerState())->SetPlayerStatus(E_SelectingAction);
 		    }
 			/* If the selected piece is changing, remove the selection reticle from the previous piece and reset its fresnel brightness. */
 		    else

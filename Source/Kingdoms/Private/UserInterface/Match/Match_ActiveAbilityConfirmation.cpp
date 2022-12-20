@@ -86,7 +86,7 @@ void UMatch_ActiveAbilityConfirmation::DestroyWidget(bool bReset)
 	if (bReset)
 	{
 		/* Reset the player state. */
-		PlayerPawnPtr->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
+		PlayerPawnPtr->GetPlayerState<AMatch_PlayerState>()->SetPlayerStatus(E_SelectingPiece);
 
 		/* Reset the highlight of every tile that was highlighted. */
 		if (IsValid(PieceUsingAbility))

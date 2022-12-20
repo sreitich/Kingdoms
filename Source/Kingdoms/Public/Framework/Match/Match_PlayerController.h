@@ -42,7 +42,11 @@ public:
 	/* Getter for the server communication component. */
 	UFUNCTION(BlueprintPure, Category="Networking")
 	FORCEINLINE UServerCommunicationComponent* GetServerCommunicationComponent() const { return ServerCommunicationComponent; }
-	
+
+
+/* Public UI-managing functions. */
+public:
+
 	/* Creates or destroys the army selection widget. */
 	UFUNCTION(Client, Reliable, Category="User Inteface")
 	void CreateSelectArmyWidget(bool bDestroy);

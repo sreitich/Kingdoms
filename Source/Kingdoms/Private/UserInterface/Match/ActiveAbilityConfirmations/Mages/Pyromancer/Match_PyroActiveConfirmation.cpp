@@ -53,7 +53,7 @@ void UMatch_PyroActiveConfirmation::OnCancelClicked()
 	Cast<APyromancer>(PendingFriendlyPiece)->ConfirmationWidget = nullptr;
 
 	/* Reset the player state. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->Server_SetPlayerStatus(E_SelectingPiece);
+	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->SetPlayerStatus(E_SelectingPiece);
 	/* Reset the player's selected piece, selected enemy piece, and selected tile. */
 	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, true, false, true, false);
 

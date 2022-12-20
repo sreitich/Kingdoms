@@ -50,7 +50,7 @@ void AMatch_GameStateBase::SetUpMatch()
         if (Cast<AMatch_PlayerState>(PlayerState))
         {
             /* Set their player state to "placing pieces." */
-            Cast<AMatch_PlayerState>(PlayerState)->Server_SetPlayerStatus(E_PlacingPieces);
+            Cast<AMatch_PlayerState>(PlayerState)->SetPlayerStatus(E_PlacingPieces);
 
             /* Cast to their controller to create the army selection widget. */
             PlayerState->GetPawn<AMatch_PlayerPawn>()->GetController<AMatch_PlayerController>()->CreateSelectArmyWidget(false);
@@ -102,7 +102,7 @@ void AMatch_GameStateBase::Server_EndTurn_Implementation(AMatch_PlayerState* Cur
 
     /* End the last player's turn, which will reset their used actions and action indicators. */
     if (IsValid(CurrentPlayer))
-        CurrentPlayer->Server_SetPlayerStatus(E_WaitingForTurn);
+        CurrentPlayer->SetPlayerStatus(E_WaitingForTurn);
 
     /* Decrement the modifier durations and ability cooldowns for the player whose turn just ended. */
     Server_DecrementModifierDurations(CurrentPlayer);
@@ -110,7 +110,7 @@ void AMatch_GameStateBase::Server_EndTurn_Implementation(AMatch_PlayerState* Cur
 
     /* Start the next player's turn. */
     if (IsValid(NewPlayer))
-        NewPlayer->Server_SetPlayerStatus(E_SelectingPiece);
+        NewPlayer->SetPlayerStatus(E_SelectingPiece);
 }
 
 void AMatch_GameStateBase::Server_StartMatch_Implementation()
@@ -144,13 +144,13 @@ void AMatch_GameStateBase::Server_StartMatch_Implementation()
             if (Cast<AMatch_PlayerState>(PlayerState)->PlayerIndex == 1)
             {
                 /* Set their player state to "selecting piece." */
-                Cast<AMatch_PlayerState>(PlayerState)->Server_SetPlayerStatus(E_SelectingPiece);
+                Cast<AMatch_PlayerState>(PlayerState)->SetPlayerStatus(E_SelectingPiece);
             }
             /* If this is player 2... */
             else if (Cast<AMatch_PlayerState>(PlayerState)->PlayerIndex == 2)
             {
                 /* Set their player state to "waiting for turn." */
-                Cast<AMatch_PlayerState>(PlayerState)->Server_SetPlayerStatus(E_WaitingForTurn);
+                Cast<AMatch_PlayerState>(PlayerState)->SetPlayerStatus(E_WaitingForTurn);
             }
         }
     }

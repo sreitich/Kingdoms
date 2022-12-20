@@ -8,7 +8,6 @@
 #include "Framework/Match/Match_PlayerController.h"
 
 #include "Net/UnrealNetwork.h"
-#include "Engine/Engine.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -43,61 +42,22 @@ void AMatch_PlayerState::Server_EndTurn_Implementation()
     }
 }
 
-void AMatch_PlayerState::SetReadyToPlay_Server_Implementation(bool bReady)
+void AMatch_PlayerState::SetReadyToPlay(bool bReady)
 {
+    /* Locally update the player's "ready" state to reduce delay. */
     bReadyToPlay = bReady;
 
-    /* Get the game state. */
-    AMatch_GameStateBase* MatchGameState = GetWorld()->GetGameState<AMatch_GameStateBase>();
+    /* OnRep functions are not called automatically locally. */
+    OnRep_bReadyToPlay();
 
-    /* If all players are ready to start... */
-    if (MatchGameState && MatchGameState->CheckReadyToStart())
+    /* If this was called on a non-server client, update the player's "ready" state on the server. */
+    if (!HasAuthority())
     {
-        /* Start the match on each client with the server. */
-        MatchGameState->Server_StartMatch();
+        Server_SetReadyToPlay(bReady);
     }
 }
 
-void AMatch_PlayerState::SetLocalPlayerStatus(EPlayerStatus NewPlayerStatus)
-{
-    CurrentPlayerStatus = NewPlayerStatus;
-}
-
-void AMatch_PlayerState::Server_SetMoveActionUsed_Implementation(bool bNewMoveActionUsed)
-{
-    /* Players' action uses start as false by default and are only changed by updating their state. This function can
-     * only be used to prevent players from taking more move actions, if the player is in a valid state. */
-    if (bNewMoveActionUsed &&
-        (CurrentPlayerStatus == E_SelectingPiece ||
-        CurrentPlayerStatus == E_SelectingAction ||
-        CurrentPlayerStatus == E_SelectingTarget_Move ||
-        CurrentPlayerStatus == E_SelectingTarget_ActiveAbility))
-    {
-        bMoveActionUsed = true;
-
-        /* The server does not call the OnRep automatically. */
-        OnRep_MoveActionUsed();
-    }
-}
-
-void AMatch_PlayerState::Server_SetAbilityActionUsed_Implementation(bool bNewAbilityActionUsed)
-{
-    /* Players' action uses start as false by default and are only changed by updating their state. This function can
-     * only be used to prevent players from taking more move actions, if the player is in a valid state. */
-    if (bNewAbilityActionUsed &&
-        (CurrentPlayerStatus == E_SelectingPiece ||
-        CurrentPlayerStatus == E_SelectingAction ||
-        CurrentPlayerStatus == E_SelectingTarget_Move ||
-        CurrentPlayerStatus == E_SelectingTarget_ActiveAbility))
-    {
-        bAbilityActionUsed = true;
-
-        /* The server does not call the OnRep automatically. */
-        OnRep_AbilityActionUsed();
-    }
-}
-
-void AMatch_PlayerState::Server_SetPlayerStatus_Implementation(EPlayerStatus NewPlayerStatus)
+void AMatch_PlayerState::SetPlayerStatus(EPlayerStatus NewPlayerStatus)
 {
     /* Ways player states can change:
      * - Connecting
@@ -130,19 +90,83 @@ void AMatch_PlayerState::Server_SetPlayerStatus_Implementation(EPlayerStatus New
      *      - From Selecting Target Active
      */
 
-    // If we go to selecting piece from waiting for turn, refresh our piece info widget
-
+    /* Save the player's old player status for logic that executes based on transitions. */
     const EPlayerStatus OldPlayerStatus = CurrentPlayerStatus;
 
+    /* Locally update the player's status to reduce delay. */
     CurrentPlayerStatus = NewPlayerStatus;
 
-    /* OnRep is not called on the server. */
+    /* OnRep functions are not called automatically locally. */
     OnRep_CurrentPlayerStatus(OldPlayerStatus);
+
+    /* If this was called on a non-server client, update the player's status on the server. */
+    if (!HasAuthority())
+    {
+        Server_SetPlayerStatus(NewPlayerStatus);
+    }
+}
+
+void AMatch_PlayerState::SetMoveActionUsed()
+{
+    /* Players' action uses start as false by default and are only changed by updating their state. This function can
+     * only be used to prevent players from taking more move actions, if the player is in a valid state to have used one. */
+    if (CurrentPlayerStatus == E_SelectingPiece ||
+        CurrentPlayerStatus == E_SelectingAction ||
+        CurrentPlayerStatus == E_SelectingTarget_Move ||
+        CurrentPlayerStatus == E_SelectingTarget_ActiveAbility)
+    {
+        /* Locally update the move action usage to reduce delay. */
+        bMoveActionUsed = true;
+
+        /* OnRep functions are not called automatically locally. */
+        OnRep_MoveActionUsed();
+
+        /* If this was called on a non-server client, update the move action usage on the server. */
+        if (!HasAuthority())
+        {
+            Server_SetMoveActionUsed();
+        }
+    }
+}
+
+void AMatch_PlayerState::SetAbilityActionUsed()
+{
+    /* Players' action uses start as false by default and are only changed by updating their state. This function can
+     * only be used to prevent players from taking more ability actions, if the player is in a valid state to have used one. */
+    if (CurrentPlayerStatus == E_SelectingPiece ||
+        CurrentPlayerStatus == E_SelectingAction ||
+        CurrentPlayerStatus == E_SelectingTarget_Move ||
+        CurrentPlayerStatus == E_SelectingTarget_ActiveAbility)
+    {
+
+        /* Locally update the ability action usage to reduce delay. */
+        bAbilityActionUsed = true;
+
+        /* OnRep functions are not called automatically locally. */
+        OnRep_AbilityActionUsed();
+
+        /* If this was called on a non-server client, update the ability action usage on the server. */
+        if (!HasAuthority())
+        {
+            Server_SetAbilityActionUsed();
+        }
+    }
+}
+
+void AMatch_PlayerState::OnRep_bReadyToPlay()
+{
+    /* If this is the server and all players are ready to start, begin the match. */
+    if (HasAuthority())
+    {
+        AMatch_GameStateBase* MatchGameState = GetWorld()->GetGameState<AMatch_GameStateBase>();
+        if (MatchGameState && MatchGameState->CheckReadyToStart())
+            MatchGameState->Server_StartMatch();
+    }
 }
 
 void AMatch_PlayerState::OnRep_CurrentPlayerStatus(EPlayerStatus OldPlayerStatus)
 {
-    /* If the player was waiting for their turn and they are now selecting a piece, reset their turn progress and refresh their piece info widget. */
+    /* If the player was waiting for their turn and they are now selecting a piece, reset their turn progress and refresh their piece info widgets. */
     if (CurrentPlayerStatus == E_SelectingPiece && OldPlayerStatus == E_WaitingForTurn)
     {
         bMoveActionUsed = false;
@@ -164,7 +188,9 @@ void AMatch_PlayerState::OnRep_MoveActionUsed()
 {
     /* Update the turn progress indicators to indicate whether the move action has been used. */
     if (const AMatch_PlayerController* PlayerControllerPtr = GetPawn()->GetController<AMatch_PlayerController>())
+    {
         PlayerControllerPtr->UpdateActionIndicator(bMoveActionUsed, true);
+    }
 
     /* Enable the end turn button to allow the player to end their turn after using a move action. */
     if (bMoveActionUsed)
@@ -181,4 +207,43 @@ void AMatch_PlayerState::OnRep_AbilityActionUsed()
     /* Update the turn progress indicators to indicate whether the ability action has been used. */
     if (const AMatch_PlayerController* PlayerControllerPtr = GetPawn()->GetController<AMatch_PlayerController>())
         PlayerControllerPtr->UpdateActionIndicator(bAbilityActionUsed, false);
+}
+
+void AMatch_PlayerState::Server_SetReadyToPlay_Implementation(bool bReady)
+{
+    /* Set bReadyToPlay on the server. */
+    bReadyToPlay = bReady;
+
+    /* The server does not call the OnRep automatically. */
+    OnRep_bReadyToPlay();
+}
+
+void AMatch_PlayerState::Server_SetPlayerStatus_Implementation(EPlayerStatus NewPlayerStatus)
+{
+    /* Save what the original player status was. */
+    const EPlayerStatus OldPlayerStatus = CurrentPlayerStatus;
+
+    /* Update the player status on the server. */
+    CurrentPlayerStatus = NewPlayerStatus;
+
+    /* The server does not call the OnRep automatically. */
+    OnRep_CurrentPlayerStatus(OldPlayerStatus);
+}
+
+void AMatch_PlayerState::Server_SetMoveActionUsed_Implementation()
+{
+    /* Set the move action usage on the server. */
+    bMoveActionUsed = true;
+    
+    /* The server does not call the OnRep automatically. */
+    OnRep_MoveActionUsed();
+}
+
+void AMatch_PlayerState::Server_SetAbilityActionUsed_Implementation()
+{
+    /* Set the ability action usage on the server. */
+    bAbilityActionUsed = true;
+
+    /* The server does not call the OnRep automatically. */
+    OnRep_AbilityActionUsed();
 }

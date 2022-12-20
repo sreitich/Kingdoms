@@ -672,7 +672,7 @@ void AParentPiece::OnActiveAbility(TArray<AActor*> Targets)
 {
 	/* Record that the player used their ability action for this turn, preventing them from using another active ability
 	 * until their next turn. */
-	Cast<AMatch_PlayerPawn>(GetInstigator())->GetPlayerState<AMatch_PlayerState>()->Server_SetAbilityActionUsed(true);
+	Cast<AMatch_PlayerPawn>(GetInstigator())->GetPlayerState<AMatch_PlayerState>()->SetAbilityActionUsed();
 
 	/* Get this piece's piece data to trigger its cooldown and decrement its uses as needed. */
 	if (PieceDataTable)

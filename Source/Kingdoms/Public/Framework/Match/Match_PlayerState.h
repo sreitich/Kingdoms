@@ -33,43 +33,41 @@ public:
 /* Public accessors and modifiers. */
 public:
 
-	/* Getter for bReadyToPlay. */
+	/* Getter for if the player is ready to start the match. */
 	UFUNCTION(BlueprintPure, Category="Ready to Play")
 	FORCEINLINE bool GetReadyToPlay() const { return bReadyToPlay; }
 
-	/* Server-side setter for bReadyToPlay. */
-	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Ready to Play")
-	void SetReadyToPlay_Server(bool bReady);
+	/* Sets the player's "ready" state locally and on the server. */
+	UFUNCTION(BlueprintCallable, Category="Ready to Play")
+	void SetReadyToPlay(bool bReady);
 
-	/* Getter for CurrentPlayerStatus. */
+	/* Getter for the player's current status. */
 	UFUNCTION(BlueprintPure, Category="Player Status")
 	FORCEINLINE EPlayerStatus GetCurrentPlayerStatus() const { return CurrentPlayerStatus; }
-
-	/* Client-side setter for CurrentPlayerStatus to remove client-side latency. */
-	UFUNCTION(BlueprintCallable, Category="Player Status")
-	void SetLocalPlayerStatus(EPlayerStatus NewPlayerStatus);
 	
-	/* Server-side setter for CurrentPlayerStatus. */
-	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Player Status")
-	void Server_SetPlayerStatus(EPlayerStatus NewPlayerStatus);
+	/* Sets the player status locally and on the server. */
+	UFUNCTION(BlueprintCallable, Category="Player Status")
+	void SetPlayerStatus(EPlayerStatus NewPlayerStatus);
 
-	/* Getter for bMoveActionUsed. */
+	/* Getter for whether the player has used their move action. */
 	UFUNCTION(BlueprintPure, Category="Turn Progress")
 	FORCEINLINE bool GetMoveActionUsed() const { return bMoveActionUsed; }
 
-	/* Server-side setter for bMoveActionUsed. Turn progress can only be reset by changing the player's state. This
-	 * function can only be used to set bMoveActionUsed to true, assuming that the player is in a valid state. */
-	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Turn Progress")
-	void Server_SetMoveActionUsed(bool bNewMoveActionUsed);
+	/* Sets whether the player has used their move action locally and on the server. Turn progress can only be reset by
+	 * changing the player's state. This function can only be used to set bMoveActionUsed to true, assuming that the
+	 * player is in a valid state. */
+	UFUNCTION(BlueprintCallable, Category="Turn Progress")
+	void SetMoveActionUsed();
 
-	/* Getter for bAbilityActionUsed. */
+	/* Getter for whether the player has used their ability action. */
 	UFUNCTION(BlueprintPure, Category="Turn Progress")
 	FORCEINLINE bool GetAbilityActionUsed() const { return bAbilityActionUsed; }
 
-	/* Server-side setter for bAbilityActionUsed. Turn progress can only be reset by changing the player's state. This
-	 * function can only be used to set bAbilityActionUsed to true, assuming that the player is in a valid state. */
-	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Turn Progress")
-	void Server_SetAbilityActionUsed(bool bNewAbilityActionUsed);
+	/* Sets whether the player has used their ability action locally and on the server. Turn progress can only be reset by
+	 * changing the player's state. This function can only be used to set bAbilityActionUsed to true, assuming that the
+	 * player is in a valid state. */
+	UFUNCTION(BlueprintCallable, Category="Turn Progress")
+	void SetAbilityActionUsed();
 
 
 /* Public variables. */
@@ -87,7 +85,11 @@ public:
 /* Protected functions. */
 protected:
 
-	/* Calls additional logic in when. */
+	/* Attempts to start the match if both players are ready. */
+	UFUNCTION()
+	void OnRep_bReadyToPlay();
+	
+	/* Calls additional logic when the player's status is updated. */
 	UFUNCTION()
 	void OnRep_CurrentPlayerStatus(EPlayerStatus OldPlayerStatus);
 
@@ -100,15 +102,35 @@ protected:
 	void OnRep_AbilityActionUsed();
 
 
+/* Protected accessors and modifiers. */
+protected:
+
+	/* Sets the player's "ready" state on the server. */
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Ready to Play")
+	void Server_SetReadyToPlay(bool bReady);
+
+	/* Sets the player's status on the server. */
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Player Status")
+	void Server_SetPlayerStatus(EPlayerStatus NewPlayerStatus);
+
+	/* Sets that the player has used their move action on the server. */
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Turn Progress")
+	void Server_SetMoveActionUsed();
+
+	/* Sets that the player has used their ability action on the server. */
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Turn Progress")
+	void Server_SetAbilityActionUsed();
+
+
 /* Protected variables. */
 protected:
 
 	/* Tracks when the player has placed their pieces and is ready to start the match. */
-	UPROPERTY(Replicated, VisibleAnywhere)
+	UPROPERTY(ReplicatedUsing=OnRep_bReadyToPlay, VisibleAnywhere)
 	bool bReadyToPlay = false;
 
 	/* Determines the current available actions for this player. */
-	UPROPERTY(Replicated, VisibleAnywhere)
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentPlayerStatus, VisibleAnywhere)
 	TEnumAsByte<EPlayerStatus> CurrentPlayerStatus;
 
 	/* Tracks whether the player has used their move/attack action for this turn. */

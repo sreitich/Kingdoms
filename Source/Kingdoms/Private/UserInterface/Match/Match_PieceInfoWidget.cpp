@@ -59,8 +59,6 @@ void UMatch_PieceInfoWidget::ClosingAnimFinished()
 
 bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlignment Alignment, bool bEnableButtons)
 {
-    UE_LOG(LogTemp, Error, TEXT("enable buttons: %i"), int(bEnableButtons));
-    
     /* Tracks whether any displayed information has actually changed. */
     bool bInfoChanged = false;
 
@@ -507,13 +505,9 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
 {
     /* Clear the piece info widgets but keep the currently selected piece. */
     GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false, false, false, false, true);
-
-    /* Instantly change the player status for the local client so that they don't have to wait for the server to update
-     * their status before choosing a target. */
-    GetOwningPlayerState<AMatch_PlayerState>(false)->SetLocalPlayerStatus(E_SelectingTarget_Move);
     
     /* Set the player's state to be selecting a place to move. */
-    GetOwningPlayerState<AMatch_PlayerState>(false)->Server_SetPlayerStatus(E_SelectingTarget_Move);
+    GetOwningPlayerState<AMatch_PlayerState>(false)->SetPlayerStatus(E_SelectingTarget_Move);
 
     /* Create a new move confirmation widget. */
     GetOwningPlayer<AMatch_PlayerController>()->CreateMoveConfirmationWidget(false, DisplayedPiece);
@@ -543,12 +537,8 @@ void UMatch_PieceInfoWidget::OnUseActiveClicked()
     /* Clear the piece info widgets but keep the currently selected piece. */
     GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false, false, false, false, true);
 
-    /* Instantly change the player status for the local client so that they don't have to wait for the server to update
-    * their status before choosing targets. */
-    GetOwningPlayerState<AMatch_PlayerState>(false)->SetLocalPlayerStatus(E_SelectingTarget_ActiveAbility);
-
     /* Set the player's state to be selecting targets for an active ability. */
-    GetOwningPlayerState<AMatch_PlayerState>(false)->Server_SetPlayerStatus(E_SelectingTarget_ActiveAbility);
+    GetOwningPlayerState<AMatch_PlayerState>(false)->SetPlayerStatus(E_SelectingTarget_ActiveAbility);
 
     /* Make sure that there's a valid displayed piece. */
     if (IsValid(DisplayedPiece))
