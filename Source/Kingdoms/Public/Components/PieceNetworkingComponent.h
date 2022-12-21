@@ -21,7 +21,7 @@ public:
 	/* Sets default values for this component's properties. */
 	UPieceNetworkingComponent();
 
-	/* Apply a new modifier ot this piece, activating a pop-up and flashing a piece highlight if requested. If the
+	/* Apply a new modifier to this piece, activating a pop-up and flashing a piece highlight if requested. If the
 	 * modifier already exists, reset the duration and stack the modifiers together. */
 	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Modifiers")
 	void Server_AddModifier(AParentPiece* PieceToModify, FModifier NewModifier, bool bActivatePopUps);

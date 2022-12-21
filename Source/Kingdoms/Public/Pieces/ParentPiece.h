@@ -37,7 +37,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	/* Replicates variables. */
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/* Called when the player starts hovering over this piece. */
 	UFUNCTION()
@@ -89,7 +89,7 @@ public:
 	virtual void OnGameStart();
 
 
-	/* Returns all tiles that this piece can move to (not accounting for other pieces or pathfinding). Overridden by each piece. */
+	/* Returns all valid tiles that this piece can currently move to. Checks for validity. Overridden by each piece. */
 	UFUNCTION(BlueprintPure, Category="Movement")
 	virtual TArray<ABoardTile*> GetValidMoveTiles();
 
@@ -114,8 +114,8 @@ public:
 		UFUNCTION(Category="Active Ability")
 		virtual void Piece_UpdateActiveConfirmation(TArray<AActor*> Targets);
 
-	/* Returns all actors within the active ability range that this piece's active ability can target. If an active
-	 * ability does not target anything, this returns the game state actor. Overridden by pieces with an active ability. */
+	/* Returns all actors within the active ability range that this piece's active ability can currently target. Checks
+	 * for validity. Overridden by pieces with an active ability. */
 	UFUNCTION(BlueprintPure, Category="Active Ability")
 	virtual TArray<AActor*> GetValidActiveAbilityTargets();
 
@@ -152,9 +152,9 @@ public:
 	UFUNCTION(BlueprintPure, Category="Current Tile")
 	FORCEINLINE ABoardTile* GetCurrentTile() const { return CurrentTile; }
 
-	/* Server-only setter for CurrentTile. */
-	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Current Tile")
-	void Server_SetCurrentTile(ABoardTile* NewTile);
+	/* Sets this piece's current tile locally and on the server. */
+	UFUNCTION(BlueprintCallable, Category="Current Tile")
+	void SetCurrentTile(ABoardTile* NewTile);
 
 	/* Getter for DynamicMaterial. */
 	UFUNCTION(BlueprintPure, Category="Materials")
@@ -164,60 +164,61 @@ public:
 	UFUNCTION(BlueprintPure, Category="Is Attacking?")
 	FORCEINLINE FAttackInfo GetAttackInfo() const { return AttackInfo; }
 
-	/* Server-only setter for AttackInfo. */
+	/* Sets the information for the current attack locally and on the server. */
 	UFUNCTION(BlueprintCallable, Category="Is Attacking?")
 	void SetAttackInfo(FAttackInfo NewAttackInfo);
 
 
-	/* Getter for TemporaryModifiers. Returns a reference. */
+	/* Getter for TemporaryModifiers. Returns a reference so that this array can be mutated. */
 	UFUNCTION(BlueprintCallable, Category="Modifiers")
 	FORCEINLINE TArray<FModifier>& GetTemporaryModifiers() { return TemporaryModifiers; }
 
 	/* Updates this piece's strength and armor. This lets the strength and armor variables stay protected, so they can
-	 * only be updated by applying modifiers. */
+	 * only be updated by applying modifiers. This is public to be used by the piece networking component. */
 	UFUNCTION()
 	void OnRep_TemporaryModifiers(TArray<FModifier> OldTemporaryModifiers);
 
 
-	/* Getter for CurrentStrength. */
+	/* Getter for this piece's current strength stat. */
 	UFUNCTION(BlueprintPure, Category="Piece Stats")
 	FORCEINLINE int GetCurrentStrength() const { return CurrentStrength; }
 
-	/* Getter for CurrentArmor. */
+	/* Getter for this piece's current armor stat. */
 	UFUNCTION(BlueprintPure, Category="Piece Stats")
 	FORCEINLINE int GetCurrentArmor() const { return CurrentArmor; }
 
-	/* Getter for PassiveCD. */
+
+	/* Getter for this piece's current passive cooldown. */
 	UFUNCTION(BlueprintPure, Category="Passive Ability")
 	FORCEINLINE int GetPassiveCD() const { return PassiveCD; }
 
-	/* Server-only setter for PassiveCD. */
+	/* Sets this piece's current passive ability cooldown locally and on the server. */
 	UFUNCTION(BlueprintCallable, Category="Passive Ability")
-	bool SetPassiveCD(int NewPassiveCD);
+	void SetPassiveCD(int NewPassiveCD);
 
-	/* Getter for PassiveUses. */
+	/* Getter for this piece's remaining passive ability uses. */
 	UFUNCTION(BlueprintPure, Category="Passive Ability")
 	FORCEINLINE int GetPassiveUses() const { return PassiveUses; }
 
-	/* Server-only setter for PassiveUses. */
+	/* Sets this piece's remaining passive ability uses locally and on the server. */
 	UFUNCTION(BlueprintCallable, Category="Passive Ability")
-	bool SetPassiveUses(int NewPassiveUses);
+	void SetPassiveUses(int NewPassiveUses);
 
-	/* Getter for ActiveCD. */
+	/* Getter for this piece's current active ability cooldown. */
 	UFUNCTION(BlueprintPure, Category="Active Ability")
 	FORCEINLINE int GetActiveCD() const { return ActiveCD; }
 
-	/* Server-only setter for ActiveCD. */
+	/* Sets this piece's current active ability cooldown locally and on the server. */
 	UFUNCTION(BlueprintCallable, Category="Active Ability")
-	bool SetActiveCD(int NewActiveCD);
+	void SetActiveCD(int NewActiveCD);
 
-	/* Getter for ActiveUses. */
+	/* Getter for this piece's remaining active ability uses. */
 	UFUNCTION(BlueprintPure, Category="Active Ability")
 	FORCEINLINE int GetActiveUses() const { return ActiveUses; }
 
-	/* Server-only setter for ActiveUses. */
+	/* Sets this piece's remaining active ability uses locally and on the server. */
 	UFUNCTION(BlueprintCallable, Category="Active Ability")
-	bool SetActiveUses(int NewActiveUses);
+	void SetActiveUses(int NewActiveUses);
 
 
 /* Public variables. */
@@ -307,7 +308,7 @@ public:
 	/* The color that this piece flashes when gaining a debuff or losing a buff. */
 	UPROPERTY(EditDefaultsOnly, Category="Highlights")
 	FLinearColor DebuffColor = FLinearColor(1.0f, 0.0f, 0.0f, 1.0f);
-	
+
 	/* This piece's idle/walk blend space. Used to interpolate and play this piece's unique idle and walk animations. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Animations")
 	UBlendSpaceBase* IdleWalkBS;
@@ -429,6 +430,35 @@ protected:
 	virtual void OnMoveToTileCompleted();
 
 
+/* Protected accessors and modifiers. */
+protected:
+
+	/* Sets this piece's current tile on the server. */
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Current Tile")
+	void Server_SetCurrentTile(ABoardTile* NewTile);
+
+	/* Sets the information for the current attack on the server. */
+	UFUNCTION(Server, Reliable, BlueprintCallable, Category="Is Attacking?")
+	void Server_SetAttackInfo(FAttackInfo NewAttackInfo);
+
+
+	/* Sets this piece's passive ability cooldown on the server. */
+	UFUNCTION(BlueprintCallable, Category="Passive Ability")
+	void Server_SetPassiveCD(int NewPassiveCD);
+
+	/* Sets this piece's remaining passive ability uses on the server. */
+	UFUNCTION(BlueprintCallable, Category="Passive Ability")
+	void Server_SetPassiveUses(int NewPassiveUses);
+
+	/* Sets this piece's active ability cooldown on the server. */
+	UFUNCTION(BlueprintCallable, Category="Active Ability")
+	void Server_SetActiveCD(int NewActiveCD);
+
+	/* Sets this piece's remaining active ability uses on the server. */
+	UFUNCTION(BlueprintCallable, Category="Active Ability")
+	void Server_SetActiveUses(int NewActiveUses);
+
+
 /* Protected variables. */
 protected:
 
@@ -493,35 +523,32 @@ protected:
 	FAttackInfo AttackInfo;
 
 	/* Every modifier currently applied to this piece's statistics. */
-	UPROPERTY(ReplicatedUsing=OnRep_TemporaryModifiers, EditInstanceOnly, BlueprintReadWrite, Category="Piece Info")
+	UPROPERTY(ReplicatedUsing=OnRep_TemporaryModifiers, EditInstanceOnly, BlueprintReadOnly, Category="Piece Info")
 	TArray<FModifier> TemporaryModifiers;
 
 
-	/* EditAnywhere enabled for playtesting. These will be changed to Replicated, EditInstanceOnly, BlueprintReadOnly
-	 * later. */
-
 	/* This piece's current strength with modifiers. */
-	UPROPERTY(ReplicatedUsing=OnRep_CurrentStrength, EditAnywhere, Category="Piece Stats")
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentStrength, EditInstanceOnly, BlueprintReadOnly, Category="Piece Stats")
 	int CurrentStrength;
 
 	/* This piece's current armor with modifiers. */
-	UPROPERTY(ReplicatedUsing=OnRep_CurrentArmor, EditAnywhere, Category="Piece Stats")
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentArmor, EditInstanceOnly, BlueprintReadOnly, Category="Piece Stats")
 	int CurrentArmor;
 
 	/* How long before this piece's passive ability can be used again. */
-	UPROPERTY(ReplicatedUsing=OnRep_PassiveCooldown, EditAnywhere, Category="Piece Stats")
+	UPROPERTY(ReplicatedUsing=OnRep_PassiveCooldown, EditInstanceOnly, BlueprintReadOnly, Category="Piece Stats")
 	int PassiveCD;
 
 	/* How many uses this piece's passive ability has left. */
-	UPROPERTY(ReplicatedUsing=OnRep_PassiveUses, EditAnywhere, Category="Piece Stats")
+	UPROPERTY(ReplicatedUsing=OnRep_PassiveUses, EditInstanceOnly, BlueprintReadOnly, Category="Piece Stats")
 	int PassiveUses;
 
 	/* How long before this piece's passive ability can be used again. */
-	UPROPERTY(ReplicatedUsing=OnRep_ActiveCooldown, EditAnywhere, Category="Piece Stats")
+	UPROPERTY(ReplicatedUsing=OnRep_ActiveCooldown, EditInstanceOnly, BlueprintReadOnly, Category="Piece Stats")
 	int ActiveCD;
 
 	/* How many uses this piece's active ability has left. */
-	UPROPERTY(ReplicatedUsing=OnRep_ActiveUses, EditAnywhere, Category="Piece Stats")
+	UPROPERTY(ReplicatedUsing=OnRep_ActiveUses, EditInstanceOnly, BlueprintReadOnly, Category="Piece Stats")
 	int ActiveUses;
 
 };

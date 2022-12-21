@@ -79,309 +79,6 @@ AParentPiece::AParentPiece()
 	PieceHighlightCurve = LoadObject<UCurveFloat>(nullptr, TEXT("/Game/Curves/PieceHighlightCurve.PieceHighlightCurve"));
 }
 
-void AParentPiece::BeginPlay()
-{
-	Super::BeginPlay();
-
-	/* Set this piece's skeletal meshes to use a dynamic material instance so that its parameters (like the fresnel) can
-	 * be changed during runtime. */
-	DynamicMaterial = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(0), this);
-	GetMesh()->SetMaterial(0, DynamicMaterial);
-	TArray<USceneComponent*> MeshChildren;
-	GetMesh()->GetChildrenComponents(true, MeshChildren);
-	for (USceneComponent* SkeletalMesh : MeshChildren)
-	{
-		if (USkeletalMeshComponent* SkeletalMeshPtr = Cast<USkeletalMeshComponent>(SkeletalMesh))
-			SkeletalMeshPtr->SetMaterial(0, DynamicMaterial);
-	}
-	
-	/* Set the animations to use in this piece's animation blueprint. */
-	UAnimInstance_Parent* AnimInstance = Cast<UAnimInstance_Parent>(GetMesh()->GetAnimInstance());
-	if (AnimInstance)
-	{
-		AnimInstance->IdleWalkBS = IdleWalkBS;
-		AnimInstance->AttackAnimation = AttackAnimation;
-		AnimInstance->TakingDamageAnimation = TakingDamageAnimation;
-		AnimInstance->DeathAnimation = DeathAnimation;
-		AnimInstance->CelebrationAnimation = CelebrationAnimation;
-		AnimInstance->DeadlockAnimation = DeadlockAnimation;
-		AnimInstance->ActiveAbilityAnimation = ActiveAbilityAnimation;
-		AnimInstance->PassiveAbilityAnimation = PassiveAbilityAnimation;
-		AnimInstance->bActiveAbilityLoops = bActiveAbilityLoops;
-	}
-	
-	/* If the player spawned this piece (during the piece setup phase). */
-	if (IsValid(GetInstigator()) && GetInstigator()->IsA(AMatch_PlayerPawn::StaticClass()))
-	{
-	    /* If the player who spawned this piece is owned by this machine... */
-		if (GetInstigator()->IsLocallyControlled())
-		{
-			/* Don't hide this piece. */
-			SetActorHiddenInGame(false);
-
-			/* Set a reference to this pawn's dragged piece. */
-			Cast<AMatch_PlayerPawn>(GetInstigator())->DraggedPiece = this;
-
-			/* Give this piece a friendly fresnel. */
-			DynamicMaterial->SetVectorParameterValue(TEXT("FresnelColor"), FriendlyFresnelColor);
-		}
-        /* If this machine wasn't responsible for spawning the piece... , hide it so that players can't see each other's
-         * pieces yet. Give the piece an enemy piece fresnel. */
-        else
-        {
-        	/* Hide this piece so that players can't see each other's pieces yet. */
-            SetActorHiddenInGame(true);
-
-        	/* Give this piece an enemy fresnel. */
-			DynamicMaterial->SetVectorParameterValue(TEXT("FresnelColor"), EnemyFresnelColor);
-        }
-
-		/* Initialize the dynamic material's fresnel brightness with the default brightness. */
-		DynamicMaterial->SetScalarParameterValue(TEXT("Brightness"), DefaultFresnelStrength);
-	}
-
-	/* If the piece data table was found... */
-    if (PieceDataTable)
-    {
-        /* Get this piece's row from the piece data. */
-        static const FString ContextString(TEXT("Piece Data Struct"));
-        const FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(PieceID, ContextString, true);
-
-		/* If the data table row was found... */
-        if (PieceData)
-        {
-            /* Set initial stats. */
-			CurrentStrength = PieceData->BaseStrength;
-
-			CurrentArmor = PieceData->BaseArmor;
-
-			PassiveCD = 0;
-
-			PassiveUses = PieceData->PassiveUses;
-
-			ActiveCD = 0;
-
-			ActiveUses = PieceData->ActiveUses;
-        }
-	}
-
-	/* If this piece was spawned during the game, play its pop-up animation. */
-	if (const AMatch_PlayerPawn* InstigatingPawn = Cast<AMatch_PlayerPawn>(GetInstigator()))
-	{
-		PlayPiecePopUp(0.25f, false);
-	}
-
-	/* Set up the piece pop-up timeline. */
-	if (PiecePopUpCurve)
-	{
-		FOnTimelineFloat PopUpTimelineCallback;
-		PopUpTimelineCallback.BindUFunction(this, FName("PopUpTimelineTick"));
-		PopUpTimeline.AddInterpFloat(PiecePopUpCurve, PopUpTimelineCallback);
-	}
-
-	/* Set up the piece rotation timeline. */
-	if (PieceRotationCurve)
-	{
-		FOnTimelineFloat RotationTimelineCallback;
-		FOnTimelineEventStatic RotationTimelineFinishedCallback;
-
-		RotationTimelineCallback.BindUFunction(this, FName("RotationTimelineTick"));
-		RotationTimelineFinishedCallback.BindUFunction(this, FName("RotationTimelineEnd"));
-
-		RotationTimeline.AddInterpFloat(PieceRotationCurve, RotationTimelineCallback);
-		RotationTimeline.SetTimelineFinishedFunc(RotationTimelineFinishedCallback);
-	}
-
-	/* Set up the piece highlight timeline. */
-	if (PieceHighlightCurve)
-	{
-		FOnTimelineFloat HighlightTimelineCallback;
-		FOnTimelineEventStatic HighlightTimelineFinishedCallback;
-
-		HighlightTimelineCallback.BindUFunction(this, FName("HighlightTimelineTick"));
-		HighlightTimelineFinishedCallback.BindUFunction(this, FName("HighlightTimelineEnd"));
-
-		HighlightTimeline.AddInterpFloat(PieceHighlightCurve, HighlightTimelineCallback);
-		HighlightTimeline.SetTimelineFinishedFunc(HighlightTimelineFinishedCallback);
-	}
-}
-
-void AParentPiece::PopUpTimelineTick(float Value)
-{
-	/* Set the piece's size to the current value of the timeline. */
-	GetMesh()->SetRelativeScale3D(FVector(Value));
-}
-
-void AParentPiece::RotationTimelineTick(float Value)
-{
-	/* Rotate the actor towards the target rotation. */
-	SetActorRotation(FMath::RInterpTo(OriginalRotationRot, TargetRotationRot, Value, 1.0f));
-
-	/* If the piece is rotating in order to move to a new location, start moving to the new tile when the piece is
-	 * halfway through its rotation. This just gives the movement a smoother feel. */
-	if (bRotationMoveWhenFinished && Value > 0.5 && !bRotationStartedMoving)
-	{
-		/* Only move the piece once. */
-		bRotationStartedMoving = true;
-
-		Cast<AMatch_PlayerController>(Cast<AMatch_PlayerPawn>(GetInstigator())->GetController())->GetServerCommunicationComponent()->MovePieceToTile
-		(
-			this,
-			RotationNewTile,
-			bRotationResetStateWhenFinished
-		);
-	}
-}
-
-void AParentPiece::RotationTimelineEnd()
-{
-	bRotationStartedMoving = false;
-}
-
-void AParentPiece::HighlightTimelineTick(float Value)
-{
-	/* Interpolate the piece's highlight and brightness. */
-	DynamicMaterial->SetVectorParameterValue(FName("FresnelColor"), FMath::CInterpTo(OriginalHighlightColor, TargetHighlightColor, Value, 1.0f));
-	DynamicMaterial->SetScalarParameterValue(FName("Brightness"), FMath::FInterpTo(OriginalHighlightBrightness, TargetHighlightBrightness, Value, 1.0f));
-}
-
-void AParentPiece::HighlightTimelineEnd()
-{
-	/* If this highlight has a definite duration and just finished highlighting, wait for the given duration. */
-	if (!bIndefiniteHighlightDuration && HighlightTimelineDirection == ETimelineDirection::Forward)
-	{
-		/* Call HighlightDurationEnd() after the given duration. */
-		FTimerHandle HighlightDurationHandle;
-		GetWorldTimerManager().SetTimer(HighlightDurationHandle, this, &AParentPiece::HighlightDurationEnd, HighlightDuration, false);
-	}
-}
-
-void AParentPiece::HighlightDurationEnd()
-{
-	/* Reverse the highlight to its original color and brightness. */
-	HighlightTimelineDirection = ETimelineDirection::Backward;
-	HighlightTimeline.ReverseFromEnd();
-}
-
-void AParentPiece::OnRep_TemporaryModifiers(TArray<FModifier> OldTemporaryModifiers)
-{
-	/* Apply the effects of the added or removed modifier on the server. */
-	if (HasAuthority())
-	{
-		/* A modifier was added. */
-		if (TemporaryModifiers.Num() > OldTemporaryModifiers.Num())
-		{
-			/* Get a reference to the most recently added modifier. */
-			FModifier& NewModifier = TemporaryModifiers.Last(0);
-
-			/* Set the new strength statistic, clamped so that it can't go above 20. */
-			if (NewModifier.StrengthChange != 0)
-			{
-				CurrentStrength = FMath::Clamp(CurrentStrength + NewModifier.StrengthChange, 0, 20);
-
-				/* Create a strength modifier pop-up and highlight if this modifier's strength pop-up hasn't been played and there isn't a pop-up already playing. */
-				if (!NewModifier.bStrPopUpPlayed && !bIsModifierPopUpPlaying)
-				{
-					Multicast_CreateModifierPopUp(NewModifier.StrengthChange, true, true);
-
-					/* Prevent this modifier from playing another strength pop-up. */
-					NewModifier.bStrPopUpPlayed = true;
-					/* Prevent another pop-up from being played before this one finishes. */
-					bIsModifierPopUpPlaying = true;
-				}
-
-				/* Manually call the OnRep on the server. */
-				OnRep_CurrentStrength();
-			}
-
-			/* Set the new armor statistic, clamped so that it can't go above 20. */
-			if (NewModifier.ArmorChange != 0)
-			{
-				CurrentArmor = FMath::Clamp(CurrentArmor + NewModifier.ArmorChange, 0, 20);
-
-				/* Create a armor modifier pop-up and highlight if this modifier's armor pop-up hasn't been played and there isn't a pop-up already playing. */
-				if (!NewModifier.bArmPopUpPlayed && !bIsModifierPopUpPlaying)
-				{
-					Multicast_CreateModifierPopUp(NewModifier.ArmorChange, false, true);
-
-					/* Prevent this modifier from playing another armor pop-up. */
-					NewModifier.bArmPopUpPlayed = true;
-					/* Prevent another pop-up from being played before this one finishes. */
-					bIsModifierPopUpPlaying = true;
-				}
-
-				/* Manually call the OnRep on the server. */
-				OnRep_CurrentArmor();
-			}
-		}
-		/* A modifier was removed. */
-		else if (TemporaryModifiers.Num() < OldTemporaryModifiers.Num())
-		{
-			/* Get the modifier that was just removed. */
-			const FModifier RemovedModifier = OldTemporaryModifiers.Last(0);
-
-			/* Set the new strength statistic, clamped so that it can't go below 0. */
-			if (RemovedModifier.StrengthChange != 0)
-			{
-				CurrentStrength = FMath::Clamp(CurrentStrength - RemovedModifier.StrengthChange, 0, 20);
-				/* Manually call the OnRep on the server. */
-				OnRep_CurrentStrength();
-			}
-
-			/* Set the new armor statistic, clamped so that it can't go below 0. */
-			if (RemovedModifier.ArmorChange != 0)
-			{
-				CurrentArmor = FMath::Clamp(CurrentArmor - RemovedModifier.ArmorChange, 0, 20);
-				/* Manually call the OnRep on the server. */
-				OnRep_CurrentArmor();
-			}
-		}
-	}
-}
-
-void AParentPiece::OnRep_CurrentStrength()
-{
-	/* Refresh any piece info widgets currently displaying this piece's info. */
-	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
-}
-
-void AParentPiece::OnRep_CurrentArmor()
-{
-	/* Refresh any piece info widgets currently displaying this piece's info. */
-	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
-}
-
-void AParentPiece::OnRep_PassiveCooldown()
-{
-	/* Refresh any piece info widgets currently displaying this piece's info. */
-	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
-}
-
-void AParentPiece::OnRep_PassiveUses()
-{
-	/* Refresh any piece info widgets currently displaying this piece's info. */
-	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
-
-}
-
-void AParentPiece::OnRep_ActiveCooldown()
-{
-	/* Refresh any piece info widgets currently displaying this piece's info. */
-	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
-
-}
-
-void AParentPiece::OnRep_ActiveUses()
-{
-	/* Refresh any piece info widgets currently displaying this piece's info. */
-	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
-}
-
-void AParentPiece::OnMoveToTileCompleted()
-{
-	/* Piece finished moving to a new tile. */
-}
-
 void AParentPiece::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -668,6 +365,24 @@ void AParentPiece::Piece_UpdateActiveConfirmation(TArray<AActor*> Targets)
 	UE_LOG(LogTemp, Error, TEXT("Piece_UpdateActiveConfirmation called on a piece without an active ability."));
 }
 
+TArray<AActor*> AParentPiece::GetValidActiveAbilityTargets()
+{
+	/* Not all pieces have active abilities. */
+	UE_LOG(LogTemp, Error, TEXT("GetValidActiveAbilityTargets called on a piece without an active ability."));
+
+	/* Return an empty array. */
+	return TArray<AActor*>();
+}
+
+TArray<ABoardTile*> AParentPiece::GetActiveAbilityRange()
+{
+	/* Not all pieces have active abilities. */
+	UE_LOG(LogTemp, Error, TEXT("GetActiveAbilityRange called on a piece without an active ability."));
+
+	/* Return an empty array. */
+	return TArray<ABoardTile*>();
+}
+
 void AParentPiece::OnActiveAbility(TArray<AActor*> Targets)
 {
 	/* Record that the player used their ability action for this turn, preventing them from using another active ability
@@ -699,24 +414,6 @@ void AParentPiece::OnAbilityEffectEnded(TArray<AActor*> Targets)
 	// UE_LOG(LogTemp, Error, TEXT("OnAbilityEffectEnded called on a piece that does not implement OnAbilityEffectEnded."));
 }
 
-TArray<AActor*> AParentPiece::GetValidActiveAbilityTargets()
-{
-	/* Not all pieces have active abilities. */
-	UE_LOG(LogTemp, Error, TEXT("GetValidActiveAbilityTargets called on a piece without an active ability."));
-
-	/* Return an empty array. */
-	return TArray<AActor*>();
-}
-
-TArray<ABoardTile*> AParentPiece::GetActiveAbilityRange()
-{
-	/* Not all pieces have active abilities. */
-	UE_LOG(LogTemp, Error, TEXT("GetActiveAbilityRange called on a piece without an active ability."));
-
-	/* Return an empty array. */
-	return TArray<ABoardTile*>();
-}
-
 void AParentPiece::OnPassiveAbility(TArray<AActor*> Targets)
 {
 	/* Not all pieces have passive abilities. */
@@ -728,101 +425,453 @@ void AParentPiece::OnDeath(AActor* Killer)
 	/* No default logic. */
 }
 
-void AParentPiece::Server_SetCurrentTile_Implementation(ABoardTile* NewTile)
+void AParentPiece::SetCurrentTile(ABoardTile* NewTile)
 {
-	/* Change the occupying piece. Only the server can do this. */
+	/* Locally update this piece's current tile to reduce delay. */
 	CurrentTile = NewTile;
+
+	/* If this was called on a non-server client, update this piece's current tile on the server. */
+	if (!HasAuthority())
+	{
+		Server_SetCurrentTile(NewTile);
+	}
 }
 
 void AParentPiece::SetAttackInfo(FAttackInfo NewAttackInfo)
 {
-	/* Only allow the attack info to be updated if it has a valid reference to an attacking piece and a defending piece. */
-	if (HasAuthority() && IsValid(NewAttackInfo.Attacker) && IsValid(NewAttackInfo.Defender))
+	/* The given attacker and defender must both be valid for the variable to be updated. */
+	if (IsValid(NewAttackInfo.Attacker) && IsValid(NewAttackInfo.Defender))
 	{
+		/* Locally update the current attack's information to reduce delay. */
 		AttackInfo = NewAttackInfo;
+
+		/* If this was called on a non-server client, update the current attack's information on the server. */
+		if (!HasAuthority())
+		{
+			Server_SetAttackInfo(NewAttackInfo);
+		}
 	}
 }
 
-bool AParentPiece::SetPassiveCD(int NewPassiveCD)
+void AParentPiece::OnRep_TemporaryModifiers(TArray<FModifier> OldTemporaryModifiers)
 {
-	/* Make sure that the server is calling this. */
+	/* Apply the effects of the added or removed modifier on the server. */
 	if (HasAuthority())
 	{
-		/* Passive cooldown can't be less than 0. */
-		if (NewPassiveCD < 0)
+		/* A modifier was added. */
+		if (TemporaryModifiers.Num() > OldTemporaryModifiers.Num())
 		{
+			/* Get a reference to the most recently added modifier. */
+			FModifier& NewModifier = TemporaryModifiers.Last(0);
+
+			/* Set the new strength statistic, clamped so that it can't go above 20. */
+			if (NewModifier.StrengthChange != 0)
+			{
+				CurrentStrength = FMath::Clamp(CurrentStrength + NewModifier.StrengthChange, 0, 20);
+
+				/* Create a strength modifier pop-up and highlight if this modifier's strength pop-up hasn't been played and there isn't a pop-up already playing. */
+				if (!NewModifier.bStrPopUpPlayed && !bIsModifierPopUpPlaying)
+				{
+					Multicast_CreateModifierPopUp(NewModifier.StrengthChange, true, true);
+
+					/* Prevent this modifier from playing another strength pop-up. */
+					NewModifier.bStrPopUpPlayed = true;
+					/* Prevent another pop-up from being played before this one finishes. */
+					bIsModifierPopUpPlaying = true;
+				}
+
+				/* Manually call the OnRep on the server. */
+				OnRep_CurrentStrength();
+			}
+
+			/* Set the new armor statistic, clamped so that it can't go above 20. */
+			if (NewModifier.ArmorChange != 0)
+			{
+				CurrentArmor = FMath::Clamp(CurrentArmor + NewModifier.ArmorChange, 0, 20);
+
+				/* Create a armor modifier pop-up and highlight if this modifier's armor pop-up hasn't been played and there isn't a pop-up already playing. */
+				if (!NewModifier.bArmPopUpPlayed && !bIsModifierPopUpPlaying)
+				{
+					Multicast_CreateModifierPopUp(NewModifier.ArmorChange, false, true);
+
+					/* Prevent this modifier from playing another armor pop-up. */
+					NewModifier.bArmPopUpPlayed = true;
+					/* Prevent another pop-up from being played before this one finishes. */
+					bIsModifierPopUpPlaying = true;
+				}
+
+				/* Manually call the OnRep on the server. */
+				OnRep_CurrentArmor();
+			}
+		}
+		/* A modifier was removed. */
+		else if (TemporaryModifiers.Num() < OldTemporaryModifiers.Num())
+		{
+			/* Get the modifier that was just removed. */
+			const FModifier RemovedModifier = OldTemporaryModifiers.Last(0);
+
+			/* Set the new strength statistic, clamped so that it can't go below 0. */
+			if (RemovedModifier.StrengthChange != 0)
+			{
+				CurrentStrength = FMath::Clamp(CurrentStrength - RemovedModifier.StrengthChange, 0, 20);
+				/* Manually call the OnRep on the server. */
+				OnRep_CurrentStrength();
+			}
+
+			/* Set the new armor statistic, clamped so that it can't go below 0. */
+			if (RemovedModifier.ArmorChange != 0)
+			{
+				CurrentArmor = FMath::Clamp(CurrentArmor - RemovedModifier.ArmorChange, 0, 20);
+				/* Manually call the OnRep on the server. */
+				OnRep_CurrentArmor();
+			}
+		}
+	}
+}
+
+void AParentPiece::SetPassiveCD(int NewPassiveCD)
+{
+	/* Clamp the given passive ability cooldown so that it doesn't go below 0. */
+	const int ClampedPassiveCD = FMath::Clamp(NewPassiveCD, 0, NewPassiveCD);
+
+	/* Locally update this piece's passive ability cooldown to reduce delay. */
+	PassiveCD = ClampedPassiveCD;
+
+	/* OnRep functions are not called automatically locally. */
+	OnRep_PassiveCooldown();
+
+	/* If this was called on a non-server client, update this piece's passive ability cooldown on the server. */
+	if (!HasAuthority())
+	{
+		Server_SetPassiveCD(ClampedPassiveCD);
+	}
+}
+
+void AParentPiece::SetPassiveUses(int NewPassiveUses)
+{
+	/* Clamp the given remaining passive ability uses so that they don't go below 0. */
+	const int ClampedPassiveUses = FMath::Clamp(NewPassiveUses, 0, NewPassiveUses);
+
+	/* Locally update this piece's remaining passive ability uses to reduce delay. */
+	PassiveCD = ClampedPassiveUses;
+
+	/* OnRep functions are not called automatically locally. */
+	OnRep_PassiveUses();
+
+	/* If this was called on a non-server client, update this piece's remaining passive ability uses on the server. */
+	if (!HasAuthority())
+	{
+		Server_SetPassiveUses(ClampedPassiveUses);
+	}
+}
+
+void AParentPiece::SetActiveCD(int NewActiveCD)
+{
+	/* Clamp the given active ability cooldown so that it doesn't go below 0. */
+	const int ClampedActiveCD = FMath::Clamp(NewActiveCD, 0, NewActiveCD);
+
+	/* Locally update this piece's active ability cooldown to reduce delay. */
+	ActiveCD = ClampedActiveCD;
+
+	/* OnRep functions are not called automatically locally. */
+	OnRep_ActiveCooldown();
+
+	/* If this was called on a non-server client, update this piece's active ability cooldown on the server. */
+	if (!HasAuthority())
+	{
+		Server_SetPassiveCD(ClampedActiveCD);
+	}
+}
+
+void AParentPiece::SetActiveUses(int NewActiveUses)
+{
+	/* Clamp the given remaining active ability uses so that they don't go below 0. */
+	const int ClampedActiveUses = FMath::Clamp(NewActiveUses, 0, NewActiveUses);
+
+	/* Locally update this piece's remaining active ability uses to reduce delay. */
+	PassiveCD = ClampedActiveUses;
+
+	/* OnRep functions are not called automatically locally. */
+	OnRep_ActiveUses();
+
+	/* If this was called on a non-server client, update this piece's remaining active ability uses on the server. */
+	if (!HasAuthority())
+	{
+		Server_SetActiveUses(ClampedActiveUses);
+	}
+}
+
+void AParentPiece::BeginPlay()
+{
+	Super::BeginPlay();
+
+	/* Set this piece's skeletal meshes to use a dynamic material instance so that its parameters (like the fresnel) can
+	 * be changed during runtime. */
+	DynamicMaterial = UMaterialInstanceDynamic::Create(GetMesh()->GetMaterial(0), this);
+	GetMesh()->SetMaterial(0, DynamicMaterial);
+	TArray<USceneComponent*> MeshChildren;
+	GetMesh()->GetChildrenComponents(true, MeshChildren);
+	for (USceneComponent* SkeletalMesh : MeshChildren)
+	{
+		if (USkeletalMeshComponent* SkeletalMeshPtr = Cast<USkeletalMeshComponent>(SkeletalMesh))
+			SkeletalMeshPtr->SetMaterial(0, DynamicMaterial);
+	}
+	
+	/* Set the animations to use in this piece's animation blueprint. */
+	UAnimInstance_Parent* AnimInstance = Cast<UAnimInstance_Parent>(GetMesh()->GetAnimInstance());
+	if (AnimInstance)
+	{
+		AnimInstance->IdleWalkBS = IdleWalkBS;
+		AnimInstance->AttackAnimation = AttackAnimation;
+		AnimInstance->TakingDamageAnimation = TakingDamageAnimation;
+		AnimInstance->DeathAnimation = DeathAnimation;
+		AnimInstance->CelebrationAnimation = CelebrationAnimation;
+		AnimInstance->DeadlockAnimation = DeadlockAnimation;
+		AnimInstance->ActiveAbilityAnimation = ActiveAbilityAnimation;
+		AnimInstance->PassiveAbilityAnimation = PassiveAbilityAnimation;
+		AnimInstance->bActiveAbilityLoops = bActiveAbilityLoops;
+	}
+	
+	/* If the player spawned this piece (during the piece setup phase). */
+	if (IsValid(GetInstigator()) && GetInstigator()->IsA(AMatch_PlayerPawn::StaticClass()))
+	{
+	    /* If the player who spawned this piece is owned by this machine... */
+		if (GetInstigator()->IsLocallyControlled())
+		{
+			/* Don't hide this piece. */
+			SetActorHiddenInGame(false);
+
+			/* Set a reference to this pawn's dragged piece. */
+			Cast<AMatch_PlayerPawn>(GetInstigator())->DraggedPiece = this;
+
+			/* Give this piece a friendly fresnel. */
+			DynamicMaterial->SetVectorParameterValue(TEXT("FresnelColor"), FriendlyFresnelColor);
+		}
+        /* If this machine wasn't responsible for spawning the piece... , hide it so that players can't see each other's
+         * pieces yet. Give the piece an enemy piece fresnel. */
+        else
+        {
+        	/* Hide this piece so that players can't see each other's pieces yet. */
+            SetActorHiddenInGame(true);
+
+        	/* Give this piece an enemy fresnel. */
+			DynamicMaterial->SetVectorParameterValue(TEXT("FresnelColor"), EnemyFresnelColor);
+        }
+
+		/* Initialize the dynamic material's fresnel brightness with the default brightness. */
+		DynamicMaterial->SetScalarParameterValue(TEXT("Brightness"), DefaultFresnelStrength);
+	}
+
+	/* If the piece data table was found... */
+    if (PieceDataTable)
+    {
+        /* Get this piece's row from the piece data. */
+        static const FString ContextString(TEXT("Piece Data Struct"));
+        const FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(PieceID, ContextString, true);
+
+		/* If the data table row was found... */
+        if (PieceData)
+        {
+            /* Set initial stats. */
+			CurrentStrength = PieceData->BaseStrength;
+
+			CurrentArmor = PieceData->BaseArmor;
+
 			PassiveCD = 0;
-		}
-		else
-		{
-			PassiveCD = NewPassiveCD;
-		}
 
-		return true;
-	}
+			PassiveUses = PieceData->PassiveUses;
 
-	return false;
-}
-
-bool AParentPiece::SetPassiveUses(int NewPassiveUses)
-{
-	/* Make sure that the server is calling this. */
-	if (HasAuthority())
-	{
-		/* Passive uses can't be less than 0. */
-		if (NewPassiveUses < 0)
-		{
-			PassiveUses = 0;
-		}
-		else
-		{
-			PassiveUses = NewPassiveUses;
-		}
-
-		return true;
-	}
-
-	return false;
-}
-
-bool AParentPiece::SetActiveCD(int NewActiveCD)
-{
-	/* Make sure that the server is calling this. */
-	if (HasAuthority())
-	{
-		/* Active cooldown can't be less than 0. */
-		if (NewActiveCD < 0)
-		{
 			ActiveCD = 0;
-		}
-		else
-		{
-			ActiveCD = NewActiveCD;
-		}
 
-		return true;
+			ActiveUses = PieceData->ActiveUses;
+        }
 	}
 
-	return false;
+	/* If this piece was spawned during the game, play its pop-up animation. */
+	if (const AMatch_PlayerPawn* InstigatingPawn = Cast<AMatch_PlayerPawn>(GetInstigator()))
+	{
+		PlayPiecePopUp(0.25f, false);
+	}
+
+	/* Set up the piece pop-up timeline. */
+	if (PiecePopUpCurve)
+	{
+		FOnTimelineFloat PopUpTimelineCallback;
+		PopUpTimelineCallback.BindUFunction(this, FName("PopUpTimelineTick"));
+		PopUpTimeline.AddInterpFloat(PiecePopUpCurve, PopUpTimelineCallback);
+	}
+
+	/* Set up the piece rotation timeline. */
+	if (PieceRotationCurve)
+	{
+		FOnTimelineFloat RotationTimelineCallback;
+		FOnTimelineEventStatic RotationTimelineFinishedCallback;
+
+		RotationTimelineCallback.BindUFunction(this, FName("RotationTimelineTick"));
+		RotationTimelineFinishedCallback.BindUFunction(this, FName("RotationTimelineEnd"));
+
+		RotationTimeline.AddInterpFloat(PieceRotationCurve, RotationTimelineCallback);
+		RotationTimeline.SetTimelineFinishedFunc(RotationTimelineFinishedCallback);
+	}
+
+	/* Set up the piece highlight timeline. */
+	if (PieceHighlightCurve)
+	{
+		FOnTimelineFloat HighlightTimelineCallback;
+		FOnTimelineEventStatic HighlightTimelineFinishedCallback;
+
+		HighlightTimelineCallback.BindUFunction(this, FName("HighlightTimelineTick"));
+		HighlightTimelineFinishedCallback.BindUFunction(this, FName("HighlightTimelineEnd"));
+
+		HighlightTimeline.AddInterpFloat(PieceHighlightCurve, HighlightTimelineCallback);
+		HighlightTimeline.SetTimelineFinishedFunc(HighlightTimelineFinishedCallback);
+	}
 }
 
-bool AParentPiece::SetActiveUses(int NewActiveUses)
+void AParentPiece::PopUpTimelineTick(float Value)
 {
-	/* Make sure that the server is calling this. */
-	if (HasAuthority())
+	/* Set the piece's size to the current value of the timeline. */
+	GetMesh()->SetRelativeScale3D(FVector(Value));
+}
+
+void AParentPiece::RotationTimelineTick(float Value)
+{
+	/* Rotate the actor towards the target rotation. */
+	SetActorRotation(FMath::RInterpTo(OriginalRotationRot, TargetRotationRot, Value, 1.0f));
+
+	/* If the piece is rotating in order to move to a new location, start moving to the new tile when the piece is
+	 * halfway through its rotation. This just gives the movement a smoother feel. */
+	if (bRotationMoveWhenFinished && Value > 0.5 && !bRotationStartedMoving)
 	{
-		/* Active uses can't be less than 0. */
-		if (NewActiveUses < 0)
-		{
-			ActiveUses = 0;
-		}
-		else
-		{
-			ActiveUses = NewActiveUses;
-		}
+		/* Only move the piece once. */
+		bRotationStartedMoving = true;
 
-		return true;
+		Cast<AMatch_PlayerController>(Cast<AMatch_PlayerPawn>(GetInstigator())->GetController())->GetServerCommunicationComponent()->MovePieceToTile
+		(
+			this,
+			RotationNewTile,
+			bRotationResetStateWhenFinished
+		);
 	}
+}
 
-	return false;
+void AParentPiece::RotationTimelineEnd()
+{
+	bRotationStartedMoving = false;
+}
+
+void AParentPiece::HighlightTimelineTick(float Value)
+{
+	/* Interpolate the piece's highlight and brightness. */
+	DynamicMaterial->SetVectorParameterValue(FName("FresnelColor"), FMath::CInterpTo(OriginalHighlightColor, TargetHighlightColor, Value, 1.0f));
+	DynamicMaterial->SetScalarParameterValue(FName("Brightness"), FMath::FInterpTo(OriginalHighlightBrightness, TargetHighlightBrightness, Value, 1.0f));
+}
+
+void AParentPiece::HighlightTimelineEnd()
+{
+	/* If this highlight has a definite duration and just finished highlighting, wait for the given duration. */
+	if (!bIndefiniteHighlightDuration && HighlightTimelineDirection == ETimelineDirection::Forward)
+	{
+		/* Call HighlightDurationEnd() after the given duration. */
+		FTimerHandle HighlightDurationHandle;
+		GetWorldTimerManager().SetTimer(HighlightDurationHandle, this, &AParentPiece::HighlightDurationEnd, HighlightDuration, false);
+	}
+}
+
+void AParentPiece::HighlightDurationEnd()
+{
+	/* Reverse the highlight to its original color and brightness. */
+	HighlightTimelineDirection = ETimelineDirection::Backward;
+	HighlightTimeline.ReverseFromEnd();
+}
+
+void AParentPiece::OnRep_CurrentStrength()
+{
+	/* Refresh any piece info widgets currently displaying this piece's info. */
+	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
+}
+
+void AParentPiece::OnRep_CurrentArmor()
+{
+	/* Refresh any piece info widgets currently displaying this piece's info. */
+	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
+}
+
+void AParentPiece::OnRep_PassiveCooldown()
+{
+	/* Refresh any piece info widgets currently displaying this piece's info. */
+	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
+}
+
+void AParentPiece::OnRep_PassiveUses()
+{
+	/* Refresh any piece info widgets currently displaying this piece's info. */
+	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
+
+}
+
+void AParentPiece::OnRep_ActiveCooldown()
+{
+	/* Refresh any piece info widgets currently displaying this piece's info. */
+	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
+
+}
+
+void AParentPiece::OnRep_ActiveUses()
+{
+	/* Refresh any piece info widgets currently displaying this piece's info. */
+	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets(this, false);
+}
+
+void AParentPiece::OnMoveToTileCompleted()
+{
+	/* Piece finished moving to a new tile. */
+}
+
+void AParentPiece::Server_SetCurrentTile_Implementation(ABoardTile* NewTile)
+{
+	/* Set this piece's current tile on the server. */
+	CurrentTile = NewTile;
+}
+
+void AParentPiece::Server_SetAttackInfo_Implementation(FAttackInfo NewAttackInfo)
+{
+	/* Set the information for the current attack on the server. */
+	AttackInfo = NewAttackInfo;
+}
+
+void AParentPiece::Server_SetPassiveCD(int NewPassiveCD)
+{
+	/* Set this piece's passive ability cooldown on the server. */
+	PassiveCD = NewPassiveCD;
+
+	/* OnRep functions are not called automatically locally. */
+	OnRep_PassiveCooldown();
+}
+
+void AParentPiece::Server_SetPassiveUses(int NewPassiveUses)
+{
+	/* Set this piece's remaining passive ability uses on the server. */
+	PassiveUses = NewPassiveUses;
+
+	/* OnRep functions are not called automatically locally. */
+	OnRep_PassiveUses();
+}
+
+void AParentPiece::Server_SetActiveCD(int NewActiveCD)
+{
+	/* Set this piece's active ability cooldown on the server. */
+	ActiveCD = NewActiveCD;
+
+	/* OnRep functions are not called automatically locally. */
+	OnRep_ActiveCooldown();
+}
+
+void AParentPiece::Server_SetActiveUses(int NewActiveUses)
+{
+	/* Set this piece's remaining active ability uses on the server. */
+	ActiveUses = NewActiveUses;
+
+	/* OnRep functions are not called automatically locally. */
+	OnRep_ActiveUses();
 }
