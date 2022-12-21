@@ -42,9 +42,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Pending Targets")
 	bool SetPendingTargets(TArray<AActor*> NewTargets);
 
-	/* Cleans up and destroys this widget. Resets the player's state, all selected actors, and all tiles if bReset is true. */
+	/* Cleans up and destroys this widget. Resets the player's state, all selected actors, and all tiles. */
 	UFUNCTION()
-	void DestroyWidget(bool bReset);
+	virtual void DestroyWidget();
 
 
 /* Protected functions. */

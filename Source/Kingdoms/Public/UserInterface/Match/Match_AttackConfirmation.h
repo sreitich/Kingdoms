@@ -30,9 +30,10 @@ public:
 	UFUNCTION()
 	void UpdateAttackPreviewInfo(AParentPiece* FriendlyPiece, AParentPiece* EnemyPiece);
 
-	/* Cleans up and destroys this widget. Resets the player and all tiles if bReset is true. */
+	/* Cleans up and destroys this widget. Resets the player and all tiles if bReset is true. bReset is false when
+	 * switching to a move confirmation widget. */
 	UFUNCTION()
-	void DestroyWidget(bool bReset);
+	virtual void DestroyWidget(bool bReset);
 
 
 /* Protected functions. */

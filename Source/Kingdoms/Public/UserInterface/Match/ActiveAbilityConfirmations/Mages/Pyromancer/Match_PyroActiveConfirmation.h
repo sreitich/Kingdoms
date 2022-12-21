@@ -6,6 +6,8 @@
 #include "UserInterface/Match/Match_AttackConfirmation.h"
 #include "Match_PyroActiveConfirmation.generated.h"
 
+class APyromancer;
+
 /**
  * 
  */
@@ -14,23 +16,21 @@ class KINGDOMS_API UMatch_PyroActiveConfirmation : public UMatch_AttackConfirmat
 {
 	GENERATED_BODY()
 
-/* Public variables. */
-public:
-
-	UPROPERTY()
-	class APyromancer* ConfirmingPiece = nullptr;
-	
 /* Protected functions. */
 protected:
 
-	/* Bind the Pyromancer's OnAttackClicked and OnCancelClicked functions to the "Attack" and "Cancel" buttons,
-	 * overriding the default functions that are bound by the attack confirmation widget. */
-	virtual void BindButtons() override;
+	/* Cleans up and destroys this widget. Resets the player and all tiles if bReset is true. Since this is actually an
+	 * active ability confirmation widget, bReset will never be false. */
+	virtual void DestroyWidget(bool bReset) override;
 
+
+	/* We need to override both of these functions because this widget inherits from the attack confirmation widget, not
+	 * the active ability confirmation widget. */
+	
 	/* We need additional "fireball" ability code to execute before starting the attack. */
 	virtual void OnAttackClicked() override;
 
-	/* Overridden to clean up everything when the active ability is cancelled. */
+	/* Destroys this widget and resets the player and all tiles. */
 	virtual void OnCancelClicked() override;
 	
 };

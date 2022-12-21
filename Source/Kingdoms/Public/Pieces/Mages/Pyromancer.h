@@ -20,11 +20,14 @@ public:
 	/* Sets default values for this character's properties. */
 	APyromancer();
 
-	/* Returns all tiles that this piece can move to. */
-	// virtual TArray<ABoardTile*> GetValidMoveTiles() override;
-
 	/* Tests if the given tile's coordinates match any of this piece's movement patterns.. */
 	virtual bool TileIsInMoveRange(ABoardTile* Tile) override;
+
+	/* Creates and updates the Pyromancer's active ability confirmation widget. */
+	virtual void OnActiveClicked() override;
+
+	/* Updates the Pyromancer's active ability confirmation widget. */
+	virtual void Piece_UpdateActiveConfirmation(TArray<AActor*> Targets) override;
 	
 	/* Valid targets for "Fireball" ability. Returns all valid tile locations, but doesn't check if
 	 * there are enemy pieces occupying them. */
@@ -33,27 +36,19 @@ public:
 		/* Returns all of the tiles within the fireball's range, regardless of if they have valid target pieces. */
 		virtual TArray<ABoardTile*> GetActiveAbilityRange() override;
 
-	// FIX THIS
-	/* Creates a confirmation widget. */
-	// virtual void StartActiveConfirmation() override;
-
 	/* Implementation of "Fireball" ability. */
 	virtual void OnActiveAbility(TArray<AActor*> Targets) override;
 
-		/* Blueprint implementation of "Pyromancer" ability, called by OnActiveAbility(). */
+		/* Blueprint implementation of "Fireball" ability, called by OnActiveAbility(). */
 		UFUNCTION(BlueprintImplementableEvent)
 		void BP_OnActiveAbility(AParentPiece* Target);
 
-	/* Stops the Pyromaner's flaming hands. */
+	/* Stops the Pyromancer's flaming hands. */
 	virtual void OnAbilityEffectEnded(TArray<AActor*> Targets) override;
 
 
 /* Public variables. */
 public:
-
-	/* Pointer to the currently displayed active ability confirmation widget. */
-	UPROPERTY()
-	class UMatch_PyroActiveConfirmation* ConfirmationWidget;
 
 	/* Tracks whether or not the piece's power-up animation has played yet. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Active Ability")

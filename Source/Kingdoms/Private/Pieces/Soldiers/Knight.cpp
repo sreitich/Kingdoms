@@ -5,8 +5,6 @@
 
 #include "Board/BoardManager.h"
 #include "Board/BoardTile.h"
-#include "Framework/Match/Match_GameStateBase.h"
-#include "UserDefinedData/PieceData_UserDefinedData.h"
 #include "UserInterface/Match/ActiveAbilityConfirmations/Soldiers/Knight_ActiveAbilityConfirmation.h"
 
 AKnight::AKnight()
@@ -56,14 +54,18 @@ void AKnight::OnActiveClicked()
 	/* Highlight valid tiles. */
 	Super::OnActiveClicked();
 
-	/* Create an instance of this piece's active ability confirmation widget. */
-	ActiveAbilityConfirmationWidget = CreateWidget<UKnight_ActiveAbilityConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
-
-	/* Update the active ability confirmation widget and add it to the viewport if it was created successfully. */
-	if (ActiveAbilityConfirmationWidget)
+	/* Create and update the active ability confirmation widget if it hasn't been created yet. */
+	if (!ActiveAbilityConfirmationWidget)
 	{
-		Cast<UKnight_ActiveAbilityConfirmation>(ActiveAbilityConfirmationWidget)->Widget_UpdateActiveConfirmation(this, TArray<AActor*>());
-		ActiveAbilityConfirmationWidget->AddToViewport();
+		/* Create an instance of this piece's active ability confirmation widget. */
+		ActiveAbilityConfirmationWidget = CreateWidget<UKnight_ActiveAbilityConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
+
+		/* Update the active ability confirmation widget and add it to the viewport if it was created successfully. */
+		if (ActiveAbilityConfirmationWidget)
+		{
+			Cast<UKnight_ActiveAbilityConfirmation>(ActiveAbilityConfirmationWidget)->Widget_UpdateActiveConfirmation(this, TArray<AActor*>());
+			ActiveAbilityConfirmationWidget->AddToViewport(0);
+		}
 	}
 }
 

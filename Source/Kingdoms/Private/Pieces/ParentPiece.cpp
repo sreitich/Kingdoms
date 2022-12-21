@@ -412,6 +412,7 @@ void AParentPiece::OnAbilityEffectEnded(TArray<AActor*> Targets)
 {
 	/* Not all pieces have abilities with effects. */
 	// UE_LOG(LogTemp, Error, TEXT("OnAbilityEffectEnded called on a piece that does not implement OnAbilityEffectEnded."));
+	UE_LOG(LogTemp, Error, TEXT("Remaining active uses: %i"), GetActiveUses());
 }
 
 void AParentPiece::OnPassiveAbility(TArray<AActor*> Targets)
@@ -540,11 +541,8 @@ void AParentPiece::SetPassiveCD(int NewPassiveCD)
 	/* OnRep functions are not called automatically locally. */
 	OnRep_PassiveCooldown();
 
-	/* If this was called on a non-server client, update this piece's passive ability cooldown on the server. */
-	if (!HasAuthority())
-	{
-		Server_SetPassiveCD(ClampedPassiveCD);
-	}
+	/* Update this piece's passive ability cooldown on the server to replicate the change to all clients. */
+	Server_SetPassiveCD(ClampedPassiveCD);
 }
 
 void AParentPiece::SetPassiveUses(int NewPassiveUses)
@@ -558,11 +556,8 @@ void AParentPiece::SetPassiveUses(int NewPassiveUses)
 	/* OnRep functions are not called automatically locally. */
 	OnRep_PassiveUses();
 
-	/* If this was called on a non-server client, update this piece's remaining passive ability uses on the server. */
-	if (!HasAuthority())
-	{
-		Server_SetPassiveUses(ClampedPassiveUses);
-	}
+	/* Update this piece's remaining passive ability uses on the server to replicate the change to all clients. */
+	Server_SetPassiveUses(ClampedPassiveUses);
 }
 
 void AParentPiece::SetActiveCD(int NewActiveCD)
@@ -576,11 +571,8 @@ void AParentPiece::SetActiveCD(int NewActiveCD)
 	/* OnRep functions are not called automatically locally. */
 	OnRep_ActiveCooldown();
 
-	/* If this was called on a non-server client, update this piece's active ability cooldown on the server. */
-	if (!HasAuthority())
-	{
-		Server_SetPassiveCD(ClampedActiveCD);
-	}
+	/* Update this piece's active ability cooldown on the server to replicate the change to all clients. */
+	Server_SetActiveCD(ClampedActiveCD);
 }
 
 void AParentPiece::SetActiveUses(int NewActiveUses)
@@ -594,11 +586,8 @@ void AParentPiece::SetActiveUses(int NewActiveUses)
 	/* OnRep functions are not called automatically locally. */
 	OnRep_ActiveUses();
 
-	/* If this was called on a non-server client, update this piece's remaining active ability uses on the server. */
-	if (!HasAuthority())
-	{
-		Server_SetActiveUses(ClampedActiveUses);
-	}
+	/* Update this piece's remaining active ability uses on the server to replicate the change to all clients. */
+	Server_SetActiveUses(ClampedActiveUses);
 }
 
 void AParentPiece::BeginPlay()
@@ -869,6 +858,7 @@ void AParentPiece::Server_SetActiveCD(int NewActiveCD)
 
 void AParentPiece::Server_SetActiveUses(int NewActiveUses)
 {
+	UE_LOG(LogTemp, Error, TEXT("New uses on server: %i"), NewActiveUses);
 	/* Set this piece's remaining active ability uses on the server. */
 	ActiveUses = NewActiveUses;
 

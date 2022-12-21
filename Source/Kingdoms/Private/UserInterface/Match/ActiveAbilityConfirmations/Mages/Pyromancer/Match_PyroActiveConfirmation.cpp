@@ -13,26 +13,38 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/Button.h"
 
-void UMatch_PyroActiveConfirmation::BindButtons()
+void UMatch_PyroActiveConfirmation::DestroyWidget(bool bReset)
 {
-	/* Bind the confirm button to activate the piece's active ability. */
-	AttackButton->OnClicked.AddDynamic(this, &UMatch_PyroActiveConfirmation::OnAttackClicked);
-	/* Bind the cancel button to reset the active ability action. */
-	CancelButton->OnClicked.AddDynamic(this, &UMatch_PyroActiveConfirmation::OnCancelClicked);
-}
+	AMatch_PlayerPawn* PlayerPawnPtr = GetOwningPlayerPawn<AMatch_PlayerPawn>();
+	
+	/* Reset the player state. */
+	PlayerPawnPtr->GetPlayerState<AMatch_PlayerState>()->SetPlayerStatus(E_SelectingPiece);
+
+	/* Reset the highlight of every tile that was highlighted. */
+	if (IsValid(PendingFriendlyPiece))
+	{
+		for (ABoardTile* Tile : PendingFriendlyPiece->GetActiveAbilityRange())
+		{
+			Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
+		}
+	}
+
+	/* Clear the player's selected piece, selected enemy piece, and selected tile and hide the piece info widgets. */
+	PlayerPawnPtr->ClearSelection(true, true, false, true, true);
+
+	/* Nullify the piece's pointer to its active ability confirmation widget so it makes a new one next time. */
+	PendingFriendlyPiece->ActiveAbilityConfirmationWidget = nullptr;
+	
+	/* Clear this widget's information and disable the confirmation button. */
+	PendingFriendlyPiece = nullptr;
+	PendingEnemyPiece = nullptr;
+	AttackButton->SetIsEnabled(false);
+
+	/* Destroy this widget. */
+	RemoveFromParent();}
 
 void UMatch_PyroActiveConfirmation::OnAttackClicked()
 {
-	/* Clear the player's selected piece, selected enemy piece, and selected tile. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, true, false, true, false);
-
-	/* Reset the highlight of every tile that was highlighted. */
-	for (AActor* Target : PendingFriendlyPiece->GetValidActiveAbilityTargets())
-	{
-		if (ABoardTile* Tile = Cast<ABoardTile>(Target))
-			Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
-	}
-
 	/* Activate this piece's active ability if there is a valid reference to it. */
 	if (IsValid(PendingFriendlyPiece))
 	{
@@ -41,35 +53,12 @@ void UMatch_PyroActiveConfirmation::OnAttackClicked()
 		Cast<AMatch_PlayerPawn>(GetOwningPlayerPawn())->Server_UseActiveAbility(PendingFriendlyPiece, Targets);
 	}
 
-	ConfirmingPiece->ConfirmationWidget = nullptr;
-	
-	/* Destroy this widget after the ability is confirmed. */
-	RemoveFromParent();
+	/* Destroy this widget and reset the player and all tiles. */
+	DestroyWidget(true);
 }
 
 void UMatch_PyroActiveConfirmation::OnCancelClicked()
 {
-	/* Nullify the piece's pointer to its ability confirmation widget so it makes a new one next time. */
-	Cast<APyromancer>(PendingFriendlyPiece)->ConfirmationWidget = nullptr;
-
-	/* Reset the player state. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->GetPlayerState<AMatch_PlayerState>()->SetPlayerStatus(E_SelectingPiece);
-	/* Reset the player's selected piece, selected enemy piece, and selected tile. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(true, true, false, true, false);
-
-	if (IsValid(PendingFriendlyPiece))
-	{
-		/* Reset the highlight of every tile that was highlighted. */
-		for (AActor* Target : PendingFriendlyPiece->GetValidActiveAbilityTargets())
-		{
-			if (ABoardTile* Tile = Cast<ABoardTile>(Target))
-				Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
-		}
-	}
-
-	/* Nullify the piece's pointer to its ability confirmation widget so it makes a new one next time. */
-	// Cast<APyromancer>(PendingFriendlyPiece)->ConfirmationWidget = nullptr;
-
-	/* Destroy this widget. */
-	RemoveFromParent();
+	/* Destroy this widget and reset the player and all tiles. */
+	DestroyWidget(true);
 }

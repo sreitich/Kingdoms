@@ -23,14 +23,14 @@ public:
 	/* Tests if the given tile's coordinates match any of this piece's movement patterns. */
 	virtual bool TileIsInMoveRange(ABoardTile* Tile) override;
 
-	/* Returns all friendly pieces (ability has infinite range). */
-	virtual TArray<ABoardTile*> GetActiveAbilityRange() override;
+	/* Creates an active ability confirmation widget since the player doesn't need to select a specific target. */
+	virtual void OnActiveClicked() override;
 
 	/* Returns all friendly pieces (all friendly pieces are valid). */
 	virtual TArray<AActor*> GetValidActiveAbilityTargets() override;
 
-	/* Creates an active ability confirmation widget since the player doesn't need to select a specific target. */
-	virtual void OnActiveClicked() override;
+		/* Returns all friendly pieces' tiles (ability has infinite range). */
+		virtual TArray<ABoardTile*> GetActiveAbilityRange() override;
 
 	/* Wrapper for BP_OnActiveAbility. */
 	virtual void OnActiveAbility(TArray<AActor*> Targets) override;

@@ -78,29 +78,25 @@ bool UMatch_ActiveAbilityConfirmation::SetPendingTargets(TArray<AActor*> NewTarg
 	return false;
 }
 
-void UMatch_ActiveAbilityConfirmation::DestroyWidget(bool bReset)
+void UMatch_ActiveAbilityConfirmation::DestroyWidget()
 {
 	AMatch_PlayerPawn* PlayerPawnPtr = GetOwningPlayerPawn<AMatch_PlayerPawn>();
 
-	/* Reset the player's state and highlighted tiles if requested. This should theoretically always be true. */
-	if (bReset)
+	/* Reset the player state. */
+	PlayerPawnPtr->GetPlayerState<AMatch_PlayerState>()->SetPlayerStatus(E_SelectingPiece);
+
+	/* Reset the highlight of every tile that was highlighted. */
+	if (IsValid(PieceUsingAbility))
 	{
-		/* Reset the player state. */
-		PlayerPawnPtr->GetPlayerState<AMatch_PlayerState>()->SetPlayerStatus(E_SelectingPiece);
-
-		/* Reset the highlight of every tile that was highlighted. */
-		if (IsValid(PieceUsingAbility))
+		for (ABoardTile* Tile : PieceUsingAbility->GetActiveAbilityRange())
 		{
-			for (ABoardTile* Tile : PieceUsingAbility->GetActiveAbilityRange())
-			{
-				Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
-			}
+			Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
 		}
-
-		/* Reset the player's selected piece, enemy piece, target piece and tile and hide the piece info widgets. */
-		// Might not want to clear the selected piece and enemy piece
-        PlayerPawnPtr->ClearSelection(true, true, true, true, true);
 	}
+
+	/* Reset the player's selected piece, enemy piece, target piece and tile and hide the piece info widgets. */
+	// Might not want to clear the selected piece and enemy piece
+    PlayerPawnPtr->ClearSelection(true, true, true, true, true);
 
 	/* Nullify the piece's pointer to its active ability confirmation widget so it makes a new one next time. */
 	PieceUsingAbility->ActiveAbilityConfirmationWidget = nullptr;
@@ -131,7 +127,7 @@ void UMatch_ActiveAbilityConfirmation::OnConfirmClicked()
 		Cast<AMatch_PlayerPawn>(GetOwningPlayerPawn())->Server_UseActiveAbility(PieceUsingAbility, PendingTargets);
 
 	/* Destroy this widget and reset the player and all tiles. */
-	DestroyWidget(true);
+	DestroyWidget();
 }
 
 void UMatch_ActiveAbilityConfirmation::OnCancelClicked()
@@ -153,5 +149,5 @@ void UMatch_ActiveAbilityConfirmation::OnCancelClicked()
 	//
 	
 	/* Destroy this widget and reset the player and all tiles. */
-	DestroyWidget(true);
+	DestroyWidget();
 }

@@ -6,8 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "Board/BoardManager.h"
 #include "Board/BoardTile.h"
-#include "Components/PieceNetworkingComponent.h"
-#include "Framework/Match/Match_PlayerPawn.h"
 #include "Pieces/ParentPiece.h"
 #include "UserInterface/Match/ActiveAbilityConfirmations/Commanders/King_ActiveAbilityConfirmation.h"
 
@@ -55,19 +53,39 @@ bool AKing::TileIsInMoveRange(ABoardTile* Tile)
 	return false;
 }
 
-TArray<ABoardTile*> AKing::GetActiveAbilityRange()
+void AKing::OnActiveClicked()
 {
-	/* Get and return every tile since this ability has infinite range. */
-	TArray<AActor*> AllTileActors;
-	TArray<ABoardTile*> AllTiles;
-	UGameplayStatics::GetAllActorsOfClass(this, ABoardTile::StaticClass(), OUT AllTileActors);
+	/* Highlight all friendly pieces and their tiles. */
+	for (AActor* Target : GetValidActiveAbilityTargets())
+	{
+		if (AParentPiece* Piece = Cast<AParentPiece>(Target))
+		{
+			/* Highlight each piece as "selected." */
+			Piece->FlashHighlight(Piece->FriendlyFresnelColor, Piece->SelectedFresnelStrength, 1.0f, 0.0f, true);
 
-	/* Cast every tile actor to a board tile to return the correct type. */
-	for (AActor* Tile : AllTileActors)
-		if (ABoardTile* CastTile = Cast<ABoardTile>(Tile))
-			AllTiles.Add(CastTile);
-	
-	return AllTiles;
+			/* Highlight each tile. */
+			ABoardTile* Tile = Piece->GetCurrentTile();
+			Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_Friendly);
+		}
+	}
+
+	/* Create the active ability confirmation widget if it hasn't been created yet. */
+	if (!ActiveAbilityConfirmationWidget)
+	{
+		/* Create an instance of this piece's active ability confirmation widget. */
+		ActiveAbilityConfirmationWidget = CreateWidget<UKing_ActiveAbilityConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
+
+		/* Update the active ability confirmation widget and add it to the viewport if it was created successfully. */
+		if (ActiveAbilityConfirmationWidget)
+		{
+			/* Get all friendly pieces, which will all be the target of this piece's active ability. */
+			const TArray<AActor*> Targets = GetValidActiveAbilityTargets();
+
+			/* Update the widget's information. */
+			Cast<UKing_ActiveAbilityConfirmation>(ActiveAbilityConfirmationWidget)->Widget_UpdateActiveConfirmation(this, Targets);
+			ActiveAbilityConfirmationWidget->AddToViewport(0);
+		}
+	}
 }
 
 TArray<AActor*> AKing::GetValidActiveAbilityTargets()
@@ -93,35 +111,19 @@ TArray<AActor*> AKing::GetValidActiveAbilityTargets()
 	return AllFriendlyPieces;
 }
 
-void AKing::OnActiveClicked()
+TArray<ABoardTile*> AKing::GetActiveAbilityRange()
 {
-	/* Highlight all friendly pieces and their tiles. */
-	for (AActor* Target : GetValidActiveAbilityTargets())
-	{
-		if (AParentPiece* Piece = Cast<AParentPiece>(Target))
-		{
-			/* Highlight each piece as "selected." */
-			Piece->FlashHighlight(Piece->FriendlyFresnelColor, Piece->SelectedFresnelStrength, 1.0f, 0.0f, true);
+	/* Get and return every tile since this ability has infinite range. */
+	TArray<AActor*> AllTileActors;
+	TArray<ABoardTile*> AllTiles;
+	UGameplayStatics::GetAllActorsOfClass(this, ABoardTile::StaticClass(), OUT AllTileActors);
 
-			/* Highlight each tile. */
-			ABoardTile* Tile = Piece->GetCurrentTile();
-			Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_Friendly);
-		}
-	}
-
-	/* If the confirmation widget hasn't been created yet, create it. */
-	if (!ActiveAbilityConfirmationWidget)
-	{
-		/* Create an ability confirmation widget. */
-		ActiveAbilityConfirmationWidget = CreateWidget<UKing_ActiveAbilityConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
-		ActiveAbilityConfirmationWidget->AddToViewport(0);
-	}
-
-	/* Get all friendly pieces. */
-	const TArray<AActor*> Targets = GetValidActiveAbilityTargets();
+	/* Cast every tile actor to a board tile to return the correct type. */
+	for (AActor* Tile : AllTileActors)
+		if (ABoardTile* CastTile = Cast<ABoardTile>(Tile))
+			AllTiles.Add(CastTile);
 	
-	/* Update the widget's information. */
-	Cast<UKing_ActiveAbilityConfirmation>(ActiveAbilityConfirmationWidget)->Widget_UpdateActiveConfirmation(this, Targets);
+	return AllTiles;
 }
 
 void AKing::OnActiveAbility(TArray<AActor*> Targets)

@@ -18,24 +18,6 @@ APyromancer::APyromancer()
 {
 }
 
-// TArray<ABoardTile*> APyromancer::GetValidMoveTiles()
-// {
-// 	/* This array of valid tiles is going to be returned. */
-// 	TArray<ABoardTile*> ValidTiles;
-//
-// 	/* Get the board manager's array of every tile on the board. */
-// 	for (ABoardTile* Tile : GetWorld()->GetGameState<AMatch_GameStateBase>()->BoardManager->AllTiles)
-// 	{
-// 		/* If the tile's coordinates match with one of this piece's move patterns and the path to the tile is clear, it is a valid destination. */
-// 		if (TileIsInMoveRange(Tile) && PathToTileIsClear(Tile))
-// 		{
-// 			ValidTiles.Add(Tile);
-// 		}
-// 	}
-//
-// 	return ValidTiles;
-// }
-
 bool APyromancer::TileIsInMoveRange(ABoardTile* Tile)
 {
 	/* Make sure that a valid tile was passed. */
@@ -74,21 +56,62 @@ bool APyromancer::TileIsInMoveRange(ABoardTile* Tile)
 	return false;
 }
 
+void APyromancer::OnActiveClicked()
+{
+	/* Highlight valid targets. */
+	Super::OnActiveClicked();
+
+	/* Create and update the active ability confirmation widget if it hasn't been created yet. */
+	if (!ActiveAbilityConfirmationWidget)
+	{
+		/* Create an instance of this piece's active ability confirmation widget. */
+		ActiveAbilityConfirmationWidget = CreateWidget<UMatch_PyroActiveConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
+
+		/* Update the active ability confirmation widget and add it to the viewport if it was created successfully. */
+		if (ActiveAbilityConfirmationWidget)
+		{
+			/* This piece's active ability confirmation widget is actually an attack confirmation widget. Update the
+			 * widget's friendly piece information, hide its enemy piece information, and disable the confirmation option. */
+			Cast<UMatch_PyroActiveConfirmation>(ActiveAbilityConfirmationWidget)->UpdateAttackPreviewInfo(this, nullptr);
+			ActiveAbilityConfirmationWidget->AddToViewport(0);
+		}
+	}
+}
+
+void APyromancer::Piece_UpdateActiveConfirmation(TArray<AActor*> Targets)
+{
+	/* The player can select either a piece or its current tile. Either way, get the target as a piece. */
+	AParentPiece* TargetPiece = nullptr;
+	if (AParentPiece* TargetToPiece = Cast<AParentPiece>(Targets[0]))
+	{
+		/* Get the target piece from the selected piece actor. */
+		TargetPiece = TargetToPiece;
+	}
+	else if (ABoardTile* TargetToTile = Cast<ABoardTile>(Targets[0]))
+	{
+		/* Get the target piece from the selected tile. */
+		TargetPiece = TargetToTile->GetOccupyingPiece();
+	}
+
+	if (IsValid(TargetPiece) && ActiveAbilityConfirmationWidget)
+	{
+		Cast<UMatch_PyroActiveConfirmation>(ActiveAbilityConfirmationWidget)->UpdateAttackPreviewInfo(this, TargetPiece);
+	}
+}
+
 TArray<AActor*> APyromancer::GetValidActiveAbilityTargets()
 {
 	TArray<AActor*> ValidTargets;
 
-	for (AActor* Actor : GetActiveAbilityRange())
+	/* Returns all valid target pieces and their current tiles, so players can select either one. */
+	for (ABoardTile* Tile : GetActiveAbilityRange())
 	{
-		if (ABoardTile* Tile = Cast<ABoardTile>(Actor))
+		/* Tiles can only be targeted if they're occupied by an enemy piece and the path to them is clear. */
+		if (IsValid(Tile->GetOccupyingPiece()) && !Tile->GetOccupyingPiece()->GetInstigator()->IsLocallyControlled() && PathToTileIsClear(Tile))
 		{
-			/* Tiles can only be targeted if they're occupied by an enemy piece and the path to them is clear. */
-			if (IsValid(Tile->GetOccupyingPiece()) && !Tile->GetOccupyingPiece()->GetInstigator()->IsLocallyControlled() && PathToTileIsClear(Tile))
-			{
-				/* The player can select the piece or its tile. */
-				ValidTargets.Add(Cast<AActor>(Tile->GetOccupyingPiece()));
-				ValidTargets.Add(Cast<AActor>(Tile));
-			}
+			/* The player can select the piece or its tile. */
+			ValidTargets.Add(Cast<AActor>(Tile->GetOccupyingPiece()));
+			ValidTargets.Add(Cast<AActor>(Tile));
 		}
 	}
 
@@ -170,54 +193,6 @@ TArray<ABoardTile*> APyromancer::GetActiveAbilityRange()
 
 	return TilesInRange;
 }
-
-// FIX THIS
-// void APyromancer::StartActiveConfirmation()
-// {
-// 	/* If the confirmation widget hasn't been created yet, create it. */
-// 	if (!ConfirmationWidget)
-// 	{
-// 		/* Create an active ability confirmation widget. */
-// 		ConfirmationWidget = CreateWidget<UMatch_PyroActiveConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Fireball Ability Confirmation Widget"));
-//
-// 		/* If the widget was created successfully, update it and add the it to the viewport. */
-// 		if (ConfirmationWidget)
-// 		{
-// 			ConfirmationWidget->ConfirmingPiece = this;
-// 			ConfirmationWidget->AddToViewport(0);
-//
-// 			/* Initialize the attack confirmation widget with this piece's information, but without an enemy piece selected. */
-// 			ConfirmationWidget->UpdateAttackPreviewInfo(this, nullptr);
-// 		}
-// 	}
-// 	
-// 	// /* Get the target as a piece. If the player clicked a piece, cast it to a piece pointer. If they clicked
-// 	//  * a tile, get its occupying piece. */
-// 	// AParentPiece* Target = nullptr;
-// 	// if (AParentPiece* TargetPiece = Cast<AParentPiece>(Targets[0]))
-// 	// {
-// 	// 	Target = TargetPiece;
-// 	// }
-// 	// else if (const ABoardTile* TargetTile = Cast<ABoardTile>(Targets[0]))
-// 	// {
-// 	// 	Target = TargetTile->GetOccupyingPiece();
-// 	// }
-// 	// else
-// 	// {
-// 	// 	/* Only pieces and tiles can be targeted, so this should never happen. */
-// 	// }
-// 	
-// 	/* If the target piece was successfully found, update the confirmation widget's info and highlight
-// 	 * the pending tile. */
-// 	// if (IsValid(Target))
-// 	// {
-// 		/* Update the widget's information. */
-// 		// ConfirmationWidget->UpdateAttackPreviewInfo(this, nullptr);
-// 	
-// 		/* Highlight the pending tile. */
-// 		// Cast<ABoardTile>(Target->GetCurrentTile())->Highlight->SetMaterial(0, Target->GetCurrentTile()->Highlight_Target);
-// 	// }
-// }
 
 void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 {

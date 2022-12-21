@@ -18,14 +18,14 @@ class KINGDOMS_API AKnight : public AParentPiece
 
 /* Public functions. */
 public:
-	
+
 	/* Sets default values for this character's properties. */
 	AKnight();
 
 	/* Tests if the given tile's coordinates match any of this piece's movement patterns. */
 	virtual bool TileIsInMoveRange(ABoardTile* Tile) override;
 
-	/* Creates an updates the knight's active ability confirmation widget. */
+	/* Creates and updates the knight's active ability confirmation widget. */
 	virtual void OnActiveClicked() override;
 
 	/* Updates the knight's active ability confirmation widget. */
