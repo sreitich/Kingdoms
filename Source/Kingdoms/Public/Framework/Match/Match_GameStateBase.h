@@ -42,7 +42,7 @@ public:
 
 	/* Switches the current turn from the given player to the other player. */
 	UFUNCTION(Server, Reliable)
-	void Server_EndTurn(AMatch_PlayerState* CurrentPlayer);
+	void Server_SwitchTurn(AMatch_PlayerState* CurrentPlayer);
 
 	/* Ends the match with one winner and one loser. */
 	UFUNCTION(Server, Reliable)
@@ -70,11 +70,11 @@ public:
 	
 	/* Tracks the official time of the match. */
 	UPROPERTY(Replicated)
-	int32 MatchTime;
+	int32 MatchTime = 0.0f;
 
 	/* Tracks the official time of the current player's turn. */
 	UPROPERTY(Replicated)
-	int32 TurnTime;
+	int32 TurnTime = 0.0f;
 
 	/* Name of map, displayed in each player base widget. */
 	FName MapName = "Clockwork";

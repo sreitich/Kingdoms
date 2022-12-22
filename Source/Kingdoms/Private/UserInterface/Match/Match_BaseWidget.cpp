@@ -3,9 +3,7 @@
 
 #include "UserInterface/Match/Match_BaseWidget.h"
 
-#include "Framework/Match/Match_GameStateBase.h"
 #include "Framework/Match/Match_PlayerState.h"
-#include "Pieces/ParentPiece.h"
 #include "UserInterface/Match/Match_PieceInfoWidget.h"
 
 #include "Runtime/UMG/Public/UMG.h"
@@ -86,7 +84,10 @@ void UMatch_BaseWidget::OnEndTurnClicked()
     if (AMatch_PlayerState* PlayerStatePtr = GetOwningPlayerState<AMatch_PlayerState>())
     {
         /* End this player's turn and start the next player's turn through the game state. */
-        PlayerStatePtr->Server_EndTurn();
+        PlayerStatePtr->Server_EndPlayerTurn();
+
+        /* Instantly update this player's status to reduce delay when refreshing piece info widgets. */
+        PlayerStatePtr->SetPlayerStatus(E_WaitingForTurn);
 
         /* Disable this button. */
         EndTurnButton->SetIsEnabled(false);

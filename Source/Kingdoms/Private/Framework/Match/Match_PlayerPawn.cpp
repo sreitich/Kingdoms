@@ -209,7 +209,7 @@ void AMatch_PlayerPawn::Interact_WaitingForTurn(FHitResult InteractionHit)
 		}
 
 		/* Update and reveal the corresponding piece info widget with no buttons. */
-		GetController<AMatch_PlayerController>()->UpdatePieceInfoWidget(InteractedPiece, Alignment, false, false);
+		GetController<AMatch_PlayerController>()->UpdatePieceInfoWidget(InteractedPiece, Alignment, false);
 	}
 }
 
@@ -284,7 +284,7 @@ void AMatch_PlayerPawn::Interact_SelectingPiece(FHitResult InteractionHit)
 		}
 
 		/* Update and reveal the corresponding piece info widget. Enable buttons if the selected piece is friendly so that they can perform actions. */
-		GetController<AMatch_PlayerController>()->UpdatePieceInfoWidget(InteractedPiece, Alignment, Alignment == E_Friendly, false);
+		GetController<AMatch_PlayerController>()->UpdatePieceInfoWidget(InteractedPiece, Alignment, false);
 	}
 }
 
@@ -504,10 +504,10 @@ void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTarg
 		if (AMatch_PlayerController* PlayerController = Cast<AMatch_PlayerController>(GetController()))
 		{
 			/* Hide the friendly piece info widget. */
-			PlayerController->UpdatePieceInfoWidget(SelectedPiece, E_Friendly, false, true);
+			PlayerController->UpdatePieceInfoWidget(SelectedPiece, E_Friendly, true);
 
 			/* Hide the enemy piece info widget. */
-			PlayerController->UpdatePieceInfoWidget(SelectedPiece, E_Hostile, false, true);
+			PlayerController->UpdatePieceInfoWidget(SelectedPiece, E_Hostile, true);
 		}
 	}
 
@@ -584,10 +584,17 @@ void AMatch_PlayerPawn::Client_DeselectPieceOrTile_Implementation(AParentPiece* 
 	{ ClearSelection(false, false, false, true, false); }
 }
 
-void AMatch_PlayerPawn::Client_RefreshPieceInfoWidgets_Implementation(AParentPiece* PieceToRefresh, bool bHide) const
+void AMatch_PlayerPawn::Client_RefreshPieceInfoWidgets_Implementation() const
 {
-	/* Refresh any piece info widget displaying the given piece. */
-	Cast<AMatch_PlayerController>(GetController())->RefreshPieceInfoWidgets(PieceToRefresh, bHide);
+	/* Refresh any piece info widget displaying the currently selected friendly or enemy piece. */
+	Cast<AMatch_PlayerController>(GetController())->RefreshPieceInfoWidgets(SelectedPiece);
+	Cast<AMatch_PlayerController>(GetController())->RefreshPieceInfoWidgets(SelectedEnemyPiece);
+}
+
+void AMatch_PlayerPawn::Client_HideWidgetDisplayingPiece_Implementation(AParentPiece* PieceToHide) const
+{
+	/* Hide any piece info widget currently displaying the given piece. */
+	Cast<AMatch_PlayerController>(GetController())->HideWidgetDisplayingPiece(PieceToHide);
 }
 
 void AMatch_PlayerPawn::Server_Attack_Implementation(const FAttackInfo InInfo, bool bMoveCamera)
@@ -669,13 +676,14 @@ void AMatch_PlayerPawn::KillPiece_Implementation(AParentPiece* PieceToKill, AAct
 		PieceToKill->GetCurrentTile()->SetOccupyingPiece(nullptr);
 	}
 
-	/* Refresh each player's piece info widgets, hiding any that were displaying the killed piece, and deselect the
-	 * killed piece if it either player had it selected for any reason. */
+	/* Refresh each player's piece info widgets, hide any that were displaying the killed piece, and deselect the
+	 * killed piece if either player had it selected for any reason. */
 	for (const APlayerState* PlayerStatePtr : UGameplayStatics::GetGameState(this)->PlayerArray)
 	{
 		if (AMatch_PlayerPawn* PlayerPawnPtr = Cast<AMatch_PlayerPawn>(PlayerStatePtr->GetPawn()))
 		{
-			PlayerPawnPtr->Client_RefreshPieceInfoWidgets(PieceToKill, true);
+			PlayerPawnPtr->Client_RefreshPieceInfoWidgets();
+			PlayerPawnPtr->Client_HideWidgetDisplayingPiece(PieceToKill);
 			PlayerPawnPtr->Client_DeselectPieceOrTile(PieceToKill, nullptr);
 		}
 	}

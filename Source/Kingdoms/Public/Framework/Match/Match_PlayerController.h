@@ -77,12 +77,16 @@ public:
 
 	/* Reveals and updates or hides one of the piece info widgets. */
 	UFUNCTION(Category="User Interface")
-	void UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlignment Alignment, bool bEnableButtons, bool bHide) const;
+	void UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlignment Alignment, bool bHide) const;
 	
-		/* Refreshes both piece info widgets, if they have been created. If bHide is true, hides any widget displaying
-		 * PieceToRefresh. */
+		/* Refreshes both piece info widgets, if they have been created. */
 		UFUNCTION(Category="User Interface")
-		void RefreshPieceInfoWidgets(AParentPiece* PieceToRefresh, bool bHide) const;
+		void RefreshPieceInfoWidgets(AParentPiece* PieceToRefresh) const;
+
+		/* Hides any piece info widgets currently displaying the given piece. Used to hide piece info widgets displaying
+		 * pieces that are dead. */
+		UFUNCTION(Category="User Interface")
+		void HideWidgetDisplayingPiece(AParentPiece* PieceToHide) const;
 
 	/* Creates or destroys a move confirmation pop-up. */
 	UFUNCTION(Category="User Interface")

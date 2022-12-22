@@ -3,12 +3,10 @@
 
 #include "Pieces/Mages/Pyromancer.h"
 
-#include "Animations/AnimInstance_Parent.h"
 #include "Board/BoardManager.h"
 #include "Board/BoardTile.h"
 #include "Framework/Match/Match_GameStateBase.h"
 #include "Framework/Match/Match_PlayerPawn.h"
-#include "UserDefinedData/PieceData_UserDefinedData.h"
 
 #include "UserInterface/Match/ActiveAbilityConfirmations/Mages/Pyromancer/Match_PyroActiveConfirmation.h"
 
@@ -65,7 +63,7 @@ void APyromancer::OnActiveClicked()
 	if (!ActiveAbilityConfirmationWidget)
 	{
 		/* Create an instance of this piece's active ability confirmation widget. */
-		ActiveAbilityConfirmationWidget = CreateWidget<UMatch_PyroActiveConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
+		ActiveAbilityConfirmationWidget = CreateWidget<UMatch_PyroActiveConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Pyromancer Active Ability Confirmation Widget"));
 
 		/* Update the active ability confirmation widget and add it to the viewport if it was created successfully. */
 		if (ActiveAbilityConfirmationWidget)

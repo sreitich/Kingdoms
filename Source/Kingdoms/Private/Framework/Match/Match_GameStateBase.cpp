@@ -88,29 +88,35 @@ void AMatch_GameStateBase::Server_EndMatch_Implementation(AMatch_PlayerState* Wi
     UE_LOG(LogTemp, Error, TEXT("Match ended. %s wins!"), *Winner->GetName());
 }
 
-void AMatch_GameStateBase::Server_EndTurn_Implementation(AMatch_PlayerState* CurrentPlayer)
+void AMatch_GameStateBase::Server_SwitchTurn_Implementation(AMatch_PlayerState* CurrentPlayer)
 {
-    /* Get the player whose turn we're switching to. */
-    AMatch_PlayerState* NewPlayer = nullptr;
-    for (APlayerState* PlayerStatePtr : PlayerArray)
+    if (IsValid(CurrentPlayer))
     {
-        if (PlayerStatePtr != CurrentPlayer)
+        /* Get the player whose turn we're switching to. */
+        AMatch_PlayerState* NewPlayer = nullptr;
+        for (APlayerState* PlayerStatePtr : PlayerArray)
         {
-            NewPlayer = Cast<AMatch_PlayerState>(PlayerStatePtr);
+            if (PlayerStatePtr != CurrentPlayer)
+            {
+                NewPlayer = Cast<AMatch_PlayerState>(PlayerStatePtr);
+            }
+        }
+
+        if (IsValid(NewPlayer))
+        {
+            /* End the last player's turn, which will reset their used actions and action indicators. */
+            CurrentPlayer->SetPlayerStatus(E_WaitingForTurn);
+
+            /* Decrement the modifier durations and ability cooldowns for the player whose turn just ended. */
+            Server_DecrementModifierDurations(CurrentPlayer);
+            Server_DecrementAbilityCooldowns(CurrentPlayer);
+            
+
+            /* Start the next player's turn by resetting their turn timer and allowing them to start selecting a piece. */
+            TurnTime = 0.0f;
+            NewPlayer->SetPlayerStatus(E_SelectingPiece);
         }
     }
-
-    /* End the last player's turn, which will reset their used actions and action indicators. */
-    if (IsValid(CurrentPlayer))
-        CurrentPlayer->SetPlayerStatus(E_WaitingForTurn);
-
-    /* Decrement the modifier durations and ability cooldowns for the player whose turn just ended. */
-    Server_DecrementModifierDurations(CurrentPlayer);
-    Server_DecrementAbilityCooldowns(CurrentPlayer);
-
-    /* Start the next player's turn. */
-    if (IsValid(NewPlayer))
-        NewPlayer->SetPlayerStatus(E_SelectingPiece);
 }
 
 void AMatch_GameStateBase::Server_StartMatch_Implementation()
@@ -271,4 +277,6 @@ void AMatch_GameStateBase::Count_Implementation()
 {
     /* Increment the match time every second. MatchTime is taken by each player controller to display on the timer widget each tick. */
     MatchTime++;
+    /* Increment the current player's turn time every second. */
+    TurnTime++;
 }

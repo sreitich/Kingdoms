@@ -217,7 +217,7 @@ void AMatch_PlayerController::UpdateEndTurnButton(bool bEnable) const
     }
 }
 
-void AMatch_PlayerController::UpdatePieceInfoWidget(AParentPiece *NewPiece, const EAlignment Alignment, const bool bEnableButtons, const bool bHide) const
+void AMatch_PlayerController::UpdatePieceInfoWidget(AParentPiece *NewPiece, const EAlignment Alignment, const bool bHide) const
 {
     /* Only execute on local client. I added this check a long time ago but I think it's actually redundant... I'm scared to remove it though. */
     if (IsLocalPlayerController())
@@ -240,7 +240,7 @@ void AMatch_PlayerController::UpdatePieceInfoWidget(AParentPiece *NewPiece, cons
             else
             {
                 /* Update the widget's displayed information, enable it, and determine whether or not any information changed. */
-                const bool bInfoChanged = Match_BaseWidget->GetPieceInfoWidget(Alignment)->UpdatePieceInfoWidget(NewPiece, Alignment, bEnableButtons);
+                const bool bInfoChanged = Match_BaseWidget->GetPieceInfoWidget(Alignment)->UpdatePieceInfoWidget(NewPiece, Alignment);
                 Match_BaseWidget->GetPieceInfoWidget(Alignment)->SetVisibility(ESlateVisibility::HitTestInvisible);
 
                 /* If any information changed or the widget wasn't already revealed, play the opening animation. */
@@ -251,34 +251,40 @@ void AMatch_PlayerController::UpdatePieceInfoWidget(AParentPiece *NewPiece, cons
     }
 }
 
-void AMatch_PlayerController::RefreshPieceInfoWidgets(AParentPiece* PieceToRefresh, bool bHide) const
+void AMatch_PlayerController::RefreshPieceInfoWidgets(AParentPiece* PieceToRefresh) const
 {
-    /* If the friendly piece info widget exists, is currently displaying PieceToRefresh, and is currently visible... */
-    if (Match_BaseWidget && Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->GetDisplayedPiece() == PieceToRefresh && Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->GetVisibility() == ESlateVisibility::Visible)
+    if (IsValid(PieceToRefresh))
     {
-        /* Hide the widget if requested. */
-        if (bHide)
+        /* If the friendly piece info widget exists, is currently displaying PieceToRefresh, and is currently visible... */
+        if (Match_BaseWidget && Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->GetDisplayedPiece() == PieceToRefresh && Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->GetVisibility() == ESlateVisibility::Visible)
         {
-            UpdatePieceInfoWidget(PieceToRefresh, E_Friendly, false, true);
-        }
-        /* Refresh the widget if it doesn't need to be hidden. */
-        else
-        {
+            /* Refresh the widget. */
             Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->RefreshWidget();
         }
-    }
-    /* If the enemy piece info widget exists, is currently displaying PieceToRefresh, and is currently visible... */
-    else if (Match_BaseWidget && Match_BaseWidget->GetPieceInfoWidget(E_Hostile)->GetDisplayedPiece() == PieceToRefresh && Match_BaseWidget->GetPieceInfoWidget(E_Hostile)->GetVisibility() == ESlateVisibility::Visible)
-    {
-        /* Hide the widget if requested. */
-        if (bHide)
+        /* If the enemy piece info widget exists, is currently displaying PieceToRefresh, and is currently visible... */
+        else if (Match_BaseWidget && Match_BaseWidget->GetPieceInfoWidget(E_Hostile)->GetDisplayedPiece() == PieceToRefresh && Match_BaseWidget->GetPieceInfoWidget(E_Hostile)->GetVisibility() == ESlateVisibility::Visible)
         {
-            UpdatePieceInfoWidget(PieceToRefresh, E_Hostile, false, true);
-        }
-        /* Refresh the widget if it doesn't need to be hidden. */
-        else
-        {
+            /* Refresh the widget. */
             Match_BaseWidget->GetPieceInfoWidget(E_Hostile)->RefreshWidget();
+        }
+    }
+}
+
+void AMatch_PlayerController::HideWidgetDisplayingPiece(AParentPiece* PieceToHide) const
+{
+    if (IsValid(PieceToHide))
+    {
+        /* If the friendly piece info widget exists, is currently displaying PieceToHide, and is currently visible... */
+        if (Match_BaseWidget && Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->GetDisplayedPiece() == PieceToHide && Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->GetVisibility() == ESlateVisibility::Visible)
+        {
+            /* Hide the widget. */
+            UpdatePieceInfoWidget(PieceToHide, E_Friendly, true);
+        }
+        /* If the enemy piece info widget exists, is currently displaying PieceToHide, and is currently visible... */
+        else if (Match_BaseWidget && Match_BaseWidget->GetPieceInfoWidget(E_Hostile)->GetDisplayedPiece() == PieceToHide && Match_BaseWidget->GetPieceInfoWidget(E_Hostile)->GetVisibility() == ESlateVisibility::Visible)
+        {
+            /* Hide the widget. */
+            UpdatePieceInfoWidget(PieceToHide, E_Hostile, true);
         }
     }
 }

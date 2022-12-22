@@ -33,12 +33,12 @@ void AMatch_PlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
     DOREPLIFETIME(AMatch_PlayerState, bAbilityActionUsed);
 }
 
-void AMatch_PlayerState::Server_EndTurn_Implementation()
+void AMatch_PlayerState::Server_EndPlayerTurn_Implementation()
 {
     /* End this player's turn and start the next player's turn. */
     if (AMatch_GameStateBase* GameStatePtr = Cast<AMatch_GameStateBase>(UGameplayStatics::GetGameState(this)))
     {
-        GameStatePtr->Server_EndTurn(this);
+        GameStatePtr->Server_SwitchTurn(this);
     }
 }
 
@@ -166,7 +166,7 @@ void AMatch_PlayerState::OnRep_bReadyToPlay()
 
 void AMatch_PlayerState::OnRep_CurrentPlayerStatus(EPlayerStatus OldPlayerStatus)
 {
-    /* If the player was waiting for their turn and they are now selecting a piece, reset their turn progress and refresh their piece info widgets. */
+    /* If the player was waiting for their turn and is now selecting a piece, reset their turn progress. */
     if (CurrentPlayerStatus == E_SelectingPiece && OldPlayerStatus == E_WaitingForTurn)
     {
         bMoveActionUsed = false;
@@ -179,8 +179,14 @@ void AMatch_PlayerState::OnRep_CurrentPlayerStatus(EPlayerStatus OldPlayerStatus
             OnRep_AbilityActionUsed();
         }
 
-        /* The first parameter currently isn't used with this function call, but I might change that if there are problems. */
-        // GetPawn<AMatch_PlayerPawn>()->Client_RefreshPieceInfoWidgets(nullptr, false);
+        /* Refresh this player's piece info widgets when their turn starts and their player status has been updated. */
+        GetPawn<AMatch_PlayerPawn>()->Client_RefreshPieceInfoWidgets();
+    }
+    /* When the player's turn ends, refresh their piece info widgets. */
+    else if (CurrentPlayerStatus == E_WaitingForTurn)
+    {
+        /* Refresh this player's piece info widgets after their player status has been updated. */
+        GetPawn<AMatch_PlayerPawn>()->Client_RefreshPieceInfoWidgets();
     }
 }
 

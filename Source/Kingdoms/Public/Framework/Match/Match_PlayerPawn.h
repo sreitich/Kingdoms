@@ -47,10 +47,14 @@ public:
 		UFUNCTION(Client, Reliable)
 		void Client_DeselectPieceOrTile(AParentPiece* PieceToDeselect, ABoardTile* TileToDeselect);
 
-	/* Refreshes any piece info widget that is currently displaying the given piece. If bHide is true, hides any widget
-	 currently displaying PieceToRefresh. */
+	/* Refreshes any piece info widget that is currently displaying this player's selected friendly or enemy piece. */
 	UFUNCTION(Client, Reliable)
-	void Client_RefreshPieceInfoWidgets(AParentPiece* PieceToRefresh, bool bHide) const;
+	void Client_RefreshPieceInfoWidgets() const;
+
+	/* Hides any piece info widgets currently displaying the given piece. Used to hide piece info widgets displaying
+	 * pieces that are dead. */
+	UFUNCTION(Client, Reliable)
+	void Client_HideWidgetDisplayingPiece(AParentPiece* PieceToHide) const;
 
 
 /* Public piece networking functions. */

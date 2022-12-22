@@ -73,7 +73,7 @@ void AKing::OnActiveClicked()
 	if (!ActiveAbilityConfirmationWidget)
 	{
 		/* Create an instance of this piece's active ability confirmation widget. */
-		ActiveAbilityConfirmationWidget = CreateWidget<UKing_ActiveAbilityConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Active Ability Confirmation Widget"));
+		ActiveAbilityConfirmationWidget = CreateWidget<UKing_ActiveAbilityConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("King Active Ability Confirmation Widget"));
 
 		/* Update the active ability confirmation widget and add it to the viewport if it was created successfully. */
 		if (ActiveAbilityConfirmationWidget)

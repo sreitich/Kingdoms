@@ -57,14 +57,23 @@ void UMatch_PieceInfoWidget::ClosingAnimFinished()
     SetVisibility(ESlateVisibility::Hidden);
 }
 
-bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlignment Alignment, bool bEnableButtons)
+bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlignment Alignment)
 {
     /* Tracks whether any displayed information has actually changed. */
     bool bInfoChanged = false;
 
-    /* If the piece data table was found... */
-    if (PieceDataTable)
+    /* If the given piece is valid and the piece data table was found... */
+    if (IsValid(NewPiece) && PieceDataTable)
     {
+        /* Determine whether or not we can eventually enable buttons. We'll only consider enabling buttons on this
+         * widget if it's this player's turn and the given piece is friendly. */
+        bool bEnableButtons = false;
+        const EPlayerStatus PlayerStatus = GetOwningPlayerState<AMatch_PlayerState>()->GetCurrentPlayerStatus();
+        if ((PlayerStatus == E_SelectingPiece || PlayerStatus == E_SelectingAction || PlayerStatus == E_SelectingTarget_Move || PlayerStatus == E_SelectingTarget_ActiveAbility)
+            && NewPiece->GetLocalAlignment() == E_Friendly)
+                bEnableButtons = true;
+
+        
         /* Get this piece's row from the piece data. */
         static const FString ContextString(TEXT("Piece Data Struct"));
         PieceData = PieceDataTable->FindRow<FPieceDataStruct>(NewPiece->PieceID, ContextString, true);
@@ -124,232 +133,229 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
                     DisplayedPhotoBackground->SetBrushFromTexture(Background_Basic, true);
             }
 
-            /* If the passed piece is valid... */
-            if (IsValid(NewPiece))
+
+            /* If there is no piece info widget currently displayed or the piece's stats have changed since its information was last opened, allow the opening animation to play. */
+            if (DisplayedPiece == nullptr || NewPiece->GetCurrentStrength() != DisplayedPiece->GetCurrentStrength() || NewPiece->GetCurrentArmor() != DisplayedPiece->GetCurrentArmor())
+                bInfoChanged = true;
+
+
+            /* Update the piece's displayed current strength value. */
+            DisplayedStrength->SetText(FText::FromString(FString::FromInt(NewPiece->GetCurrentStrength())));
+            /* If this piece's current strength is the same as its base strength, highlight it in yellow if it has strength modifiers and white if it doesn't. */
+            if (NewPiece->GetCurrentStrength() == PieceData->BaseStrength)
             {
-                /* If there is no piece info widget currently displayed or the piece's stats have changed since its information was last opened, allow the opening animation to play. */
-                if (DisplayedPiece == nullptr || NewPiece->GetCurrentStrength() != DisplayedPiece->GetCurrentStrength() || NewPiece->GetCurrentArmor() != DisplayedPiece->GetCurrentArmor())
-                    bInfoChanged = true;
-
-
-                /* Update the piece's displayed current strength value. */
-                DisplayedStrength->SetText(FText::FromString(FString::FromInt(NewPiece->GetCurrentStrength())));
-                /* If this piece's current strength is the same as its base strength, highlight it in yellow if it has strength modifiers and white if it doesn't. */
-                if (NewPiece->GetCurrentStrength() == PieceData->BaseStrength)
+                /* Check if the piece does have strength modifiers, but they actually just cancel out. */
+                bool bModifiersCancel = false;
+                for (FModifier const Modifier : NewPiece->GetTemporaryModifiers())
                 {
-                    /* Check if the piece does have strength modifiers, but they actually just cancel out. */
-                    bool bModifiersCancel = false;
-                    for (FModifier const Modifier : NewPiece->GetTemporaryModifiers())
+                    if (Modifier.EffectedStat == Modifier.Strength)
                     {
-                        if (Modifier.EffectedStat == Modifier.Strength)
-                        {
-                            bModifiersCancel = true;
-                            break;
-                        }
-                    }
-
-                    /* If the piece does have strength modifiers that cancel out, highlight the strength in yellow. */
-                    if (bModifiersCancel)
-                    {
-                        DisplayedStrength->SetColorAndOpacity(FLinearColor(IneffectiveModifierColor));
-                    }
-                    /* If the piece doesn't have strength modifiers, don't highlight the text. */
-                    else
-                    {
-                        DisplayedStrength->SetColorAndOpacity(FLinearColor(DefaultTextColor));
+                        bModifiersCancel = true;
+                        break;
                     }
                 }
-                /* If the piece's current strength is greater than its base strength, highlight it in green. */
-                else if (NewPiece->GetCurrentStrength() > PieceData->BaseStrength)
+
+                /* If the piece does have strength modifiers that cancel out, highlight the strength in yellow. */
+                if (bModifiersCancel)
                 {
-                    DisplayedStrength->SetColorAndOpacity(FLinearColor(BuffColor));
+                    DisplayedStrength->SetColorAndOpacity(FLinearColor(IneffectiveModifierColor));
                 }
-                /* If the piece's current strength is less than its base strength, highlight it in red. */
+                /* If the piece doesn't have strength modifiers, don't highlight the text. */
                 else
                 {
-                    DisplayedStrength->SetColorAndOpacity(FLinearColor(DebuffColor));
+                    DisplayedStrength->SetColorAndOpacity(FLinearColor(DefaultTextColor));
                 }
+            }
+            /* If the piece's current strength is greater than its base strength, highlight it in green. */
+            else if (NewPiece->GetCurrentStrength() > PieceData->BaseStrength)
+            {
+                DisplayedStrength->SetColorAndOpacity(FLinearColor(BuffColor));
+            }
+            /* If the piece's current strength is less than its base strength, highlight it in red. */
+            else
+            {
+                DisplayedStrength->SetColorAndOpacity(FLinearColor(DebuffColor));
+            }
 
 
-                /* Update the piece's displayed current armor value. */
-                DisplayedArmor->SetText(FText::FromString(FString::FromInt(NewPiece->GetCurrentArmor())));
-                /* If this piece's current armor is the same as its base armor, highlight it in yellow if it has armor modifiers and white if it doesn't. */
-                if (NewPiece->GetCurrentArmor() == PieceData->BaseArmor)
+            /* Update the piece's displayed current armor value. */
+            DisplayedArmor->SetText(FText::FromString(FString::FromInt(NewPiece->GetCurrentArmor())));
+            /* If this piece's current armor is the same as its base armor, highlight it in yellow if it has armor modifiers and white if it doesn't. */
+            if (NewPiece->GetCurrentArmor() == PieceData->BaseArmor)
+            {
+                /* Check if the piece does have armor modifiers, but they actually just cancel out. */
+                bool bModifiersCancel = false;
+                for (FModifier const Modifier : NewPiece->GetTemporaryModifiers())
                 {
-                    /* Check if the piece does have armor modifiers, but they actually just cancel out. */
-                    bool bModifiersCancel = false;
-                    for (FModifier const Modifier : NewPiece->GetTemporaryModifiers())
+                    if (Modifier.EffectedStat == Modifier.Armor)
                     {
-                        if (Modifier.EffectedStat == Modifier.Armor)
-                        {
-                            bModifiersCancel = true;
-                            break;
-                        }
+                        bModifiersCancel = true;
+                        break;
                     }
+                }
 
-                    /* If the piece does have armor modifiers that cancel out, highlight the armor in yellow. */
-                    if (bModifiersCancel)
-                    {
-                        DisplayedArmor->SetColorAndOpacity(FLinearColor(IneffectiveModifierColor));
-                    }
-                    /* If the piece doesn't have armor modifiers, don't highlight the text. */
-                    else
-                    {
-                        DisplayedArmor->SetColorAndOpacity(FLinearColor(DefaultTextColor));
-                    }
-                }
-                /* If the piece's current armor is greater than its base armor, highlight it in green. */
-                else if (NewPiece->GetCurrentArmor() > PieceData->BaseArmor)
+                /* If the piece does have armor modifiers that cancel out, highlight the armor in yellow. */
+                if (bModifiersCancel)
                 {
-                    DisplayedArmor->SetColorAndOpacity(FLinearColor(BuffColor));
+                    DisplayedArmor->SetColorAndOpacity(FLinearColor(IneffectiveModifierColor));
                 }
-                /* If the piece's current armor is less than its base armor, highlight it in red. */
+                /* If the piece doesn't have armor modifiers, don't highlight the text. */
                 else
                 {
-                    DisplayedArmor->SetColorAndOpacity(FLinearColor(DebuffColor));
+                    DisplayedArmor->SetColorAndOpacity(FLinearColor(DefaultTextColor));
                 }
+            }
+            /* If the piece's current armor is greater than its base armor, highlight it in green. */
+            else if (NewPiece->GetCurrentArmor() > PieceData->BaseArmor)
+            {
+                DisplayedArmor->SetColorAndOpacity(FLinearColor(BuffColor));
+            }
+            /* If the piece's current armor is less than its base armor, highlight it in red. */
+            else
+            {
+                DisplayedArmor->SetColorAndOpacity(FLinearColor(DebuffColor));
+            }
 
 
-                /* Reveal and enable the move button if buttons are enabled and a move action can be used. */
+            /* Reveal and enable the move button if buttons are enabled and a move action can be used. */
+            if (bEnableButtons)
+            {
+                MoveButton->SetVisibility(ESlateVisibility::Visible);
+                MoveButton->SetIsEnabled(!GetOwningPlayerState<AMatch_PlayerState>()->GetMoveActionUsed());
+            }
+            /* Hide the move button if buttons are not enabled. */
+            else
+            {
+                MoveButton->SetVisibility(ESlateVisibility::Collapsed);
+            }
+
+
+            /* If this piece has both a passive and active ability... */
+            if (PieceData && PieceData->PassiveName != "" && PieceData->ActiveName != "")
+            {
+                /* Align both ability boxes together. */
+                Cast<UHorizontalBoxSlot>(PassiveAbilityBox->Slot)->SetPadding(FMargin(0.0f, 15.0f, 15.0f, 0.0f));
+                Cast<UHorizontalBoxSlot>(ActiveAbilityBox->Slot)->SetPadding(FMargin(0.0f, 15.0f, 15.0f, 0.0f));
+            }
+            /* If this piece only has a passive ability... */
+            else if (PieceData && PieceData->PassiveName != "")
+            {
+                /* Center the passive ability. */
+                Cast<UHorizontalBoxSlot>(PassiveAbilityBox->Slot)->SetPadding(FMargin(0.0f, 15.0f, 57.0f, 0.0f));
+            }
+            /* If this piece only has an active ability... */
+            else if (PieceData && PieceData->ActiveName != "")
+            {
+                /* Center the active ability. */
+                Cast<UHorizontalBoxSlot>(ActiveAbilityBox->Slot)->SetPadding(FMargin(0.0f, 15.0f, 57.0f, 0.0f));
+            }
+
+            /* If this piece has an active ability... */
+            if (PieceData && PieceData->ActiveName != "")
+            {
+                /* Reveal all of the active ability widgets. */
+                ActiveAbilityBox->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+                /* Reveal and enable the ability button if buttons are enabled and an ability action can be used. */
                 if (bEnableButtons)
                 {
-                    MoveButton->SetVisibility(ESlateVisibility::Visible);
-                    MoveButton->SetIsEnabled(!GetOwningPlayerState<AMatch_PlayerState>()->GetMoveActionUsed());
+                    ActiveButton->SetVisibility(ESlateVisibility::Visible);
+                    ActiveButton->SetIsEnabled(!GetOwningPlayerState<AMatch_PlayerState>()->GetAbilityActionUsed());
                 }
-                /* Hide the move button if buttons are not enabled. */
+                /* Hide the ability button if buttons are not enabled. */
                 else
                 {
-                    MoveButton->SetVisibility(ESlateVisibility::Collapsed);
-                }
-
-
-                /* If this piece has both a passive and active ability... */
-                if (PieceData && PieceData->PassiveName != "" && PieceData->ActiveName != "")
-                {
-                    /* Align both ability boxes together. */
-                    Cast<UHorizontalBoxSlot>(PassiveAbilityBox->Slot)->SetPadding(FMargin(0.0f, 15.0f, 15.0f, 0.0f));
-                    Cast<UHorizontalBoxSlot>(ActiveAbilityBox->Slot)->SetPadding(FMargin(0.0f, 15.0f, 15.0f, 0.0f));
-                }
-                /* If this piece only has a passive ability... */
-                else if (PieceData && PieceData->PassiveName != "")
-                {
-                    /* Center the passive ability. */
-                    Cast<UHorizontalBoxSlot>(PassiveAbilityBox->Slot)->SetPadding(FMargin(0.0f, 15.0f, 57.0f, 0.0f));
-                }
-                /* If this piece only has an active ability... */
-                else if (PieceData && PieceData->ActiveName != "")
-                {
-                    /* Center the active ability. */
-                    Cast<UHorizontalBoxSlot>(ActiveAbilityBox->Slot)->SetPadding(FMargin(0.0f, 15.0f, 57.0f, 0.0f));
-                }
-
-                /* If this piece has an active ability... */
-                if (PieceData && PieceData->ActiveName != "")
-                {
-                    /* Reveal all of the active ability widgets. */
-                    ActiveAbilityBox->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-                    /* Reveal and enable the ability button if buttons are enabled and an ability action can be used. */
-                    if (bEnableButtons)
-                    {
-                        ActiveButton->SetVisibility(ESlateVisibility::Visible);
-                        ActiveButton->SetIsEnabled(!GetOwningPlayerState<AMatch_PlayerState>()->GetAbilityActionUsed());
-                    }
-                    /* Hide the ability button if buttons are not enabled. */
-                    else
-                    {
-                        ActiveButton->SetVisibility(ESlateVisibility::Collapsed);
-                    }
-
-                    /* Reveal and update the usage bars if this piece's active ability has limited uses. */
-                    if (PieceData->ActiveUses > 0)
-                    {
-                        EmptyBars(true, true, PieceData->ActiveUses - NewPiece->GetActiveUses());
-                    }
-                    /* Hide the usage bars if this piece's active ability has unlimited uses. */
-                    else
-                    {
-                        /* Hide the usage bars. */
-                        EmptyBars(false, true, 0);
-                    }
-
-                    /* Update the cooldown timer if the active ability's cooldown is active. */
-                    if (NewPiece->GetActiveCD() > 0)
-                    {
-                        /* Don't display a cooldown counter if the piece doesn't have any more ability uses left. */
-                        if ((PieceData->ActiveUses > 0 && NewPiece->GetActiveUses() > 0) || PieceData->ActiveUses == 0)
-                        {
-                            /* Update and display the cooldown counter. */
-                            DisplayedActiveCD->SetText(FText::FromString(FString::FromInt(NewPiece->GetActiveCD())));
-                            DisplayedActiveCD->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-                        }
-                    }
-                    /* Hide the cooldown counter if the active ability is not on cooldown.    */
-                    else
-                    {
-                        DisplayedActiveCD->SetVisibility(ESlateVisibility::Hidden);
-                    }
-
-                    /* If this piece's active ability is not on cooldown, and either has limited uses and has uses left or has unlimited uses, then it can be used. */
-                    if (NewPiece->GetActiveCD() == 0 && ((PieceData->ActiveUses > 0 && NewPiece->GetActiveUses() > 0) || PieceData->ActiveUses == 0))
-                    {
-                        /* Hide the cooldown indicator (that doubles as the "no uses left" indicator). */
-                        ActiveCooldownIndicator->SetVisibility(ESlateVisibility::Hidden);
-                        // /* Enable the "use active ability" button. */
-                        // ActiveButton->SetIsEnabled(true);
-                    }
-                    /* If this ability can't be used. */
-                    else
-                    {
-                        /* Reveal the active cooldown indicator, greying out the ability icon. */
-                        ActiveCooldownIndicator->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-                        /* Disable the "use active ability" button. */
-                        ActiveButton->SetIsEnabled(false);
-                    }
-                }
-                /* If this piece doesn't have an active ability... */
-                else
-                {
-                    /* Hide all of the active ability widgets. */
-                    ActiveAbilityBox->SetVisibility(ESlateVisibility::Collapsed);
-                    /* Hide the active ability button. */
                     ActiveButton->SetVisibility(ESlateVisibility::Collapsed);
                 }
 
-
-                /* If this piece has an passive ability... */
-                if (PieceData && PieceData->PassiveName != "")
+                /* Reveal and update the usage bars if this piece's active ability has limited uses. */
+                if (PieceData->ActiveUses > 0)
                 {
-                    /* Reveal all of the passive ability widgets. */
-                    PassiveAbilityBox->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-                    /* If the passive ability's cooldown is active... */
-                    if (NewPiece->GetPassiveCD() > 0)
-                    {
-                        /* Update and display the current cooldown. */
-                        DisplayedPassiveCD->SetText(FText::FromString(FString::FromInt(NewPiece->GetPassiveCD())));
-                        DisplayedPassiveCD->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-                        /* Reveal the passive cooldown indicator, greying out the passive ability icon. Disable test visibility so that it doesn't block the button. */
-                        PassiveCooldownIndicator->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-                    }
-                    /* If the passive ability can be used... */
-                    else
-                    {
-                        /* Hide the passive cooldown indicator and the cooldown turn counter. */
-                        PassiveCooldownIndicator->SetVisibility(ESlateVisibility::Hidden);
-                        DisplayedPassiveCD->SetVisibility(ESlateVisibility::Hidden);
-                    }
-
-                    /* Update the number of uses remaining. */
-                    EmptyBars(true, false, (PieceData->PassiveUses) - (NewPiece->GetPassiveUses()));
+                    EmptyBars(true, true, PieceData->ActiveUses - NewPiece->GetActiveUses());
                 }
-                /* If this piece doesn't have a passive ability... */
+                /* Hide the usage bars if this piece's active ability has unlimited uses. */
                 else
                 {
-                    /* Hide all of the passive ability widgets. */
-                    PassiveAbilityBox->SetVisibility(ESlateVisibility::Collapsed);
+                    /* Hide the usage bars. */
+                    EmptyBars(false, true, 0);
                 }
+
+                /* Update the cooldown timer if the active ability's cooldown is active. */
+                if (NewPiece->GetActiveCD() > 0)
+                {
+                    /* Don't display a cooldown counter if the piece doesn't have any more ability uses left. */
+                    if ((PieceData->ActiveUses > 0 && NewPiece->GetActiveUses() > 0) || PieceData->ActiveUses == 0)
+                    {
+                        /* Update and display the cooldown counter. */
+                        DisplayedActiveCD->SetText(FText::FromString(FString::FromInt(NewPiece->GetActiveCD())));
+                        DisplayedActiveCD->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+                    }
+                }
+                /* Hide the cooldown counter if the active ability is not on cooldown.    */
+                else
+                {
+                    DisplayedActiveCD->SetVisibility(ESlateVisibility::Hidden);
+                }
+
+                /* If this piece's active ability is not on cooldown, and either has limited uses and has uses left or has unlimited uses, then it can be used. */
+                if (NewPiece->GetActiveCD() == 0 && ((PieceData->ActiveUses > 0 && NewPiece->GetActiveUses() > 0) || PieceData->ActiveUses == 0))
+                {
+                    /* Hide the cooldown indicator (that doubles as the "no uses left" indicator). */
+                    ActiveCooldownIndicator->SetVisibility(ESlateVisibility::Hidden);
+                    // /* Enable the "use active ability" button. */
+                    // ActiveButton->SetIsEnabled(true);
+                }
+                /* If this ability can't be used. */
+                else
+                {
+                    /* Reveal the active cooldown indicator, greying out the ability icon. */
+                    ActiveCooldownIndicator->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+                    /* Disable the "use active ability" button. */
+                    ActiveButton->SetIsEnabled(false);
+                }
+            }
+            /* If this piece doesn't have an active ability... */
+            else
+            {
+                /* Hide all of the active ability widgets. */
+                ActiveAbilityBox->SetVisibility(ESlateVisibility::Collapsed);
+                /* Hide the active ability button. */
+                ActiveButton->SetVisibility(ESlateVisibility::Collapsed);
+            }
+
+
+            /* If this piece has an passive ability... */
+            if (PieceData && PieceData->PassiveName != "")
+            {
+                /* Reveal all of the passive ability widgets. */
+                PassiveAbilityBox->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+                /* If the passive ability's cooldown is active... */
+                if (NewPiece->GetPassiveCD() > 0)
+                {
+                    /* Update and display the current cooldown. */
+                    DisplayedPassiveCD->SetText(FText::FromString(FString::FromInt(NewPiece->GetPassiveCD())));
+                    DisplayedPassiveCD->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+                    /* Reveal the passive cooldown indicator, greying out the passive ability icon. Disable test visibility so that it doesn't block the button. */
+                    PassiveCooldownIndicator->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+                }
+                /* If the passive ability can be used... */
+                else
+                {
+                    /* Hide the passive cooldown indicator and the cooldown turn counter. */
+                    PassiveCooldownIndicator->SetVisibility(ESlateVisibility::Hidden);
+                    DisplayedPassiveCD->SetVisibility(ESlateVisibility::Hidden);
+                }
+
+                /* Update the number of uses remaining. */
+                EmptyBars(true, false, (PieceData->PassiveUses) - (NewPiece->GetPassiveUses()));
+            }
+            /* If this piece doesn't have a passive ability... */
+            else
+            {
+                /* Hide all of the passive ability widgets. */
+                PassiveAbilityBox->SetVisibility(ESlateVisibility::Collapsed);
             }
         }
 
@@ -381,10 +387,11 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
             PassiveAbilityBackgroundButton->WidgetStyle.Pressed.SetResourceObject(PassiveBackground_Enemy);
             PassiveAbilityBackgroundButton->WidgetStyle.Disabled.SetResourceObject(PassiveBackground_Enemy);
         }
-    }
 
-    /* Set the displayed piece pointer to the passed piece for use in other functions. */
-    DisplayedPiece = NewPiece;
+
+        /* Set the displayed piece pointer to the passed piece for use in other functions. */
+        DisplayedPiece = NewPiece;
+    }
 
     /* Return whether any displayed information has changed, if this info widget was already open. */
     return bInfoChanged;
@@ -407,7 +414,7 @@ void UMatch_PieceInfoWidget::PlayOpenCloseAnim(bool bOpen, float StartTime, int3
 void UMatch_PieceInfoWidget::RefreshWidget()
 {
     /* Refresh the information in this widget. */
-    UpdatePieceInfoWidget(DisplayedPiece, DisplayedPiece->GetLocalAlignment(), MoveButton->GetVisibility() == ESlateVisibility::Visible);
+    UpdatePieceInfoWidget(DisplayedPiece, DisplayedPiece->GetLocalAlignment());
 }
 
 bool UMatch_PieceInfoWidget::AreStatsHovered() const
