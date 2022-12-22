@@ -25,9 +25,9 @@ public:
 	/* Replicates variables. */
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	/* Ends this player's turn and starts the next player's turn. This is a wrapper for the EndTurn RPC in the game state. */
+	/* Ends this player's turn and starts the next player's turn. This is a wrapper for the SwitchTurn RPC in the game state. */
 	UFUNCTION(Server, Reliable)
-	void Server_EndTurn();
+	void Server_EndPlayerTurn();
 
 
 /* Public accessors and modifiers. */

@@ -36,7 +36,7 @@ public:
 	/* Updates all displayed piece information by retrieving data from the piece data table. Returns whether any
 	 * displayed information changed if the widget was already open. */
 	UFUNCTION()
-	bool UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlignment Alignment, bool bEnableButtons);
+	bool UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlignment Alignment);
 
 	/* Allows the base widget to play this widget's animations. */
 	UFUNCTION()

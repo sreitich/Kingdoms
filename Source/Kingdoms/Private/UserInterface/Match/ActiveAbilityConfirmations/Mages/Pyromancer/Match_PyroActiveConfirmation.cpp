@@ -8,7 +8,6 @@
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
 #include "Pieces/ParentPiece.h"
-#include "Pieces/Mages/Pyromancer.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Components/Button.h"
@@ -41,7 +40,8 @@ void UMatch_PyroActiveConfirmation::DestroyWidget(bool bReset)
 	AttackButton->SetIsEnabled(false);
 
 	/* Destroy this widget. */
-	RemoveFromParent();}
+	RemoveFromParent();
+}
 
 void UMatch_PyroActiveConfirmation::OnAttackClicked()
 {
