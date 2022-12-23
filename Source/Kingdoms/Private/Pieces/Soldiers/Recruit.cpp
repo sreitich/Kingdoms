@@ -3,8 +3,10 @@
 
 #include "Pieces/Soldiers/Recruit.h"
 
+#include "Board/BoardManager.h"
 #include "Board/BoardTile.h"
 #include "Components/PieceNetworkingComponent.h"
+#include "Framework/Match/Match_GameStateBase.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Pieces/PieceAIController.h"
@@ -49,6 +51,48 @@ bool ARecruit::TileIsInMoveRange(ABoardTile* Tile)
 	return false;
 }
 
+TArray<AActor*> ARecruit::GetValidPassiveAbilityTargets()
+{
+	/* Get every recruit in the game. */
+	TArray<AActor*> AllRecruitActors;
+	TArray<AActor*> ValidPassiveAbilityTargets;
+	UGameplayStatics::GetAllActorsOfClass(this, ARecruit::StaticClass(), AllRecruitActors);
+
+	/* Add any adjacent recruits to the array of valid passive ability targets. */
+	for (AActor* RecruitActor : AllRecruitActors)
+	{
+		if (ARecruit* RecruitPtr = Cast<ARecruit>(RecruitActor))
+		{
+			/* If the iterated recruit is laterally adjacent to this recruit and is friendly, it's a valid passive
+			 * ability target. */
+			if (GetCurrentTile()->IsAdjacentTo(false, RecruitPtr->GetCurrentTile()) && RecruitPtr->GetInstigator() == GetInstigator())
+			{
+				ValidPassiveAbilityTargets.Add(RecruitPtr);
+			}
+		}
+	}
+
+	return ValidPassiveAbilityTargets;
+}
+
+TArray<ABoardTile*> ARecruit::GetPassiveAbilityRange()
+{
+	TArray<ABoardTile*> TilesInRange;
+
+	/* Get the board manager's array of every tile on the board. */
+	for (ABoardTile* Tile : GetWorld()->GetGameState<AMatch_GameStateBase>()->BoardManager->AllTiles)
+	{
+		/* If the iterated tile is laterally adjacent to this piece's current tile, it's within this piece's passive
+		 * ability's range. */
+		if (GetCurrentTile()->IsAdjacentTo(false, Tile))
+		{
+			TilesInRange.Add(Tile);
+		}
+	}
+
+	return TilesInRange;
+}
+
 void ARecruit::BeginPlay()
 {
 	Super::BeginPlay();
@@ -63,7 +107,7 @@ void ARecruit::OnMoveToTileCompleted()
 
 	for (ARecruit* RecruitPtr : AdjacentRecruits)
 	{
-		if (!TileIsAdjacent(RecruitPtr->GetCurrentTile()))
+		if (!GetCurrentTile()->IsAdjacentTo(false, RecruitPtr->GetCurrentTile()))
 		{
 			RecruitPtr->AdjacentRecruits.Remove(this);
 			RecruitPtr->UpdatePassiveModifier(false);
@@ -93,7 +137,7 @@ void ARecruit::OnMoveToTileCompleted()
 			/* A recruit can trigger the passive ability if it is laterally adjacent, became adjacent with the most
 			 * recent move, and has the same instigator (i.e. is friendly). The IsFriendly() function doesn't work on
 			 * clients here for some reason. */
-			if (TileIsAdjacent(RecruitPtr->GetCurrentTile()) && !AdjacentRecruits.Contains(RecruitPtr) && RecruitPtr->GetInstigator() == GetInstigator())
+			if (GetCurrentTile()->IsAdjacentTo(false, RecruitPtr->GetCurrentTile()) && !AdjacentRecruits.Contains(RecruitPtr) && RecruitPtr->GetInstigator() == GetInstigator())
 			{
 				AdjacentRecruits.Add(RecruitPtr);
 				NewlyAdjacentRecruits.Add(RecruitPtr);
@@ -161,26 +205,4 @@ void ARecruit::UpdatePassiveModifier(bool bTriggerPopUp)
 			Cast<AMatch_PlayerPawn>(GetInstigator())->GetPieceNetworkingComponent()->Server_AddModifier(this, ModifierToAdd, bTriggerPopUp);
 		}
 	}
-}
-
-bool ARecruit::TileIsAdjacent(ABoardTile* Tile)
-{
-	/* Save each coordinate to make the adjacency pattern easier to read. */
-	const int XThis = GetCurrentTile()->Coordinates.X;
-	const int YThis = GetCurrentTile()->Coordinates.Y;
-	const int XOther = Tile->Coordinates.X;
-	const int YOther = Tile->Coordinates.Y;
-
-	/* Check if the given tile is laterally adjacent to this piece's tile. */
-	return
-	(
-		/* 1 forward. */
-		XThis == XOther && YThis == YOther + 1 ||
-		/* 1 backward. */
-		XThis == XOther && YThis == YOther - 1 ||
-		/* 1 right. */
-		XThis == XOther + 1 && YThis == YOther ||
-		/* 1 left. */
-		XThis == XOther - 1 && YThis == YOther
-	);
 }

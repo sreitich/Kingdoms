@@ -9,6 +9,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/TargetInterface.h"
 #include "BoardTile.generated.h"
 
 class AMatch_PlayerState;
@@ -16,7 +17,7 @@ class AParentPiece;
 class URectLightComponent;
 
 UCLASS()
-class KINGDOMS_API ABoardTile : public AActor
+class KINGDOMS_API ABoardTile : public AActor, public ITargetInterface
 {
 	GENERATED_BODY()
 	
@@ -51,6 +52,9 @@ public:
 	/* Called when the player stops hovering over this tile. */
 	UFUNCTION(BlueprintCallable, Category="Board Tile")
 	void OnEndCursorOver(UPrimitiveComponent* Component);
+
+	/* Highlights this tile depending on its occupancy and alignment. */
+	virtual void HighlightTarget() override;
 	
 	/* Reveals or hides a yellow or green reticle, indicating that the player is hovering over this tile. */
 	UFUNCTION(BlueprintCallable, Category="Board Tile")
@@ -59,6 +63,10 @@ public:
 	/* Enables/disables the emissive highlight, interpolating its brightness to glow the given color. */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Board Tile")
 	void UpdateEmissiveHighlight(bool bReveal, float PlayRate, FLinearColor Color);
+
+	/* Returns whether or not this tile is laterally (or diagonally) adjacent to the given tile. */
+	UFUNCTION(BlueprintPure, Category="Board Tile")
+	bool IsAdjacentTo(bool bDiagonal, const ABoardTile* Other) const;
 
 
 /* Public variables. */

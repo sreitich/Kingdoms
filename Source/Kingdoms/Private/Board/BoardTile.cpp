@@ -3,7 +3,9 @@
 
 #include "Board/BoardTile.h"
 
+#include "Board/BoardManager.h"
 #include "Components/RectLightComponent.h"
+#include "Framework/Match/Match_GameStateBase.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
 #include "Kismet/GameplayStatics.h"
@@ -155,6 +157,20 @@ void ABoardTile::OnEndCursorOver(UPrimitiveComponent* Component)
 	}
 }
 
+void ABoardTile::HighlightTarget()
+{
+	/* If this tile is occupied, highlight it depending on its alignment. */
+	if (IsValid(OccupyingPiece))
+	{
+		UpdateEmissiveHighlight(true, DefaultHighlightPlayRate, GetOccupyingPiece()->GetLocalAlignment() == E_Friendly ? Highlight_Friendly : Highlight_Enemy);
+	}
+	/* If this tile is empty, highlight it as unoccupied. */
+	else
+	{
+		UpdateEmissiveHighlight(true, DefaultHighlightPlayRate, Highlight_ValidUnoccupiedTile);
+	}
+}
+
 void ABoardTile::UpdateReticle(bool bReveal, bool bYellow)
 {
 	/* Exception catch: some crashes were being caused by these not being initialized yet. */
@@ -164,6 +180,45 @@ void ABoardTile::UpdateReticle(bool bReveal, bool bYellow)
 		Reticle->SetVisibility(bReveal, false);
 		ReticleMaterial->SetVectorParameterValue(TEXT("EmissiveColor"), bYellow ? ReticleColor_Hovered : ReticleColor_Selected);
 	}
+}
+
+bool ABoardTile::IsAdjacentTo(bool bDiagonal, const ABoardTile* Other) const
+{
+	/* Store this tile and the given tile's coordinates in variables for readability. */
+	const int ThisX = Coordinates.X, ThisY = Coordinates.Y;
+	const int OtherX = Other->Coordinates.X, OtherY = Other->Coordinates.Y;
+
+	/* If the tile is at a valid lateral location, return true. */
+	if
+	(
+		/* 1 forward */
+		(ThisY == OtherY + 1 && ThisX == OtherX) ||
+		/* 1 backward */
+		(ThisY == OtherY - 1 && ThisX == OtherX) ||
+		/* 1 right */
+		(ThisY == OtherY && ThisX == OtherX + 1) ||
+		/* 1 left */
+		(ThisY == OtherY && ThisX == OtherX - 1))
+	{
+		return true;
+	}
+	/* If we're also checking for diagonal adjacency and the tile is at a valid diagonal location, return true. */
+	else if (!bDiagonal &&
+	(
+		/* 1 forward, 1 right */
+		(ThisY == OtherY + 1 && ThisX == OtherX + 1) ||
+		/* 1 forward, 1 left */
+		(ThisY == OtherY + 1 && ThisX == OtherX - 1) ||
+		/* 1 backward, 1 right */
+		(ThisY == OtherY - 1 && ThisX == OtherX + 1) ||
+		/* 1 backward, 1 left */
+		(ThisY == OtherY - 1 && ThisX == OtherX - 1)))
+	{
+		return true;
+	}
+
+	/* If the given tile is not adjacent to this tile, return false. */
+	return false;
 }
 
 void ABoardTile::SetOccupyingPiece_Implementation(AParentPiece* NewOccupyingPiece)

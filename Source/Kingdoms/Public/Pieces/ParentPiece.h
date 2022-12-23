@@ -10,6 +10,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/TargetInterface.h"
 #include "ParentPiece.generated.h"
 
 class ABoardTile;
@@ -19,7 +20,7 @@ class UPopUpLocationComponent;
 class UMatch_AbilityInfoPopup;
 
 UCLASS()
-class KINGDOMS_API AParentPiece : public ACharacter
+class KINGDOMS_API AParentPiece : public ACharacter, public ITargetInterface
 {
 
 /* This piece's controller needs to access its members. */
@@ -65,6 +66,9 @@ public:
 		UFUNCTION(Server, Reliable, BlueprintCallable)
 		void Server_ResetPieceRotation();
 
+	/* Highlights this piece's tile. */
+	virtual void HighlightTarget() override;
+	
 	/* Flashes a given highlight onto the piece at a given strength for a given amount of time. Normal brightness is 4.0.
 	 * Highlighted brightness is 20.0 for action/ability targets, 10.0 for effects/modifiers. Standard play-rate is
 	 * 0.25. Standard duration is 0.5. */
@@ -134,6 +138,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Active Ability")
 	virtual void OnAbilityEffectEnded(TArray<AActor*> Targets);
 
+
+	/* Returns all actors within the passive ability range that this piece's passive ability can currently target. Checks
+	 * for validity. Overridden by pieces with a passive ability. */
+	UFUNCTION(BlueprintPure, Category="Passive Ability")
+	virtual TArray<AActor*> GetValidPassiveAbilityTargets();
+
+		/* Returns the tiles within range of this piece's passive ability, without checking for validity. Overridden by
+		 * pieces with a passive ability.*/
+		UFUNCTION(BlueprintPure, Category="Passive Ability")
+		virtual TArray<ABoardTile*> GetPassiveAbilityRange();
 
 	/* Called when a piece's passive ability is triggered, if it has one. Overridden by pieces with a passive ability. */
 	UFUNCTION(Category="Passive Ability")

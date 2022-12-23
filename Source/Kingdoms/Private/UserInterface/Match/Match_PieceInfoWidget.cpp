@@ -473,6 +473,15 @@ void UMatch_PieceInfoWidget::OnActiveHovered()
         /* Align the pop-up to the left if it's for a friendly piece. Align it to the right if it's for an enemy piece. */
         CanvasSlot->SetAlignment(PieceAlignment == E_Friendly ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
     }
+
+    /* Highlight all valid active ability targets. */
+    for (AActor* Target : DisplayedPiece->GetValidActiveAbilityTargets())
+    {
+        if (Target->GetClass()->ImplementsInterface(UTargetInterface::StaticClass()))
+        {
+            Cast<ITargetInterface>(Target)->HighlightTarget();
+        }
+    }
 }
 
 void UMatch_PieceInfoWidget::OnPassiveHovered()
@@ -494,6 +503,15 @@ void UMatch_PieceInfoWidget::OnPassiveHovered()
         CanvasSlot->SetPosition(FVector2D(PieceAlignment == E_Friendly ? PassiveAbilityBackgroundButton->GetDesiredSize().X - 20.0f : 20.0f, -PassiveAbilityBackgroundButton->GetDesiredSize().Y + 20.0f));
         /* Align the pop-up to the left if it's for a friendly piece. Align it to the right if it's for an enemy piece. */
         CanvasSlot->SetAlignment(PieceAlignment == E_Friendly ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
+    }
+
+    /* Highlight all valid passive ability targets. */
+    for (AActor* Target : DisplayedPiece->GetValidPassiveAbilityTargets())
+    {
+        if (Target->GetClass()->ImplementsInterface(UTargetInterface::StaticClass()))
+        {
+            Cast<ITargetInterface>(Target)->HighlightTarget();
+        }
     }
 }
 
@@ -525,16 +543,19 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
         /* Set a new highlight for every tile that this piece can move to to show the player their options. */
         for (ABoardTile* Tile : DisplayedPiece->GetValidMoveTiles())
         {
-            /* If this tile is occupied by an enemy piece, highlight it as a valid attack target. */
-            if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetLocalAlignment() == E_Hostile)
-            {
-                Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_Enemy);
-            }
-            /* If the tile is empty, highlight it as a valid target destination. */
-            else if (!IsValid(Tile->GetOccupyingPiece()))
-            {
-                Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_ValidUnoccupiedTile);
-            }
+            /* Highlight the tile depending on its alignment and occupancy. */
+            Tile->HighlightTarget();
+
+            // /* If this tile is occupied by an enemy piece, highlight it as a valid attack target. */
+            // if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetLocalAlignment() == E_Hostile)
+            // {
+            //     Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_Enemy);
+            // }
+            // /* If the tile is empty, highlight it as a valid target destination. */
+            // else if (!IsValid(Tile->GetOccupyingPiece()))
+            // {
+            //     Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_ValidUnoccupiedTile);
+            // }
         }
     }
 }

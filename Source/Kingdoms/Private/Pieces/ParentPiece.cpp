@@ -9,7 +9,6 @@
 #include "Board/ModifierBoardPopup.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/PopUpLocationComponent.h"
-#include "Components/PieceNetworkingComponent.h"
 #include "Framework/Match/Match_GameStateBase.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
@@ -23,7 +22,6 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/ServerCommunicationComponent.h"
 #include "Framework/Match/Match_PlayerController.h"
-#include "UserInterface/Match/Match_ActiveAbilityConfirmation.h"
 
 AParentPiece::AParentPiece()
 {
@@ -157,6 +155,12 @@ void AParentPiece::Server_ResetPieceRotation_Implementation()
 	const AActor* PlayerStart = GameStatePtr->PlayerStarts[PlayerIndex - 1];
 	/* Interpolate this actor's rotation to the rotation that its owning player was spawned at. */
 	InterpolatePieceRotation(nullptr, GetActorRotation(),PlayerStart->GetActorRotation(), false, false);
+}
+
+void AParentPiece::HighlightTarget()
+{
+	/* Highlight this piece's tile depending on its alignment. */
+	CurrentTile->UpdateEmissiveHighlight(true, CurrentTile->DefaultHighlightPlayRate, GetLocalAlignment() == E_Friendly ? CurrentTile->Highlight_Friendly : CurrentTile->Highlight_Enemy);
 }
 
 void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float PlayRate, float Duration, bool bIndefiniteDuration)
@@ -313,43 +317,15 @@ bool AParentPiece::TileIsInMoveRange(ABoardTile* Tile)
 
 void AParentPiece::OnActiveClicked()
 {
-	/* By default, highlight every target that the player can select. This can be iterated on if there are abilities that
-	* can target things other than pieces or tiles. */
+	/* By default, highlight every target that the player can select. This can be iterated on if there are more actors
+	 * that can be targeted for abilities, in which case they just need to implement the target interface. */
 	for (AActor* Target : GetValidActiveAbilityTargets())
 	{
-		/* If the target is a tile, highlight it, depending on if this ability targets tiles or pieces. */
-		if (ABoardTile* Tile = Cast<ABoardTile>(Target))
+		/* If this target implements the target interface (which all possible target actors should), highlight it. */
+		if (Target->GetClass()->ImplementsInterface(UTargetInterface::StaticClass()))
 		{
-			/* If the piece data table object was set... */
-			if (PieceDataTable)
-			{
-				/* Get this piece's row from the piece data. */
-				static const FString ContextString(TEXT("Piece Data Struct"));
-				const FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(PieceID, ContextString, true);
-
-				/* If the data table row was found... */
-				if (PieceData)
-				{
-					/* If this ability only targets tiles, highlight the target tile yellow. */
-					if (PieceData->bActiveTargetsTiles)
-					{
-						Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_ValidUnoccupiedTile);
-					}
-					/* If this ability targets pieces, highlight the target tile depending on the piece alignment. */
-					else if (IsValid(Tile->GetOccupyingPiece()) && !PieceData->bActiveTargetsTiles)
-					{
-						Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->GetOccupyingPiece()->GetLocalAlignment() == E_Friendly ? Tile->Highlight_Friendly : Tile->Highlight_Enemy);
-					}
-				}
-			}
+			Cast<ITargetInterface>(Target)->HighlightTarget();
 		}
-		/* If the target was a piece, highlight that piece's tile depending on its allegiance. */
-		else if (const AParentPiece* Piece = Cast<AParentPiece>(Target))
-		{
-			ABoardTile* const TargetPieceTile = Piece->GetCurrentTile();
-			TargetPieceTile->UpdateEmissiveHighlight(true, TargetPieceTile->DefaultHighlightPlayRate, Piece->GetLocalAlignment() == E_Friendly ? TargetPieceTile->Highlight_Friendly : TargetPieceTile->Highlight_Enemy);
-		}
-		/* This can be iterated on if we add pieces that can target things other than tiles or pieces in the future. */
 	}
 }
 
@@ -413,6 +389,24 @@ void AParentPiece::OnAbilityEffectEnded(TArray<AActor*> Targets)
 	/* Not all pieces have abilities with effects. */
 	// UE_LOG(LogTemp, Error, TEXT("OnAbilityEffectEnded called on a piece that does not implement OnAbilityEffectEnded."));
 	UE_LOG(LogTemp, Error, TEXT("Remaining active uses: %i"), GetActiveUses());
+}
+
+TArray<AActor*> AParentPiece::GetValidPassiveAbilityTargets()
+{
+	/* Not all pieces have passive abilities. */
+	UE_LOG(LogTemp, Error, TEXT("GetValidPassiveAbilityTargets called on a piece without a passive ability."));
+
+	/* Return an empty array. */
+	return TArray<AActor*>();
+}
+
+TArray<ABoardTile*> AParentPiece::GetPassiveAbilityRange()
+{
+	/* Not all pieces have passive abilities. */
+	UE_LOG(LogTemp, Error, TEXT("GetPassiveAbilityRange called on a piece without a passive ability."));
+
+	/* Return an empty array. */
+	return TArray<ABoardTile*>();
 }
 
 void AParentPiece::OnPassiveAbility(TArray<AActor*> Targets)

@@ -31,6 +31,12 @@ public:
 	/* Tests if the given tile's coordinates match any of this piece's movement patterns.. */
 	virtual bool TileIsInMoveRange(ABoardTile* Tile) override;
 
+	/* Returns all of this passive ability's valid targets. */
+	virtual TArray<AActor*> GetValidPassiveAbilityTargets() override;
+
+	/* Returns all tiles within range of this passive ability. Does not check for validity. */
+	virtual TArray<ABoardTile*> GetPassiveAbilityRange() override;
+
 
 /* Public variables. */
 public:
@@ -52,9 +58,6 @@ protected:
 
 	/* Update the passive modifier depending on how many recruits are in the adjacent recruit array. */
 	void UpdatePassiveModifier(bool bTriggerPopUp);
-	
-	/* Returns "true" if the given tile is laterally adjacent to this piece's tile. */
-	bool TileIsAdjacent(ABoardTile* Tile);
 
 
 /* Protected variables. */
