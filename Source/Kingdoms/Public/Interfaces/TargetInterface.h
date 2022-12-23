@@ -24,4 +24,7 @@ public:
 
 	/* Highlights a target depending on its class. */
 	virtual void HighlightTarget() = 0;
+
+	/* Removes the highlight from a target depending on its class. */
+	virtual void RemoveTargetHighlight() = 0;
 };

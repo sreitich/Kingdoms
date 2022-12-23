@@ -69,6 +69,9 @@ public:
 	/* Highlights this piece's tile. */
 	virtual void HighlightTarget() override;
 	
+	/* Removes the highlight from this piece's tile. */
+	virtual void RemoveTargetHighlight() override;
+	
 	/* Flashes a given highlight onto the piece at a given strength for a given amount of time. Normal brightness is 4.0.
 	 * Highlighted brightness is 20.0 for action/ability targets, 10.0 for effects/modifiers. Standard play-rate is
 	 * 0.25. Standard duration is 0.5. */

@@ -160,7 +160,13 @@ void AParentPiece::Server_ResetPieceRotation_Implementation()
 void AParentPiece::HighlightTarget()
 {
 	/* Highlight this piece's tile depending on its alignment. */
-	CurrentTile->UpdateEmissiveHighlight(true, CurrentTile->DefaultHighlightPlayRate, GetLocalAlignment() == E_Friendly ? CurrentTile->Highlight_Friendly : CurrentTile->Highlight_Enemy);
+	CurrentTile->HighlightTarget();
+}
+
+void AParentPiece::RemoveTargetHighlight()
+{
+	/* Remove the highlight from this piece's tile. */
+	CurrentTile->RemoveTargetHighlight();
 }
 
 void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float PlayRate, float Duration, bool bIndefiniteDuration)
@@ -258,8 +264,9 @@ TArray<ABoardTile*> AParentPiece::GetValidMoveTiles()
 	/* Get the board manager's array of every tile on the board. */
 	for (ABoardTile* Tile : GetWorld()->GetGameState<AMatch_GameStateBase>()->BoardManager->AllTiles)
 	{
-		/* If the tile's coordinates match with one of this piece's move patterns and the path to the tile is clear, it is a valid destination. */
-		if (TileIsInMoveRange(Tile) && PathToTileIsClear(Tile))
+		/* If the tile's coordinates match with one of this piece's move patterns, and the path to the tile is clear,
+		 * and it is empty or not occupied by a friendly piece, it is a valid destination. */
+		if (TileIsInMoveRange(Tile) && PathToTileIsClear(Tile) && (!IsValid(Tile->GetOccupyingPiece()) || Tile->GetOccupyingPiece()->GetLocalAlignment() != E_Friendly))
 		{
 			ValidTiles.Add(Tile);
 		}

@@ -171,6 +171,12 @@ void ABoardTile::HighlightTarget()
 	}
 }
 
+void ABoardTile::RemoveTargetHighlight()
+{
+	/* Hide this tile's highlight. */
+	UpdateEmissiveHighlight(false, DefaultHighlightPlayRate, EmissiveHighlight->GetLightColor());
+}
+
 void ABoardTile::UpdateReticle(bool bReveal, bool bYellow)
 {
 	/* Exception catch: some crashes were being caused by these not being initialized yet. */
@@ -202,8 +208,9 @@ bool ABoardTile::IsAdjacentTo(bool bDiagonal, const ABoardTile* Other) const
 	{
 		return true;
 	}
+
 	/* If we're also checking for diagonal adjacency and the tile is at a valid diagonal location, return true. */
-	else if (!bDiagonal &&
+	if (bDiagonal &&
 	(
 		/* 1 forward, 1 right */
 		(ThisY == OtherY + 1 && ThisX == OtherX + 1) ||

@@ -98,9 +98,13 @@ protected:
 	UFUNCTION()
 	void OnPassiveHovered();
 
-	/* Destroys the ability info pop-up. */
+	/* Destroys the active ability info pop-up. */
 	UFUNCTION()
-	void OnAbilityUnhovered();
+	void OnActiveUnhovered();
+	
+	/* Destroys the passive ability info pop-up. */
+	UFUNCTION()
+	void OnPassiveUnhovered();
 
 
 	/* Begins targeting a location to move to or to attack. */

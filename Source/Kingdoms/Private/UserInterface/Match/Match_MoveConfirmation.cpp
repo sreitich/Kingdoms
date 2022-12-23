@@ -62,7 +62,7 @@ void UMatch_MoveConfirmation::DestroyWidget(bool bReset)
         {
             for (ABoardTile* Tile : PendingPiece->GetValidMoveTiles())
             {
-                Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
+                Tile->RemoveTargetHighlight();
             }
         }
 

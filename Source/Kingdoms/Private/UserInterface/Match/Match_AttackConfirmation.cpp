@@ -104,7 +104,7 @@ void UMatch_AttackConfirmation::DestroyWidget(bool bReset)
 		{
 			for (ABoardTile* Tile : PendingFriendlyPiece->GetValidMoveTiles())
 			{
-				Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
+				Tile->RemoveTargetHighlight();
 			}
 		}
 

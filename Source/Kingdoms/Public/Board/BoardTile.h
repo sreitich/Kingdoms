@@ -55,6 +55,9 @@ public:
 
 	/* Highlights this tile depending on its occupancy and alignment. */
 	virtual void HighlightTarget() override;
+
+	/* Removes the highlight from this tile. */
+	virtual void RemoveTargetHighlight() override;
 	
 	/* Reveals or hides a yellow or green reticle, indicating that the player is hovering over this tile. */
 	UFUNCTION(BlueprintCallable, Category="Board Tile")

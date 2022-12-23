@@ -90,7 +90,7 @@ void UMatch_ActiveAbilityConfirmation::DestroyWidget()
 	{
 		for (ABoardTile* Tile : PieceUsingAbility->GetActiveAbilityRange())
 		{
-			Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
+			Tile->RemoveTargetHighlight();
 		}
 	}
 

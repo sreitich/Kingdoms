@@ -29,8 +29,8 @@ void UMatch_PieceInfoWidget::NativeConstruct()
     PassiveAbilityBackgroundButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnPassiveHovered);
     
     /* Bind the ability buttons to destroy the ability info widget pop-up. */
-    ActiveAbilityBackgroundButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnAbilityUnhovered);
-    PassiveAbilityBackgroundButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnAbilityUnhovered);
+    ActiveAbilityBackgroundButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnActiveUnhovered);
+    PassiveAbilityBackgroundButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnPassiveUnhovered);
 
     /* Bind the "move" and "use active" buttons to activate their effects. */
     MoveButton->OnClicked.AddDynamic(this, &UMatch_PieceInfoWidget::OnMoveClicked);
@@ -515,14 +515,41 @@ void UMatch_PieceInfoWidget::OnPassiveHovered()
     }
 }
 
-void UMatch_PieceInfoWidget::OnAbilityUnhovered()
+void UMatch_PieceInfoWidget::OnActiveUnhovered()
 {
-    /* If an ability info widget is currently displayed... */
+    /* Destroy the ability info widget if it's currently displayed. */
     if (IsValid(AbilityInfoPopup))
     {
-        /* Destroy the widget. */
         AbilityInfoPopup->RemoveFromParent();
         AbilityInfoPopup = nullptr;
+    }
+
+    /* Remove the highlight from every valid active ability target. */
+    for (AActor* Target : DisplayedPiece->GetValidActiveAbilityTargets())
+    {
+        if (Target->GetClass()->ImplementsInterface(UTargetInterface::StaticClass()))
+        {
+            Cast<ITargetInterface>(Target)->RemoveTargetHighlight();
+        }
+    }
+}
+
+void UMatch_PieceInfoWidget::OnPassiveUnhovered()
+{
+    /* Destroy the ability info widget if it's currently displayed. */
+    if (IsValid(AbilityInfoPopup))
+    {
+        AbilityInfoPopup->RemoveFromParent();
+        AbilityInfoPopup = nullptr;
+    }
+
+    /* Remove the highlight from every valid passive ability target. */
+    for (AActor* Target : DisplayedPiece->GetValidPassiveAbilityTargets())
+    {
+        if (Target->GetClass()->ImplementsInterface(UTargetInterface::StaticClass()))
+        {
+            Cast<ITargetInterface>(Target)->RemoveTargetHighlight();
+        }
     }
 }
 
