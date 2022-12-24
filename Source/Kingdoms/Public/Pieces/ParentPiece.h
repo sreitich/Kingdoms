@@ -359,15 +359,16 @@ public:
 	UAnimSequenceBase* PassiveAbilityAnimation;
 
 	/* The particle effect to spawn on opponent pieces when this piece attacks them. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Effects")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Dealing Damage Effects")
 	UParticleSystem* DamagingParticle;
 
-	/* Which mesh component to play the damage particle effect on. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Effects")
+	/* Which mesh component to play the attacking piece's damage particle effect on when taking damage. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Taking Damage Effects")
 	USkeletalMeshComponent* DamagedParticleAttachment;
 
-	/* The transform relative to the attached mesh that the damage particle effect should be played with. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Effects")
+	/* The transform relative to the attached mesh that the attacking damage particle effect should be played with
+	 * when taking damage. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Taking Damage Effects")
 	FTransform DamagedParticleTransform;
 
 

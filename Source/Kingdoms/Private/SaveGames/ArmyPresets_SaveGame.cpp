@@ -12,10 +12,11 @@ UArmyPresets_SaveGame::UArmyPresets_SaveGame()
 	/* Initialize five empty army presets. */
 	ArmyPresets.Init(FArmyPresetStruct(), 5);
 	
-	/* 1 knight, 1 pyromancer, and 1 king. */
+	/* 1 knight, 1 pyromancer, 1 guardian, and 1 king. */
 	ArmyPresets[0].ArmyName = TEXT("Starting Army");
 	ArmyPresets[0].Pieces.Add(TEXT("S-01"));
 	ArmyPresets[0].Pieces.Add(TEXT("M-01"));
+	ArmyPresets[0].Pieces.Add(TEXT("P-01"));
 	ArmyPresets[0].Pieces.Add(TEXT("C-01"));
 
 	/* 3 academy recruits. */
@@ -23,4 +24,19 @@ UArmyPresets_SaveGame::UArmyPresets_SaveGame()
 	ArmyPresets[1].Pieces.Add(TEXT("S-02"));
 	ArmyPresets[1].Pieces.Add(TEXT("S-02"));
 	ArmyPresets[1].Pieces.Add(TEXT("S-02"));
+
+	/* 6 knights, 2 pyromancers, 2 guardians, 1 assassin, and 1 king. */
+	ArmyPresets[2].ArmyName = TEXT("Game-Legal Army");
+	ArmyPresets[2].Pieces.Add(TEXT("S-01"));
+	ArmyPresets[2].Pieces.Add(TEXT("S-01"));
+	ArmyPresets[2].Pieces.Add(TEXT("S-01"));
+	ArmyPresets[2].Pieces.Add(TEXT("S-01"));
+	ArmyPresets[2].Pieces.Add(TEXT("S-01"));
+	ArmyPresets[2].Pieces.Add(TEXT("S-01"));
+	ArmyPresets[2].Pieces.Add(TEXT("M-01"));
+	ArmyPresets[2].Pieces.Add(TEXT("M-01"));
+	ArmyPresets[2].Pieces.Add(TEXT("P-01"));
+	ArmyPresets[2].Pieces.Add(TEXT("P-01"));
+	// ArmyPresets[2].Pieces.Add(TEXT("R-01"));
+	ArmyPresets[2].Pieces.Add(TEXT("C-01"));
 }

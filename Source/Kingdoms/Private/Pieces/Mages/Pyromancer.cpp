@@ -50,7 +50,7 @@ bool APyromancer::TileIsInMoveRange(ABoardTile* Tile)
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
