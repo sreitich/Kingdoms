@@ -809,6 +809,15 @@ void AParentPiece::OnRep_ActiveCooldown()
 
 void AParentPiece::OnRep_ActiveUses()
 {
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Error, TEXT("OnRep_ActiveUses called on server."));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("OnRep_ActiveUses called on client."));
+	}
+	
 	/* Refresh any piece info widgets currently displaying this piece's info. */
 	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets();
 }
@@ -859,7 +868,6 @@ void AParentPiece::Server_SetActiveCD(int NewActiveCD)
 
 void AParentPiece::Server_SetActiveUses(int NewActiveUses)
 {
-	UE_LOG(LogTemp, Error, TEXT("New uses on server: %i"), NewActiveUses);
 	/* Set this piece's remaining active ability uses on the server. */
 	ActiveUses = NewActiveUses;
 
