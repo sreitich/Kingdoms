@@ -194,10 +194,11 @@ TArray<ABoardTile*> APyromancer::GetActiveAbilityRange()
 
 void APyromancer::OnActiveAbility(TArray<AActor*> Targets)
 {
-	/* Updates the player's turn progress, trigger the ability cooldown, and decrement the ability's limited uses. */
+	/* Update the player's turn progress, trigger the ability cooldown, and decrement the ability's limited uses. */
 	Super::OnActiveAbility(Targets);
 
-	/* Call the blueprint implementation of the ability, which begins the power-up phase. */
+	/* Call the blueprint implementation of the ability, which begins the power-up phase. Piece_UpdateActiveConfirmation
+	 * ensures that given targets are always pieces. */
 	BP_OnActiveAbility(Cast<AParentPiece>(Targets[0]));
 }
 

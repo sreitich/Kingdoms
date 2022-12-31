@@ -26,7 +26,7 @@ public:
 	AMatch_GameStateBase();
 
 	/* Replicates variables. */
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/* Lets players start placing their pieces. */
 	UFUNCTION()

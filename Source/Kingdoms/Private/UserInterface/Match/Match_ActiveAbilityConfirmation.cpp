@@ -5,7 +5,6 @@
 
 #include "Board/BoardTile.h"
 #include "Components/Button.h"
-#include "Components/RectLightComponent.h"
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
 #include "Pieces/ParentPiece.h"

@@ -395,7 +395,6 @@ void AParentPiece::OnAbilityEffectEnded(TArray<AActor*> Targets)
 {
 	/* Not all pieces have abilities with effects. */
 	// UE_LOG(LogTemp, Error, TEXT("OnAbilityEffectEnded called on a piece that does not implement OnAbilityEffectEnded."));
-	UE_LOG(LogTemp, Error, TEXT("Remaining active uses: %i"), GetActiveUses());
 }
 
 TArray<AActor*> AParentPiece::GetValidPassiveAbilityTargets()
@@ -809,15 +808,6 @@ void AParentPiece::OnRep_ActiveCooldown()
 
 void AParentPiece::OnRep_ActiveUses()
 {
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Error, TEXT("OnRep_ActiveUses called on server."));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("OnRep_ActiveUses called on client."));
-	}
-	
 	/* Refresh any piece info widgets currently displaying this piece's info. */
 	Cast<AMatch_PlayerPawn>(UGameplayStatics::GetPlayerPawn(this, 0))->Client_RefreshPieceInfoWidgets();
 }
