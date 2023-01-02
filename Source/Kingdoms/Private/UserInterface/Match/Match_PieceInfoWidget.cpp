@@ -438,9 +438,25 @@ void UMatch_PieceInfoWidget::OnStatsHovered()
         /* Attach the list to the stats button. */
         ModifierListWrapper->AddChild(ModifierList);
 
-        /* Offset the widget based on the size of the statistics overlay and whether or not the displayed piece is friendly. */
+        /* Check if this piece's strength is affected by a modifier. If not, then this piece's modifiers are only
+         * affecting its armor. */
+        bool bStrengthModified = false;
+        for (const FModifier Mod : ActiveModifiers)
+        {
+            if (Mod.StrengthChange != 0)
+            {
+                bStrengthModified = true;
+                break;
+            }
+        }
+
+        /* If this piece's armor is the only modified stat, move it halfway down the stats box to position it above the
+         * armor stat. Otherwise, leave it at the top, by the strength stat. */
+        const float InitialOffset = bStrengthModified ? 0.0f : StatsButtonOverlay->GetDesiredSize().Y / 2.0f;
+        
+        /* Offset the widget based on the modified stat and whether or not the displayed piece is friendly. */
         UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(ModifierList->ModifierListOverlay->Slot);
-        CanvasSlot->SetPosition(FVector2D(PieceAlignment == E_Friendly ? StatsButtonOverlay->GetDesiredSize().X - 20.0f : 20.0f, -StatsButtonOverlay->GetDesiredSize().Y + 20.0f));
+        CanvasSlot->SetPosition(FVector2D(PieceAlignment == E_Friendly ? StatsButtonOverlay->GetDesiredSize().X - 20.0f : 20.0f, -StatsButtonOverlay->GetDesiredSize().Y + InitialOffset + 20.0f));
 
         /* Align the pop-up to the left if it's for a friendly piece. Align it to the right if it's for an enemy piece. */
         CanvasSlot->SetAlignment(PieceAlignment == E_Friendly ? FVector2D(0.0f, 1.0f) : FVector2D(1.0f, 1.0f));
