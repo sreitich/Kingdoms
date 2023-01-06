@@ -579,51 +579,71 @@ void UMatch_PieceInfoWidget::OnPassiveUnhovered()
 
 void UMatch_PieceInfoWidget::OnMoveClicked()
 {
-    /* Clear the piece info widgets but keep the currently selected piece. */
-    GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false, false, false, false, true);
-    
-    /* Set the player's state to be selecting a place to move. */
-    GetOwningPlayerState<AMatch_PlayerState>(false)->SetPlayerStatus(E_SelectingTarget_Move);
-
-    /* Create a new move confirmation widget. */
-    GetOwningPlayer<AMatch_PlayerController>()->CreateMoveConfirmationWidget(false, DisplayedPiece);
-    
-    /* Make sure that there's a valid displayed piece. */
-    if (IsValid(DisplayedPiece))
+    /* Safety check. Ensure that the player is in the correct state to be taking actions. */
+    const AMatch_PlayerState* PlayerStatePtr = GetOwningPlayerState<AMatch_PlayerState>();
+    if (IsValid(PlayerStatePtr) && PlayerStatePtr->GetCurrentPlayerStatus() == E_SelectingAction)
     {
-        /* Set a new highlight for every tile that this piece can move to to show the player their options. */
-        for (ABoardTile* Tile : DisplayedPiece->GetValidMoveTiles())
-        {
-            /* Highlight the tile depending on its alignment and occupancy. */
-            Tile->HighlightTarget();
+        /* Clear the piece info widgets but keep the currently selected piece. */
+        GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false, false, false, false, true);
+        
+        /* Set the player's state to be selecting a place to move. */
+        GetOwningPlayerState<AMatch_PlayerState>(false)->SetPlayerStatus(E_SelectingTarget_Move);
 
-            // /* If this tile is occupied by an enemy piece, highlight it as a valid attack target. */
-            // if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetLocalAlignment() == E_Hostile)
-            // {
-            //     Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_Enemy);
-            // }
-            // /* If the tile is empty, highlight it as a valid target destination. */
-            // else if (!IsValid(Tile->GetOccupyingPiece()))
-            // {
-            //     Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_ValidUnoccupiedTile);
-            // }
+        /* Create a new move confirmation widget. */
+        GetOwningPlayer<AMatch_PlayerController>()->CreateMoveConfirmationWidget(false, DisplayedPiece);
+        
+        /* Make sure that there's a valid displayed piece. */
+        if (IsValid(DisplayedPiece))
+        {
+            /* Set a new highlight for every tile that this piece can move to to show the player their options. */
+            for (ABoardTile* Tile : DisplayedPiece->GetValidMoveTiles())
+            {
+                /* Highlight the tile depending on its alignment and occupancy. */
+                Tile->HighlightTarget();
+
+                // /* If this tile is occupied by an enemy piece, highlight it as a valid attack target. */
+                // if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetLocalAlignment() == E_Hostile)
+                // {
+                //     Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_Enemy);
+                // }
+                // /* If the tile is empty, highlight it as a valid target destination. */
+                // else if (!IsValid(Tile->GetOccupyingPiece()))
+                // {
+                //     Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_ValidUnoccupiedTile);
+                // }
+            }
         }
+    }
+    /* If the player is somehow not in the correct state, refresh this widget to properly reflect their actual state. */
+    else
+    {
+        RefreshWidget();
     }
 }
 
 void UMatch_PieceInfoWidget::OnUseActiveClicked()
 {
-    /* Clear the piece info widgets but keep the currently selected piece. */
-    GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false, false, false, false, true);
-
-    /* Set the player's state to be selecting targets for an active ability. */
-    GetOwningPlayerState<AMatch_PlayerState>(false)->SetPlayerStatus(E_SelectingTarget_ActiveAbility);
-
-    /* Make sure that there's a valid displayed piece. */
-    if (IsValid(DisplayedPiece))
+    /* Safety check. Ensure that the player is in the correct state to be taking actions. */
+    const AMatch_PlayerState* PlayerStatePtr = GetOwningPlayerState<AMatch_PlayerState>();
+    if (IsValid(PlayerStatePtr) && PlayerStatePtr->GetCurrentPlayerStatus() == E_SelectingAction)
     {
-        /* Call the ability-specific code used when the active ability is selected. By default, this just highlights
-         * all of the valid targets. */
-        DisplayedPiece->OnActiveClicked();
+        /* Clear the piece info widgets but keep the currently selected piece. */
+        GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false, false, false, false, true);
+
+        /* Set the player's state to be selecting targets for an active ability. */
+        GetOwningPlayerState<AMatch_PlayerState>(false)->SetPlayerStatus(E_SelectingTarget_ActiveAbility);
+
+        /* Make sure that there's a valid displayed piece. */
+        if (IsValid(DisplayedPiece))
+        {
+            /* Call the ability-specific code used when the active ability is selected. By default, this just highlights
+             * all of the valid targets. */
+            DisplayedPiece->OnActiveClicked();
+        }
+    }
+    /* If the player is somehow not in the correct state, refresh this widget to properly reflect their actual state. */
+    else
+    {
+        RefreshWidget();
     }
 }
