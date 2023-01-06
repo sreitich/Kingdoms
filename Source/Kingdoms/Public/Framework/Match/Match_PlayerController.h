@@ -71,8 +71,8 @@ public:
 	UFUNCTION(Category="User Interface")
 	void UpdateActionIndicator(bool bUsed, bool bMoveAction) const;
 
-	/* Enables or disables the end turn button. */
-	UFUNCTION(Category="User Interface")
+	/* Enables or disables the "end turn" button. */
+	UFUNCTION(BlueprintCallable, Category="User Interface")
 	void UpdateEndTurnButton(bool bEnable) const;
 
 	/* Reveals and updates or hides one of the piece info widgets. */
@@ -111,11 +111,6 @@ public:
 		/* Plays a given animation on the attack graphic. */
 		UFUNCTION(BlueprintCallable, Category="User Interface")
 		void PlayAttackGraphicAnimation(EAttackGraphicAnimation AttackGraphicAnim);
-
-	// DEPRECATED
-	/* Sets a reference to or destroys an active ability confirmation pop-up. The pop-up is created by the piece that it corresponds to. */
-	UFUNCTION(Category="BlueprintInterface")
-	void UpdateActiveAbilityConfirmationWidget(bool bDestroy, UUserWidget* NewConfirmationWidget);
 
 
 /* Protected functions. */

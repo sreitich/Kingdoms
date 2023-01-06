@@ -184,24 +184,33 @@ void UMatch_AttackConfirmation::UpdateResultPreviewText() const
 
 void UMatch_AttackConfirmation::OnAttackClicked()
 {
-	/* Parameters used for an attack from a move. */
-	FAttackInfo AttackInfo;
-	AttackInfo.Attacker = PendingFriendlyPiece;
-	AttackInfo.Defender = PendingEnemyPiece;
-	AttackInfo.bMoveTo = true;
-	AttackInfo.bMoved = false;
-	AttackInfo.bDefenderFights = true;
-	AttackInfo.bTakePlace = true;
-	
-	/* Tell the server to execute the attack logic with authority and on each client. */
-	GetOwningPlayerPawn<AMatch_PlayerPawn>()->Server_Attack(AttackInfo, true);
+	/* Get the local player's controller, player state, and pawn. */
+	AMatch_PlayerController* PlayerControllerPtr = GetOwningPlayer<AMatch_PlayerController>();
+	AMatch_PlayerState* PlayerStatePtr = GetOwningPlayerState<AMatch_PlayerState>();
+	AMatch_PlayerPawn* PlayerPawnPtr = GetOwningPlayerPawn<AMatch_PlayerPawn>();
+	if (PlayerControllerPtr && PlayerStatePtr && PlayerPawnPtr)
+	{
+		/* Parameters used for an attack from a move. */
+		FAttackInfo AttackInfo;
+		AttackInfo.Attacker = PendingFriendlyPiece;
+		AttackInfo.Defender = PendingEnemyPiece;
+		AttackInfo.bMoveTo = true;
+		AttackInfo.bMoved = false;
+		AttackInfo.bDefenderFights = true;
+		AttackInfo.bTakePlace = true;
 
-	/* Record that the player has used their move action for this turn, preventing them from using another move action until their next turn. */
-	GetOwningPlayerState<AMatch_PlayerState>()->SetMoveActionUsed();
+		/* Record that the player has used their move action for this turn, preventing them from using another move action until their next turn. */
+		PlayerStatePtr->SetMoveActionUsed();
 
-	/* Destroy this widget through the player controller to clean up references. */
-	if (AMatch_PlayerController* PlayerControllerPtr = Cast<AMatch_PlayerController>(GetOwningPlayer()))
+		/* Set that the player is in a sequence to prevent them from taking actions or ending their turn until the sequence ends. */
+		PlayerStatePtr->SetIsInSequence(true);
+
+		/* Tell the server to execute the attack logic with authority and on each client. */
+		PlayerPawnPtr->Server_Attack(AttackInfo, true);
+
+		/* Destroy this widget through the player controller to clean up references. */
 		PlayerControllerPtr->CreateAttackConfirmationWidget(true, nullptr);
+	}
 }
 
 void UMatch_AttackConfirmation::OnCancelClicked()

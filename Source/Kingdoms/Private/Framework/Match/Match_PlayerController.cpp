@@ -438,23 +438,23 @@ void AMatch_PlayerController::PlayAttackGraphicAnimation(EAttackGraphicAnimation
     }
 }
 
-void AMatch_PlayerController::UpdateActiveAbilityConfirmationWidget(bool bDestroy, UUserWidget* NewConfirmationWidget)
-{
-    /* Only execute on local client. */
-    if (IsLocalPlayerController())
-    {
-        /* If the widget needs to be destroyed and it's already been created. */
-        if (bDestroy && ActiveAbilityConfirmationWidget)
-        {
-            /* Each widget overrides the Destruct function to reset everything before being destroyed. */
-            ActiveAbilityConfirmationWidget->Destruct();
-
-            ActiveAbilityConfirmationWidget = nullptr;
-        }
-        /* If this class's reference to the confirmation widget needs to be set. */
-        else if (!bDestroy && NewConfirmationWidget)
-        {
-            ActiveAbilityConfirmationWidget = NewConfirmationWidget;
-        }
-    }
-}
+// void AMatch_PlayerController::UpdateActiveAbilityConfirmationWidget(bool bDestroy, UUserWidget* NewConfirmationWidget)
+// {
+//     /* Only execute on local client. */
+//     if (IsLocalPlayerController())
+//     {
+//         /* If the widget needs to be destroyed and it's already been created. */
+//         if (bDestroy && ActiveAbilityConfirmationWidget)
+//         {
+//             /* Each widget overrides the Destruct function to reset everything before being destroyed. */
+//             ActiveAbilityConfirmationWidget->Destruct();
+//
+//             ActiveAbilityConfirmationWidget = nullptr;
+//         }
+//         /* If this class's reference to the confirmation widget needs to be set. */
+//         else if (!bDestroy && NewConfirmationWidget)
+//         {
+//             ActiveAbilityConfirmationWidget = NewConfirmationWidget;
+//         }
+//     }
+// }

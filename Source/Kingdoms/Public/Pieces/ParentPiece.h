@@ -132,9 +132,14 @@ public:
 		virtual TArray<ABoardTile*> GetActiveAbilityRange();
 
 	/* Called when a piece uses an active ability, if it has one. Called on server by default. Default implementation
-	 * triggers cool-downs and decrements uses as needed. Overridden by pieces with an active ability. */
+	 * sets that the instigating player is in a sequence and triggers cool-downs and decrements uses as needed.
+	 * Overridden by pieces with an active ability. */
 	UFUNCTION(BlueprintCallable, Category="Active Ability")
 	virtual void OnActiveAbility(TArray<AActor*> Targets);
+
+	/* Called when the active ability sequence ends. Default implementation sets the player as no longer "InSequence." */
+	UFUNCTION(BlueprintCallable, Category="Active Ability")
+	virtual void OnActiveAbilityEnded();
 
 	/* If one of this piece's ability has a lasting effect (e.g. a modifier), this is called when that effect ends.
 	 * Overridden by pieces with that need to perform code when an effect ends. */

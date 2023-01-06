@@ -69,6 +69,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Turn Progress")
 	void SetAbilityActionUsed();
 
+	/* Getter for whether this player is in a sequence. */
+	UFUNCTION(BlueprintPure, Category="Sequences")
+	FORCEINLINE bool GetIsInSequence() const { return bIsInSequence; }
+
+	/* RPC wrapper for SetIsInSequence. */
+	UFUNCTION(Client, Reliable, BlueprintCallable, Category="Sequences")
+	void Client_SetIsInSequence(bool bNewIsInSequence);
+
+		/* Sets whether this player is in a sequence and refreshes widgets depending on the new value. */
+		UFUNCTION(BlueprintCallable, Category="Sequences")
+		void SetIsInSequence(bool bNewIsInSequence);
+
 
 /* Public variables. */
 public:
@@ -140,5 +152,10 @@ protected:
 	/* Tracks whether the player has used their move/attack action for this turn. */
 	UPROPERTY(ReplicatedUsing=OnRep_AbilityActionUsed, VisibleAnywhere)
 	bool bAbilityActionUsed;
+
+	/* Tracks whether a player is currently in a sequence (move, attack, or ability), preventing them from taking
+	 * actions. */
+	UPROPERTY(VisibleAnywhere)
+	bool bIsInSequence;
 
 };

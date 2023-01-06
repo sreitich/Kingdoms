@@ -67,8 +67,9 @@ UMatch_PieceInfoWidget* UMatch_BaseWidget::GetPieceInfoWidget(EAlignment Alignme
 
 void UMatch_BaseWidget::UpdateEndTurnButton(bool bEnable)
 {
-    /* Enable or disable the end turn button. */
-    EndTurnButton->SetIsEnabled(bEnable);
+    /* Enable or disable the end turn button, unless it is already in the desired state. */
+    if (bEnable != EndTurnButton->GetIsEnabled())
+        EndTurnButton->SetIsEnabled(bEnable);
 }
 
 void UMatch_BaseWidget::NativeConstruct()

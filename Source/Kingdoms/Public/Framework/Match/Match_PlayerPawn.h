@@ -47,14 +47,22 @@ public:
 		UFUNCTION(Client, Reliable)
 		void Client_DeselectPieceOrTile(AParentPiece* PieceToDeselect, ABoardTile* TileToDeselect);
 
-	/* Refreshes any piece info widget that is currently displaying this player's selected friendly or enemy piece. */
-	UFUNCTION(Client, Reliable)
+	/* RPC wrapper for RefreshPieceInfoWidgets. */
+	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void Client_RefreshPieceInfoWidgets() const;
+
+		/* Refreshes any piece info widget that is currently displaying this player's selected friendly or enemy piece. */
+		UFUNCTION(BlueprintCallable)
+		void RefreshPieceInfoWidgets() const;
 
 	/* Hides any piece info widgets currently displaying the given piece. Used to hide piece info widgets displaying
 	 * pieces that are dead. */
 	UFUNCTION(Client, Reliable)
 	void Client_HideWidgetDisplayingPiece(AParentPiece* PieceToHide) const;
+	
+	/* Enables or disables this player's "end turn" button. */
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void Client_UpdateEndTurnButton(bool bIsEnabled);
 
 
 /* Public piece networking functions. */

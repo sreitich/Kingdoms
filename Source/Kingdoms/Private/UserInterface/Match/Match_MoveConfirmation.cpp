@@ -96,19 +96,27 @@ void UMatch_MoveConfirmation::NativeConstruct()
 
 void UMatch_MoveConfirmation::OnConfirmClicked()
 {
-    /* Record that the player has used their move action for this turn, preventing them from using another move action until their next turn. */
-    GetOwningPlayerState<AMatch_PlayerState>()->SetMoveActionUsed();
+    /* Get the local player's controller, player state, and pawn. */
+    AMatch_PlayerController* PlayerControllerPtr = GetOwningPlayer<AMatch_PlayerController>();
+    AMatch_PlayerState* PlayerStatePtr = GetOwningPlayerState<AMatch_PlayerState>();
+    AMatch_PlayerPawn* PlayerPawnPtr = GetOwningPlayerPawn<AMatch_PlayerPawn>();
+	if (PlayerControllerPtr && PlayerStatePtr && PlayerPawnPtr)
+    {
+        /* Record that the player has used their move action for this turn, preventing them from using another move action until their next turn. */
+        PlayerStatePtr->SetMoveActionUsed();
 
-    /* Reset this piece's rotation after it finishes moving. */
-    Cast<AMatch_PlayerPawn>(GetOwningPlayerPawn())->Server_SetResetAfterMove(PendingPiece, true);
+		/* Set that the player is in a sequence to prevent them from taking actions or ending their turn until the sequence ends. */
+	    PlayerStatePtr->SetIsInSequence(true);
 
-    /* Move the piece to the tile on the server via the player controller's server communication component. */
-    Cast<AMatch_PlayerController>(PendingPiece->GetInstigator()->GetController())->
-        GetServerCommunicationComponent()->Server_MovePieceToTile(PendingPiece, PendingTile, true);
+        /* Reset this piece's rotation after it finishes moving. */
+        PlayerPawnPtr->Server_SetResetAfterMove(PendingPiece, true);
 
-    /* Destroy this widget through the player controller to clean up references. */
-    if (AMatch_PlayerController* PlayerControllerPtr = Cast<AMatch_PlayerController>(GetOwningPlayer()))
+        /* Move the piece to the tile on the server via the player controller's server communication component. */
+        PlayerControllerPtr->GetServerCommunicationComponent()->Server_MovePieceToTile(PendingPiece, PendingTile, true);
+
+        /* Destroy this widget through the player controller to clean up references. */
         PlayerControllerPtr->CreateMoveConfirmationWidget(true, nullptr);
+    }
 }
 
 void UMatch_MoveConfirmation::OnCancelClicked()

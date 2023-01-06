@@ -153,6 +153,39 @@ void AMatch_PlayerState::SetAbilityActionUsed()
     }
 }
 
+void AMatch_PlayerState::Client_SetIsInSequence_Implementation(bool bNewIsInSequence)
+{
+    /* Update whether this player is in a sequence. */
+    SetIsInSequence(bNewIsInSequence);
+}
+
+void AMatch_PlayerState::SetIsInSequence(bool bNewIsInSequence)
+{
+    /* Update whether this player is in a sequence. */
+    bIsInSequence = bNewIsInSequence;
+
+    /* Refresh this player's piece info widgets to enable or disable the buttons, depending on the new value of
+     * bIsInSequence. */
+    GetPawn<AMatch_PlayerPawn>()->RefreshPieceInfoWidgets();
+
+    /* Enable or disable this player's "end turn" button. */
+    const AMatch_PlayerController* PlayerControllerPtr = GetPawn()->GetController<AMatch_PlayerController>();
+    if (IsValid(PlayerControllerPtr))
+    {
+        /* Disable the "end turn" button if this player is now in a sequence. */
+        if (bIsInSequence)
+        {
+            PlayerControllerPtr->UpdateEndTurnButton(false);
+        }
+        /* Enable the "end turn" button if this player is no longer in a sequence and has already used their move
+         * action. */
+        else
+        {
+            PlayerControllerPtr->UpdateEndTurnButton(bMoveActionUsed);
+        }
+    }
+}
+
 void AMatch_PlayerState::OnRep_bReadyToPlay()
 {
     /* If this is the server and all players are ready to start, begin the match. */
@@ -203,7 +236,7 @@ void AMatch_PlayerState::OnRep_MoveActionUsed()
     {
         if (const AMatch_PlayerController* PlayerControllerPtr = GetPawn()->GetController<AMatch_PlayerController>())
         {
-            PlayerControllerPtr->UpdateEndTurnButton(true);
+            // PlayerControllerPtr->UpdateEndTurnButton(true);
         }
     }
 }

@@ -357,6 +357,14 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
                 /* Hide all of the passive ability widgets. */
                 PassiveAbilityBox->SetVisibility(ESlateVisibility::Collapsed);
             }
+
+
+            /* Disable both buttons if this player is currently in a sequence that prevents them from taking actions. */
+            if (GetOwningPlayerState<AMatch_PlayerState>()->GetIsInSequence())
+            {
+                MoveButton->SetIsEnabled(false);
+                ActiveButton->SetIsEnabled(false);
+            }
         }
 
         /* If the selected piece is friendly... */

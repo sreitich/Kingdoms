@@ -558,6 +558,13 @@ void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTarg
 	}
 }
 
+void AMatch_PlayerPawn::Client_UpdateEndTurnButton_Implementation(bool bIsEnabled)
+{
+	/* Update this player's "end turn" button. */
+	if (const AMatch_PlayerController* PlayerControllerPtr = GetController<AMatch_PlayerController>())
+		PlayerControllerPtr->UpdateEndTurnButton(bIsEnabled);
+}
+
 void AMatch_PlayerPawn::Multicast_FlashHighlight_Implementation(AParentPiece* PieceToHighlight, FLinearColor Color,
 	float Brightness, float PlayRate, float Duration, bool bIndefiniteDuration)
 {
@@ -585,6 +592,12 @@ void AMatch_PlayerPawn::Client_DeselectPieceOrTile_Implementation(AParentPiece* 
 }
 
 void AMatch_PlayerPawn::Client_RefreshPieceInfoWidgets_Implementation() const
+{
+	/* Refresh this player's piece info widgets. */
+	RefreshPieceInfoWidgets();
+}
+
+void AMatch_PlayerPawn::RefreshPieceInfoWidgets() const
 {
 	/* Refresh any piece info widget displaying the currently selected friendly or enemy piece. */
 	Cast<AMatch_PlayerController>(GetController())->RefreshPieceInfoWidgets(SelectedPiece);

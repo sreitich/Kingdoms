@@ -368,6 +368,10 @@ TArray<ABoardTile*> AParentPiece::GetActiveAbilityRange()
 
 void AParentPiece::OnActiveAbility(TArray<AActor*> Targets)
 {
+	/* Set that this player is in a sequence, preventing them from taking actions or ending their turn. This is set back
+	 * to false in OnActiveAbilityEnded. */
+	GetInstigator()->GetPlayerState<AMatch_PlayerState>()->Client_SetIsInSequence(true);
+
 	/* Record that the player used their ability action for this turn, preventing them from using another active ability
 	 * until their next turn. */
 	Cast<AMatch_PlayerPawn>(GetInstigator())->GetPlayerState<AMatch_PlayerState>()->SetAbilityActionUsed();
@@ -389,6 +393,12 @@ void AParentPiece::OnActiveAbility(TArray<AActor*> Targets)
 				SetActiveUses(ActiveUses - 1);
 		}
 	}
+}
+
+void AParentPiece::OnActiveAbilityEnded()
+{
+	/* Set that this player is no longer in a sequence, allowing them to take actions or end their turn. */
+	GetInstigator()->GetPlayerState<AMatch_PlayerState>()->Client_SetIsInSequence(false);
 }
 
 void AParentPiece::OnAbilityEffectEnded(TArray<AActor*> Targets)
