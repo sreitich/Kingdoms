@@ -139,7 +139,6 @@ public:
 	UPieceNetworkingComponent* PieceNetworkingComponent;
 
 
-
 /* Protected functions. */
 protected:
 
@@ -172,6 +171,22 @@ protected:
 	/* Determines whether the player is currently dragging a piece in the setup phase. */
 	UPROPERTY()
 	bool bIsDraggingPiece;
+
+	/* The pitch of the player camera when in the angled view. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Camera")
+	float AngledCameraPitch;
+
+	/* The pitch of the player camera when in the top-down view. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Camera")
+	float TopDownCameraPitch;
+
+	/* The minimum distance from the origin to the player's camera when zooming. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Camera")
+	float MinZoomDistance;
+
+	/* The maximum distance from the origin to the player's camera when zooming. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Camera")
+	float MaxZoomDistance;
 	
 	/* If the player is currently looking from a top-down perspective. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Camera")
