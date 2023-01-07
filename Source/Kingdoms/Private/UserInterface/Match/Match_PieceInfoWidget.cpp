@@ -584,8 +584,8 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
     if (IsValid(PlayerStatePtr) && PlayerStatePtr->GetCurrentPlayerStatus() == E_SelectingAction)
     {
         /* Clear the piece info widgets but keep the currently selected piece. */
-        GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false, false, false, false, true);
-        
+        GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false, true, false, false, true);
+
         /* Set the player's state to be selecting a place to move. */
         GetOwningPlayerState<AMatch_PlayerState>(false)->SetPlayerStatus(E_SelectingTarget_Move);
 
@@ -600,17 +600,6 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
             {
                 /* Highlight the tile depending on its alignment and occupancy. */
                 Tile->HighlightTarget();
-
-                // /* If this tile is occupied by an enemy piece, highlight it as a valid attack target. */
-                // if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetLocalAlignment() == E_Hostile)
-                // {
-                //     Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_Enemy);
-                // }
-                // /* If the tile is empty, highlight it as a valid target destination. */
-                // else if (!IsValid(Tile->GetOccupyingPiece()))
-                // {
-                //     Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_ValidUnoccupiedTile);
-                // }
             }
         }
     }
@@ -628,7 +617,7 @@ void UMatch_PieceInfoWidget::OnUseActiveClicked()
     if (IsValid(PlayerStatePtr) && PlayerStatePtr->GetCurrentPlayerStatus() == E_SelectingAction)
     {
         /* Clear the piece info widgets but keep the currently selected piece. */
-        GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false, false, false, false, true);
+        GetOwningPlayerPawn<AMatch_PlayerPawn>()->ClearSelection(false, true, false, false, true);
 
         /* Set the player's state to be selecting targets for an active ability. */
         GetOwningPlayerState<AMatch_PlayerState>(false)->SetPlayerStatus(E_SelectingTarget_ActiveAbility);
