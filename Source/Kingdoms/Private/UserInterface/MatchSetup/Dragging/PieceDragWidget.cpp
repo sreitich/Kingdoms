@@ -1,4 +1,4 @@
-// Copyright Samuel Reitich 2022.
+// Copyright Change Studios, LLC 2023.
 
 
 #include "UserInterface/MatchSetup/Dragging/PieceDragWidget.h"

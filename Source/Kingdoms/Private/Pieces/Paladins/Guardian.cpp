@@ -1,4 +1,4 @@
-// Copyright Samuel Reitich 2023.
+// Copyright Change Studios, LLC 2023.
 
 
 #include "Pieces/Paladins/Guardian.h"
@@ -176,3 +176,14 @@ void AGuardian::OnActiveAbility(TArray<AActor*> Targets)
 	BP_OnActiveAbility(Cast<AParentPiece>(Targets[0]));
 }
 
+void AGuardian::OnAbilityEffectEnded(TArray<AActor*> Targets)
+{
+	/* Wrap the multicast implementation of this function, since this is called by the server. */
+	Multicast_OnAbilityEffectEnded();
+}
+
+void AGuardian::Multicast_OnAbilityEffectEnded_Implementation()
+{
+	/* Call the blueprint-implementation of this function on each client. */
+	BP_OnAbilityEffectEnded();
+}

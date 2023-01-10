@@ -1,4 +1,4 @@
-// Copyright Samuel Reitich 2023.
+// Copyright Change Studios, LLC 2023.
 
 #pragma once
 
@@ -38,12 +38,15 @@ public:
 	/* Executes active ability logic. */
 	virtual void OnActiveAbility(TArray<AActor*> Targets) override;
 
-		/* Executes blueprint implementation of active ability. */
-		UFUNCTION(BlueprintImplementableEvent)
-		void BP_OnActiveAbility(AParentPiece* Target);
+	/* Called when a modifier given by this piece expires. */
+	virtual void OnAbilityEffectEnded(TArray<AActor*> Targets) override;
+
+		/* Removes this piece's ability indicator on all clients. */
+		UFUNCTION(NetMulticast, Reliable)
+		void Multicast_OnAbilityEffectEnded();
 
 
-/* Protected variables. */
+/* Public variables. */
 public:
 
 	/* Used to maintain a valid reference to the ability target while the ability sequence plays, after the player's
@@ -58,6 +61,18 @@ public:
 	/* How long the Guardian's armor buff lasts for. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Active Ability")
 	int ArmorBuffDuration = 2;
+
+
+/* Protected functions. */
+// protected:
+
+	/* Executes blueprint implementation of active ability. */
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_OnActiveAbility(AParentPiece* Target);
+
+	/* Removes the shield that indicates that another piece has a buff from this piece. */
+	UFUNCTION(BlueprintImplementableEvent)
+	void BP_OnAbilityEffectEnded();
 
 
 };

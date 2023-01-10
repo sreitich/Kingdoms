@@ -1,4 +1,4 @@
-// Copyright Samuel Reitich 2022.
+// Copyright Change Studios, LLC 2023.
 
 
 #include "SaveGames/ArmyPresets_SaveGame.h"
