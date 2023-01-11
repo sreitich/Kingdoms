@@ -157,12 +157,19 @@ void ABoardTile::OnEndCursorOver(UPrimitiveComponent* Component)
 	}
 }
 
-void ABoardTile::HighlightTarget()
+void ABoardTile::HighlightTarget(bool bTargetedByFriendly)
 {
-	/* If this tile is occupied, highlight it depending on its alignment. */
+	/* If this tile is occupied, highlight it relative to the alignment of the piece targeting it and depending on the
+	 * occupying piece's alignment. */
 	if (IsValid(OccupyingPiece))
 	{
-		UpdateEmissiveHighlight(true, DefaultHighlightPlayRate, GetOccupyingPiece()->GetLocalAlignment() == E_Friendly ? Highlight_Friendly : Highlight_Enemy);
+		/* If this tile is being targeted by a friendly piece, then highlight the tile relative to the local player. */
+		if (bTargetedByFriendly)
+			UpdateEmissiveHighlight(true, DefaultHighlightPlayRate, GetOccupyingPiece()->GetLocalAlignment() == E_Friendly ? Highlight_Friendly : Highlight_Enemy);
+		/* If this tile is being targeted by an enemy piece, then highlight the tile relative to the local player's
+		 * opponent. */
+		else
+			UpdateEmissiveHighlight(true, DefaultHighlightPlayRate, GetOccupyingPiece()->GetLocalAlignment() == E_Hostile ? Highlight_Friendly : Highlight_Enemy);
 	}
 	/* If this tile is empty, highlight it as unoccupied. */
 	else

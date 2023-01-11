@@ -67,7 +67,7 @@ public:
 		void Server_ResetPieceRotation();
 
 	/* Highlights this piece's tile. */
-	virtual void HighlightTarget() override;
+	virtual void HighlightTarget(bool bTargetedByFriendly) override;
 	
 	/* Removes the highlight from this piece's tile. */
 	virtual void RemoveTargetHighlight() override;
@@ -121,8 +121,9 @@ public:
 		UFUNCTION(Category="Active Ability")
 		virtual void Piece_UpdateActiveConfirmation(TArray<AActor*> Targets);
 
-	/* Returns all actors within the active ability range that this piece's active ability can currently target. Checks
-	 * for validity. Overridden by pieces with an active ability. */
+	/* Returns all actors within the active ability range that this piece's active ability can currently target,
+	 * relative to this piece's alignment, not the player's. Checks for validity. Overridden by pieces with an active
+	 * ability. */
 	UFUNCTION(BlueprintPure, Category="Active Ability")
 	virtual TArray<AActor*> GetValidActiveAbilityTargets();
 
@@ -147,8 +148,9 @@ public:
 	virtual void OnAbilityEffectEnded(TArray<AActor*> Targets);
 
 
-	/* Returns all actors within the passive ability range that this piece's passive ability can currently target. Checks
-	 * for validity. Overridden by pieces with a passive ability. */
+	/* Returns all actors within the passive ability range that this piece's passive ability can currently target,
+	 * relative to this piece's alignment, not the player's. Checks for validity. Overridden by pieces with a passive
+	 * ability. */
 	UFUNCTION(BlueprintPure, Category="Passive Ability")
 	virtual TArray<AActor*> GetValidPassiveAbilityTargets();
 

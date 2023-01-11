@@ -63,9 +63,9 @@ TArray<AActor*> ARecruit::GetValidPassiveAbilityTargets()
 	{
 		if (ARecruit* RecruitPtr = Cast<ARecruit>(RecruitActor))
 		{
-			/* If the iterated recruit is laterally adjacent to this recruit and is friendly, it's a valid passive
+			/* If the iterated recruit is laterally adjacent to this recruit and is friendly to it, it's a valid passive
 			 * ability target. */
-			if (GetCurrentTile()->IsAdjacentTo(false, RecruitPtr->GetCurrentTile()) && RecruitPtr->GetInstigator() == GetInstigator())
+			if (GetCurrentTile()->IsAdjacentTo(false, RecruitPtr->GetCurrentTile()) && RecruitPtr->GetLocalAlignment() == GetLocalAlignment())
 			{
 				ValidPassiveAbilityTargets.Add(RecruitPtr);
 			}

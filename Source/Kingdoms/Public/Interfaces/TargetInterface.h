@@ -22,8 +22,8 @@ class KINGDOMS_API ITargetInterface
 
 public:
 
-	/* Highlights a target depending on its class. */
-	virtual void HighlightTarget() = 0;
+	/* Highlights a target depending on its class and whether its the target of a friendly or enemy piece. */
+	virtual void HighlightTarget(bool bTargetedByFriendly) = 0;
 
 	/* Removes the highlight from a target depending on its class. */
 	virtual void RemoveTargetHighlight() = 0;

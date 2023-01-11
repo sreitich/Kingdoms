@@ -103,7 +103,7 @@ TArray<AActor*> AKing::GetValidActiveAbilityTargets()
 		if (AParentPiece* PieceCast = Cast<AParentPiece>(PieceActor))
 		{
 			/* If the target piece is friendly to this piece. */
-			if (PieceCast->GetInstigator() == GetInstigator())
+			if (PieceCast->GetLocalAlignment() == GetLocalAlignment())
 				AllFriendlyPieces.Add(PieceCast);
 		}
 	}

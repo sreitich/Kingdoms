@@ -106,7 +106,7 @@ TArray<AActor*> AGuardian::GetValidActiveAbilityTargets()
 	for (ABoardTile* Tile : GetActiveAbilityRange())
 	{
 		/* Tiles can only be targeted if they're occupied by a friendly piece and the path to them is clear. */
-		if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetInstigator()->IsLocallyControlled() && PathToTileIsClear(Tile))
+		if (IsValid(Tile->GetOccupyingPiece()) && Tile->GetOccupyingPiece()->GetLocalAlignment() == GetLocalAlignment() && PathToTileIsClear(Tile))
 		{
 			/* The player can select the piece or its tile. */
 			ValidTargets.Add(Cast<AActor>(Tile->GetOccupyingPiece()));

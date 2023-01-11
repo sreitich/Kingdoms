@@ -40,6 +40,12 @@ void UMatch_PieceInfoWidget::NativeConstruct()
     MoveButton->OnClicked.AddDynamic(this, &UMatch_PieceInfoWidget::OnMoveClicked);
     ActiveButton->OnClicked.AddDynamic(this, &UMatch_PieceInfoWidget::OnUseActiveClicked);
 
+    /* Bind the "move pattern" buttons to highlight and unhighlight the piece's movement pattern. */
+    FriendlyMovePatternButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnMovePatternHovered);
+    FriendlyMovePatternButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnMovePatternUnhovered);
+    EnemyMovePatternButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnMovePatternHovered);
+    EnemyMovePatternButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnMovePatternUnhovered);
+    
     /* Bind the OpeningAnimFinished and ClosingAnimFinished functions to their respective delegates. */
     OpenFinishedDelegate.BindDynamic(this, &UMatch_PieceInfoWidget::OpeningAnimFinished);
     CloseFinishedDelegate.BindDynamic(this, &UMatch_PieceInfoWidget::ClosingAnimFinished);
@@ -542,7 +548,8 @@ void UMatch_PieceInfoWidget::OnActiveHovered()
     {
         if (Target->GetClass()->ImplementsInterface(UTargetInterface::StaticClass()))
         {
-            Cast<ITargetInterface>(Target)->HighlightTarget();
+            /* Highlight the active ability target relative to the alignment of the piece that is targeting it. */
+            Cast<ITargetInterface>(Target)->HighlightTarget(DisplayedPiece->GetLocalAlignment() == E_Friendly);
         }
     }
 }
@@ -573,7 +580,8 @@ void UMatch_PieceInfoWidget::OnPassiveHovered()
     {
         if (Target->GetClass()->ImplementsInterface(UTargetInterface::StaticClass()))
         {
-            Cast<ITargetInterface>(Target)->HighlightTarget();
+            /* Highlight the passive ability target relative to the alignment of the piece that is targeting it. */
+            Cast<ITargetInterface>(Target)->HighlightTarget(DisplayedPiece->GetLocalAlignment() == E_Friendly);
         }
     }
 }
@@ -637,8 +645,9 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
             /* Set a new highlight for every tile that this piece can move to to show the player their options. */
             for (ABoardTile* Tile : DisplayedPiece->GetValidMoveTiles())
             {
-                /* Highlight the tile depending on its alignment and occupancy. */
-                Tile->HighlightTarget();
+                /* Highlight the tile relative to the alignment of the piece targeting it, the tile's piece's
+                 * alignment, and the tile's occupancy. */
+                Tile->HighlightTarget(true);
             }
         }
     }
@@ -673,5 +682,34 @@ void UMatch_PieceInfoWidget::OnUseActiveClicked()
     else
     {
         RefreshWidget();
+    }
+}
+
+void UMatch_PieceInfoWidget::OnMovePatternHovered()
+{
+    /* Make sure that there's a valid displayed piece. */
+    if (IsValid(DisplayedPiece))
+    {
+        /* Set a new highlight for every tile that this piece can move to. */
+        for (ABoardTile* Tile : DisplayedPiece->GetValidMoveTiles())
+        {
+            /* Highlight the tile relative to the alignment of the piece targeting it, the tile's piece's alignment, and
+             * the tile's occupancy. */
+            Tile->HighlightTarget(DisplayedPiece->GetLocalAlignment() == E_Friendly);
+        }
+    }
+}
+
+void UMatch_PieceInfoWidget::OnMovePatternUnhovered()
+{
+    /* Make sure that there's a valid displayed piece. */
+    if (IsValid(DisplayedPiece))
+    {
+        /* Remove the highlight from every tile that this piece can move to. */
+        for (ABoardTile* Tile : DisplayedPiece->GetValidMoveTiles())
+        {
+            /* Remove the tile's highlight. */
+            Tile->RemoveTargetHighlight();
+        }
     }
 }

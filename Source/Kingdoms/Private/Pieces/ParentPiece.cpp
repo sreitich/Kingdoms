@@ -157,10 +157,10 @@ void AParentPiece::Server_ResetPieceRotation_Implementation()
 	InterpolatePieceRotation(nullptr, GetActorRotation(),PlayerStart->GetActorRotation(), false, false);
 }
 
-void AParentPiece::HighlightTarget()
+void AParentPiece::HighlightTarget(bool bTargetedByFriendly)
 {
-	/* Highlight this piece's tile depending on its alignment. */
-	CurrentTile->HighlightTarget();
+	/* Highlight this piece's tile depending the tile's alignment and the alignment of the piece targeting the tile. */
+	CurrentTile->HighlightTarget(bTargetedByFriendly);
 }
 
 void AParentPiece::RemoveTargetHighlight()
@@ -331,7 +331,8 @@ void AParentPiece::OnActiveClicked()
 		/* If this target implements the target interface (which all possible target actors should), highlight it. */
 		if (Target->GetClass()->ImplementsInterface(UTargetInterface::StaticClass()))
 		{
-			Cast<ITargetInterface>(Target)->HighlightTarget();
+			/* Highlight the target with respect to the local player. */
+			Cast<ITargetInterface>(Target)->HighlightTarget(true);
 		}
 	}
 }

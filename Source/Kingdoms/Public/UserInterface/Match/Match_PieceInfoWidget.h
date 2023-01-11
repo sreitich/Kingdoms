@@ -116,6 +116,15 @@ protected:
 	void OnUseActiveClicked();
 
 
+	/* Highlights the current piece's movement pattern. */
+	UFUNCTION()
+	void OnMovePatternHovered();
+
+	/* Unhighlights the current piece's movement pattern. */
+	UFUNCTION()
+	void OnMovePatternUnhovered();
+
+
 /* Public widgets. */
 public:
 
@@ -283,6 +292,14 @@ protected:
 	/* Button that prompts a piece to move or attack when clicked. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* MoveButton;
+
+	/* Highlights a friendly piece's movement pattern when hovered over. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* FriendlyMovePatternButton;
+
+	/* Highlights an enemy piece's movement pattern when hovered over. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* EnemyMovePatternButton;
 
 	/* Button that prompts a piece to use its active ability when clicked. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))

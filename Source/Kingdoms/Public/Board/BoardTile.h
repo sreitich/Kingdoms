@@ -54,7 +54,7 @@ public:
 	void OnEndCursorOver(UPrimitiveComponent* Component);
 
 	/* Highlights this tile depending on its occupancy and alignment. */
-	virtual void HighlightTarget() override;
+	virtual void HighlightTarget(bool bTargetedByFriendly) override;
 
 	/* Removes the highlight from this tile. */
 	virtual void RemoveTargetHighlight() override;
