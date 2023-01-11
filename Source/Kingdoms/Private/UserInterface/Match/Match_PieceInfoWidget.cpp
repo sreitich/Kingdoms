@@ -20,9 +20,13 @@
 
 void UMatch_PieceInfoWidget::NativeConstruct()
 {
-    /* Bind the stats button to create modifier lists. */
-    StatsButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnStatsHovered);
-    StatsButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnStatsUnhovered);
+    /* Bind the stats buttons to create modifier lists. */
+    DualStatsButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnStatsHovered);
+    DualStatsButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnStatsUnhovered);
+    StrengthStatButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnStatsHovered);
+    StrengthStatButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnStatsUnhovered);
+    ArmorStatButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnStatsHovered);
+    ArmorStatButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnStatsUnhovered);
 
     /* Bind the ability buttons to create an ability info widget pop-up. */
     ActiveAbilityBackgroundButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnActiveHovered);
@@ -367,6 +371,41 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
             }
         }
 
+
+        /* Check this piece's current modifiers to determine which modifier pop-up buttons to use. */
+        TArray<FModifier> CurrentModifiers = NewPiece->GetTemporaryModifiers();
+        bool bStrengthChanged = false, bArmorChanged = false;
+        for (const FModifier Mod : CurrentModifiers)
+        {
+            if (Mod.StrengthChange != 0)
+                bStrengthChanged = true;
+
+            if (Mod.ArmorChange != 0)
+                bArmorChanged = true;
+        }
+
+        /* Only enable the corresponding pop-up button for the modified stat. If both stats are modified, enable the
+         * dual stat pop-up button, so either stat can be hovered. */
+        if (bStrengthChanged && !bArmorChanged)
+        {
+            StrengthStatButton->SetVisibility(ESlateVisibility::Visible);
+            ArmorStatButton->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+            DualStatsButton->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+        }
+        else if (bArmorChanged && !bStrengthChanged)
+        {
+            StrengthStatButton->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+            ArmorStatButton->SetVisibility(ESlateVisibility::Visible);
+            DualStatsButton->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+        }
+        else if (bStrengthChanged && bArmorChanged)
+        {
+            StrengthStatButton->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+            ArmorStatButton->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+            DualStatsButton->SetVisibility(ESlateVisibility::Visible);
+        }
+
+
         /* If the selected piece is friendly... */
         if (Alignment == E_Friendly)
         {
@@ -427,7 +466,7 @@ void UMatch_PieceInfoWidget::RefreshWidget()
 
 bool UMatch_PieceInfoWidget::AreStatsHovered() const
 {
-    return StatsButton->IsHovered();
+    return DualStatsButton->IsHovered();
 }
 
 void UMatch_PieceInfoWidget::OnStatsHovered()

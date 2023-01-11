@@ -206,9 +206,19 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UOverlay* StatsButtonOverlay;
 	
-	/* Displays a list of current stat modifiers when hovered over. */
+	/* Displays a list of current stat modifiers when hovered over if there are any modifiers affecting both stats. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* StatsButton;
+	UButton* DualStatsButton;
+
+	/* Displays a list of current stat modifiers when hovered over if there are no modifiers affecting the armor
+	 * stat. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* StrengthStatButton;
+
+	/* Displays a list of current stat modifiers when hovered over if there are no modifiers affecting the strength
+	 * stat. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* ArmorStatButton;
 
 	/* Widget that the modifier list pop-up is parented to. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
