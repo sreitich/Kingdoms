@@ -69,6 +69,32 @@ protected:
 	UFUNCTION()
 	void ClosingAnimFinished();
 
+	/* Updates the displayed information for the current piece that cannot change during runtime, using
+	 * already-retrieved PieceData. */
+	void UpdateDisplayedConstantInfo();
+
+	/* Updates the displayed text for the given statistic depending on its base value and current value. */
+	void UpdateDisplayedStatistic(AParentPiece* NewPiece, bool bStrength);
+
+	/* Aligns the ability widgets depending on whether the piece has an active ability, a passive ability, or both. */
+	void AlignAbilities();
+
+	/* Updates the displayed active ability widgets and information. This includes updating displayed
+	 * cooldowns, remaining uses, and ability buttons. */
+	void UpdateActiveAbilityInfo(AParentPiece* NewPiece, bool bEnableButtons);
+
+	/* Updates the displayed passive ability widgets and information. This includes updating displayed
+	 * cooldowns, remaining uses, and ability buttons. */
+	void UpdatePassiveAbilityInfo(AParentPiece* NewPiece);
+
+	/* Updates the modifier buttons to only allow the player to hover over stats that have modifiers applied to
+	 * them. */
+	void UpdateModifierButtons(AParentPiece* NewPiece);
+
+	/* Change the active and passive ability icon backgrounds to be friendly or passive, depending on the piece's
+	 * alignment. */
+	void UpdateAlignmentAbilityIcons(EAlignment Alignment);
+
 	/* Removes all uses bars and adds the passed amount. bActive determines which ability's bars to target. */
 	UFUNCTION(BlueprintImplementableEvent, Category="Updating Piece Info Widget")
 	void ResetBars(bool bActive, int NewAmount);
@@ -293,13 +319,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* MoveButton;
 
-	/* Highlights a friendly piece's movement pattern when hovered over. */
+	/* Highlights a piece's movement pattern when hovered over, displayed when buttons are disabled (for enemy pieces
+	 * or for friendly pieces when it is not the player's turn). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* MovePatternButton;
+
+	/* Overlays the disabled "move" button to highlight a friendly piece's movement pattern when hovered over. Only
+	 * used when it is the player's turn. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* FriendlyMovePatternButton;
-
-	/* Highlights an enemy piece's movement pattern when hovered over. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* EnemyMovePatternButton;
 
 	/* Button that prompts a piece to use its active ability when clicked. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))

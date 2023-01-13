@@ -266,7 +266,7 @@ TArray<ABoardTile*> AParentPiece::GetValidMoveTiles()
 	{
 		/* If the tile's coordinates match with one of this piece's move patterns, and the path to the tile is clear,
 		 * and it is empty or not occupied by a friendly piece, it is a valid destination. */
-		if (TileIsInMoveRange(Tile) && PathToTileIsClear(Tile) && (!IsValid(Tile->GetOccupyingPiece()) || Tile->GetOccupyingPiece()->GetLocalAlignment() != E_Friendly))
+		if (TileIsInMoveRange(Tile) && PathToTileIsClear(Tile) && (!IsValid(Tile->GetOccupyingPiece()) || Tile->GetOccupyingPiece()->GetLocalAlignment() != GetLocalAlignment()))
 		{
 			ValidTiles.Add(Tile);
 		}
