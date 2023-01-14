@@ -595,12 +595,17 @@ void UMatch_PieceInfoWidget::OnActiveHovered()
     }
 
     /* Highlight all valid active ability targets. */
-    for (AActor* Target : DisplayedPiece->GetValidActiveAbilityTargets())
+    for (ABoardTile* TileInRange : DisplayedPiece->GetActiveAbilityRange())
     {
-        if (Target->GetClass()->ImplementsInterface(UTargetInterface::StaticClass()))
+        /* Highlight the tile correctly if it is a valid target. */
+        if (DisplayedPiece->GetValidActiveAbilityTargets().Contains(TileInRange))
         {
-            /* Highlight the active ability target relative to the alignment of the piece that is targeting it. */
-            Cast<ITargetInterface>(Target)->HighlightTarget(DisplayedPiece->GetLocalAlignment() == E_Friendly);
+            TileInRange->HighlightTarget(DisplayedPiece->GetLocalAlignment() == E_Friendly);
+        }
+        /* Highlight invalid targets within range with an invalid highlight. */
+        else
+        {
+            TileInRange->UpdateEmissiveHighlight(true, TileInRange->DefaultHighlightPlayRate, TileInRange->Highlight_InvalidTile);
         }
     }
 }
@@ -627,12 +632,17 @@ void UMatch_PieceInfoWidget::OnPassiveHovered()
     }
 
     /* Highlight all valid passive ability targets. */
-    for (AActor* Target : DisplayedPiece->GetValidPassiveAbilityTargets())
+    for (ABoardTile* TileInRange : DisplayedPiece->GetPassiveAbilityRange())
     {
-        if (Target->GetClass()->ImplementsInterface(UTargetInterface::StaticClass()))
+        /* Highlight the tile correctly if it is a valid target. */
+        if (DisplayedPiece->GetValidPassiveAbilityTargets().Contains(TileInRange))
         {
-            /* Highlight the passive ability target relative to the alignment of the piece that is targeting it. */
-            Cast<ITargetInterface>(Target)->HighlightTarget(DisplayedPiece->GetLocalAlignment() == E_Friendly);
+            TileInRange->HighlightTarget(DisplayedPiece->GetLocalAlignment() == E_Friendly);
+        }
+        /* Highlight invalid targets within range with an invalid highlight. */
+        else
+        {
+            TileInRange->UpdateEmissiveHighlight(true, TileInRange->DefaultHighlightPlayRate, TileInRange->Highlight_InvalidTile);
         }
     }
 }
@@ -646,13 +656,10 @@ void UMatch_PieceInfoWidget::OnActiveUnhovered()
         AbilityInfoPopup = nullptr;
     }
 
-    /* Remove the highlight from every valid active ability target. */
-    for (AActor* Target : DisplayedPiece->GetValidActiveAbilityTargets())
+    /* Remove the highlight from every tile within the active ability's range. */
+    for (ABoardTile* TileInRange : DisplayedPiece->GetActiveAbilityRange())
     {
-        if (Target->GetClass()->ImplementsInterface(UTargetInterface::StaticClass()))
-        {
-            Cast<ITargetInterface>(Target)->RemoveTargetHighlight();
-        }
+        TileInRange->RemoveTargetHighlight();
     }
 }
 
@@ -665,13 +672,10 @@ void UMatch_PieceInfoWidget::OnPassiveUnhovered()
         AbilityInfoPopup = nullptr;
     }
 
-    /* Remove the highlight from every valid passive ability target. */
-    for (AActor* Target : DisplayedPiece->GetValidPassiveAbilityTargets())
+    /* Remove the highlight from every tile within the passive ability's range. */
+    for (ABoardTile* TileInRange : DisplayedPiece->GetPassiveAbilityRange())
     {
-        if (Target->GetClass()->ImplementsInterface(UTargetInterface::StaticClass()))
-        {
-            Cast<ITargetInterface>(Target)->RemoveTargetHighlight();
-        }
+        TileInRange->RemoveTargetHighlight();
     }
 }
 

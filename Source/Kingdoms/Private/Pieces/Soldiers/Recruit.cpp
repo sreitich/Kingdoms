@@ -58,7 +58,7 @@ TArray<AActor*> ARecruit::GetValidPassiveAbilityTargets()
 	TArray<AActor*> ValidPassiveAbilityTargets;
 	UGameplayStatics::GetAllActorsOfClass(this, ARecruit::StaticClass(), AllRecruitActors);
 
-	/* Add any adjacent recruits to the array of valid passive ability targets. */
+	/* Add any adjacent recruits and their tiles to the array of valid passive ability targets. */
 	for (AActor* RecruitActor : AllRecruitActors)
 	{
 		if (ARecruit* RecruitPtr = Cast<ARecruit>(RecruitActor))
@@ -68,6 +68,7 @@ TArray<AActor*> ARecruit::GetValidPassiveAbilityTargets()
 			if (GetCurrentTile()->IsAdjacentTo(false, RecruitPtr->GetCurrentTile()) && RecruitPtr->GetLocalAlignment() == GetLocalAlignment())
 			{
 				ValidPassiveAbilityTargets.Add(RecruitPtr);
+				ValidPassiveAbilityTargets.Add(RecruitPtr->GetCurrentTile());
 			}
 		}
 	}

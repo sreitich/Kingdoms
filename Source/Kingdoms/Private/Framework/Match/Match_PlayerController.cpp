@@ -374,7 +374,21 @@ void AMatch_PlayerController::CreateAttackConfirmationWidget(bool bDestroy, APar
         /* If the widget was created successfully or already existed, update its friendly piece information, hide its
          * enemy piece information, and disable the confirmation option. */
         if (Match_AttackConfirmation)
-            Match_AttackConfirmation->UpdateAttackPreviewInfo(FriendlyPiece, nullptr);
+        {
+            /* Gather the information that will be used to update the attack confirmation widget. */
+            const FAttackPreviewInfo AttackPreviewInfo =
+            {
+                FriendlyPiece,
+                nullptr,
+                FriendlyPiece->GetCurrentStrength(),
+                FriendlyPiece->GetCurrentArmor(),
+                0,
+                0,
+                false
+            };
+
+            Match_AttackConfirmation->UpdateAttackPreviewInfo(AttackPreviewInfo);
+        }
     }
 }
 
@@ -386,7 +400,19 @@ void AMatch_PlayerController::UpdateAttackConfirmationWidget(AParentPiece* Frien
         /* If a valid widget is currently displayed, update it. */
         if (Match_AttackConfirmation)
         {
-            Match_AttackConfirmation->UpdateAttackPreviewInfo(FriendlyPiece, EnemyPiece);
+            /* Gather the information that will be used to update the attack confirmation widget. */
+            const FAttackPreviewInfo AttackPreviewInfo =
+            {
+                FriendlyPiece,
+                EnemyPiece,
+                FriendlyPiece->GetCurrentStrength(),
+                FriendlyPiece->GetCurrentArmor(),
+                EnemyPiece->GetCurrentStrength(),
+                EnemyPiece->GetCurrentArmor(),
+                false
+            };
+
+            Match_AttackConfirmation->UpdateAttackPreviewInfo(AttackPreviewInfo);
         }
     }
 }

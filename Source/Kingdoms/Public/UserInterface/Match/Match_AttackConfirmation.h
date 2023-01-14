@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UserDefinedData/Match_UserDefinedData.h"
+
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Match_AttackConfirmation.generated.h"
@@ -26,9 +28,9 @@ class KINGDOMS_API UMatch_AttackConfirmation : public UUserWidget
 /* Public functions. */
 public:
 
-	/* Updates the displayed attack information. */
+	/* Updates the displayed attack information with the given information. */
 	UFUNCTION()
-	void UpdateAttackPreviewInfo(AParentPiece* FriendlyPiece, AParentPiece* EnemyPiece);
+	virtual void UpdateAttackPreviewInfo(FAttackPreviewInfo AttackPreviewInfo);
 
 	/* Cleans up and destroys this widget. Resets the player and all tiles if bReset is true. bReset is false when
 	 * switching to a move confirmation widget. */
@@ -51,10 +53,10 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetEnemyInfoIsHidden(bool bHide);
 
-	/* Updates the result preview text. Overrides need conditions for the pending enemy piece being valid and null.
-	 * Default implementation assumes a two-way attack. */
+	/* Updates the result preview text with the given information. Overrides need conditions for the pending enemy
+	 * piece being valid and null. Default implementation assumes a two-way attack. */
 	UFUNCTION()
-	virtual void UpdateResultPreviewText() const;
+	virtual void UpdateResultPreviewText(FAttackPreviewInfo AttackPreviewInfo) const;
 
 	/* Attacks the enemy piece at the target tile. Can be overridden by custom attack confirmation widgets. */
 	UFUNCTION()

@@ -100,6 +100,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Colors")
 	FLinearColor Highlight_Friendly;
 
+	/* Indicates a tile that is within range of an action but is invalid for any reason. */
+	UPROPERTY(EditDefaultsOnly, Category="Colors")
+	FLinearColor Highlight_InvalidTile;
+
 	/* The default play-rate with which to highlight tiles. */
 	UPROPERTY(EditDefaultsOnly, Category="Highlights")
 	float DefaultHighlightPlayRate = 4.0f;

@@ -81,6 +81,37 @@ struct FTileCoordinates
 	int32 Y = 0;
 };
 
+/* Information used to update attack preview/confirmation widgets. */
+USTRUCT(BlueprintType)
+struct FAttackPreviewInfo
+{
+	GENERATED_BODY()
+
+	/* The attacking piece (will be always be friendly to the local player). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	AParentPiece* FriendlyPiece;
+	/* The defending piece (will always be hostile to the local player). This can be left as null to create a preview
+	 * without a selected piece (i.e. the player is currently selecting one). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	AParentPiece* EnemyPiece;
+
+	/* The attacker's overridden stats. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int AttackerStrength;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int AttackerArmor;
+
+	/* The defender's overridden stats. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int DefenderStrength;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int DefenderArmor;
+
+	/* Whether the previewed attack is one-sided. This affects the "attack outcome" text. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bOneSidedAttack;
+};
+
 /* Information needed to execute an attack. */
 USTRUCT(BlueprintType)
 struct FAttackInfo

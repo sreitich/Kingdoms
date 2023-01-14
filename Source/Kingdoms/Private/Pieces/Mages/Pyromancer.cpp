@@ -68,9 +68,22 @@ void APyromancer::OnActiveClicked()
 		/* Update the active ability confirmation widget and add it to the viewport if it was created successfully. */
 		if (ActiveAbilityConfirmationWidget)
 		{
+			/* Display the preview with what the pyromancer's stats would be if the player used its ability. */
+			const FAttackPreviewInfo AttackPreviewInfo =
+			{
+				this,
+				__nullptr,
+				GetCurrentStrength() + StrengthBuffValue,
+				GetCurrentArmor(),
+				0,
+				0,
+				true
+			};
+
 			/* This piece's active ability confirmation widget is actually an attack confirmation widget. Update the
-			 * widget's friendly piece information, hide its enemy piece information, and disable the confirmation option. */
-			Cast<UMatch_PyroActiveConfirmation>(ActiveAbilityConfirmationWidget)->UpdateAttackPreviewInfo(this, nullptr);
+			 * widget's friendly piece information, hide its enemy piece information, and disable the confirmation
+			 * option. */
+			Cast<UMatch_PyroActiveConfirmation>(ActiveAbilityConfirmationWidget)->UpdateAttackPreviewInfo(AttackPreviewInfo);
 			ActiveAbilityConfirmationWidget->AddToViewport(0);
 		}
 	}
@@ -93,7 +106,19 @@ void APyromancer::Piece_UpdateActiveConfirmation(TArray<AActor*> Targets)
 
 	if (IsValid(TargetPiece) && ActiveAbilityConfirmationWidget)
 	{
-		Cast<UMatch_PyroActiveConfirmation>(ActiveAbilityConfirmationWidget)->UpdateAttackPreviewInfo(this, TargetPiece);
+		/* Display the preview with what the pyromancer's stats would be if the player used its ability. */
+		const FAttackPreviewInfo AttackPreviewInfo =
+		{
+			this,
+			TargetPiece,
+			GetCurrentStrength() + StrengthBuffValue,
+			GetCurrentArmor(),
+			TargetPiece->GetCurrentStrength(),
+			TargetPiece->GetCurrentArmor(),
+			true
+		};
+
+		Cast<UMatch_PyroActiveConfirmation>(ActiveAbilityConfirmationWidget)->UpdateAttackPreviewInfo(AttackPreviewInfo);
 	}
 }
 

@@ -7,7 +7,6 @@
 #include "Framework/Match/Match_PlayerPawn.h"
 #include "Framework/Match/Match_PlayerState.h"
 #include "Pieces/ParentPiece.h"
-#include "UserDefinedData/Match_UserDefinedData.h"
 #include "UserDefinedData/PieceData_UserDefinedData.h"
 
 #include "Components/Button.h"
@@ -16,54 +15,59 @@
 #include "Framework/Match/Match_PlayerController.h"
 #include "Runtime/UMG/Public/UMG.h"
 
-void UMatch_AttackConfirmation::UpdateAttackPreviewInfo(AParentPiece* FriendlyPiece, AParentPiece* EnemyPiece)
+void UMatch_AttackConfirmation::UpdateAttackPreviewInfo(FAttackPreviewInfo AttackPreviewInfo)
 {
 	/* Used to retrieve data from the piece data table. */
 	static const FString ContextString(TEXT("Piece Data Struct"));
-	
+
 	/* If the piece data table was found... */
 	if (PieceDataTable)
 	{
 		/* Update the pending friendly piece and the displayed information if the given friendly piece is valid. */
-		if (IsValid(FriendlyPiece))
+		if (IsValid(AttackPreviewInfo.FriendlyPiece))
 		{
 			/* Set a reference to this widget's pending friendly piece to use when confirming the attack. */
-			PendingFriendlyPiece = FriendlyPiece;
+			PendingFriendlyPiece = AttackPreviewInfo.FriendlyPiece;
 
 			/* Get the friendly piece's row from the data table. */
-			const FPieceDataStruct* FriendlyPieceData = PieceDataTable->FindRow<FPieceDataStruct>(FriendlyPiece->PieceID, ContextString, true);
+			const FPieceDataStruct* FriendlyPieceData = PieceDataTable->FindRow<FPieceDataStruct>(AttackPreviewInfo.FriendlyPiece->PieceID, ContextString, true);
 
-			/* Update the displayed friendly piece information that doesn't change during the game, if the row was found. */
-			if (FriendlyPiece)
+			/* Update the displayed friendly piece information that doesn't change during the game, if the row was
+			 * found. */
+			if (AttackPreviewInfo.FriendlyPiece)
 			{
 				FriendlyImage->SetBrushFromTexture(FriendlyPieceData->AttackPreviewPhoto);
 				FriendlyName->SetText(FText::FromString(FriendlyPieceData->PieceName.ToUpper()));
 			}
 
-			/* Update the displayed friendly piece information that can change during the game using the piece's current stats. */
-			FriendlyStrength->SetText(FText::FromString(FString::FromInt(FriendlyPiece->GetCurrentStrength())));
-			FriendlyArmor->SetText(FText::FromString(FString::FromInt(FriendlyPiece->GetCurrentArmor())));
+			/* Update the displayed friendly piece information that can change during the game using the attacker's
+			 * given stats. */
+			FriendlyStrength->SetText(FText::FromString(FString::FromInt(AttackPreviewInfo.AttackerStrength)));
+			FriendlyArmor->SetText(FText::FromString(FString::FromInt(AttackPreviewInfo.AttackerArmor)));
 		}
 
-		/* Update the pending enemy piece, reveal and update its displayed information, and enable the attack confirmation if the given enemy piece is valid. */
-		if (IsValid(EnemyPiece))
+		/* Update the pending enemy piece, reveal and update its displayed information, and enable the attack
+		 * confirmation if the given enemy piece is valid. */
+		if (IsValid(AttackPreviewInfo.EnemyPiece))
 		{
 			/* Set a reference to this widget's pending enemy piece to use when confirming the attack. */
-			PendingEnemyPiece = EnemyPiece;
+			PendingEnemyPiece = AttackPreviewInfo.EnemyPiece;
 
 			/* Get the enemy piece's row from the data table. */
-			const FPieceDataStruct* EnemyPieceData = PieceDataTable->FindRow<FPieceDataStruct>(EnemyPiece->PieceID, ContextString, true);
+			const FPieceDataStruct* EnemyPieceData = PieceDataTable->FindRow<FPieceDataStruct>(AttackPreviewInfo.EnemyPiece->PieceID, ContextString, true);
 
-			/* Update the displayed enemy piece information that doesn't change during the game, if the row was found. */
+			/* Update the displayed enemy piece information that doesn't change during the game, if the row was
+			 * found. */
 			if (EnemyPieceData)
 			{
 				EnemyImage->SetBrushFromTexture(EnemyPieceData->AttackPreviewPhoto);
 				EnemyName->SetText(FText::FromString(EnemyPieceData->PieceName.ToUpper()));
 			}
 
-			/* Update the displayed enemy piece information that can change during the game using the piece's current stats. */
-			EnemyStrength->SetText(FText::FromString(FString::FromInt(EnemyPiece->GetCurrentStrength())));
-			EnemyArmor->SetText(FText::FromString(FString::FromInt(EnemyPiece->GetCurrentArmor())));
+			/* Update the displayed enemy piece information that can change during the game using the defender's given
+			 * stats. */
+			EnemyStrength->SetText(FText::FromString(FString::FromInt(AttackPreviewInfo.DefenderStrength)));
+			EnemyArmor->SetText(FText::FromString(FString::FromInt(AttackPreviewInfo.DefenderArmor)));
 
 			/* Enable the widget's "confirm" button. */
 			AttackButton->SetIsEnabled(true);
@@ -71,7 +75,8 @@ void UMatch_AttackConfirmation::UpdateAttackPreviewInfo(AParentPiece* FriendlyPi
 			/* Reveal the pending enemy piece's information and picture. */
 			SetEnemyInfoIsHidden(false);
 		}
-		/* Hide the enemy piece's displayed information and disable the confirmation button if the given enemy piece is null. */
+		/* Hide the enemy piece's displayed information and disable the confirmation button if the given enemy piece is
+		 * null. */
 		else
 		{
 			/* Might need to reset the pending piece. */
@@ -85,8 +90,8 @@ void UMatch_AttackConfirmation::UpdateAttackPreviewInfo(AParentPiece* FriendlyPi
 		}
 	}
 
-	/* Update the displayed result text. */
-	UpdateResultPreviewText();
+	/* Update the displayed result text using the same stats given here. */
+	UpdateResultPreviewText(AttackPreviewInfo);
 }
 
 void UMatch_AttackConfirmation::DestroyWidget(bool bReset)
@@ -143,16 +148,16 @@ void UMatch_AttackConfirmation::BindButtons()
 	CancelButton->OnClicked.AddDynamic(this, &UMatch_AttackConfirmation::OnCancelClicked);
 }
 
-void UMatch_AttackConfirmation::UpdateResultPreviewText() const
+void UMatch_AttackConfirmation::UpdateResultPreviewText(FAttackPreviewInfo AttackPreviewInfo) const
 {
 	/* Update the text depending on the result if both pieces are known. */
 	if (IsValid(PendingFriendlyPiece) && IsValid(PendingEnemyPiece))
 	{
 		/* Save the piece's stats for readability. */
-		const int AttStr = PendingFriendlyPiece->GetCurrentStrength();
-		const int AttArm = PendingFriendlyPiece->GetCurrentArmor();
-		const int DefStr = PendingEnemyPiece->GetCurrentStrength();
-		const int DefArm = PendingEnemyPiece->GetCurrentArmor();
+		const int AttStr = AttackPreviewInfo.AttackerStrength;
+		const int AttArm = AttackPreviewInfo.AttackerArmor;
+		const int DefStr = AttackPreviewInfo.DefenderStrength;
+		const int DefArm = AttackPreviewInfo.DefenderArmor;
 
 		/* Attacker defeats defender. */
 		if (AttStr >= DefArm && DefStr < AttArm)
@@ -162,12 +167,22 @@ void UMatch_AttackConfirmation::UpdateResultPreviewText() const
 		/* Defender defeats attacker. */
 		else if (DefStr >= AttArm && AttStr < DefArm)
 		{
-			DisplayedResult->SetText(FText::FromString("<LosingResult>Defender will defeat attacker.</>"));
+			/* If this is a one-sided attack, nothing happens. */
+			if (AttackPreviewInfo.bOneSidedAttack)
+				DisplayedResult->SetText(FText::FromString("<EvenResult>Attacker and defender will both survive.</>"));
+			/* If this is a two-sided attack, the attacker dies. */
+			else
+				DisplayedResult->SetText(FText::FromString("<LosingResult>Defender will defeat attacker.</>"));
 		}
 		/* Attack and defender kill each other. */
 		else if (AttStr >= DefArm && DefStr >= AttArm)
 		{
-			DisplayedResult->SetText(FText::FromString("<EvenResult>Attacker and defender will both die.</>"));
+			/* If this is a one-sided attack, the attacker kills the defender. */
+			if (AttackPreviewInfo.bOneSidedAttack)
+				DisplayedResult->SetText(FText::FromString("<WinningResult>Attacker will defeat defender.</>"));
+			/* If this is a two-sided attack, both pieces die. */
+			else
+				DisplayedResult->SetText(FText::FromString("<EvenResult>Attacker and defender will both die.</>"));
 		}
 		/* Attacker and defender both survive. */
 		else if (DefArm > AttStr && AttArm > DefStr)

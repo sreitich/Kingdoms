@@ -97,14 +97,17 @@ TArray<AActor*> AKing::GetValidActiveAbilityTargets()
 	/* Get every piece. */
 	UGameplayStatics::GetAllActorsOfClass(this, AParentPiece::StaticClass(), OUT AllPiecesActors);
 
-	/* Add every friendly piece to an array of all friendly pieces. */
+	/* Add every friendly piece and its tile to an array of all friendly pieces. */
 	for (AActor* PieceActor : AllPiecesActors)
 	{
 		if (AParentPiece* PieceCast = Cast<AParentPiece>(PieceActor))
 		{
 			/* If the target piece is friendly to this piece. */
 			if (PieceCast->GetLocalAlignment() == GetLocalAlignment())
+			{
 				AllFriendlyPieces.Add(PieceCast);
+				AllFriendlyPieces.Add(PieceCast->GetCurrentTile());
+			}
 		}
 	}
 

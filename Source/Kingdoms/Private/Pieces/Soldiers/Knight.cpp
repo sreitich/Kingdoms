@@ -5,6 +5,7 @@
 
 #include "Board/BoardManager.h"
 #include "Board/BoardTile.h"
+#include "Framework/Match/Match_GameStateBase.h"
 #include "UserInterface/Match/ActiveAbilityConfirmations/Soldiers/Knight_ActiveAbilityConfirmation.h"
 
 AKnight::AKnight()
@@ -95,8 +96,21 @@ TArray<AActor*> AKnight::GetValidActiveAbilityTargets()
 
 TArray<ABoardTile*> AKnight::GetActiveAbilityRange()
 {
-	/* The Knight uses the same range as its movement. */
-	return GetValidMoveTiles();
+	/* The array of tiles in range that will be returned. */
+	TArray<ABoardTile*> TilesInRange;
+
+	/* Get the board manager's array of every tile on the board. */
+	for (ABoardTile* Tile : GetWorld()->GetGameState<AMatch_GameStateBase>()->BoardManager->AllTiles)
+	{
+		/* If this tile is within range, add it to the array of tiles in range. */
+		if (TileIsInMoveRange(Tile))
+		{
+			TilesInRange.Add(Tile);
+		}
+	}
+
+	/* Return the array of every tile in range. */
+	return TilesInRange;
 }
 
 void AKnight::OnActiveAbility(TArray<AActor*> Targets)
