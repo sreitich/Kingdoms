@@ -171,9 +171,20 @@ void AParentPiece::RemoveTargetHighlight()
 
 void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float PlayRate, float Duration, bool bIndefiniteDuration)
 {
-	/* Store the original color and brightness to restore after the flash. */
-	DynamicMaterial->GetVectorParameterValue(TEXT("FresnelColor"), OriginalHighlightColor);
-	DynamicMaterial->GetScalarParameterValue(TEXT("Brightness"), OriginalHighlightBrightness);
+	/* If a timeline is already playing, then save the target highlight information as the original information, so that
+	 * the highlight returns to the state it would have been had it waited for the previous highlight to finish. */
+	if (HighlightTimeline.IsPlaying())
+	{
+		OriginalHighlightBrightness = TargetHighlightBrightness;
+		OriginalHighlightColor = TargetHighlightColor;
+	}
+	/* If there is no active highlight, save the current information as the original color and brightness to restore
+	 * after the flash. */
+	else
+	{
+		DynamicMaterial->GetVectorParameterValue(TEXT("FresnelColor"), OriginalHighlightColor);
+		DynamicMaterial->GetScalarParameterValue(TEXT("Brightness"), OriginalHighlightBrightness);
+	}
 
 	/* Set the other parameters needed for the highlight timeline. */
 	TargetHighlightColor = Color;

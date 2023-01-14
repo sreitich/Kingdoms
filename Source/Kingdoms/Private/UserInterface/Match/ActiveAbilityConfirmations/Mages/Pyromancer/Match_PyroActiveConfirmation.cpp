@@ -28,8 +28,8 @@ void UMatch_PyroActiveConfirmation::DestroyWidget(bool bReset)
 		}
 	}
 
-	/* Clear the player's selected piece, selected enemy piece, and selected tile and hide the piece info widgets. */
-	PlayerPawnPtr->ClearSelection(true, true, false, true, true);
+	/* Clear the player's selected piece, selected enemy piece, and selected target and hide the piece info widgets. */
+	PlayerPawnPtr->ClearSelection(true, true, true, false, true);
 
 	/* Nullify the piece's pointer to its active ability confirmation widget so it makes a new one next time. */
 	PendingFriendlyPiece->ActiveAbilityConfirmationWidget = nullptr;
