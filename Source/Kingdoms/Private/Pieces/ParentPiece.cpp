@@ -188,8 +188,10 @@ void AParentPiece::FlashHighlight(FLinearColor Color, float Brightness, float Pl
 	 * the highlight returns to the state it would have been had it waited for the previous highlight to finish. */
 	if (HighlightTimeline.IsPlaying())
 	{
-		OriginalHighlightBrightness = TargetHighlightBrightness;
-		OriginalHighlightColor = TargetHighlightColor;
+		/* Skip to the end of the timeline. */
+		HighlightTimeline.SetNewTime(HighlightTimeline.GetTimelineLength());
+		// OriginalHighlightBrightness = TargetHighlightBrightness;
+		// OriginalHighlightColor = TargetHighlightColor;
 	}
 	/* If there is no active highlight, save the current information as the original color and brightness to restore
 	 * after the flash. */
