@@ -427,7 +427,11 @@ protected:
 	UFUNCTION()
 	void HighlightDurationEnd();
 
-	
+
+	/* Refreshes any reticles that are on this piece. */
+	UFUNCTION()
+	void OnRep_CurrentTile(ABoardTile* OldTile);
+
 	/* Refreshes any piece info widget displaying this piece. */
 	UFUNCTION()
 	void OnRep_CurrentStrength();
@@ -537,7 +541,7 @@ protected:
 protected:
 
 	/* Pointer to the piece currently on this tile. */
-	UPROPERTY(Replicated, EditInstanceOnly, Category="Piece Info")
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentTile, EditInstanceOnly, Category="Piece Info")
 	ABoardTile* CurrentTile;
 
 	/* Tracks when this piece is participating in an attack as a defender. This is currently used for notifies to

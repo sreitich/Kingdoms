@@ -474,8 +474,14 @@ void AParentPiece::OnDeath(AActor* Killer)
 
 void AParentPiece::SetCurrentTile(ABoardTile* NewTile)
 {
+	/* Save what this piece's previous tile was. */
+	ABoardTile* OldTile = CurrentTile;
+
 	/* Locally update this piece's current tile to reduce delay. */
 	CurrentTile = NewTile;
+
+	/* OnRep functions are not called automatically locally. */
+	OnRep_CurrentTile(OldTile);
 
 	/* If this was called on a non-server client, update this piece's current tile on the server. */
 	if (!HasAuthority())
@@ -818,6 +824,18 @@ void AParentPiece::HighlightDurationEnd()
 	/* Reverse the highlight to its original color and brightness. */
 	HighlightTimelineDirection = ETimelineDirection::Backward;
 	HighlightTimeline.ReverseFromEnd();
+}
+
+void AParentPiece::OnRep_CurrentTile(ABoardTile* OldTile)
+{
+	/* Update this piece's old and new tiles' reticles. */
+	AMatch_GameStateBase* GameStatePtr = Cast<AMatch_GameStateBase>(UGameplayStatics::GetGameState(this));
+	for (APlayerState* Player : GameStatePtr->PlayerArray)
+	{
+		/* If any player had this piece selected, reset its old tile's reticle and add a reticle to its new tile. */
+		if (AMatch_PlayerPawn* PawnPtr = Player->GetPawn<AMatch_PlayerPawn>())
+			PawnPtr->UpdateSelectedPieceTile(this, OldTile);
+	}
 }
 
 void AParentPiece::OnRep_CurrentStrength()

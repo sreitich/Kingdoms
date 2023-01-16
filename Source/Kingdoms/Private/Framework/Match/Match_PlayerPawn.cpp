@@ -204,7 +204,7 @@ void AMatch_PlayerPawn::Interact_WaitingForTurn(FHitResult InteractionHit)
 			if (IsValid(SelectedEnemyPiece))
 			{
 				SelectedEnemyPiece->GetCurrentTile()->bReticleControlledByCursor = true;
-				SelectedEnemyPiece->GetCurrentTile()->UpdateReticle(false, true);
+				SelectedEnemyPiece->GetCurrentTile()->UpdateReticle(false, false);
 
 				SelectedEnemyPiece->FlashHighlight(SelectedEnemyPiece->EnemyFresnelColor, SelectedEnemyPiece->DefaultFresnelStrength, 1.0, 0.0f, true);
 			}
@@ -587,6 +587,21 @@ void AMatch_PlayerPawn::ClearSelection(bool bPiece, bool bEnemyPiece, bool bTarg
 		SelectedTile->UpdateReticle(false, true);
 		/* Clear the pointer to the selected tile. */
 		SelectedTile = nullptr;
+	}
+}
+
+void AMatch_PlayerPawn::UpdateSelectedPieceTile(AParentPiece* Piece, ABoardTile* OldTile)
+{
+	/* If this piece was selected. */
+	if (IsValid(Piece) && (Piece == SelectedPiece || Piece == SelectedEnemyPiece || Piece == SelectedTargetPiece))
+	{
+		/* Remove the reticle from its old tile. */
+		OldTile->bReticleControlledByCursor = true;
+		OldTile->UpdateReticle(false, false);
+
+		/* Add a reticle to its new tile. */
+		Piece->GetCurrentTile()->bReticleControlledByCursor = false;
+		Piece->GetCurrentTile()->UpdateReticle(true, false);
 	}
 }
 

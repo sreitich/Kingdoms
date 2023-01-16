@@ -47,6 +47,10 @@ public:
 		UFUNCTION(Client, Reliable)
 		void Client_DeselectPieceOrTile(AParentPiece* PieceToDeselect, ABoardTile* TileToDeselect);
 
+	/* Refreshes the reticle for the given piece's old and new tiles after it moves. */
+	UFUNCTION(BlueprintCallable)
+	void UpdateSelectedPieceTile(AParentPiece* Piece, ABoardTile* OldTile);
+
 	/* RPC wrapper for RefreshPieceInfoWidgets. */
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void Client_RefreshPieceInfoWidgets() const;
@@ -109,6 +113,10 @@ public:
 	/* Returns this pawn's piece networking component, allowing other classes to call networked piece-related functions. */
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE UPieceNetworkingComponent* GetPieceNetworkingComponent() const { return PieceNetworkingComponent; }
+
+	// /* Used to check which enemy piece the player currently has selected so they can be updated if it moves. */
+	// UFUNCTION(BlueprintCallable)
+	// FORCEINLINE AParentPiece* GetSelectedEnemyPiece() const { return SelectedEnemyPiece; }
 
 
 /* Public variables. */
