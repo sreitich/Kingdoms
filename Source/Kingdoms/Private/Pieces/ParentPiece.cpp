@@ -147,6 +147,15 @@ void AParentPiece::PlayPiecePopUp(float Duration, bool bReverse)
 void AParentPiece::InterpolatePieceRotation(ABoardTile* NewTile, FRotator OriginalRot, FRotator TargetRot,
 	bool bMoveWhenFinished, bool bResetStateWhenFinished)
 {
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Rotation requested on server."));
+		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Rotation requested on client."));
+	}
 	/* Set the parameters needed for the piece rotation timeline. */
 	RotationNewTile = NewTile;
 	OriginalRotationRot = OriginalRot;
