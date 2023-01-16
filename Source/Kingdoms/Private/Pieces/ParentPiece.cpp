@@ -107,6 +107,19 @@ void AParentPiece::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(AParentPiece, AttackInfo);
 }
 
+void AParentPiece::Destroyed()
+{
+	Super::Destroyed();
+
+	/* Destroy every actor attached to this piece. */
+	TArray<AActor*> AttachedActors;
+	GetAttachedActors(AttachedActors, false);
+	for (AActor* AttachedActor : AttachedActors)
+	{
+		AttachedActor->Destroy();
+	}
+}
+
 void AParentPiece::OnBeginCursorOver(UPrimitiveComponent* Component)
 {
 	/* If this piece occupies a tile, call that tile's OnBeginCursorOver function, which just handles the logic for

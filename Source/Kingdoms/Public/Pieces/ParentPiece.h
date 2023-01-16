@@ -40,6 +40,9 @@ public:
 	/* Replicates variables. */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	/* Called when this actor is explicitly destroyed. */
+	virtual void Destroyed() override;
+
 	/* Called when the player starts hovering over this piece. */
 	UFUNCTION()
 	void OnBeginCursorOver(UPrimitiveComponent* Component);
