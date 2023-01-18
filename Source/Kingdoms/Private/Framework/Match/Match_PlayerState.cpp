@@ -199,7 +199,8 @@ void AMatch_PlayerState::OnRep_bReadyToPlay()
 
 void AMatch_PlayerState::OnRep_CurrentPlayerStatus(EPlayerStatus OldPlayerStatus)
 {
-    /* If the player was waiting for their turn and is now selecting a piece, reset their turn progress. */
+    /* If the player was waiting for their turn and is now selecting a piece, reset their turn progress and check if
+     * they already have a piece info widget open. */
     if (CurrentPlayerStatus == E_SelectingPiece && OldPlayerStatus == E_WaitingForTurn)
     {
         bMoveActionUsed = false;
@@ -210,6 +211,16 @@ void AMatch_PlayerState::OnRep_CurrentPlayerStatus(EPlayerStatus OldPlayerStatus
         {
             OnRep_MoveActionUsed();
             OnRep_AbilityActionUsed();
+        }
+
+        /* If this player has a friendly piece info widget open when it becomes their turn, set their current status
+         * to E_SelectingAction instead of E_SelectingPiece. */
+        if (const AMatch_PlayerController* ControllerPtr = GetPawn()->GetController<AMatch_PlayerController>())
+        {
+            if (ControllerPtr->IsPieceInfoWidgetOpen(E_Friendly))
+            {
+                SetPlayerStatus(E_SelectingAction);
+            }
         }
 
         /* Refresh this player's piece info widgets when their turn starts and their player status has been updated. */

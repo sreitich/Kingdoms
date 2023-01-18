@@ -17,8 +17,6 @@
 #include "UserDefinedData/PieceData_UserDefinedData.h"
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
-#include "Framework/Match/Match_PlayerPawn.h"
-#include "Framework/Match/Match_PlayerState.h"
 #include "UserInterface/Match/Match_TurnProgressWidget.h"
 
 AMatch_PlayerController::AMatch_PlayerController()
@@ -259,12 +257,6 @@ void AMatch_PlayerController::RefreshPieceInfoWidgets(AParentPiece* PieceToRefre
         /* If the friendly piece info widget exists, is currently displaying PieceToRefresh, and is currently visible... */
         if (Match_BaseWidget && Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->GetDisplayedPiece() == PieceToRefresh && Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->GetVisibility() == ESlateVisibility::Visible)
         {
-            /* If the player is currently selecting a piece but has a friendly piece info widget open (e.g. it became
-             * their turn while the widget was open), then change their status to be selecting an action. */
-            AMatch_PlayerState* PlayerStatePtr = GetPlayerState<AMatch_PlayerState>();
-            if (PlayerStatePtr->GetCurrentPlayerStatus() == E_SelectingPiece)
-                PlayerStatePtr->SetPlayerStatus(E_SelectingAction);
-
             /* Refresh the widget. */
             Match_BaseWidget->GetPieceInfoWidget(E_Friendly)->RefreshWidget();
         }
@@ -294,6 +286,22 @@ void AMatch_PlayerController::HideWidgetDisplayingPiece(AParentPiece* PieceToHid
             UpdatePieceInfoWidget(PieceToHide, E_Hostile, true);
         }
     }
+}
+
+bool AMatch_PlayerController::IsPieceInfoWidgetOpen(EAlignment Alignment) const
+{
+    /* Return whether or not the corresponding piece info widget is open. */
+    if (IsValid(Match_BaseWidget))
+    {
+        const UMatch_PieceInfoWidget* WidgetToCheck = Match_BaseWidget->GetPieceInfoWidget(Alignment);
+
+        if (IsValid(WidgetToCheck))
+        {
+            return WidgetToCheck->GetVisibility() == ESlateVisibility::Visible;
+        }
+    }
+
+    return false;
 }
 
 void AMatch_PlayerController::CreateMoveConfirmationWidget(bool bDestroy, AParentPiece* PendingPiece)

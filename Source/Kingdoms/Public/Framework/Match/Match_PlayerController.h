@@ -88,6 +88,9 @@ public:
 		UFUNCTION(Category="User Interface")
 		void HideWidgetDisplayingPiece(AParentPiece* PieceToHide) const;
 
+		UFUNCTION(Category="User Interface")
+		bool IsPieceInfoWidgetOpen(EAlignment Alignment) const;
+
 	/* Creates or destroys a move confirmation pop-up. */
 	UFUNCTION(Category="User Interface")
 	void CreateMoveConfirmationWidget(bool bDestroy, AParentPiece* PendingPiece);
@@ -168,13 +171,13 @@ private:
 	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
 	UMatch_BaseWidget* Match_BaseWidget = nullptr;
 
-	/* Friendly piece info widget pointer. */
-	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
-	UMatch_PieceInfoWidget* Match_FriendlyPieceInfoWidget = nullptr;
-
-	/* Enemy piece info widget pointer. */
-	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
-	UMatch_PieceInfoWidget* Match_EnemyPieceInfoWidget = nullptr;
+	// /* Friendly piece info widget pointer. */
+	// UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
+	// UMatch_PieceInfoWidget* Match_FriendlyPieceInfoWidget = nullptr;
+	//
+	// /* Enemy piece info widget pointer. */
+	// UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
+	// UMatch_PieceInfoWidget* Match_EnemyPieceInfoWidget = nullptr;
 
 	/* Move confirmation widget pointer. */
 	UPROPERTY(VisibleInstanceOnly, Category="Widget Objects")
