@@ -523,7 +523,10 @@ void AMatch_PlayerPawn::Interact_Released()
 	if (bIsDraggingPiece)
 	{
 		/* Remove the PieceDragWidget widget from its parent, triggering its NativeDestruct function */
-		PieceDragWidget->RemoveFromParent();
+		// PieceDragWidget->RemoveFromParent();
+
+		/* Wait for the widget to finish spawning its piece before destroying it. */
+		PieceDragWidget->bPendingDestroy = true;
 	}
 }
 

@@ -40,6 +40,11 @@ public:
 	UPROPERTY()
 	AParentPiece* SpawnedPiece;
 
+	/* Tracks when the player is no longer dragging this widget. Used to ensure the widget's code finishes executing
+	 * before being destroyed. */
+	UPROPERTY()
+	bool bPendingDestroy;
+
 
 /* Public widgets. */
 public:
@@ -95,10 +100,5 @@ protected:
 	/* The current board tile that the dragged piece was placed onto. Used when updating the piece's position. */
 	UPROPERTY()
 	AActor* CurrentTile;
-	
-	/* Used to mark this widget for destruction when this widget's data is stilled required by another class, ensuring
-	 * that it doesn't get destroyed while it's a dependency. */
-	UPROPERTY()
-	bool bPendingDestruction = false;
 
 };

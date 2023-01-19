@@ -89,14 +89,15 @@ void UPieceDragWidget::NativeConstruct()
 
 void UPieceDragWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	/* Try to destroy this widget again if it's safe to. */
-	if (bPendingDestruction)
+	UE_LOG(LogTemp, Error, TEXT("I'm still here"));
+	/* Try to destroy this widget if it is pending destruction and is safe to destroy. */
+	if (bPendingDestroy)
 	{
 		NativeDestruct();
 	}
 	else
 	{
-		/* If the piece has been spawned yet, which is always should be... */
+		/* If the piece has been spawned yet, which it always should be... */
 		if (IsValid(SpawnedPiece))
 		{
 			/* Perform a line trace for board tiles */
@@ -182,7 +183,9 @@ void UPieceDragWidget::NativeDestruct()
 	}
 	else
 	{
-		bPendingDestruction = true;
+		/* Mark this widget for destruction, to try to destroy it as soon as it is safe to do so (i.e. its piece has
+		 * been successfully created. */
+		bPendingDestroy = true;
 	}
 }
 
