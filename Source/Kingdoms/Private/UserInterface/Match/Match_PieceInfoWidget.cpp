@@ -536,7 +536,7 @@ void UMatch_PieceInfoWidget::OnStatsHovered()
     if (ActiveModifiers.Num() > 0 && ModifierListClass)
     {
         /* Create and populate a list of modifier widgets. */
-        ModifierList = Cast<UMatch_ModifierList>(CreateWidget<UUserWidget>(GetWorld(), ModifierListClass, FName("Modifier List Widget")));
+        ModifierList = Cast<UMatch_ModifierList>(CreateWidget<UUserWidget>(GetOwningPlayer(), ModifierListClass, FName("Modifier List Widget")));
         ModifierList->PopulateModifierList(this, ActiveModifiers, PieceAlignment == E_Friendly);
 
         /* Attach the list to the stats button. */
@@ -582,7 +582,7 @@ void UMatch_PieceInfoWidget::OnActiveHovered()
         const EAlignment PieceAlignment = DisplayedPiece->GetLocalAlignment();
 
         /* Create a new ability info pop-up widget and update its information. */
-        AbilityInfoPopup = Cast<UMatch_AbilityInfoPopup>(CreateWidget<UUserWidget>(GetWorld(), DisplayedPiece->ActiveAbilityInfoWidget, FName("Ability Info Pop-Up")));
+        AbilityInfoPopup = Cast<UMatch_AbilityInfoPopup>(CreateWidget<UUserWidget>(GetOwningPlayer(), DisplayedPiece->ActiveAbilityInfoWidget, FName("Ability Info Pop-Up")));
         AbilityInfoPopup->SetUpWidget(DisplayedPiece, true, PieceAlignment == E_Friendly);
         /* Attach the widget to the active ability icon. */
         ActiveAbilityPopupWrapper->AddChild(AbilityInfoPopup);
@@ -619,7 +619,7 @@ void UMatch_PieceInfoWidget::OnPassiveHovered()
         const EAlignment PieceAlignment = DisplayedPiece->GetLocalAlignment();
 
         /* Create a new ability info pop-up widget and update its information. */
-        AbilityInfoPopup = Cast<UMatch_AbilityInfoPopup>(CreateWidget<UUserWidget>(GetWorld(), DisplayedPiece->PassiveAbilityInfoWidget, FName("Ability Info Pop-Up")));
+        AbilityInfoPopup = Cast<UMatch_AbilityInfoPopup>(CreateWidget<UUserWidget>(GetOwningPlayer(), DisplayedPiece->PassiveAbilityInfoWidget, FName("Ability Info Pop-Up")));
         AbilityInfoPopup->SetUpWidget(DisplayedPiece, false, PieceAlignment == E_Friendly);
         /* Attach the widget to the passive ability icon. */
         PassiveAbilityPopupWrapper->AddChild(AbilityInfoPopup);

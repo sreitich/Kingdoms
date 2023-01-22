@@ -1,4 +1,4 @@
-// Copyright Samuel Reitich 2023.
+// Copyright Change Studios, LLC 2023.
 
 #pragma once
 

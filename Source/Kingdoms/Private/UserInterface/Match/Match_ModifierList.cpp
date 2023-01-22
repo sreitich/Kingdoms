@@ -22,7 +22,7 @@ void UMatch_ModifierList::PopulateModifierList(UMatch_PieceInfoWidget* SpawningP
 	{
 		if (ModifierClass)
 		{
-			UMatch_Modifier* ModifierWidget = Cast<UMatch_Modifier>(CreateWidget<UUserWidget>(GetWorld(), ModifierClass, FName("Modifier " + i)));
+			UMatch_Modifier* ModifierWidget = Cast<UMatch_Modifier>(CreateWidget<UUserWidget>(GetOwningPlayer(), ModifierClass, FName("Modifier " + i)));
 			ModifierListBox->AddChild(ModifierWidget);
 			/* Align the widget's text to the left depending on whether or not the piece is friendly. */
 			ModifierWidget->UpdateDisplayedModifier(this, Modifiers[i], bAlignedLeft);

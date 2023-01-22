@@ -18,7 +18,7 @@ void UMatchSetup_PlacePieces::LoadArmy(FArmyPresetStruct ArmyToLoad)
 		if (IsValid(MatchSetup_UnplacedPieceWidgetClass))
 		{
 			/* Create an unplaced piece widget for this piece. The widget's name is the piece's ID followed by its index in the army. */
-			UMatchSetup_UnplacedPieceWidget* UnplacedPieceWidget = CreateWidget<UMatchSetup_UnplacedPieceWidget>(this, MatchSetup_UnplacedPieceWidgetClass, FName(ArmyToLoad.Pieces[ii] + " - " + FString::FromInt(ii)));
+			UMatchSetup_UnplacedPieceWidget* UnplacedPieceWidget = CreateWidget<UMatchSetup_UnplacedPieceWidget>(GetOwningPlayer(), MatchSetup_UnplacedPieceWidgetClass, FName(ArmyToLoad.Pieces[ii] + " - " + FString::FromInt(ii)));
 
 			/* If the widget was successfully created... */
 			if (UnplacedPieceWidget)

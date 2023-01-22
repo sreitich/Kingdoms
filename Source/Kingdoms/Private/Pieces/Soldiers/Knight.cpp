@@ -59,7 +59,7 @@ void AKnight::OnActiveClicked()
 	if (!ActiveAbilityConfirmationWidget)
 	{
 		/* Create an instance of this piece's active ability confirmation widget. */
-		ActiveAbilityConfirmationWidget = CreateWidget<UKnight_ActiveAbilityConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Knight Active Ability Confirmation Widget"));
+		ActiveAbilityConfirmationWidget = CreateWidget<UKnight_ActiveAbilityConfirmation>(Cast<APlayerController>(GetInstigator()->GetController()), ActiveAbilityConfirmationClass, FName("Knight Active Ability Confirmation Widget"));
 
 		/* Update the active ability confirmation widget and add it to the viewport if it was created successfully. */
 		if (ActiveAbilityConfirmationWidget)

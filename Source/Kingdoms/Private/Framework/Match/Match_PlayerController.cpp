@@ -75,7 +75,7 @@ void AMatch_PlayerController::CreateSelectArmyWidget_Implementation(bool bDestro
             if (IsValid(MatchSetup_SelectArmyClass))
             {
                 /* Create and store the army selection widget for this player. */
-                MatchSetup_SelectArmy = CreateWidget<UMatchSetup_SelectArmy>(GetWorld(), MatchSetup_SelectArmyClass, FName("Army Selection Widget"));
+                MatchSetup_SelectArmy = CreateWidget<UMatchSetup_SelectArmy>(this, MatchSetup_SelectArmyClass, FName("Army Selection Widget"));
 
                 /* If the widget was created successfully... */
                 if (MatchSetup_SelectArmy)
@@ -111,7 +111,7 @@ void AMatch_PlayerController::CreatePlacePiecesWidget_Implementation(FArmyPreset
             if (IsValid(MatchSetup_PlacePiecesClass))
             {
                 /* Create and store the place pieces widget for this player. */
-                MatchSetup_PlacePieces = CreateWidget<UMatchSetup_PlacePieces>(GetWorld(), MatchSetup_PlacePiecesClass, FName("Place Pieces Widget"));
+                MatchSetup_PlacePieces = CreateWidget<UMatchSetup_PlacePieces>(this, MatchSetup_PlacePiecesClass, FName("Place Pieces Widget"));
 
                 /* If the widget was created successfully... */
                 if (MatchSetup_PlacePieces)
@@ -162,7 +162,7 @@ void AMatch_PlayerController::CreateBaseWidget_Implementation(bool bDestroy, boo
             if (IsValid(Match_BaseWidgetClass))
             {
                 /* Create and store the base widget for this player. */
-                Match_BaseWidget = CreateWidget<UMatch_BaseWidget>(GetWorld(), Match_BaseWidgetClass, FName("Base Widget"));
+                Match_BaseWidget = CreateWidget<UMatch_BaseWidget>(this, Match_BaseWidgetClass, FName("Base Widget"));
 
                 /* If the widget was created successfully... */
                 if (Match_BaseWidget)
@@ -326,7 +326,7 @@ void AMatch_PlayerController::CreateMoveConfirmationWidget(bool bDestroy, AParen
             }
 
             /* Create the move confirmation widget. */
-            Match_MoveConfirmation = CreateWidget<UMatch_MoveConfirmation>(GetWorld(), Match_MoveConfirmationClass, FName("Move Confirmation Widget"));
+            Match_MoveConfirmation = CreateWidget<UMatch_MoveConfirmation>(this, Match_MoveConfirmationClass, FName("Move Confirmation Widget"));
 
             /* If the widget was created successfully, add it to the viewport. */
             if (Match_MoveConfirmation)
@@ -379,7 +379,7 @@ void AMatch_PlayerController::CreateAttackConfirmationWidget(bool bDestroy, APar
             }
 
             /* Create the widget. */
-            Match_AttackConfirmation = CreateWidget<UMatch_AttackConfirmation>(GetWorld(), Match_AttackConfirmationClass, FName("Attack Confirmation Widget"));
+            Match_AttackConfirmation = CreateWidget<UMatch_AttackConfirmation>(this, Match_AttackConfirmationClass, FName("Attack Confirmation Widget"));
 
             /* If the widget was created successfully, add it to the viewport. */
             if (Match_AttackConfirmation)
@@ -449,7 +449,7 @@ void AMatch_PlayerController::UpdateAttackGraphicWidget(bool bDestroy, AParentPi
         else if (!bDestroy)
         {
             /* Create the widget. */
-            Match_AttackGraphic = CreateWidget<UMatch_AttackGraphic>(GetWorld(), Match_AttackGraphicClass,
+            Match_AttackGraphic = CreateWidget<UMatch_AttackGraphic>(this, Match_AttackGraphicClass,
                 FName("Attack Graphic Widget"));
 
             /* If the attack graphic widget was successfully created... */

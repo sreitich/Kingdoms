@@ -60,7 +60,7 @@ void UMatchSetup_UnplacedPieceWidget::NativeOnDragDetected(const FGeometry& InGe
 	if (PieceDragWidgetClass)
 	{
 		/* Create a new widget to represent this widget while it's being dragged. */
-        UPieceDragWidget* PieceDragWidget = CreateWidget<UPieceDragWidget>(this, PieceDragWidgetClass, FName("Piece Drag Widget"));
+        UPieceDragWidget* PieceDragWidget = CreateWidget<UPieceDragWidget>(GetOwningPlayer(), PieceDragWidgetClass, FName("Piece Drag Widget"));
 
 		/* Tell the piece drag widget which class it will need to spawn. */
 		PieceDragWidget->ClassToSpawn = PieceData->ClassRef;

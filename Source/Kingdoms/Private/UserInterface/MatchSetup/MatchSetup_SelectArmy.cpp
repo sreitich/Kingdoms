@@ -29,7 +29,7 @@ void UMatchSetup_SelectArmy::NativeConstruct()
 			if (IsValid(MatchSetup_ArmyPresetWidgetClass) && KingdomsGameInstance->ArmyPresets_SaveGame->ArmyPresets[i].Pieces.Num() >  0)
 			{
 				/* Create an army preset widget for this army preset. */
-				UMatchSetup_ArmyPresetWidget* ArmyPresetWidget = CreateWidget<UMatchSetup_ArmyPresetWidget>(this, MatchSetup_ArmyPresetWidgetClass, FName(KingdomsGameInstance->ArmyPresets_SaveGame->ArmyPresets[i].ArmyName));
+				UMatchSetup_ArmyPresetWidget* ArmyPresetWidget = CreateWidget<UMatchSetup_ArmyPresetWidget>(GetOwningPlayer(), MatchSetup_ArmyPresetWidgetClass, FName(KingdomsGameInstance->ArmyPresets_SaveGame->ArmyPresets[i].ArmyName));
 
 				/* If the widget was successfully created... */
 				if (ArmyPresetWidget)

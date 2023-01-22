@@ -63,7 +63,7 @@ void APyromancer::OnActiveClicked()
 	if (!ActiveAbilityConfirmationWidget)
 	{
 		/* Create an instance of this piece's active ability confirmation widget. */
-		ActiveAbilityConfirmationWidget = CreateWidget<UMatch_PyroActiveConfirmation>(GetWorld(), ActiveAbilityConfirmationClass, FName("Pyromancer Active Ability Confirmation Widget"));
+		ActiveAbilityConfirmationWidget = CreateWidget<UMatch_PyroActiveConfirmation>(Cast<APlayerController>(GetInstigator()->GetController()), ActiveAbilityConfirmationClass, FName("Pyromancer Active Ability Confirmation Widget"));
 
 		/* Update the active ability confirmation widget and add it to the viewport if it was created successfully. */
 		if (ActiveAbilityConfirmationWidget)
