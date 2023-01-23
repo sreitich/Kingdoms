@@ -28,11 +28,11 @@ void UMM_MainMenuWidget::NativeConstruct()
 
 	/* Bind the deactivation animation to destroy this widget when it finishes playing. */
 	FWidgetAnimationDynamicEvent AnimBinding = FWidgetAnimationDynamicEvent();
-	AnimBinding.BindDynamic(this, &UMM_MainMenuWidget::OnDeactivated);
+	AnimBinding.BindDynamic(this, &UMM_MainMenuWidget::OnDeactivatedAnimEnd);
 	BindToAnimationFinished(OnDeactivatedAnim, AnimBinding);
 }
 
-void UMM_MainMenuWidget::OnDeactivated()
+void UMM_MainMenuWidget::OnDeactivatedAnimEnd()
 {
 	/* When this widget is deactivated, safely destroy it and transition to the next queued menu in the HUD. */
 	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
@@ -49,15 +49,21 @@ void UMM_MainMenuWidget::OnPlayButton()
 
 void UMM_MainMenuWidget::OnArmyButton()
 {
-	UE_LOG(LogTemp, Error, TEXT("Navigating to army menu."))
+	/* To navigate to the army menu, queue the menu, which will deactivate this menu and transition to the new one. */
+	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
+	HUDPtr->QueueMenuChange(E_ArmyMenu);
 }
 
 void UMM_MainMenuWidget::OnStoreButton()
 {
-	UE_LOG(LogTemp, Error, TEXT("Navigating to store."))
+	/* To navigate to the store, queue the new screen, which will deactivate this menu and transition to the new one. */
+	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
+	HUDPtr->QueueMenuChange(E_StoreScreen);
 }
 
 void UMM_MainMenuWidget::OnOptionsButton()
 {
-	UE_LOG(LogTemp, Error, TEXT("Navigating to options menu."))
+	/* To navigate to the options screen, queue the new screen, which will deactivate this menu and transition to the new one. */
+	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
+	HUDPtr->QueueMenuChange(E_OptionsScreen);
 }

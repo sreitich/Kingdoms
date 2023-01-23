@@ -34,7 +34,7 @@ protected:
 
 	/* Called when the deactivation animation finishes playing to destroy this widget. */
 	UFUNCTION()
-	void OnDeactivated();
+	void OnDeactivatedAnimEnd();
 
 
 	/* Called when the "play" button is clicked. Navigates to the "play" menu. */

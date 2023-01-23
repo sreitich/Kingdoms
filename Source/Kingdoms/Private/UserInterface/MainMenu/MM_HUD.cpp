@@ -52,7 +52,7 @@ void AMM_HUD::ChangeMenus()
 			CreatePlayMenuWidget(false);
 			break;
 		case E_StoreScreen:
-			CreateOptionsWidget(false);
+			CreateStoreWidget(false);
 			break;
 		/* Return to the main menu by default if there's is a problem. */
 		default:
@@ -110,6 +110,7 @@ void AMM_HUD::CreatePlayMenuWidget(bool bDestroy)
 				PlayMenuWidget->AddToViewport(0);
 				CurrentMenu = PlayMenuWidget;
 			}
+			/* If there was a problem creating the widget, return to the main menu. */
 			else
 			{
 				QueueMenuChange(E_MainMenu);
@@ -129,7 +130,7 @@ void AMM_HUD::CreatePlayMenuWidget(bool bDestroy)
 
 void AMM_HUD::CreateArmyMenuWidget(bool bDestroy)
 {
-		/* Create an army menu widget if requested. */
+	/* Create an army menu widget if requested. */
 	if (!bDestroy)
 	{
 		if (ArmyMenuWidgetClass)
@@ -139,7 +140,15 @@ void AMM_HUD::CreateArmyMenuWidget(bool bDestroy)
 
 			/* Add the army menu widget to the player's viewport if it was successfully created. */
 			if (ArmyMenuWidget)
+			{
 				ArmyMenuWidget->AddToViewport(0);
+				CurrentMenu = ArmyMenuWidget;
+			}
+			/* If there was a problem creating the widget, return to the main menu. */
+			else
+			{
+				QueueMenuChange(E_MainMenu);
+			}
 		}
 	}
 	/* Destroy the army menu widget if requested. */
@@ -147,7 +156,7 @@ void AMM_HUD::CreateArmyMenuWidget(bool bDestroy)
 	{
 		if (ArmyMenuWidget)
 		{
-			// ArmyMenuWidget->DestroyWidget();
+			ArmyMenuWidget->RemoveFromParent();
 			ArmyMenuWidget = nullptr;
 		}
 	}
@@ -155,7 +164,7 @@ void AMM_HUD::CreateArmyMenuWidget(bool bDestroy)
 
 void AMM_HUD::CreateStoreWidget(bool bDestroy)
 {
-		/* Create a store widget if requested. */
+	/* Create a store widget if requested. */
 	if (!bDestroy)
 	{
 		if (StoreWidgetClass)
@@ -165,7 +174,15 @@ void AMM_HUD::CreateStoreWidget(bool bDestroy)
 
 			/* Add the store widget to the player's viewport if it was successfully created. */
 			if (StoreWidget)
+			{
 				StoreWidget->AddToViewport(0);
+				CurrentMenu = StoreWidget;
+			}
+			/* If there was a problem creating the widget, return to the main menu. */
+			else
+			{
+				QueueMenuChange(E_MainMenu);
+			}
 		}
 	}
 	/* Destroy the store widget if requested. */
@@ -173,7 +190,7 @@ void AMM_HUD::CreateStoreWidget(bool bDestroy)
 	{
 		if (StoreWidget)
 		{
-			// StoreWidget->DestroyWidget();
+			StoreWidget->RemoveFromParent();
 			StoreWidget = nullptr;
 		}
 	}
@@ -191,7 +208,15 @@ void AMM_HUD::CreateOptionsWidget(bool bDestroy)
 
 			/* Add the options widget to the player's viewport if it was successfully created. */
 			if (OptionsWidget)
+			{
 				OptionsWidget->AddToViewport(0);
+				CurrentMenu = OptionsWidget;
+			}
+			/* If there was a problem creating the widget, return to the main menu. */
+			else
+			{
+				QueueMenuChange(E_OptionsScreen);
+			}
 		}
 	}
 	/* Destroy the options widget if requested. */
@@ -199,7 +224,7 @@ void AMM_HUD::CreateOptionsWidget(bool bDestroy)
 	{
 		if (OptionsWidget)
 		{
-			// OptionsWidget->DestroyWidget();
+			OptionsWidget->RemoveFromParent();
 			OptionsWidget = nullptr;
 		}
 	}
