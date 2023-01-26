@@ -45,6 +45,14 @@ protected:
 /* Protected widgets. */
 protected:
 
+	/* Attempts to join an online match. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* QuickPlayButton;
+
+	/* Allows the player to invite a friend to play. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* InviteFriendButton;
+
 	/* Returns the player to the main menu. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* BackButton;
