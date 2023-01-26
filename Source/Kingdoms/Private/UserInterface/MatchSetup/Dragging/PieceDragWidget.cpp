@@ -13,6 +13,8 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/TextBlock.h"
+#include "Framework/Match/Match_GameStateBase.h"
+#include "Framework/Match/Match_PlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
 #define OUT
@@ -49,8 +51,11 @@ void UPieceDragWidget::InitializeWidget(bool bSpawnPiece)
 			PieceSpawnLocation = GetClosestOpenTile(HitResult.ImpactPoint)->GetActorLocation() + FVector(0.0f, 0.0f, 165.0f);
 		}
 
-		/* Get the direction of this player's pawn so that the placed piece faces the same direction as its owning player. */
-		PieceSpawnRotation.Yaw = GetOwningPlayerPawn()->GetActorRotation().Yaw;
+		/* Get the direction of this player's player start so that the placed piece faces the same direction as its owning player. */
+		if (AMatch_GameStateBase* GameStatePtr = Cast<AMatch_GameStateBase>(UGameplayStatics::GetGameState(GetOwningPlayerPawn())))
+		{
+			PieceSpawnRotation.Yaw = GameStatePtr->PlayerStarts[GetOwningPlayerState<AMatch_PlayerState>()->PlayerIndex - 1]->GetActorRotation().Yaw;
+		}
 
 		/* Spawn the new piece on the server that will replicate. */
 		GetOwningPlayer<AMatch_PlayerController>()->GetServerCommunicationComponent()->SpawnPiece_Server(ClassToSpawn, PieceSpawnLocation, PieceSpawnRotation, this);
