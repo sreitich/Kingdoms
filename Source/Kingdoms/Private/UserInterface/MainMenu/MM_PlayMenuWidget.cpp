@@ -3,9 +3,11 @@
 
 #include "UserInterface/MainMenu/MM_PlayMenuWidget.h"
 
+#include "Framework/KingdomsGameInstance.h"
 #include "UserInterface/MainMenu/MM_HUD.h"
 
 #include "Components/Button.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMM_PlayMenuWidget::DeactivateWidget()
 {
@@ -17,6 +19,10 @@ void UMM_PlayMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	/* Bind the quick-play button to find/create and join then a session. */
+	QuickPlayButton->OnClicked.AddDynamic(this, &UMM_PlayMenuWidget::OnQuickPlayClicked);
+	/* Bind the invite button to open the Steam friend invite interface. */
+	InviteFriendButton->OnClicked.AddDynamic(this, &UMM_PlayMenuWidget::OnInviteFriendClicked);
 	/* Bind the "back" button to deactivate this widget. */
 	BackButton->OnClicked.AddDynamic(this, &UMM_PlayMenuWidget::OnBackClicked);
 
@@ -27,6 +33,9 @@ void UMM_PlayMenuWidget::NativeConstruct()
 	FWidgetAnimationDynamicEvent AnimBinding = FWidgetAnimationDynamicEvent();
 	AnimBinding.BindDynamic(this, &UMM_PlayMenuWidget::OnDeactivatedAnimEnd);
 	BindToAnimationFinished(OnDeactivatedAnim, AnimBinding);
+
+	/* Grab a persistent pointer to the game instance. */
+	GameInstancePtr = Cast<UKingdomsGameInstance>(UGameplayStatics::GetGameInstance(GetOwningPlayer()));
 }
 
 void UMM_PlayMenuWidget::OnDeactivatedAnimEnd()
@@ -35,6 +44,20 @@ void UMM_PlayMenuWidget::OnDeactivatedAnimEnd()
 	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
 	HUDPtr->ChangeMenus();
 	HUDPtr->CreatePlayMenuWidget(true);
+}
+
+void UMM_PlayMenuWidget::OnQuickPlayClicked()
+{
+	/* Join an available session. If no sessions are available, create a new one. */
+	if (IsValid(GameInstancePtr))
+	{
+		GameInstancePtr->JoinServer();
+	}
+}
+
+void UMM_PlayMenuWidget::OnInviteFriendClicked()
+{
+	
 }
 
 void UMM_PlayMenuWidget::OnBackClicked()

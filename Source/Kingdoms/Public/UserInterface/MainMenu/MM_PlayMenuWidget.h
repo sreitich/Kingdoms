@@ -9,6 +9,7 @@
 #include "MM_PlayMenuWidget.generated.h"
 
 class UButton;
+class UKingdomsGameInstance;
 
 /**
  * 
@@ -37,9 +38,25 @@ protected:
 	void OnDeactivatedAnimEnd();
 
 
+	/* Attempts to connect the player to an existing session. Creates a new session if one cannot be found. */
+	UFUNCTION()
+	void OnQuickPlayClicked();
+
+	/* Uses the Steam interface to challenge a target Steam friend to play. */
+	UFUNCTION()
+	void OnInviteFriendClicked();
+	
 	/* Plays the deactivation animation animation, which deactivates this widget when it finishes playing. */
 	UFUNCTION()
 	void OnBackClicked();
+
+
+/* Protected variables. */
+protected:
+
+	/* A persistent pointer to the game instance. */
+	UPROPERTY()
+	UKingdomsGameInstance* GameInstancePtr;
 
 
 /* Protected widgets. */

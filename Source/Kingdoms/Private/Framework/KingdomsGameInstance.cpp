@@ -84,7 +84,7 @@ void UKingdomsGameInstance::OnFindSessionComplete(bool bSucceeded)
 		/* If the player cannot find a session, create a new one. */
 		else
 		{
-			CreateServer();
+			CreateServer(false);
 		}
 	}
 }
@@ -106,19 +106,23 @@ void UKingdomsGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSess
 	}
 }
 
-void UKingdomsGameInstance::CreateServer()
+void UKingdomsGameInstance::CreateServer(bool bFriendServer)
 {
 	// Debug line.
 	UE_LOG(LogTemp, Error, TEXT("CreateServer"));
 
 	/* Customize the settings for our new session. */
 	FOnlineSessionSettings SessionSettings;
+	SessionSettings.bAllowInvites = bFriendServer;
 	SessionSettings.bAllowJoinInProgress = true;
+	SessionSettings.bAllowJoinViaPresenceFriendsOnly = bFriendServer;
 	SessionSettings.bIsDedicated = false;
 	SessionSettings.bIsLANMatch = (IOnlineSubsystem::Get()->GetSubsystemName() == "NULL");
-	SessionSettings.bShouldAdvertise = true;
+	SessionSettings.bShouldAdvertise = !bFriendServer;
+	SessionSettings.bUseLobbiesIfAvailable = true;
 	SessionSettings.bUsesPresence = true;
-	SessionSettings.NumPublicConnections = 2;
+	SessionSettings.NumPrivateConnections = bFriendServer ? 2 : 0;
+	SessionSettings.NumPublicConnections = bFriendServer ? 0 : 2;
 
 	/* Create a new session using our settings. */
 	SessionInterface->CreateSession(0, FName("Kingdoms Session"), SessionSettings);
