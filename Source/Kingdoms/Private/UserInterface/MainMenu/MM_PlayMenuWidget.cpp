@@ -7,6 +7,7 @@
 #include "UserInterface/MainMenu/MM_HUD.h"
 
 #include "Components/Button.h"
+#include "Framework/MainMenu/MM_PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 
 void UMM_PlayMenuWidget::DeactivateWidget()
@@ -51,6 +52,7 @@ void UMM_PlayMenuWidget::OnQuickPlayClicked()
 	/* Join an available session. If no sessions are available, create a new one. */
 	if (IsValid(GameInstancePtr))
 	{
+		GetOwningPlayer<AMM_PlayerController>()->CreateQueueTimerWidget();
 		GameInstancePtr->JoinServer();
 	}
 }

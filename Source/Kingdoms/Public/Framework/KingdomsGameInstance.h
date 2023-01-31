@@ -24,11 +24,15 @@ public:
 	/* Default constructor. */
 	UKingdomsGameInstance();
 
-	/* Creates a new session. */
+	/* Creates a new public session that anyone can join via matchmaking. */
 	UFUNCTION()
-	void CreateServer(bool bFriendServer);
+	void CreatePublicServer();
 
-	/* Attempts to join an ongoing session. Creates a new session if one cannot be found. */
+	/* Creates a new private session that can only be joined via an invite from the host. */
+	UFUNCTION()
+	void CreatePrivateServer();
+
+	/* Searches for sessions with presence. */
 	UFUNCTION()
 	void JoinServer();
 
@@ -53,11 +57,18 @@ protected:
 	/* Called when an attempt to start a new game session has ended. */
 	virtual void OnCreateSessionComplete(FName SessionName, bool bSucceeded);
 
-	/* Called when game session search finishes. */
+	/* Called when game session search finishes. Joins the first session found or creates a new one if none were
+	 * found. */
 	virtual void OnFindSessionComplete(bool bSucceeded);
 
-	/* Called when an attempt to join a session has ended. */
+	/* Called when an attempt to join a session has ended. Registers the joined player with the session. */
 	virtual void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+
+	/* Attempts to start the session if there are now enough registered players. */
+	virtual void OnRegisterPlayersComplete(FName SessionName, const TArray<FUniqueNetIdRef>& PlayerId, bool bWasSuccessful);
+
+	/* Sends the connected players to the correct map. */
+	void OnStartSessionComplete(FName SessionName, bool bWasSuccessful);
 
 
 /* Protected variables. */
