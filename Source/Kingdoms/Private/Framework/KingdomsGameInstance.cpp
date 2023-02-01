@@ -113,12 +113,13 @@ void UKingdomsGameInstance::OnCreateSessionComplete(FName SessionName, bool bSuc
 {
 	UE_LOG(LogTemp, Error, TEXT("Created session."));
 	
-	/* When we successfully created a session, register with it. */
+	/* When we successfully create a session, travel to a new main menu map as the listen server. */
 	if (bSucceeded)
 	{
 		if (const ULocalPlayer* LocalPlayerPtr = GetFirstGamePlayer())
 		{
-			SessionInterface->RegisterPlayer(SessionName, *LocalPlayerPtr->GetPreferredUniqueNetId(), false);
+			// SessionInterface->RegisterPlayer(SessionName, *LocalPlayerPtr->GetPreferredUniqueNetId(), false);
+			GetWorld()->ServerTravel("/Game/Maps/L_MainMenu?listen");
 		}
 	}
 }
@@ -131,10 +132,13 @@ void UKingdomsGameInstance::OnFindSessionComplete(bool bSucceeded)
 		/* Get every found session as an array. */
 		TArray<FOnlineSessionSearchResult> SearchResults = SessionSearch->SearchResults;
 
-		/* If there were any (>0) sessions found, join the first one. */
+		/* If there were any sessions with open connections found, join the first one. */
 		if (SearchResults.Num())
 		{
-			SessionInterface->JoinSession(0, FName("Kingdoms Session"), SearchResults[0]);
+			if (SearchResults[0].Session.NumOpenPublicConnections)
+			{
+				SessionInterface->JoinSession(0, FName("Kingdoms Session"), SearchResults[0]);
+			}
 		}
 		/* If the player cannot find a session, create a new one. */
 		else
@@ -148,44 +152,12 @@ void UKingdomsGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSess
 {
 	UE_LOG(LogTemp, Error, TEXT("Joined session."));
 
+	/* When we successfully join a session, travel to the session's map. */
 	if (const ULocalPlayer* LocalPlayerPtr = GetFirstGamePlayer())
 	{
 		/* Register the local player with the session they just joined. */
-		SessionInterface->RegisterPlayer(SessionName, *LocalPlayerPtr->GetPreferredUniqueNetId(), false);
-	}
-}
+		// SessionInterface->RegisterPlayer(SessionName, *LocalPlayerPtr->GetPreferredUniqueNetId(), false);
 
-void UKingdomsGameInstance::OnRegisterPlayersComplete(FName SessionName, const TArray<FUniqueNetIdRef>& PlayerId,
-	bool bWasSuccessful)
-{
-	/* Get a pointer to the session that the player registered to. */
-	const FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(SessionName);
-
-	UE_LOG(LogTemp, Error, TEXT("Registered with the session. Current registered players: %i."), CurrentSession->SessionSettings.NumPublicConnections - CurrentSession->NumOpenPublicConnections);
-
-	/* If there are two players in this session, start the session. */
-	if (CurrentSession->SessionSettings.NumPublicConnections - CurrentSession->NumOpenPublicConnections == 2)
-	{
-		SessionInterface->StartSession(SessionName);
-	}
-}
-
-void UKingdomsGameInstance::OnStartSessionComplete(FName SessionName, bool bWasSuccessful)
-{
-	UE_LOG(LogTemp, Error, TEXT("Started the session."));
-
-	/* Get the session that was started. */
-	const FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(SessionName);
-
-	/* If this is the player who created the server, travel to the game map as a listen server. */
-	if (CurrentSession->bHosting)
-	{
-		GetWorld()->ServerTravel("/Game/Maps/Playtesting/Testing_TileRework?listen");
-	}
-	/* If this is a player who connected to the server online, travel to the game map as a client. */
-	else
-	{
-		/* Get the player's controller. */
 		if (APlayerController* PlayerControllerPtr = UGameplayStatics::GetPlayerController(GetWorld(), 0))
 		{
 			/* Get the address of the map to join. */
@@ -197,6 +169,46 @@ void UKingdomsGameInstance::OnStartSessionComplete(FName SessionName, bool bWasS
 			{
 				PlayerControllerPtr->ClientTravel(JoinAddress, ETravelType::TRAVEL_Absolute);
 			}
-		}		
+		}	
 	}
+}
+
+void UKingdomsGameInstance::OnRegisterPlayersComplete(FName SessionName, const TArray<FUniqueNetIdRef>& PlayerId,
+	bool bWasSuccessful)
+{
+	UE_LOG(LogTemp, Error, TEXT("Registered player"));
+
+	// /* Get a pointer to the session that the player registered to. */
+	// const FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(SessionName);
+	// const ULocalPlayer* LocalPlayerPtr = GetFirstGamePlayer();
+	//
+	// /* If the registered player is the host, travel to a new main menu map as a listen server. */
+	// if (LocalPlayerPtr && CurrentSession->OwningUserId == LocalPlayerPtr->GetPreferredUniqueNetId())
+	// {
+	// 	// UE_LOG(LogTemp, Error, TEXT("Registered host."));
+	// 	GetWorld()->ServerTravel("/Game/Maps/L_MainMenu?listen");
+	// }
+	// /* If the registered player is not the host, travel to the session's map. */
+	// else
+	// {
+	// 	UE_LOG(LogTemp, Error, TEXT("Registered client."));
+	// 	/* Get the player's controller. */
+	// 	if (APlayerController* PlayerControllerPtr = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+	// 	{
+	// 		/* Get the address of the map to join. */
+	// 		FString JoinAddress = "";
+	// 		SessionInterface->GetResolvedConnectString(SessionName, JoinAddress);
+	// 		
+	// 		/* Travel to the joined session's corresponding map if the map's address was found. */
+	// 		if (JoinAddress != "")
+	// 		{
+	// 			PlayerControllerPtr->ClientTravel(JoinAddress, ETravelType::TRAVEL_Absolute);
+	// 		}
+	// 	}	
+	// }
+}
+
+void UKingdomsGameInstance::OnStartSessionComplete(FName SessionName, bool bWasSuccessful)
+{
+	UE_LOG(LogTemp, Error, TEXT("Started the session."));
 }
