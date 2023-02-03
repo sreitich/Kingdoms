@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MM_QueueTimer.generated.h"
 
+class UButton;
 class UTextBlock;
 
 /**
@@ -23,12 +24,21 @@ public:
 	UFUNCTION()
 	void UpdateQueueTimer();
 
+	/* Called when an opponent is found, preventing the player from "cancelling" matchmaking until they enter their
+	 * game. */
+	UFUNCTION()
+	void FoundOpponent();
+
 
 /* Protected functions. */
 protected:
 
 	/* Called when this widget is created. */
 	virtual void NativeConstruct() override;
+
+	/* Called when the "cancel" button is clicked to leave and destroy the current session. */
+	UFUNCTION()
+	void OnCancelClicked();
 
 
 /* Protected widgets. */
@@ -38,6 +48,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UTextBlock* TimerText;
 
+	/* Leaves and destroys the current session. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* CancelButton;
+
 
 /* Protected animations. */
 protected:
@@ -45,6 +59,10 @@ protected:
 	/* Plays when this widget is spawned. */
 	UPROPERTY(Transient, meta=(BindWidgetAnim))
 	UWidgetAnimation* OnActivatedAnim;
+
+	/* Plays when an opponent is found and the queue ends. */
+	UPROPERTY(Transient, meta=(BindWidgetAnim))
+	UWidgetAnimation* FoundOpponentAnim;
 
 
 /* Private functions. */

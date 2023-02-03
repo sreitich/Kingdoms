@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UserDefinedData/Match_UserDefinedData.h"
+
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
@@ -35,6 +37,10 @@ public:
 	/* Searches for sessions with presence. */
 	UFUNCTION()
 	void JoinServer();
+
+	/* Safely leaves the current session. Destroys the session if this is the host. */
+	UFUNCTION()
+	void LeaveServer(EMatchStatus CurrentMatchStatus);
 
 	/* Provides whether or not the local player is in a session and if they are the host of that session. */
 	UFUNCTION()

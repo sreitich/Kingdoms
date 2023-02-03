@@ -47,32 +47,37 @@ public:
 	void ChangeMenus();
 
 	/* Creates or destroys the main menu widget. */
-	UFUNCTION(Category="Widget Creation")
+	UFUNCTION(Category="Main Menu Widgets")
 	void CreateMainMenuWidget(bool bDestroy);
 
 		/* Creates or destroys the play menu widget. */
-		UFUNCTION(Category="Widget Creation")
+		UFUNCTION(Category="Main Menu Widgets")
 		void CreatePlayMenuWidget(bool bDestroy);
 
 		/* Creates or destroys the army menu widget. */
-		UFUNCTION(Category="Widget Creation")
+		UFUNCTION(Category="Main Menu Widgets")
 		void CreateArmyMenuWidget(bool bDestroy);
 
 		/* Creates or destroys the store widget. */
-		UFUNCTION(Category="Widget Creation")
+		UFUNCTION(Category="Main Menu Widgets")
 		void CreateStoreWidget(bool bDestroy);
 
 		/* Creates or destroys the options widget. */
-		UFUNCTION(Category="Widget Creation")
+		UFUNCTION(Category="Main Menu Widgets")
 		void CreateOptionsWidget(bool bDestroy);
 
 	/* Creates a matchmaking start pop-up widget. */
-	UFUNCTION(Category="Widget Creation")
+	UFUNCTION(Category="Main Menu Widgets")
 	void CreateMatchmakingStartPopUpWidget();
 
 	/* Creates a queue timer widget. */
-	UFUNCTION(Category="Widget Creation")
-	void CreateQueueTimerWidget();
+	UFUNCTION(Category="Queue Timer Widget")
+	void CreateQueueTimerWidget(bool bDestroy);
+
+		/* Called when an opponent is found, preventing the player from "cancelling" matchmaking until they enter their
+		 * game. Wrapper function for queue timer widget's FoundOpponent function. */
+		UFUNCTION(Category="Queue Timer Widget")
+		void HUD_FoundOpponent();
 
 
 /* Protected functions. */

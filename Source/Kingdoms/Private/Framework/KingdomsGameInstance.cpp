@@ -8,6 +8,7 @@
 
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "UserInterface/MainMenu/MM_HUD.h"
 
 UKingdomsGameInstance::UKingdomsGameInstance()
 {
@@ -60,6 +61,22 @@ void UKingdomsGameInstance::JoinServer()
 
 	/* Search for current sessions. */
 	SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
+}
+
+void UKingdomsGameInstance::LeaveServer(EMatchStatus CurrentMatchStatus)
+{
+	/* We don't need any kind of end-of-match code when the player cancels matchmaking. */
+	if (CurrentMatchStatus == E_Matchmaking)
+	{
+		/* Destroy the current session. */
+		SessionInterface->DestroySession(CurrentSessionName);
+
+		/* Destroy the displayed queue timer widget. */
+		if (AMM_HUD* HUDPtr = GetFirstLocalPlayerController(GetWorld())->GetHUD<AMM_HUD>())
+		{
+			HUDPtr->CreateQueueTimerWidget(true);
+		}
+	}
 }
 
 void UKingdomsGameInstance::GetCurrentSessionInfo(bool& bInSession, bool& bIsHost) const
@@ -212,8 +229,6 @@ void UKingdomsGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSess
 void UKingdomsGameInstance::OnRegisterPlayersComplete(FName SessionName, const TArray<FUniqueNetIdRef>& PlayerId,
 	bool bWasSuccessful)
 {
-	UE_LOG(LogTemp, Error, TEXT("Registered player"));
-
 	// /* Get a pointer to the session that the player registered to. */
 	// const FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(SessionName);
 	// const ULocalPlayer* LocalPlayerPtr = GetFirstGamePlayer();

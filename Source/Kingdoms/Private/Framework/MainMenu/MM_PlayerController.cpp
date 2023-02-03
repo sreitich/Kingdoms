@@ -40,7 +40,7 @@ void AMM_PlayerController::BeginPlay()
 			if (AMM_HUD* HUDPtr = GetHUD<AMM_HUD>())
 			{
 				HUDPtr->CreatePlayMenuWidget(false);
-				HUDPtr->CreateQueueTimerWidget();
+				HUDPtr->CreateQueueTimerWidget(false);
 			}
 		}
 		/* If the player is entering the main menu from anywhere else, create the main menu widget. */

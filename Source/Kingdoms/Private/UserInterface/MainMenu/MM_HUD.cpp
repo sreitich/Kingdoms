@@ -73,7 +73,7 @@ void AMM_HUD::CreateMainMenuWidget(bool bDestroy)
 			MainMenuWidget = CreateWidget<UMM_MainMenuWidget>(GetOwningPlayerController(), MainMenuWidgetClass, FName("Main Menu Widget"));
 
 			/* Add the main menu widget to the player's viewport if it was successfully created. */
-			if (MainMenuWidget)
+			if (IsValid(MainMenuWidget))
 			{
 				MainMenuWidget->AddToViewport(0);
 				CurrentMenu = MainMenuWidget;
@@ -88,7 +88,7 @@ void AMM_HUD::CreateMainMenuWidget(bool bDestroy)
 	/* Destroy the main menu widget if requested. */
 	else
 	{
-		if (MainMenuWidget)
+		if (IsValid(MainMenuWidget))
 		{
 			MainMenuWidget->RemoveFromParent();
 			MainMenuWidget = nullptr;
@@ -107,7 +107,7 @@ void AMM_HUD::CreatePlayMenuWidget(bool bDestroy)
 			PlayMenuWidget = CreateWidget<UMM_PlayMenuWidget>(GetOwningPlayerController(), PlayMenuWidgetClass, FName("Play Menu Widget"));
 
 			/* Add the play menu widget to the player's viewport if it was successfully created. */
-			if (PlayMenuWidget)
+			if (IsValid(PlayMenuWidget))
 			{
 				PlayMenuWidget->AddToViewport(0);
 				CurrentMenu = PlayMenuWidget;
@@ -122,7 +122,7 @@ void AMM_HUD::CreatePlayMenuWidget(bool bDestroy)
 	/* Destroy the play menu widget if requested. */
 	else
 	{
-		if (PlayMenuWidget)
+		if (IsValid(PlayMenuWidget))
 		{
 			PlayMenuWidget->RemoveFromParent();
 			PlayMenuWidget = nullptr;
@@ -141,7 +141,7 @@ void AMM_HUD::CreateArmyMenuWidget(bool bDestroy)
 			ArmyMenuWidget = CreateWidget<UMM_ArmyMenuWidget>(GetOwningPlayerController(), ArmyMenuWidgetClass, FName("Army Menu Widget"));
 
 			/* Add the army menu widget to the player's viewport if it was successfully created. */
-			if (ArmyMenuWidget)
+			if (IsValid(ArmyMenuWidget))
 			{
 				ArmyMenuWidget->AddToViewport(0);
 				CurrentMenu = ArmyMenuWidget;
@@ -156,7 +156,7 @@ void AMM_HUD::CreateArmyMenuWidget(bool bDestroy)
 	/* Destroy the army menu widget if requested. */
 	else
 	{
-		if (ArmyMenuWidget)
+		if (IsValid(ArmyMenuWidget))
 		{
 			ArmyMenuWidget->RemoveFromParent();
 			ArmyMenuWidget = nullptr;
@@ -175,7 +175,7 @@ void AMM_HUD::CreateStoreWidget(bool bDestroy)
 			StoreWidget = CreateWidget<UMM_StoreWidget>(GetOwningPlayerController(), StoreWidgetClass, FName("Store Widget"));
 
 			/* Add the store widget to the player's viewport if it was successfully created. */
-			if (StoreWidget)
+			if (IsValid(StoreWidget))
 			{
 				StoreWidget->AddToViewport(0);
 				CurrentMenu = StoreWidget;
@@ -190,7 +190,7 @@ void AMM_HUD::CreateStoreWidget(bool bDestroy)
 	/* Destroy the store widget if requested. */
 	else
 	{
-		if (StoreWidget)
+		if (IsValid(StoreWidget))
 		{
 			StoreWidget->RemoveFromParent();
 			StoreWidget = nullptr;
@@ -209,7 +209,7 @@ void AMM_HUD::CreateOptionsWidget(bool bDestroy)
 			OptionsWidget = CreateWidget<UMM_OptionsWidget>(GetOwningPlayerController(), OptionsWidgetClass, FName("Options Widget"));
 
 			/* Add the options widget to the player's viewport if it was successfully created. */
-			if (OptionsWidget)
+			if (IsValid(OptionsWidget))
 			{
 				OptionsWidget->AddToViewport(0);
 				CurrentMenu = OptionsWidget;
@@ -241,26 +241,49 @@ void AMM_HUD::CreateMatchmakingStartPopUpWidget()
 		MatchmakingStartPopUpWidget = CreateWidget<UMM_MatchmakingStartPopUp>(GetOwningPlayerController(), MatchmakingStartPopUpClass, FName("Matchmaking Start Pop-Up Widget"));
 
 		/* Add the matchmaking start pop-up widget to the player's viewport if it was successfully created. */
-		if (MatchmakingStartPopUpWidget)
+		if (IsValid(MatchmakingStartPopUpWidget))
 		{
 			MatchmakingStartPopUpWidget->AddToViewport(1);
 		}
 	}
 }
 
-void AMM_HUD::CreateQueueTimerWidget()
+void AMM_HUD::CreateQueueTimerWidget(bool bDestroy)
 {
-	/* Ensure that the widget class to spawn is set. */
-	if (QueueTimerClass)
+	/* Create a queue timer widget if requested. */
+	if (!bDestroy)
 	{
-		/* Create the widget. */
-		QueueTimerWidget = CreateWidget<UMM_QueueTimer>(GetOwningPlayerController(), QueueTimerClass, FName("Queue Timer Widget"));
-
-		/* Add the queue timer widget to the player's viewport if it was successfully created. */
-		if (QueueTimerWidget)
+		/* Ensure that the widget class to spawn is set. */
+		if (QueueTimerClass)
 		{
-			QueueTimerWidget->AddToViewport(6);
+			/* Create the widget. */
+			QueueTimerWidget = CreateWidget<UMM_QueueTimer>(GetOwningPlayerController(), QueueTimerClass, FName("Queue Timer Widget"));
+
+			/* Add the queue timer widget to the player's viewport if it was successfully created. */
+			if (IsValid(QueueTimerWidget))
+			{
+				QueueTimerWidget->AddToViewport(6);
+			}
 		}
+	}
+	/* Safely destroy the queue timer widget if requested. */
+	else
+	{
+		if (IsValid(QueueTimerWidget))
+		{
+			QueueTimerWidget->RemoveFromParent();
+			QueueTimerWidget = nullptr;
+		}
+	}
+}
+
+void AMM_HUD::HUD_FoundOpponent()
+{
+	/* Call the queue timer widget's FoundOpponent function, which creates a new pop-up and disables the "cancel"
+	 * button. */
+	if (IsValid(QueueTimerWidget))
+	{
+		QueueTimerWidget->FoundOpponent();
 	}
 }
 

@@ -25,6 +25,7 @@ enum EPlayerStatus
 UENUM(BlueprintType)
 enum EMatchStatus
 {
+	E_Matchmaking			UMETA(DisplayName="Matchmaking"),
 	E_WaitingForPlayers		UMETA(DisplayName="Waiting For Players"),
 	E_SettingUpPieces 		UMETA(DisplayName="Setting Up Pieces"),
 	E_Player1Turn			UMETA(DisplayName="Player 1 Turn"),
