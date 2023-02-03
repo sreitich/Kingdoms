@@ -10,8 +10,10 @@
 
 class UMM_ArmyMenuWidget;
 class UMM_MainMenuWidget;
+class UMM_MatchmakingStartPopUp;
 class UMM_OptionsWidget;
 class UMM_PlayMenuWidget;
+class UMM_QueueTimer;
 class UMM_StoreWidget;
 
 /**
@@ -36,33 +38,41 @@ public:
 	UFUNCTION()
 	void QueueMenuChange(EMenuScreen NewMenu);
 
-	/* Safely destroys the current menu and creates a new menu from the next queued menu. Called by the current menu
-	 * after it is deactivated. */
+	/* Setter for QueuedMenu. */
+	FORCEINLINE void SetQueuedMenu(EMenuScreen NewMenu) { QueuedMenu = NewMenu; }
+
+	/* Safely destroys the current menu and creates a new menu from the next queued menu. This is only called by menus
+	 * after they finish deactivating. */
 	UFUNCTION()
 	void ChangeMenus();
 
 	/* Creates or destroys the main menu widget. */
-	UFUNCTION()
+	UFUNCTION(Category="Widget Creation")
 	void CreateMainMenuWidget(bool bDestroy);
 
-	/* Creates or destroys the play menu widget. */
-	UFUNCTION()
-	void CreatePlayMenuWidget(bool bDestroy);
+		/* Creates or destroys the play menu widget. */
+		UFUNCTION(Category="Widget Creation")
+		void CreatePlayMenuWidget(bool bDestroy);
 
-	/* Creates or destroys the army menu widget. */
-	UFUNCTION()
-	void CreateArmyMenuWidget(bool bDestroy);
+		/* Creates or destroys the army menu widget. */
+		UFUNCTION(Category="Widget Creation")
+		void CreateArmyMenuWidget(bool bDestroy);
 
-	/* Creates or destroys the store widget. */
-	UFUNCTION()
-	void CreateStoreWidget(bool bDestroy);
+		/* Creates or destroys the store widget. */
+		UFUNCTION(Category="Widget Creation")
+		void CreateStoreWidget(bool bDestroy);
 
-	/* Creates or destroys the options widget. */
-	UFUNCTION()
-	void CreateOptionsWidget(bool bDestroy);
+		/* Creates or destroys the options widget. */
+		UFUNCTION(Category="Widget Creation")
+		void CreateOptionsWidget(bool bDestroy);
 
-	/* Setter for QueuedMenu. */
-	FORCEINLINE void SetQueuedMenu(EMenuScreen NewMenu) { QueuedMenu = NewMenu; }
+	/* Creates a matchmaking start pop-up widget. */
+	UFUNCTION(Category="Widget Creation")
+	void CreateMatchmakingStartPopUpWidget();
+
+	/* Creates a queue timer widget. */
+	UFUNCTION(Category="Widget Creation")
+	void CreateQueueTimerWidget();
 
 
 /* Protected functions. */
@@ -102,6 +112,12 @@ protected:
 	UPROPERTY()
 	UMM_StoreWidget* StoreWidget;
 
+	UPROPERTY()
+	UMM_MatchmakingStartPopUp* MatchmakingStartPopUpWidget;
+	
+	UPROPERTY()
+	UMM_QueueTimer* QueueTimerWidget;
+
 
 /* References to the class to spawn for each widget. */
 protected:
@@ -112,15 +128,20 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
 	TSubclassOf<UUserWidget> MainMenuWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types");
+	TSubclassOf<UUserWidget> MatchmakingStartPopUpClass;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
 	TSubclassOf<UUserWidget> OptionsWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
 	TSubclassOf<UUserWidget> PlayMenuWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types");
+	TSubclassOf<UUserWidget> QueueTimerClass;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
 	TSubclassOf<UUserWidget> StoreWidgetClass;
-
 	
 
 };

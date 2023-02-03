@@ -52,8 +52,17 @@ void UMM_PlayMenuWidget::OnQuickPlayClicked()
 	/* Join an available session. If no sessions are available, create a new one. */
 	if (IsValid(GameInstancePtr))
 	{
-		GetOwningPlayer<AMM_PlayerController>()->CreateQueueTimerWidget();
-		GameInstancePtr->JoinServer();
+		if (AMM_PlayerController* PlayerControllerPtr = GetOwningPlayer<AMM_PlayerController>())
+		{
+			/* Attempt to join a session. */
+			GameInstancePtr->JoinServer();
+
+			/* Disable player input. */
+			PlayerControllerPtr->DisableInput(PlayerControllerPtr);
+			/* Create a matchmaking start pop-up widget. */
+			AMM_HUD* HUDPtr = PlayerControllerPtr->GetHUD<AMM_HUD>();
+			HUDPtr->CreateMatchmakingStartPopUpWidget();
+		}
 	}
 }
 

@@ -36,6 +36,10 @@ public:
 	UFUNCTION()
 	void JoinServer();
 
+	/* Provides whether or not the local player is in a session and if they are the host of that session. */
+	UFUNCTION()
+	void GetCurrentSessionInfo(bool& bInSession, bool& bIsHost) const;
+
 
 /* Public variables. */
 public:
@@ -79,5 +83,8 @@ protected:
 
 	/* Persistent pointer to the object used to interface with the online subsystem's sessions.  */
 	IOnlineSessionPtr SessionInterface;
+
+	/* The name of the session that this player is currently in, if they are in one. */
+	FName CurrentSessionName;
 	
 };

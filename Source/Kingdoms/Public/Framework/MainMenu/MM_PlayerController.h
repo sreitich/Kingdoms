@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "MM_PlayerController.generated.h"
 
+class UMM_MatchmakingStartPopUp;
 class UMM_QueueTimer;
 
 /**
@@ -22,10 +23,6 @@ public:
 	/* Default constructor. */
 	AMM_PlayerController();
 
-	/* Creates and saves a reference to a queue timer widget. */
-	UFUNCTION(Category="User Interface")
-	void CreateQueueTimerWidget();
-
 
 /* Protected functions. */
 protected:
@@ -37,6 +34,10 @@ protected:
 /* Protected widgets. */
 protected:
 
+	/* A reference to a currently displayed matchmaking start pop-up widget. */
+	UPROPERTY()
+	UMM_MatchmakingStartPopUp* MatchmakingStartPopUpWidget;
+	
 	/* A reference to a currently displayed queue timer widget. */
 	UPROPERTY()
 	UMM_QueueTimer* QueueTimerWidget;
@@ -44,6 +45,10 @@ protected:
 
 /* Protected widget class references. */
 protected:
+
+	/* The class to spawn when creating a matchmaking start pop-up widget. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="User Interface");
+	TSubclassOf<UUserWidget> MatchmakingStartPopUpClass;
 
 	/* The class to spawn when creating a queue timer widget. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="User Interface");

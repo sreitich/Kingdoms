@@ -7,8 +7,10 @@
 #include "UserDefinedData/Menu_UserDefinedData.h"
 #include "UserInterface/MainMenu/MM_ArmyMenuWidget.h"
 #include "UserInterface/MainMenu/MM_MainMenuWidget.h"
+#include "UserInterface/MainMenu/MM_MatchmakingStartPopUp.h"
 #include "UserInterface/MainMenu/MM_OptionsWidget.h"
 #include "UserInterface/MainMenu/MM_PlayMenuWidget.h"
+#include "UserInterface/MainMenu/MM_QueueTimer.h"
 #include "UserInterface/MainMenu/MM_StoreWidget.h"
 
 #include "Blueprint/UserWidget.h"
@@ -28,7 +30,7 @@ void AMM_HUD::QueueMenuChange(EMenuScreen NewMenu)
 	QueuedMenu = NewMenu;
 
 	/* Deactivate the current menu, which will call ChangeMenus() when it finishes deactivating. */
-	if (CurrentMenu->GetClass()->ImplementsInterface(UMenuTransitionInterface::StaticClass()))
+	if (CurrentMenu && CurrentMenu->GetClass()->ImplementsInterface(UMenuTransitionInterface::StaticClass()))
 	{
 		Cast<IMenuTransitionInterface>(CurrentMenu)->DeactivateWidget();
 	}
@@ -230,13 +232,45 @@ void AMM_HUD::CreateOptionsWidget(bool bDestroy)
 	}
 }
 
+void AMM_HUD::CreateMatchmakingStartPopUpWidget()
+{
+	/* Ensure that the widget class to spawn is set. */
+	if (MatchmakingStartPopUpClass)
+	{
+		/* Create the widget. */
+		MatchmakingStartPopUpWidget = CreateWidget<UMM_MatchmakingStartPopUp>(GetOwningPlayerController(), MatchmakingStartPopUpClass, FName("Matchmaking Start Pop-Up Widget"));
+
+		/* Add the matchmaking start pop-up widget to the player's viewport if it was successfully created. */
+		if (MatchmakingStartPopUpWidget)
+		{
+			MatchmakingStartPopUpWidget->AddToViewport(1);
+		}
+	}
+}
+
+void AMM_HUD::CreateQueueTimerWidget()
+{
+	/* Ensure that the widget class to spawn is set. */
+	if (QueueTimerClass)
+	{
+		/* Create the widget. */
+		QueueTimerWidget = CreateWidget<UMM_QueueTimer>(GetOwningPlayerController(), QueueTimerClass, FName("Queue Timer Widget"));
+
+		/* Add the queue timer widget to the player's viewport if it was successfully created. */
+		if (QueueTimerWidget)
+		{
+			QueueTimerWidget->AddToViewport(6);
+		}
+	}
+}
+
 void AMM_HUD::BeginPlay()
 {
 	Super::BeginPlay();
 
 	/* Set the current menu to be the main menu. */
-	CurrentMenu = MainMenuWidget;
+	// CurrentMenu = MainMenuWidget;
 
 	/* Create a main menu widget when the game starts. */
-	CreateMainMenuWidget(false);
+	// CreateMainMenuWidget(false);
 }
