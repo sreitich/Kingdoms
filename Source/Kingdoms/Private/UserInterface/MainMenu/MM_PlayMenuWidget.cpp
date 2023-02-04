@@ -27,9 +27,6 @@ void UMM_PlayMenuWidget::NativeConstruct()
 	/* Bind the "back" button to deactivate this widget. */
 	BackButton->OnClicked.AddDynamic(this, &UMM_PlayMenuWidget::OnBackClicked);
 
-	/* Play the activation animation to reveal this widget. */
-	PlayAnimationForward(OnActivatedAnim, 1.0f, false);
-
 	/* Bind the deactivation animation to destroy this widget when it finishes playing. */
 	FWidgetAnimationDynamicEvent AnimBinding = FWidgetAnimationDynamicEvent();
 	AnimBinding.BindDynamic(this, &UMM_PlayMenuWidget::OnDeactivatedAnimEnd);
@@ -37,6 +34,20 @@ void UMM_PlayMenuWidget::NativeConstruct()
 
 	/* Grab a persistent pointer to the game instance. */
 	GameInstancePtr = Cast<UKingdomsGameInstance>(UGameplayStatics::GetGameInstance(GetOwningPlayer()));
+
+	/* If the player is not in a session, play an animation to reveal this widget. This is done to help the illusion
+	 * of remaining in the same menu when creating a new session. */
+	if (IsValid(GameInstancePtr))
+	{
+		/* Check if the player is in a session. */
+		bool bIsInSession, bIsHost;
+		GameInstancePtr->GetCurrentSessionInfo(bIsInSession, bIsHost);
+		if (!bIsInSession)
+		{
+			/* Play the activation animation to reveal this widget. */
+			PlayAnimationForward(OnActivatedAnim, 1.0f, false);
+		}
+	}
 }
 
 void UMM_PlayMenuWidget::OnDeactivatedAnimEnd()
@@ -54,11 +65,15 @@ void UMM_PlayMenuWidget::OnQuickPlayClicked()
 	{
 		if (AMM_PlayerController* PlayerControllerPtr = GetOwningPlayer<AMM_PlayerController>())
 		{
+			/* Disable player input and all buttons while searching for a session. */
+			PlayerControllerPtr->DisableInput(PlayerControllerPtr);
+			QuickPlayButton->SetIsEnabled(false);
+			CustomGameButton->SetIsEnabled(false);
+			BackButton->SetIsEnabled(false);
+
 			/* Attempt to join a session. */
 			GameInstancePtr->JoinServer();
 
-			/* Disable player input. */
-			PlayerControllerPtr->DisableInput(PlayerControllerPtr);
 			/* Create a matchmaking start pop-up widget. */
 			AMM_HUD* HUDPtr = PlayerControllerPtr->GetHUD<AMM_HUD>();
 			HUDPtr->CreateMatchmakingStartPopUpWidget();

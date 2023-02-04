@@ -4,8 +4,6 @@
 #include "Framework/MainMenu/MM_PlayerController.h"
 
 #include "Framework/KingdomsGameInstance.h"
-#include "UserInterface/MainMenu/MM_MatchmakingStartPopUp.h"
-#include "UserInterface/MainMenu/MM_QueueTimer.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "UserInterface/MainMenu/MM_HUD.h"
@@ -28,8 +26,7 @@ void AMM_PlayerController::BeginPlay()
 	/* If the player loads into the main menu as the host of a new session, then they have begun matchmaking. To make
 	 * it look like they didn't change actually maps, we'll return them to the play menu they were just in before
 	 * creating a new queue timer widget. */
-	if (const UKingdomsGameInstance* GameInstancePtr = Cast<UKingdomsGameInstance>(
-		UGameplayStatics::GetGameInstance(this)))
+	if (const UKingdomsGameInstance* GameInstancePtr = Cast<UKingdomsGameInstance>(UGameplayStatics::GetGameInstance(this)))
 	{
 		/* Check if the player is in a session and the host of that session. */
 		bool bIsInSession, bIsHost;
