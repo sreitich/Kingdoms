@@ -6,16 +6,16 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "MM_PlayMenuWidget.generated.h"
+#include "MM_LobbyMenuWidget.generated.h"
 
 class UButton;
-class UKingdomsGameInstance;
+class UMM_PlayMenuWidget;
 
 /**
  * 
  */
 UCLASS()
-class KINGDOMS_API UMM_PlayMenuWidget : public UUserWidget, public IMenuTransitionInterface
+class KINGDOMS_API UMM_LobbyMenuWidget : public UUserWidget, public IMenuTransitionInterface
 {
 	GENERATED_BODY()
 
@@ -38,39 +38,14 @@ protected:
 	void OnDeactivatedAnimEnd();
 
 
-	/* Attempts to connect the player to an existing session. Creates a new session if one cannot be found. */
-	UFUNCTION()
-	void OnQuickPlayClicked();
-
-	/* Creates a lobby where the player can customize game settings and invite friends to play. */
-	UFUNCTION()
-	void OnCustomGameClicked();
-
 	/* Plays the deactivation animation animation, which deactivates this widget when it finishes playing. */
 	UFUNCTION()
 	void OnBackClicked();
 
 
-/* Protected variables. */
-protected:
-
-	/* A persistent pointer to the game instance. */
-	UPROPERTY()
-	UKingdomsGameInstance* GameInstancePtr;
-
-
 /* Protected widgets. */
-protected:
 
-	/* Attempts to join an online match. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* QuickPlayButton;
-
-	/* Makes a new lobby to allow the user to create a custom game. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* CustomGameButton;
-
-	/* Returns the player to the main menu. */
+	/* Returns the player to the play menu. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* BackButton;
 
@@ -85,5 +60,5 @@ protected:
 	/* Played when this widget is destroyed. */
 	UPROPERTY(Transient, meta=(BindWidgetAnim))
 	UWidgetAnimation* OnDeactivatedAnim;
-
+	
 };

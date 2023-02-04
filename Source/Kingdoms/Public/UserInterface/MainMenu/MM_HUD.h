@@ -9,6 +9,7 @@
 #include "MM_HUD.generated.h"
 
 class UMM_ArmyMenuWidget;
+class UMM_LobbyMenuWidget;
 class UMM_MainMenuWidget;
 class UMM_MatchmakingStartPopUp;
 class UMM_OptionsWidget;
@@ -53,6 +54,10 @@ public:
 		/* Creates or destroys the play menu widget. */
 		UFUNCTION(Category="Main Menu Widgets")
 		void CreatePlayMenuWidget(bool bDestroy);
+
+		/* Creates or destroys the lobby menu widget. */
+		UFUNCTION(Category="Main Menu Widgets")
+		void CreateLobbyMenuWidget(bool bDestroy);
 
 		/* Creates or destroys the army menu widget. */
 		UFUNCTION(Category="Main Menu Widgets")
@@ -106,6 +111,9 @@ protected:
 	UMM_ArmyMenuWidget* ArmyMenuWidget;
 
 	UPROPERTY()
+	UMM_LobbyMenuWidget* LobbyMenuWidget;
+
+	UPROPERTY()
 	UMM_MainMenuWidget* MainMenuWidget;
 
 	UPROPERTY()
@@ -129,6 +137,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
 	TSubclassOf<UUserWidget> ArmyMenuWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
+	TSubclassOf<UUserWidget> LobbyMenuWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
 	TSubclassOf<UUserWidget> MainMenuWidgetClass;

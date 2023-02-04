@@ -6,6 +6,7 @@
 #include "Interfaces/MenuTransitionInterface.h"
 #include "UserDefinedData/Menu_UserDefinedData.h"
 #include "UserInterface/MainMenu/MM_ArmyMenuWidget.h"
+#include "UserInterface/MainMenu/MM_LobbyMenuWidget.h"
 #include "UserInterface/MainMenu/MM_MainMenuWidget.h"
 #include "UserInterface/MainMenu/MM_MatchmakingStartPopUp.h"
 #include "UserInterface/MainMenu/MM_OptionsWidget.h"
@@ -43,6 +44,9 @@ void AMM_HUD::ChangeMenus()
 	{
 		case E_ArmyMenu:
 			CreateArmyMenuWidget(false);
+			break;
+		case E_LobbyMenu:
+			CreateLobbyMenuWidget(false);
 			break;
 		case E_MainMenu:
 			CreateMainMenuWidget(false);
@@ -126,6 +130,40 @@ void AMM_HUD::CreatePlayMenuWidget(bool bDestroy)
 		{
 			PlayMenuWidget->RemoveFromParent();
 			PlayMenuWidget = nullptr;
+		}
+	}
+}
+
+void AMM_HUD::CreateLobbyMenuWidget(bool bDestroy)
+{
+	/* Create a play menu widget if requested. */
+	if (!bDestroy)
+	{
+		if (LobbyMenuWidgetClass)
+		{
+			/* Create the widget. */
+			LobbyMenuWidget = CreateWidget<UMM_LobbyMenuWidget>(GetOwningPlayerController(), LobbyMenuWidgetClass, FName("Lobby Menu Widget"));
+
+			/* Add the lobby menu widget to the player's viewport if it was successfully created. */
+			if (IsValid(LobbyMenuWidget))
+			{
+				LobbyMenuWidget->AddToViewport(0);
+				CurrentMenu = LobbyMenuWidget;
+			}
+			/* If there was a problem creating the widget, return to the play menu. */
+			else
+			{
+				QueueMenuChange(E_PlayMenu);
+			}
+		}
+	}
+	/* Destroy the lobby menu widget if requested. */
+	else
+	{
+		if (IsValid(LobbyMenuWidget))
+		{
+			LobbyMenuWidget->RemoveFromParent();
+			LobbyMenuWidget = nullptr;
 		}
 	}
 }

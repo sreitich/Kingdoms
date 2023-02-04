@@ -22,8 +22,8 @@ void UMM_PlayMenuWidget::NativeConstruct()
 
 	/* Bind the quick-play button to find/create and join then a session. */
 	QuickPlayButton->OnClicked.AddDynamic(this, &UMM_PlayMenuWidget::OnQuickPlayClicked);
-	/* Bind the invite button to open the Steam friend invite interface. */
-	InviteFriendButton->OnClicked.AddDynamic(this, &UMM_PlayMenuWidget::OnInviteFriendClicked);
+	/* Bind the custom game button to create a new lobby. */
+	CustomGameButton->OnClicked.AddDynamic(this, &UMM_PlayMenuWidget::OnCustomGameClicked);
 	/* Bind the "back" button to deactivate this widget. */
 	BackButton->OnClicked.AddDynamic(this, &UMM_PlayMenuWidget::OnBackClicked);
 
@@ -66,9 +66,11 @@ void UMM_PlayMenuWidget::OnQuickPlayClicked()
 	}
 }
 
-void UMM_PlayMenuWidget::OnInviteFriendClicked()
+void UMM_PlayMenuWidget::OnCustomGameClicked()
 {
-	
+	/* To navigate to the lobby menu, queue the menu, which will deactivate this menu and transition to the new one. */
+	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
+	HUDPtr->QueueMenuChange(E_LobbyMenu);
 }
 
 void UMM_PlayMenuWidget::OnBackClicked()
