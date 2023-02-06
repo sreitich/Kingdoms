@@ -6,6 +6,7 @@
 #include "UserInterface/MainMenu/MM_HUD.h"
 
 #include "Components/Button.h"
+#include "Framework/KingdomsGameInstance.h"
 
 void UMM_LobbyMenuWidget::DeactivateWidget()
 {
@@ -17,6 +18,8 @@ void UMM_LobbyMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	/* Bind the "invite friends" button to open a list of friends to invite. */
+	InviteFriendsButton->OnClicked.AddDynamic(this, &UMM_LobbyMenuWidget::OnInviteFriendsClicked);
 	/* Bind the "back" button to deactivate this widget.*/
 	BackButton->OnClicked.AddDynamic(this, &UMM_LobbyMenuWidget::OnBackClicked);
 
@@ -35,6 +38,15 @@ void UMM_LobbyMenuWidget::OnDeactivatedAnimEnd()
 	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
 	HUDPtr->ChangeMenus();
 	HUDPtr->CreateLobbyMenuWidget(true);
+}
+
+void UMM_LobbyMenuWidget::OnInviteFriendsClicked()
+{
+	/* Display the subsystem's external friends UI via the game instance. */
+	if (UKingdomsGameInstance* GameInstancePtr = GetGameInstance<UKingdomsGameInstance>())
+	{
+		GameInstancePtr->ShowFriendsUI();
+	}
 }
 
 void UMM_LobbyMenuWidget::OnBackClicked()

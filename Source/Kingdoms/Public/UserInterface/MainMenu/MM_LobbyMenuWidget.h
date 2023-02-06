@@ -38,13 +38,22 @@ protected:
 	void OnDeactivatedAnimEnd();
 
 
+	/* Displays a list of the player's friends to invite to the current lobby. */
+	UFUNCTION()
+	void OnInviteFriendsClicked();
+	
 	/* Plays the deactivation animation animation, which deactivates this widget when it finishes playing. */
 	UFUNCTION()
 	void OnBackClicked();
 
 
 /* Protected widgets. */
+protected:
 
+	/* Displays a list of the player's friends to invite to the current lobby. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* InviteFriendsButton;
+	
 	/* Returns the player to the play menu. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* BackButton;

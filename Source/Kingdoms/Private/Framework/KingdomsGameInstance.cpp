@@ -7,6 +7,7 @@
 #include "SaveGames/ArmyPresets_SaveGame.h"
 
 #include "Engine/World.h"
+#include "Interfaces/OnlineExternalUIInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "UserInterface/MainMenu/MM_HUD.h"
 
@@ -112,16 +113,32 @@ void UKingdomsGameInstance::GetCurrentSessionInfo(bool& bInSession, bool& bIsHos
 	bIsHost = false;
 }
 
+void UKingdomsGameInstance::ShowFriendsUI()
+{
+	/* If there is a valid online subsystem and the player is currently in a lobby, display the subsystem's external
+	 * friends UI. */
+	if (OnlineSubsystem/* && CurrentLobbyName != ""*/)
+	{
+		if (IOnlineExternalUIPtr ExternalUIPtr = OnlineSubsystem->GetExternalUIInterface())
+		{
+			// ExternalUIPtr->ShowInviteUI(0, CurrentLobbyName);
+			ExternalUIPtr->ShowInviteUI(0, CurrentSessionName);
+		}
+	}
+}
+
 void UKingdomsGameInstance::Init()
 {
 	Super::Init();
 
-	/* Bind our delegates to our game sessions' events. Start by trying to retrieve our online subsystem to access our
-	 * session interface. */
-	if (IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get())
+	/* Retrieve our online subsystem for future use. */
+	OnlineSubsystem = IOnlineSubsystem::Get();
+
+	/* Bind our delegates to our game sessions' events. */
+	if (OnlineSubsystem)
 	{
 		/* Try to retrieve our session interface from the online subsystem. */
-		SessionInterface = Subsystem->GetSessionInterface();
+		SessionInterface = OnlineSubsystem->GetSessionInterface();
 		if (SessionInterface.IsValid())
 		{
 			/* Bind our functions for when a session is created, found, and joined. */

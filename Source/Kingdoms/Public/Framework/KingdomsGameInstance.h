@@ -46,6 +46,10 @@ public:
 	UFUNCTION()
 	void GetCurrentSessionInfo(bool& bInSession, bool& bIsHost) const;
 
+	/* Opens the subsystem's external friends interface. */
+	UFUNCTION()
+	void ShowFriendsUI();
+
 
 /* Public variables. */
 public:
@@ -84,6 +88,9 @@ protected:
 /* Protected variables. */
 protected:
 
+	/* Persistent pointer to the game instance's online subsystem. */
+	IOnlineSubsystem* OnlineSubsystem;
+
 	/* Persistent pointer to the object used to search for sessions. */
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 
@@ -92,5 +99,8 @@ protected:
 
 	/* The name of the session that this player is currently in, if they are in one. */
 	FName CurrentSessionName;
+
+	/* The name of the lobby that this player is currently in, if they are in one. */
+	FName CurrentLobbyName;
 	
 };
