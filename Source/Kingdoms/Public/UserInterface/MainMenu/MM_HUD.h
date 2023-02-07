@@ -11,6 +11,7 @@
 class UMM_ArmyMenuWidget;
 class UMM_LobbyMenuWidget;
 class UMM_MainMenuWidget;
+class UMM_MapSelectionWidget;
 class UMM_MatchmakingStartPopUp;
 class UMM_OptionsWidget;
 class UMM_PlayMenuWidget;
@@ -55,9 +56,13 @@ public:
 		UFUNCTION(Category="Main Menu Widgets")
 		void CreatePlayMenuWidget(bool bDestroy);
 
-		/* Creates or destroys the lobby menu widget. */
-		UFUNCTION(Category="Main Menu Widgets")
-		void CreateLobbyMenuWidget(bool bDestroy);
+			/* Creates or destroys the lobby menu widget. */
+			UFUNCTION(Category="Main Menu Widgets")
+			void CreateLobbyMenuWidget(bool bDestroy);
+
+				/* Creates or destroys the map selection menu widget. */
+				UFUNCTION(Category="Main Menu Widgets")
+				void CreateMapSelectionWidget(bool bDestroy);
 
 		/* Creates or destroys the army menu widget. */
 		UFUNCTION(Category="Main Menu Widgets")
@@ -117,6 +122,9 @@ protected:
 	UMM_MainMenuWidget* MainMenuWidget;
 
 	UPROPERTY()
+	UMM_MapSelectionWidget* MapSelectionWidget;
+
+	UPROPERTY()
 	UMM_OptionsWidget* OptionsWidget;
 
 	UPROPERTY()
@@ -143,6 +151,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
 	TSubclassOf<UUserWidget> MainMenuWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
+	TSubclassOf<UUserWidget> MapSelectionWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types");
 	TSubclassOf<UUserWidget> MatchmakingStartPopUpClass;

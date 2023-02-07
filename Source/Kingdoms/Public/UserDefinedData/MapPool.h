@@ -11,7 +11,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class KINGDOMS_API UMapPool : public UDataAsset
 {
 	GENERATED_BODY()

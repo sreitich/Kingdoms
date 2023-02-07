@@ -6,16 +6,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "MM_LobbyMenuWidget.generated.h"
-
-class UButton;
-class UMM_PlayMenuWidget;
+#include "MM_MapSelectionWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class KINGDOMS_API UMM_LobbyMenuWidget : public UUserWidget, public IMenuTransitionInterface
+class KINGDOMS_API UMM_MapSelectionWidget : public UUserWidget, public IMenuTransitionInterface
 {
 	GENERATED_BODY()
 
@@ -37,19 +34,11 @@ protected:
 	UFUNCTION()
 	void OnDeactivatedAnimEnd();
 
-	/* Displays a list of the player's friends to invite to the current lobby. Called when the player clicks "invite
-	 * friends." */
+	/* Plays the deactivation animation animation, which deactivates this widget when it finishes playing and returns
+	 * to the lobby menu. Called when the player clicks "back." */
 	UFUNCTION(BlueprintCallable)
-	void OpenInviteUI();
-
-	/* Transitions to the map selection menu. Called when the player clicks to change the selected map. */
-	UFUNCTION(BlueprintCallable)
-	void OpenMapSelection();
+	void ReturnToLobbyMenu();
 	
-	/* Transitions back to the play menu. Called when the player clicks "back." */
-	UFUNCTION(BlueprintCallable)
-	void ReturnToPlayMenu();
-
 
 /* Protected animations. */
 protected:
@@ -61,5 +50,5 @@ protected:
 	/* Played when this widget is destroyed. */
 	UPROPERTY(Transient, meta=(BindWidgetAnim))
 	UWidgetAnimation* OnDeactivatedAnim;
-	
+
 };

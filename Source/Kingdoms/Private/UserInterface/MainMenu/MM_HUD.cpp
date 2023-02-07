@@ -8,6 +8,7 @@
 #include "UserInterface/MainMenu/MM_ArmyMenuWidget.h"
 #include "UserInterface/MainMenu/MM_LobbyMenuWidget.h"
 #include "UserInterface/MainMenu/MM_MainMenuWidget.h"
+#include "UserInterface/MainMenu/MM_MapSelectionWidget.h"
 #include "UserInterface/MainMenu/MM_MatchmakingStartPopUp.h"
 #include "UserInterface/MainMenu/MM_OptionsWidget.h"
 #include "UserInterface/MainMenu/MM_PlayMenuWidget.h"
@@ -47,6 +48,9 @@ void AMM_HUD::ChangeMenus()
 			break;
 		case E_LobbyMenu:
 			CreateLobbyMenuWidget(false);
+			break;
+		case E_MapSelection:
+			CreateMapSelectionWidget(false);
 			break;
 		case E_MainMenu:
 			CreateMainMenuWidget(false);
@@ -136,7 +140,7 @@ void AMM_HUD::CreatePlayMenuWidget(bool bDestroy)
 
 void AMM_HUD::CreateLobbyMenuWidget(bool bDestroy)
 {
-	/* Create a play menu widget if requested. */
+	/* Create a lobby menu widget if requested. */
 	if (!bDestroy)
 	{
 		if (LobbyMenuWidgetClass)
@@ -164,6 +168,40 @@ void AMM_HUD::CreateLobbyMenuWidget(bool bDestroy)
 		{
 			LobbyMenuWidget->RemoveFromParent();
 			LobbyMenuWidget = nullptr;
+		}
+	}
+}
+
+void AMM_HUD::CreateMapSelectionWidget(bool bDestroy)
+{
+	/* Create a map selection menu widget if requested. */
+	if (!bDestroy)
+	{
+		if (MapSelectionWidgetClass)
+		{
+			/* Create the widget. */
+			MapSelectionWidget = CreateWidget<UMM_MapSelectionWidget>(GetOwningPlayerController(), MapSelectionWidgetClass, FName("Map Selection Menu Widget"));
+
+			/* Add the map selection menu widget to the player's viewport if it was successfully created. */
+			if (IsValid(MapSelectionWidget))
+			{
+				MapSelectionWidget->AddToViewport(0);
+				CurrentMenu = MapSelectionWidget;
+			}
+			/* If there was a problem creating the widget, return to the lobby menu. */
+			else
+			{
+				QueueMenuChange(E_LobbyMenu);
+			}
+		}
+	}
+	/* Destroy the map selection menu widget if requested. */
+	else
+	{
+		if (IsValid(MapSelectionWidget))
+		{
+			MapSelectionWidget->RemoveFromParent();
+			MapSelectionWidget = nullptr;
 		}
 	}
 }

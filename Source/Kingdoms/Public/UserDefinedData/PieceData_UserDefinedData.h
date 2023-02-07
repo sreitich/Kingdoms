@@ -37,7 +37,7 @@ enum EAlignment
 	E_Friendly	UMETA(DisplayName="Friendly"),
 	E_Hostile	UMETA(DisplayName="Hostile"),
 	E_Neutral	UMETA(DisplayName="Neutral"),
-	E_Debug		UMETA(DisplayName="Debug")
+	E_DebugAlignment		UMETA(DisplayName="Debug Alignment")
 };
 
 /* The structure of the piece data table. */

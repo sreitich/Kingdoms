@@ -20,7 +20,7 @@ enum EMapType
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class KINGDOMS_API UMapData : public UDataAsset
 {
 	GENERATED_BODY()
@@ -29,6 +29,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Metadata")
 	FName DisplayedName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Metadata")
+	FText GameDescription;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Metadata")
 	FString Path;
@@ -41,4 +44,5 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Images")
 	UTexture2D* CustomGameSelectionMenuImage = nullptr;
+
 };

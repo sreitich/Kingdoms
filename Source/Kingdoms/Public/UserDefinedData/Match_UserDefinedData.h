@@ -64,7 +64,8 @@ enum EAttackResult
 	E_DefenderSurvivesAttackerDies		UMETA(DisplayName="Defender kills attacker and survives"),
 	E_AttackerDiesDefenderDies			UMETA(DisplayName="Attacker kills defender and defender kills attacker"),
 	E_AttackerSurvivesDefenderSurvives	UMETA(DisplayName="Attacker survives and defender survives"),
-	E_DefenderSurvives					UMETA(DisplayName="Defender survives without fighting back")
+	E_DefenderSurvives					UMETA(DisplayName="Defender survives without fighting back"),
+	E_DebugAttack						UMETA(DisplayName="Debug Attack")
 };
 
 /* Coordinates for board tiles and pieces. */
