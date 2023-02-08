@@ -18,10 +18,10 @@ void UMM_MainMenuWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	/* Bind the navigation buttons to navigate to their respect menus. */
-	PlayNavigationButton->OnClicked.AddDynamic(this, &UMM_MainMenuWidget::OnPlayButton);
-	ArmyNavigationButton->OnClicked.AddDynamic(this, &UMM_MainMenuWidget::OnArmyButton);
-	StoreNavigationButton->OnClicked.AddDynamic(this, &UMM_MainMenuWidget::OnStoreButton);
-	OptionsNavigationButton->OnClicked.AddDynamic(this, &UMM_MainMenuWidget::OnOptionsButton);
+	// PlayNavigationButton->OnClicked.AddDynamic(this, &UMM_MainMenuWidget::OnPlayButton);
+	// ArmyNavigationButton->OnClicked.AddDynamic(this, &UMM_MainMenuWidget::OnArmyButton);
+	// StoreNavigationButton->OnClicked.AddDynamic(this, &UMM_MainMenuWidget::OnStoreButton);
+	// OptionsNavigationButton->OnClicked.AddDynamic(this, &UMM_MainMenuWidget::OnOptionsButton);
 
 	/* Play the activation animation to reveal this widget. */
 	PlayAnimationForward(OnActivatedAnim, 1.0f, false);
@@ -40,30 +40,37 @@ void UMM_MainMenuWidget::OnDeactivatedAnimEnd()
 	HUDPtr->CreateMainMenuWidget(true);
 }
 
-void UMM_MainMenuWidget::OnPlayButton()
+void UMM_MainMenuWidget::NavigateToMenu(EMenuScreen NewMenu)
 {
-	/* To navigate to the play menu, queue the menu, which will deactivate this menu and transition to the new one. */
+	/* To navigate to a new menu, queue the menu, which will deactivate this menu and transition to the new one. */
 	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
-	HUDPtr->QueueMenuChange(E_PlayMenu);
+	HUDPtr->QueueMenuChange(NewMenu);
 }
 
-void UMM_MainMenuWidget::OnArmyButton()
-{
-	/* To navigate to the army menu, queue the menu, which will deactivate this menu and transition to the new one. */
-	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
-	HUDPtr->QueueMenuChange(E_ArmyMenu);
-}
-
-void UMM_MainMenuWidget::OnStoreButton()
-{
-	/* To navigate to the store, queue the new screen, which will deactivate this menu and transition to the new one. */
-	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
-	HUDPtr->QueueMenuChange(E_StoreScreen);
-}
-
-void UMM_MainMenuWidget::OnOptionsButton()
-{
-	/* To navigate to the options screen, queue the new screen, which will deactivate this menu and transition to the new one. */
-	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
-	HUDPtr->QueueMenuChange(E_OptionsScreen);
-}
+// void UMM_MainMenuWidget::OnPlayButton()
+// {
+// 	/* To navigate to the play menu, queue the menu, which will deactivate this menu and transition to the new one. */
+// 	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
+// 	HUDPtr->QueueMenuChange(E_PlayMenu);
+// }
+//
+// void UMM_MainMenuWidget::OnArmyButton()
+// {
+// 	/* To navigate to the army menu, queue the menu, which will deactivate this menu and transition to the new one. */
+// 	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
+// 	HUDPtr->QueueMenuChange(E_ArmyMenu);
+// }
+//
+// void UMM_MainMenuWidget::OnStoreButton()
+// {
+// 	/* To navigate to the store, queue the new screen, which will deactivate this menu and transition to the new one. */
+// 	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
+// 	HUDPtr->QueueMenuChange(E_StoreScreen);
+// }
+//
+// void UMM_MainMenuWidget::OnOptionsButton()
+// {
+// 	/* To navigate to the options screen, queue the new screen, which will deactivate this menu and transition to the new one. */
+// 	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
+// 	HUDPtr->QueueMenuChange(E_OptionsScreen);
+// }

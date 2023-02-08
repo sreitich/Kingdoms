@@ -16,5 +16,6 @@ enum EMenuScreen
 	E_MapSelection	UMETA(DisplayName="Map Selection Menu"),
 	E_OptionsScreen	UMETA(DisplayName="Options Screen"),
 	E_PlayMenu		UMETA(DisplayName="Play Menu"),
-	E_StoreScreen	UMETA(DisplayName="Store Screen")
+	E_StoreScreen	UMETA(DisplayName="Store Screen"),
+	E_MenuDebug		UMETA(DisplayName="Menu Debug")
 };
