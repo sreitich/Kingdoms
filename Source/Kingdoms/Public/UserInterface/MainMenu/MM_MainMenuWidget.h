@@ -41,41 +41,6 @@ protected:
 	/* Navigates from the main menu to the given menu. */
 	UFUNCTION(BlueprintCallable)
 	void NavigateToMenu(EMenuScreen NewMenu);
-	
-	// /* Called when the "play" button is clicked. Navigates to the "play" menu. */
-	// UFUNCTION()
-	// void OnPlayButton();
-	//
-	// /* Called when the "army" button is clicked. Navigates to the army menu. */
-	// UFUNCTION()
-	// void OnArmyButton();
-	//
-	// /* Called when the "store" button is clicked. Navigates to the in-game store. */
-	// UFUNCTION()
-	// void OnStoreButton();
-	//
-	// /* Called when the "options" button is clicked. Navigates to the options menu. */
-	// UFUNCTION()
-	// void OnOptionsButton();
-
-
-/* Protected widgets. */
-protected:
-
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	// UButton* PlayNavigationButton;
-	//
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	// UButton* ArmyNavigationButton;
-	//
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	// UButton* StoreNavigationButton;
-	//
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	// UButton* OptionsNavigationButton;
-	//
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	// UButton* QuitGameButton;
 
 
 /* Protected animations. */

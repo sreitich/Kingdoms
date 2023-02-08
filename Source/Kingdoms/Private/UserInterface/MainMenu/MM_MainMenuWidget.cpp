@@ -46,31 +46,3 @@ void UMM_MainMenuWidget::NavigateToMenu(EMenuScreen NewMenu)
 	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
 	HUDPtr->QueueMenuChange(NewMenu);
 }
-
-// void UMM_MainMenuWidget::OnPlayButton()
-// {
-// 	/* To navigate to the play menu, queue the menu, which will deactivate this menu and transition to the new one. */
-// 	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
-// 	HUDPtr->QueueMenuChange(E_PlayMenu);
-// }
-//
-// void UMM_MainMenuWidget::OnArmyButton()
-// {
-// 	/* To navigate to the army menu, queue the menu, which will deactivate this menu and transition to the new one. */
-// 	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
-// 	HUDPtr->QueueMenuChange(E_ArmyMenu);
-// }
-//
-// void UMM_MainMenuWidget::OnStoreButton()
-// {
-// 	/* To navigate to the store, queue the new screen, which will deactivate this menu and transition to the new one. */
-// 	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
-// 	HUDPtr->QueueMenuChange(E_StoreScreen);
-// }
-//
-// void UMM_MainMenuWidget::OnOptionsButton()
-// {
-// 	/* To navigate to the options screen, queue the new screen, which will deactivate this menu and transition to the new one. */
-// 	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
-// 	HUDPtr->QueueMenuChange(E_OptionsScreen);
-// }
