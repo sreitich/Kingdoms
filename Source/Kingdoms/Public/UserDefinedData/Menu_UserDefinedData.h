@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 
-// #include "Menu_UserDefinedData.generated.h"
+#include "UserDefinedData/MapData.h"
+
+#include "Menu_UserDefinedData.generated.h"
 
 /* The menus available to the player. */
 UENUM(BlueprintType)
@@ -18,4 +20,14 @@ enum EMenuScreen
 	E_PlayMenu		UMETA(DisplayName="Play Menu"),
 	E_StoreScreen	UMETA(DisplayName="Store Screen"),
 	E_MenuDebug		UMETA(DisplayName="Menu Debug")
+};
+
+/* The settings for a custom game lobby. */
+USTRUCT(BlueprintType)
+struct FCustomGameSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Custom Game Settings")
+	UMapData* Map = nullptr;
 };

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "UserDefinedData/MapData.h"
+#include "UserDefinedData/Menu_UserDefinedData.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
@@ -25,24 +25,12 @@ public:
 	/* Default constructor. */
 	AMM_PlayerController();
 
-	/* Returns this player's currently selected map. */
-	UFUNCTION(BlueprintCallable)
-	FORCEINLINE UMapData* GetSelectedMap() { return CustomGameSelectedMap; }
-
 
 /* Protected functions. */
 protected:
 
 	/* Called when spawned. */
 	virtual void BeginPlay() override;
-
-
-/* Protected variables. */
-protected:
-
-	/* The map that the player currently has selected for custom games. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Map Selection")
-	UMapData* CustomGameSelectedMap;
 
 
 /* Protected widgets. */
