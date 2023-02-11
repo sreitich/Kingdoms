@@ -7,6 +7,7 @@
 #include "UserInterface/MainMenu/MM_HUD.h"
 
 #include "Components/Button.h"
+#include "Framework/MainMenu/MM_GameModeBase.h"
 #include "Framework/MainMenu/MM_PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -19,13 +20,6 @@ void UMM_PlayMenuWidget::DeactivateWidget()
 void UMM_PlayMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	/* Bind the quick-play button to find/create and join then a session. */
-	QuickPlayButton->OnClicked.AddDynamic(this, &UMM_PlayMenuWidget::OnQuickPlayClicked);
-	/* Bind the custom game button to create a new lobby. */
-	CustomGameButton->OnClicked.AddDynamic(this, &UMM_PlayMenuWidget::OnCustomGameClicked);
-	/* Bind the "back" button to deactivate this widget. */
-	BackButton->OnClicked.AddDynamic(this, &UMM_PlayMenuWidget::OnBackClicked);
 
 	/* Bind the deactivation animation to destroy this widget when it finishes playing. */
 	FWidgetAnimationDynamicEvent AnimBinding = FWidgetAnimationDynamicEvent();
@@ -58,7 +52,7 @@ void UMM_PlayMenuWidget::OnDeactivatedAnimEnd()
 	HUDPtr->CreatePlayMenuWidget(true);
 }
 
-void UMM_PlayMenuWidget::OnQuickPlayClicked()
+void UMM_PlayMenuWidget::TryQuickplay()
 {
 	/* Join an available session. If no sessions are available, create a new one. */
 	if (IsValid(GameInstancePtr))
@@ -81,14 +75,20 @@ void UMM_PlayMenuWidget::OnQuickPlayClicked()
 	}
 }
 
-void UMM_PlayMenuWidget::OnCustomGameClicked()
+void UMM_PlayMenuWidget::CreateCustomGame()
 {
+	/* Create a host beacon to host the new lobby. */
+	if (AMM_GameModeBase* GameModePtr = Cast<AMM_GameModeBase>(UGameplayStatics::GetGameMode(GetOwningPlayer())))
+	{
+		GameModePtr->CreateHostBeacon();
+	}
+
 	/* To navigate to the lobby menu, queue the menu, which will deactivate this menu and transition to the new one. */
 	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
 	HUDPtr->QueueMenuChange(E_LobbyMenu);
 }
 
-void UMM_PlayMenuWidget::OnBackClicked()
+void UMM_PlayMenuWidget::ReturnToMainMenu()
 {
 	/* To navigate back to the main menu, queue the menu, which will deactivate this menu and transition to the new
 	 * one. */

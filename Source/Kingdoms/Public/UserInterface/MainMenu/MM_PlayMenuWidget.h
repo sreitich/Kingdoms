@@ -39,16 +39,16 @@ protected:
 
 
 	/* Attempts to connect the player to an existing session. Creates a new session if one cannot be found. */
-	UFUNCTION()
-	void OnQuickPlayClicked();
+	UFUNCTION(BlueprintCallable)
+	void TryQuickplay();
 
-	/* Creates a lobby where the player can customize game settings and invite friends to play. */
-	UFUNCTION()
-	void OnCustomGameClicked();
+	/* Navigates to the lobby menu and creates a host beacon. */
+	UFUNCTION(BlueprintCallable)
+	void CreateCustomGame();
 
 	/* Plays the deactivation animation animation, which deactivates this widget when it finishes playing. */
-	UFUNCTION()
-	void OnBackClicked();
+	UFUNCTION(BlueprintCallable)
+	void ReturnToMainMenu();
 
 
 /* Protected variables. */

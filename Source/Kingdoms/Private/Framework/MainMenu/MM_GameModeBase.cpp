@@ -3,8 +3,16 @@
 
 #include "Framework/MainMenu/MM_GameModeBase.h"
 
-#include "Kismet/GameplayStatics.h"
+#include "Framework/MainMenu/MM_LobbyBeaconHostObject.h"
 #include "UserInterface/MainMenu/MM_HUD.h"
+
+#include "Kismet/GameplayStatics.h"
+#include "OnlineBeaconHost.h"
+
+AMM_GameModeBase::AMM_GameModeBase()
+{
+	HostObject = nullptr;
+}
 
 void AMM_GameModeBase::PostLogin(APlayerController* NewPlayer)
 {
@@ -21,4 +29,23 @@ void AMM_GameModeBase::PostLogin(APlayerController* NewPlayer)
 
 		GetWorld()->ServerTravel("/Game/Maps/Playtesting/Testing_TileRework?listen");
 	}
+}
+
+bool AMM_GameModeBase::CreateHostBeacon()
+{
+	if (AOnlineBeaconHost* Host = GetWorld()->SpawnActor<AOnlineBeaconHost>(AOnlineBeaconHost::StaticClass()))
+	{
+		if (Host->InitHost())
+		{
+			Host->PauseBeaconRequests(false);
+			HostObject = GetWorld()->SpawnActor<AMM_LobbyBeaconHostObject>(AMM_LobbyBeaconHostObject::StaticClass());
+			if (HostObject)
+			{
+				Host->RegisterHost(HostObject);
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
