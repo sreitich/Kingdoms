@@ -91,27 +91,27 @@ struct FAttackPreviewInfo
 
 	/* The attacking piece (will be always be friendly to the local player). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AParentPiece* FriendlyPiece;
+	AParentPiece* FriendlyPiece = nullptr;
 	/* The defending piece (will always be hostile to the local player). This can be left as null to create a preview
 	 * without a selected piece (i.e. the player is currently selecting one). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AParentPiece* EnemyPiece;
+	AParentPiece* EnemyPiece = nullptr;
 
 	/* The attacker's overridden stats. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int AttackerStrength;
+	int AttackerStrength = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int AttackerArmor;
+	int AttackerArmor = 0;
 
 	/* The defender's overridden stats. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int DefenderStrength;
+	int DefenderStrength = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int DefenderArmor;
+	int DefenderArmor = 0;
 
 	/* Whether the previewed attack is one-sided. This affects the "attack outcome" text. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bOneSidedAttack;
+	bool bOneSidedAttack = false;
 };
 
 /* Information needed to execute an attack. */
@@ -130,20 +130,20 @@ struct FAttackInfo
 
 	/* If the attacker needs to move to the defender before attacking. Usually only false if the attack is ranged. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bMoveTo;
+	bool bMoveTo = false;
 
 	/* If the attacker has moved to the defender because bMoveTo was true and it was far enough away. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bMoved;
+	bool bMoved = false;
 	
 	/* If the defender fights back against the attacker. False indicates that this is a one-sided attack. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bDefenderFights;
+	bool bDefenderFights = false;
 
 	/* If the attacker should take the place of the defender (move to their tile) if the defender dies and the attacker
 	 * survives. This should always be true for an attack triggered by moving a piece onto an occupied tile. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bTakePlace;
+	bool bTakePlace = false;
 };
 
 /* Information used to interpolate the camera from one transform to another. */
@@ -154,31 +154,31 @@ struct FCameraInterpolationInfo
 
 	/* Location to start at or return to. */
 	UPROPERTY(BlueprintReadWrite)
-	FVector StartLocation;
+	FVector StartLocation = FVector();
 
 	/* Location to move to. */
 	UPROPERTY(BlueprintReadWrite)
-	FVector EndLocation;
+	FVector EndLocation = FVector();
 
 	/* Rotation to start at or return to. */
 	UPROPERTY(BlueprintReadWrite)
-	FRotator StartRotation;
+	FRotator StartRotation = FRotator();
 
 	/* Rotation to move to. */
 	UPROPERTY(BlueprintReadWrite)
-	FRotator EndRotation;
+	FRotator EndRotation = FRotator();
 
 	/* Length to start the camera's spring arm at or to return it to. */
 	UPROPERTY(BlueprintReadWrite)
-	float StartArmLength;
+	float StartArmLength = 0.0f;
 
 	/* Length to interpolate the camera's spring arm to. */
 	UPROPERTY(BlueprintReadWrite)
-	float EndArmLength;
+	float EndArmLength = 0.0f;
 
 	/* Whether to interpolate to or from the ending location, rotation, and arm length. */
 	UPROPERTY(BlueprintReadWrite)
-	bool bReverse;
+	bool bReverse = false;
 };
 
 /* Information used to modify a piece's statistics as a result of an ability or effect. */
@@ -193,39 +193,40 @@ struct FModifier
 
 	/* The actor (usually a piece) that caused the modifier. */
 	UPROPERTY(BlueprintReadWrite)
-	AActor* SourceActor;
+	AActor* SourceActor = nullptr;
 
 	/* The alignment of the actor responsible for the modifier, relative to the player whose piece is being modified. */
 	UPROPERTY(BlueprintReadWrite)
-	TEnumAsByte<EAlignment> SourceAlignmentToTarget;
+	TEnumAsByte<EAlignment> SourceAlignmentToTarget = E_Friendly;
 
 	/* The name of the actor that caused the modifier. */
 	UPROPERTY(BlueprintReadWrite)
-	FString SourceName;
+	FString SourceName = FString();
 
 	/* The name of the ability or effect that caused the modifier. */
 	UPROPERTY(BlueprintReadWrite)
-	FString SourceAbilityName;
+	FString SourceAbilityName = FString();
 
-	/* Which stat is being modified. 0 is armor, 1 is strength. */
+	/* Which stat is being modified. 0 is armor, 1 is strength. This is pending deprecated. It is required for the
+	 * current statistic update system. Once the system is reworked, this will be removed. */
 	UPROPERTY(BlueprintReadWrite)
-	int EffectedStat;
+	int EffectedStat = 0;
 
 	/* The net effect of the modifier on the affected piece's strength. */
 	UPROPERTY(BlueprintReadWrite)
-	int StrengthChange;
+	int StrengthChange = 0;
 
 	/* The net effect of the modifier on the affected piece's armor. */
 	UPROPERTY(BlueprintReadWrite)
-	int ArmorChange;
+	int ArmorChange = 0;
 
 	/* Determines whether this modifier's duration is determined by a fixed duration or by a different condition. */
 	UPROPERTY(BlueprintReadWrite)
-	bool bIndefiniteDuration;
+	bool bIndefiniteDuration = false;
 
 	/* The remaining turn duration of the modifier. */
 	UPROPERTY(BlueprintReadWrite)
-	int RemainingDuration;
+	int RemainingDuration = false;
 
 	/* Tracks if this modifier's strength modification pop-up has been played yet. Set this to true to avoid playing strength pop-ups. */
 	UPROPERTY(BlueprintReadWrite)

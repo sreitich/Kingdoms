@@ -17,17 +17,17 @@ UPieceNetworkingComponent::UPieceNetworkingComponent()
 void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* PieceToModify, FModifier NewModifier,
 	bool bActivatePopUps)
 {
-	/* Store the original strength or armor value to find out the final change that this modifier applies. */
-	const int OriginalValue = NewModifier.EffectedStat ? PieceToModify->GetCurrentStrength() : PieceToModify->GetCurrentArmor();
-	int NewValue = OriginalValue;
-
-	/* Save the new strength value to determine the modifier pop-up value. */
-	if (NewModifier.StrengthChange != 0)
-		NewValue = FMath::Clamp(PieceToModify->GetCurrentStrength() + NewModifier.StrengthChange, 0, 20);
-
-	/* Save the new armor value to determine the modifier pop-up value. */
-	if (NewModifier.ArmorChange != 0)
-		NewValue = FMath::Clamp(PieceToModify->GetCurrentArmor() + NewModifier.ArmorChange, 0, 20);
+	// /* Store the original strength or armor value to find out the final change that this modifier applies. */
+	// const int OriginalValue = NewModifier.EffectedStat ? PieceToModify->GetCurrentStrength() : PieceToModify->GetCurrentArmor();
+	// int NewValue = OriginalValue;
+	//
+	// /* Save the new strength value to determine the modifier pop-up value. */
+	// if (NewModifier.StrengthChange != 0)
+	// 	NewValue = FMath::Clamp(PieceToModify->GetCurrentStrength() + NewModifier.StrengthChange, 0, 20);
+	//
+	// /* Save the new armor value to determine the modifier pop-up value. */
+	// if (NewModifier.ArmorChange != 0)
+	// 	NewValue = FMath::Clamp(PieceToModify->GetCurrentArmor() + NewModifier.ArmorChange, 0, 20);
 
 	/* Set whether the new modifier will trigger pop-ups when added. */
 	NewModifier.bArmPopUpPlayed = !bActivatePopUps;
@@ -67,17 +67,17 @@ void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* 
 void UPieceNetworkingComponent::Server_RemoveModifier_Implementation(AParentPiece* TargetPiece, FModifier ModifierToRemove,
 	bool bActivatePopUps, bool bFlashHighlight)
 {
-	/* Store the original strength or armor value to find out the final change that this modifier applies. */
-	const int OriginalValue = ModifierToRemove.EffectedStat ? TargetPiece->GetCurrentStrength() : TargetPiece->GetCurrentArmor();
-	int NewValue = OriginalValue;
-
-	/* Save the new strength value to determine the modifier pop-up value. */
-	if (ModifierToRemove.StrengthChange != 0)
-		NewValue = FMath::Clamp(TargetPiece->GetCurrentStrength() - ModifierToRemove.StrengthChange, 0, 20);
-
-	/* Save the new armor value to determine the modifier pop-up value. */
-	if (ModifierToRemove.ArmorChange != 0)
-		NewValue = FMath::Clamp(TargetPiece->GetCurrentArmor() - ModifierToRemove.ArmorChange, 0, 20);
+	// /* Store the original strength or armor value to find out the final change that this modifier applies. */
+	// const int OriginalValue = ModifierToRemove.EffectedStat ? TargetPiece->GetCurrentStrength() : TargetPiece->GetCurrentArmor();
+	// int NewValue = OriginalValue;
+	//
+	// /* Save the new strength value to determine the modifier pop-up value. */
+	// if (ModifierToRemove.StrengthChange != 0)
+	// 	NewValue = FMath::Clamp(TargetPiece->GetCurrentStrength() - ModifierToRemove.StrengthChange, 0, 20);
+	//
+	// /* Save the new armor value to determine the modifier pop-up value. */
+	// if (ModifierToRemove.ArmorChange != 0)
+	// 	NewValue = FMath::Clamp(TargetPiece->GetCurrentArmor() - ModifierToRemove.ArmorChange, 0, 20);
 
 
 	/* Some pieces' abilities that have lasting effects (i.e. modifiers) need to execute code when that effect ends. */

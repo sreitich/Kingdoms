@@ -42,6 +42,7 @@ bool AMM_GameModeBase::CreateHostBeacon()
 			if (HostObject)
 			{
 				Host->RegisterHost(HostObject);
+				UE_LOG(LogTemp, Error, TEXT("registered host"));
 				return true;
 			}
 		}

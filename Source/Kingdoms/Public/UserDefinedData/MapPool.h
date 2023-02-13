@@ -19,9 +19,9 @@ class KINGDOMS_API UMapPool : public UDataAsset
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Metadata")
-	FName DisplayedName;
+	FName DisplayedName = FName();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Maps")
-	TArray<UMapData*> Maps;
+	TArray<UMapData*> Maps = TArray<UMapData*>();
 	
 };

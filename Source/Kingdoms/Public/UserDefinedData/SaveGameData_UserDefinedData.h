@@ -14,11 +14,11 @@ struct FArmyPresetStruct
 
     /* Name of this army preset. */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FString ArmyName;
+    FString ArmyName = FString();
 
     /* List of piece IDs for each piece in the army. */
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TArray<FString> Pieces;
+    TArray<FString> Pieces = TArray<FString>();
 
     /* Default constructor. */
     FArmyPresetStruct()

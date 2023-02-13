@@ -34,9 +34,9 @@ enum EPieceRarity
 UENUM(BlueprintType)
 enum EAlignment
 {
-	E_Friendly	UMETA(DisplayName="Friendly"),
-	E_Hostile	UMETA(DisplayName="Hostile"),
-	E_Neutral	UMETA(DisplayName="Neutral"),
+	E_Friendly				UMETA(DisplayName="Friendly"),
+	E_Hostile				UMETA(DisplayName="Hostile"),
+	E_Neutral				UMETA(DisplayName="Neutral"),
 	E_DebugAlignment		UMETA(DisplayName="Debug Alignment")
 };
 
@@ -72,7 +72,7 @@ struct FPieceDataStruct : public FTableRowBase
 	
 	/* The reference to this piece's blueprint class, used when spawning the piece. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Code")
-	TSubclassOf<class AParentPiece> ClassRef;
+	TSubclassOf<class AParentPiece> ClassRef = nullptr;
 
 	/* The photo used on a piece's card when placing pieces before a match. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Photos")
@@ -88,11 +88,11 @@ struct FPieceDataStruct : public FTableRowBase
 
 	/* This piece's active ability's name. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
-	FString ActiveName = "";
+	FString ActiveName = FString();
 
 	/* This piece's active ability's displayed description. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
-	FString ActiveDes = "";
+	FString ActiveDes = FString();
 
 	/* Whether or not this piece's active ability targets tiles. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Abilities")
