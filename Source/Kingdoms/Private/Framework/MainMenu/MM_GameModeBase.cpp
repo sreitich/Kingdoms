@@ -33,14 +33,20 @@ void AMM_GameModeBase::PostLogin(APlayerController* NewPlayer)
 
 bool AMM_GameModeBase::CreateHostBeacon()
 {
+	/* Spawn an online beacon host to connect incoming client beacon connections to the beacon host object. */
 	if (AOnlineBeaconHost* Host = GetWorld()->SpawnActor<AOnlineBeaconHost>(AOnlineBeaconHost::StaticClass()))
 	{
+		/* Initialize our beacon host. */
 		if (Host->InitHost())
 		{
+			/* Allow remote client machines to send requests to connect to this beacon. */
 			Host->PauseBeaconRequests(false);
+
+			/* Spawn a beacon host object to manage connected client beacons. */
 			HostObject = GetWorld()->SpawnActor<AMM_LobbyBeaconHostObject>(AMM_LobbyBeaconHostObject::StaticClass());
 			if (HostObject)
 			{
+				/* Register the host object if it was successfully spawned. */
 				Host->RegisterHost(HostObject);
 				UE_LOG(LogTemp, Error, TEXT("registered host"));
 				return true;

@@ -19,18 +19,22 @@ class KINGDOMS_API AMM_GameModeBase : public AGameModeBase
 /* Public functions. */
 public:
 
+	/* Default constructor. */
 	AMM_GameModeBase();
 
 	/* Called when a player enters the map. Starts the game if there are enough players connected. */
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
-	/* Creates a new host beacon to host a lobby. */
+	/* Creates and registers a host beacon object to host a lobby. */
 	UFUNCTION()
 	bool CreateHostBeacon();
 
 
+/* Protected variables. */
 protected:
 
+	/* Persistent pointer to the beacon host object, if we are currently hosting a custom lobby. */
+	UPROPERTY()
 	AMM_LobbyBeaconHostObject* HostObject;
 
 };

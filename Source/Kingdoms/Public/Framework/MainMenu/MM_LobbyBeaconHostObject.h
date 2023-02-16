@@ -17,12 +17,14 @@ class KINGDOMS_API AMM_LobbyBeaconHostObject : public ALobbyBeaconHost
 /* Public functions. */
 public:
 
+	/* Default constructor. */
 	AMM_LobbyBeaconHostObject();
 
 
 /* Protected functions. */
 protected:
 
+	/* Called when a client beacon is connected to this host. */
 	virtual void OnClientConnected(AOnlineBeaconClient* NewClientActor, UNetConnection* ClientConnection) override;
 	
 };

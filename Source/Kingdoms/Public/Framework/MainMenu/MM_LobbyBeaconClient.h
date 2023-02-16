@@ -17,6 +17,7 @@ class KINGDOMS_API AMM_LobbyBeaconClient : public ALobbyBeaconClient
 /* Public functions. */
 public:
 
+	/* Default constructor. */
 	AMM_LobbyBeaconClient();
 
 };
