@@ -7,8 +7,8 @@
 
 AMM_LobbyBeaconHostObject::AMM_LobbyBeaconHostObject()
 {
-	/* Set which client beacons will connect to this host beacon. The AOnlineBeaconHost will pair beacon clients to
-	 * their corresponding host object. */
+	/* Set which beacon clients will connect to this beacon host object. The AOnlineBeaconHost will pair beacon clients
+	 * to their corresponding host object and form a connection. */
 	ClientBeaconActorClass = AMM_LobbyBeaconClient::StaticClass();
 	BeaconTypeName = ClientBeaconActorClass->GetName();
 }
@@ -19,10 +19,10 @@ void AMM_LobbyBeaconHostObject::OnClientConnected(AOnlineBeaconClient* NewClient
 
 	if (NewClientActor)
 	{
-		UE_LOG(LogTemp, Error, TEXT("A"));
+		UE_LOG(LogTemp, Error, TEXT("HOST: Host beacon connected to client."));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("B"));
+		UE_LOG(LogTemp, Error, TEXT("HOST: Host beacon failed to connect to client."));
 	}
 }

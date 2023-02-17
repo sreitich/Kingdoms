@@ -25,7 +25,7 @@ public:
 	/* Called when a player enters the map. Starts the game if there are enough players connected. */
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
-	/* Creates and registers a host beacon object to host a lobby. */
+	/* Creates and registers a beacon host object to host a lobby. */
 	UFUNCTION()
 	bool CreateHostBeacon();
 

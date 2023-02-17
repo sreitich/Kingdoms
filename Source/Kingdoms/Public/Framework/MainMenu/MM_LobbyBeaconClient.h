@@ -20,4 +20,18 @@ public:
 	/* Default constructor. */
 	AMM_LobbyBeaconClient();
 
+
+/* Protected functions. */
+protected:
+
+	/* Attempts to connect this beacon client to the beacon host at the given address. */
+	UFUNCTION(BlueprintCallable)
+	bool ConnectToServer(const FString& Address);
+
+	/* Called when this beacon client successfully connects to a beacon host. */
+	virtual void OnConnected() override;
+
+	/* Called when this beacon client fails to connect to a beacon host. */
+	virtual void OnFailure() override;
+
 };

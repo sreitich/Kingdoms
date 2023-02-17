@@ -24,7 +24,7 @@ public:
 /* Protected functions. */
 protected:
 
-	/* Called when a client beacon is connected to this host. */
+	/* Called when a beacon client is connected to this beacon host object. */
 	virtual void OnClientConnected(AOnlineBeaconClient* NewClientActor, UNetConnection* ClientConnection) override;
-	
+
 };
