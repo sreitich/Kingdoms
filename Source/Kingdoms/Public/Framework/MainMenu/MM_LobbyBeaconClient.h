@@ -6,9 +6,9 @@
 #include "LobbyBeaconClient.h"
 #include "MM_LobbyBeaconClient.generated.h"
 
-/**
- * 
- */
+/* Fires when a client successfully or unsuccessfully connects to a host. */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FConnectSuccess, bool, FConnected);
+
 UCLASS()
 class KINGDOMS_API AMM_LobbyBeaconClient : public ALobbyBeaconClient
 {
@@ -33,5 +33,13 @@ protected:
 
 	/* Called when this beacon client fails to connect to a beacon host. */
 	virtual void OnFailure() override;
+
+
+/* Protected variables. */
+protected:
+
+    /* Whether a connection attempt was successful or not. */
+    UPROPERTY(BlueprintAssignable)
+    FConnectSuccess FConnected;
 
 };

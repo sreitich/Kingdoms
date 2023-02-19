@@ -22,9 +22,11 @@ bool AMM_LobbyBeaconClient::ConnectToServer(const FString& Address)
 void AMM_LobbyBeaconClient::OnConnected()
 {
 	UE_LOG(LogTemp, Error, TEXT("CLIENT: Client successfully connected to host beacon."));
+	FConnected.Broadcast(true);
 }
 
 void AMM_LobbyBeaconClient::OnFailure()
 {
 	UE_LOG(LogTemp, Error, TEXT("CLIENT: Client failed to connect to host beacon."));
+	FConnected.Broadcast(false);
 }

@@ -75,17 +75,32 @@ void UMM_PlayMenuWidget::TryQuickplay()
 	}
 }
 
-void UMM_PlayMenuWidget::CreateCustomGame()
+void UMM_PlayMenuWidget::NavigateToLobbyMenu()
+{
+	/* To navigate to the lobby menu, queue the menu, which will deactivate this menu and transition to the new one. */
+	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
+	HUDPtr->QueueMenuChange(E_LobbyMenu);
+}
+
+bool UMM_PlayMenuWidget::CreateCustomGame()
 {
 	/* Create a host beacon to host the new lobby. */
 	if (AMM_GameModeBase* GameModePtr = Cast<AMM_GameModeBase>(UGameplayStatics::GetGameMode(GetOwningPlayer())))
 	{
-		GameModePtr->CreateHostBeacon();
+		if (GameModePtr->CreateHostBeacon())
+		{
+			/* Navigate to the lobby menu. */
+			NavigateToLobbyMenu();
+
+			return true;
+		}
+		else
+		{
+			// Error: game could not be created.
+		}
 	}
 
-	/* To navigate to the lobby menu, queue the menu, which will deactivate this menu and transition to the new one. */
-	AMM_HUD* HUDPtr = GetOwningPlayer()->GetHUD<AMM_HUD>();
-	HUDPtr->QueueMenuChange(E_LobbyMenu);
+	return false;
 }
 
 void UMM_PlayMenuWidget::ReturnToMainMenu()

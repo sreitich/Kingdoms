@@ -42,9 +42,14 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void TryQuickplay();
 
-	/* Navigates to the lobby menu and creates a host beacon. */
+	/* Navigates to the lobby menu. */
 	UFUNCTION(BlueprintCallable)
-	void CreateCustomGame();
+	void NavigateToLobbyMenu();
+
+	/* Creates a host beacon and navigates to the lobby menu. Returns whether or not the host beacon was successfully
+	 * created. */
+	UFUNCTION(BlueprintCallable)
+	bool CreateCustomGame();
 
 	/* Plays the deactivation animation animation, which deactivates this widget when it finishes playing. */
 	UFUNCTION(BlueprintCallable)
