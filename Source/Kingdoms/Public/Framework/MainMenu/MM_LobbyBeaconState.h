@@ -13,5 +13,10 @@ UCLASS(Blueprintable)
 class KINGDOMS_API AMM_LobbyBeaconState : public ALobbyBeaconState
 {
 	GENERATED_BODY()
-	
+
+/* Public functions. */
+public:
+
+	/* Default constructor. */
+	AMM_LobbyBeaconState();
 };

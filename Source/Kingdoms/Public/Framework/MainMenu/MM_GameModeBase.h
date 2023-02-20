@@ -7,6 +7,7 @@
 #include "MM_GameModeBase.generated.h"
 
 class AMM_LobbyBeaconHostObject;
+class AOnlineBeaconHost;
 
 /**
  * 
@@ -29,12 +30,24 @@ public:
 	UFUNCTION()
 	bool CreateHostBeacon();
 
+	/* Getter for beacon host. */
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE AOnlineBeaconHost* GetBeaconHost() const { return BeaconHost; }
+
+	/* Getter for beacon host object. */
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE AMM_LobbyBeaconHostObject* GetBeaconHostObject() const { return BeaconHostObject; }
+
 
 /* Protected variables. */
 protected:
 
+	/* Persistent pointer to the beacon host, if we are currently hosting a custom lobby. */
+	UPROPERTY()
+	AOnlineBeaconHost* BeaconHost = nullptr;
+
 	/* Persistent pointer to the beacon host object, if we are currently hosting a custom lobby. */
 	UPROPERTY()
-	AMM_LobbyBeaconHostObject* HostObject;
+	AMM_LobbyBeaconHostObject* BeaconHostObject = nullptr;
 
 };

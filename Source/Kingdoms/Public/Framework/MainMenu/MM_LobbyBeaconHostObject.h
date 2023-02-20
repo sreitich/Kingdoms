@@ -27,4 +27,13 @@ protected:
 	/* Called when a beacon client is connected to this beacon host object. */
 	virtual void OnClientConnected(AOnlineBeaconClient* NewClientActor, UNetConnection* ClientConnection) override;
 
+	/* Called when a client disconnects from this host. */
+	virtual void NotifyClientDisconnected(AOnlineBeaconClient* LeavingClientActor) override;
+
+	/* Destroys the lobby that this beacon is hosting. */
+	UFUNCTION(BlueprintCallable)
+	void DestroyLobby();
+
+		/* Disconnects all clients currently connected to this lobby. */
+		void DisconnectAllClients();
 };

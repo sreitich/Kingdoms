@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "MM_PlayerController.generated.h"
 
+class AMM_LobbyBeaconClient;
 class UMM_MatchmakingStartPopUp;
 class UMM_QueueTimer;
 
@@ -24,6 +25,19 @@ public:
 
 	/* Default constructor. */
 	AMM_PlayerController();
+
+
+/* Public variables. */
+public:
+
+	/* Whether or not this player is currently hosting a custom lobby, if they are in one. */
+	UPROPERTY(BlueprintReadWrite, Category="Custom Lobby")
+	bool bIsCustomLobbyHost = false;
+
+	/* A reference to this player's client beacon, if they are connected to a custom lobby as a client. */
+	UPROPERTY(BlueprintReadWrite, Category="Custom Lobby")
+	AMM_LobbyBeaconClient* CustomLobbyClientBeacon;
+	
 
 
 /* Protected functions. */

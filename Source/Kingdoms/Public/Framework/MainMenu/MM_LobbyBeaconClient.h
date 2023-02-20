@@ -34,6 +34,10 @@ protected:
 	/* Called when this beacon client fails to connect to a beacon host. */
 	virtual void OnFailure() override;
 
+	/* Disconnects this beacon client from the host. */
+	UFUNCTION(BlueprintCallable)
+	void LeaveLobby();
+
 
 /* Protected variables. */
 protected:

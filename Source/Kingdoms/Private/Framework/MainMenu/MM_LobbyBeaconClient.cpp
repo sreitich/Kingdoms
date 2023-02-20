@@ -30,3 +30,9 @@ void AMM_LobbyBeaconClient::OnFailure()
 	UE_LOG(LogTemp, Error, TEXT("CLIENT: Client failed to connect to host beacon."));
 	FConnected.Broadcast(false);
 }
+
+void AMM_LobbyBeaconClient::LeaveLobby()
+{
+	/* Destroy this beacon client to close its connection to the lobby. */
+	DestroyBeacon();
+}
