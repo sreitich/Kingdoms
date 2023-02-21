@@ -41,6 +41,23 @@ void AMM_LobbyBeaconHostObject::NotifyClientDisconnected(AOnlineBeaconClient* Le
 	UE_LOG(LogTemp, Error, TEXT("HOST: Client has disconnected."))
 }
 
+void AMM_LobbyBeaconHostObject::DisconnectClient(AOnlineBeaconClient* ClientActor)
+{
+	/* To disconnect a client, trigger its OnDisconnected function and disconnect it form the host. */
+	AOnlineBeaconHost* BeaconHost = Cast<AOnlineBeaconHost>(GetOwner());
+	if (BeaconHost)
+	{
+		/* Call the client's OnDisconnected function. */
+		if (AMM_LobbyBeaconClient* Client = Cast<AMM_LobbyBeaconClient>(ClientActor))
+		{
+			Client->Client_OnDisconnected();
+		}
+
+		/* Disconnect the client from the host. */
+		BeaconHost->DisconnectClient(ClientActor);
+	}
+}
+
 void AMM_LobbyBeaconHostObject::DestroyLobby()
 {
 	UE_LOG(LogTemp, Error, TEXT("HOST: Lobby destroyed."));
@@ -48,13 +65,10 @@ void AMM_LobbyBeaconHostObject::DestroyLobby()
 	DisconnectAllClients();
 
 	/* Unregister this lobby and destroy the host beacon. */
-	if (const AMM_GameModeBase* GameModePtr = GetWorld()->GetAuthGameMode<AMM_GameModeBase>())
+	if (AOnlineBeaconHost* Host = Cast<AOnlineBeaconHost>(GetOwner()))
 	{
-		if (AOnlineBeaconHost* Host = GameModePtr->GetBeaconHost())
-		{
-			Host->UnregisterHost(BeaconTypeName);
-			Host->DestroyBeacon();
-		}
+		Host->UnregisterHost(BeaconTypeName);
+		Host->DestroyBeacon();
 	}
 }
 

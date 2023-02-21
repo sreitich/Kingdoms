@@ -30,6 +30,9 @@ protected:
 	/* Called when a client disconnects from this host. */
 	virtual void NotifyClientDisconnected(AOnlineBeaconClient* LeavingClientActor) override;
 
+    /* Called to disconnect a given client from this host. */
+	virtual void DisconnectClient(AOnlineBeaconClient* ClientActor) override;
+
 	/* Destroys the lobby that this beacon is hosting. */
 	UFUNCTION(BlueprintCallable)
 	void DestroyLobby();

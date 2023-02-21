@@ -7,6 +7,12 @@ AMM_LobbyBeaconClient::AMM_LobbyBeaconClient()
 {
 }
 
+void AMM_LobbyBeaconClient::Client_OnDisconnected_Implementation()
+{
+	UE_LOG(LogTemp, Error, TEXT("Client: Disconnected"));
+	FOnDisconnected.Broadcast();
+}
+
 bool AMM_LobbyBeaconClient::ConnectToServer(const FString& Address)
 {
 	/* Construct a URL to connect to using the given address. */
@@ -22,13 +28,13 @@ bool AMM_LobbyBeaconClient::ConnectToServer(const FString& Address)
 void AMM_LobbyBeaconClient::OnConnected()
 {
 	UE_LOG(LogTemp, Error, TEXT("CLIENT: Client successfully connected to host beacon."));
-	FConnected.Broadcast(true);
+	FOnConnected.Broadcast(true);
 }
 
 void AMM_LobbyBeaconClient::OnFailure()
 {
 	UE_LOG(LogTemp, Error, TEXT("CLIENT: Client failed to connect to host beacon."));
-	FConnected.Broadcast(false);
+	FOnConnected.Broadcast(false);
 }
 
 void AMM_LobbyBeaconClient::LeaveLobby()

@@ -7,7 +7,9 @@
 #include "MM_LobbyBeaconClient.generated.h"
 
 /* Fires when a client successfully or unsuccessfully connects to a host. */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FConnectSuccess, bool, FConnected);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FConnectSuccess, bool, bConnectionSuccessful);
+/* Fires when a client is disconnected by a host. */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDisconnected);
 
 UCLASS()
 class KINGDOMS_API AMM_LobbyBeaconClient : public ALobbyBeaconClient
@@ -19,6 +21,10 @@ public:
 
 	/* Default constructor. */
 	AMM_LobbyBeaconClient();
+
+	/* Called when the client is disconnected by the host. */
+	UFUNCTION(Client, Reliable)
+	virtual void Client_OnDisconnected();
 
 
 /* Protected functions. */
@@ -42,8 +48,12 @@ protected:
 /* Protected variables. */
 protected:
 
-    /* Whether a connection attempt was successful or not. */
+    /* OnConnected delegate. */
     UPROPERTY(BlueprintAssignable)
-    FConnectSuccess FConnected;
+    FConnectSuccess FOnConnected;
+
+	/* OnDisconnected delegate. */
+	UPROPERTY(BlueprintAssignable)
+	FDisconnected FOnDisconnected;
 
 };

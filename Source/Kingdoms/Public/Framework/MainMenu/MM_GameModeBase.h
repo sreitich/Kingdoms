@@ -30,10 +30,6 @@ public:
 	UFUNCTION()
 	bool CreateHostBeacon();
 
-	/* Getter for beacon host. */
-	UFUNCTION(BlueprintCallable)
-	FORCEINLINE AOnlineBeaconHost* GetBeaconHost() const { return BeaconHost; }
-
 	/* Getter for beacon host object. */
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE AMM_LobbyBeaconHostObject* GetBeaconHostObject() const { return BeaconHostObject; }
