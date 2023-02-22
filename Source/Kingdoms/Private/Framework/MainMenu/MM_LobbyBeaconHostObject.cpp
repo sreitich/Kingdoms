@@ -20,13 +20,34 @@ AMM_LobbyBeaconHostObject::AMM_LobbyBeaconHostObject()
 	LobbyStateClass = AMM_LobbyBeaconState::StaticClass();
 }
 
+void AMM_LobbyBeaconHostObject::UpdateLobbyInfo(FCustomLobbyInformation NewLobbyInfo)
+{
+	LobbyInfo.Map = NewLobbyInfo.Map;
+
+	/* Update the lobby information for all connected clients. */
+	for (AOnlineBeaconClient* Client : ClientActors)
+	{
+		if (AMM_LobbyBeaconClient* LobbyClient = Cast<AMM_LobbyBeaconClient>(Client))
+		{
+			LobbyClient->Client_OnLobbyUpdated(LobbyInfo);
+		}
+	}
+
+	/* Don't update the player list from blueprints. */
+}
+
 void AMM_LobbyBeaconHostObject::OnClientConnected(AOnlineBeaconClient* NewClientActor, UNetConnection* ClientConnection)
 {
 	Super::OnClientConnected(NewClientActor, ClientConnection);
 
+	/* Initialize the lobby information on the client if the connection was successful. */
 	if (NewClientActor)
 	{
 		UE_LOG(LogTemp, Error, TEXT("HOST: Host beacon connected to client."));
+		if (AMM_LobbyBeaconClient* Client = Cast<AMM_LobbyBeaconClient>(NewClientActor))
+		{
+			Client->Client_OnLobbyUpdated(LobbyInfo);
+		}
 	}
 	else
 	{

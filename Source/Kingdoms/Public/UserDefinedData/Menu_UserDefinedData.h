@@ -22,12 +22,18 @@ enum EMenuScreen
 	E_MenuDebug		UMETA(DisplayName="Menu Debug")
 };
 
-/* The settings for a custom game lobby. */
+/* The settings and information for a custom game lobby. */
 USTRUCT(BlueprintType)
-struct FCustomGameSettings
+struct FCustomLobbyInformation
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Custom Game Settings")
+	/* The currently selected map. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Custom Lobby Info")
 	UMapData* Map = nullptr;
+
+	// Replace this with a custom struct of player information once we know what player info we want to display in the lobby.
+	/* The displayed names of all connected players. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Custom Lobby Info")
+	TArray<FString> PlayerNames = TArray<FString>();
 };

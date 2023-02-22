@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "UserDefinedData/Menu_UserDefinedData.h"
+
 #include "CoreMinimal.h"
 #include "LobbyBeaconHost.h"
 #include "MM_LobbyBeaconHostObject.generated.h"
@@ -19,6 +21,14 @@ public:
 
 	/* Default constructor. */
 	AMM_LobbyBeaconHostObject();
+
+	/* Local getter for LobbyInfo. */
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE FCustomLobbyInformation GetLobbyInfo() const { return LobbyInfo; }
+
+	/* Setter for LobbyInfo. This does not affect the player names. */
+	UFUNCTION(BlueprintCallable)
+	void UpdateLobbyInfo(FCustomLobbyInformation NewLobbyInfo);
 
 
 /* Protected functions. */
@@ -39,4 +49,13 @@ protected:
 
 		/* Disconnects all clients currently connected to this lobby. */
 		void DisconnectAllClients();
+
+
+/* Protected variables. */
+protected:
+
+	/* The settings and information of this custom lobby. */
+	UPROPERTY(EditDefaultsOnly, Category="Lobby Information")
+	FCustomLobbyInformation LobbyInfo = FCustomLobbyInformation();
+
 };

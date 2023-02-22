@@ -45,5 +45,12 @@ protected:
 	/* Persistent pointer to the beacon host object, if we are currently hosting a custom lobby. */
 	UPROPERTY()
 	AMM_LobbyBeaconHostObject* BeaconHostObject = nullptr;
+	
+
+/* Protected class types. */	
+protected:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Beacon Class Types")
+	TSubclassOf<AMM_LobbyBeaconHostObject> BeaconHostObjectClass;
 
 };

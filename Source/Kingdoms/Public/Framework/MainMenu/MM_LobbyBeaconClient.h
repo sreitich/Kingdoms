@@ -2,14 +2,20 @@
 
 #pragma once
 
+#include "UserDefinedData/Menu_UserDefinedData.h"
+
 #include "CoreMinimal.h"
 #include "LobbyBeaconClient.h"
 #include "MM_LobbyBeaconClient.generated.h"
+
+class AMM_LobbyBeaconClient;
 
 /* Fires when a client successfully or unsuccessfully connects to a host. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FConnectSuccess, bool, bConnectionSuccessful);
 /* Fires when a client is disconnected by a host. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDisconnected);
+/* Fires when the lobby's information changes. */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLobbyUpdated, FCustomLobbyInformation, UpdatedLobbyInfo);
 
 UCLASS()
 class KINGDOMS_API AMM_LobbyBeaconClient : public ALobbyBeaconClient
@@ -25,6 +31,10 @@ public:
 	/* Called when the client is disconnected by the host. */
 	UFUNCTION(Client, Reliable)
 	virtual void Client_OnDisconnected();
+
+	/* Called when the lobby information is changed to update the client's information. */
+	UFUNCTION(Client, Reliable)
+	void Client_OnLobbyUpdated(FCustomLobbyInformation NewLobbyInfo);
 
 
 /* Protected functions. */
@@ -55,5 +65,15 @@ protected:
 	/* OnDisconnected delegate. */
 	UPROPERTY(BlueprintAssignable)
 	FDisconnected FOnDisconnected;
+
+	/* OnLobbyUpdated delegate. */
+	UPROPERTY(BlueprintAssignable)
+	FLobbyUpdated FOnLobbyUpdated;
+
+	/* The client's local copy of the host's lobby info. This is used to temporarily store the lobby info at the time
+	 * of connection, since the client has no way of telling the server when it has navigated to the lobby menu and is
+	 * ready to update the lobby information for the first time. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Lobby Information")
+	FCustomLobbyInformation LocalLobbyInfo = FCustomLobbyInformation();
 
 };

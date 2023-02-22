@@ -42,16 +42,20 @@ bool AMM_GameModeBase::CreateHostBeacon()
 			/* Allow remote client machines to send requests to connect to this beacon. */
 			BeaconHost->PauseBeaconRequests(false);
 
-			/* Spawn a beacon host object to manage connected client beacons. */
-			BeaconHostObject = GetWorld()->SpawnActor<AMM_LobbyBeaconHostObject>(AMM_LobbyBeaconHostObject::StaticClass());
-			if (IsValid(BeaconHostObject))
+			/* Ensure we have a beacon host object class to spawn. */
+			if (BeaconHostObjectClass)
 			{
-				/* Register the host object if it was successfully spawned. */
-				BeaconHost->RegisterHost(BeaconHostObject);
-				/* Set up the lobby's state. */
-				BeaconHostObject->SetupLobbyState(2);
-				UE_LOG(LogTemp, Error, TEXT("Gamemode: Registered host"));
-				return true;
+				/* Spawn a beacon host object to manage connected client beacons. */
+				BeaconHostObject = GetWorld()->SpawnActor<AMM_LobbyBeaconHostObject>(BeaconHostObjectClass);
+				if (IsValid(BeaconHostObject))
+				{
+					/* Register the host object if it was successfully spawned. */
+					BeaconHost->RegisterHost(BeaconHostObject);
+					/* Set up the lobby's state. */
+					BeaconHostObject->SetupLobbyState(2);
+					UE_LOG(LogTemp, Error, TEXT("Gamemode: Registered host"));
+					return true;
+				}
 			}
 		}
 	}

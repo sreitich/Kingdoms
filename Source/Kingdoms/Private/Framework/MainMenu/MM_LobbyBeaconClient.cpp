@@ -3,6 +3,8 @@
 
 #include "Framework/MainMenu/MM_LobbyBeaconClient.h"
 
+#include "Framework/MainMenu/MM_LobbyBeaconState.h"
+
 AMM_LobbyBeaconClient::AMM_LobbyBeaconClient()
 {
 }
@@ -11,6 +13,12 @@ void AMM_LobbyBeaconClient::Client_OnDisconnected_Implementation()
 {
 	UE_LOG(LogTemp, Error, TEXT("Client: Disconnected"));
 	FOnDisconnected.Broadcast();
+}
+
+void AMM_LobbyBeaconClient::Client_OnLobbyUpdated_Implementation(FCustomLobbyInformation NewLobbyInfo)
+{
+	LocalLobbyInfo = NewLobbyInfo;
+	FOnLobbyUpdated.Broadcast(NewLobbyInfo);
 }
 
 bool AMM_LobbyBeaconClient::ConnectToServer(const FString& Address)

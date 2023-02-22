@@ -89,9 +89,6 @@ bool UMM_PlayMenuWidget::CreateCustomGame()
 	{
 		if (GameModePtr->CreateHostBeacon())
 		{
-			/* Navigate to the lobby menu. */
-			NavigateToLobbyMenu();
-
 			return true;
 		}
 		else

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Net/UnrealNetwork.h"
+
 #include "CoreMinimal.h"
 #include "LobbyBeaconState.h"
 #include "MM_LobbyBeaconState.generated.h"
