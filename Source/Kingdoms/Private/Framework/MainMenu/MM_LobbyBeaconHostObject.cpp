@@ -23,17 +23,22 @@ AMM_LobbyBeaconHostObject::AMM_LobbyBeaconHostObject()
 void AMM_LobbyBeaconHostObject::UpdateLobbyInfo(FCustomLobbyInformation NewLobbyInfo)
 {
 	LobbyInfo.Map = NewLobbyInfo.Map;
+	/* Don't update the player list from blueprints. */
 
 	/* Update the lobby information for all connected clients. */
-	for (AOnlineBeaconClient* Client : ClientActors)
-	{
-		if (AMM_LobbyBeaconClient* LobbyClient = Cast<AMM_LobbyBeaconClient>(Client))
-		{
-			LobbyClient->Client_OnLobbyUpdated(LobbyInfo);
-		}
-	}
+	UpdateClientLobbyInfo(NewLobbyInfo);
 
-	/* Don't update the player list from blueprints. */
+	/* Update the lobby information for the host locally. */
+	FOnHostLobbyUpdated.Broadcast(LobbyInfo);
+}
+
+void AMM_LobbyBeaconHostObject::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// This will be changed to the actual player's name later.
+	/* Add the host to the list of player names to display. */
+	LobbyInfo.PlayerNames.Add(FString("Host"));
 }
 
 void AMM_LobbyBeaconHostObject::OnClientConnected(AOnlineBeaconClient* NewClientActor, UNetConnection* ClientConnection)
@@ -43,11 +48,17 @@ void AMM_LobbyBeaconHostObject::OnClientConnected(AOnlineBeaconClient* NewClient
 	/* Initialize the lobby information on the client if the connection was successful. */
 	if (NewClientActor)
 	{
+		// This will be changed to the player's actual name later.
+		/* Add the connected player to the list of player names to display. */
+		FString PlayerName = FString("Player ");
+		PlayerName.Append(FString::FromInt(LobbyInfo.PlayerNames.Num()));
+		LobbyInfo.PlayerNames.Add(PlayerName);
+		/* Update the displayed lobby info for the host locally. */
+		FOnHostLobbyUpdated.Broadcast(LobbyInfo);
+
+		/* Update all connected clients' lobby info. */
 		UE_LOG(LogTemp, Error, TEXT("HOST: Host beacon connected to client."));
-		if (AMM_LobbyBeaconClient* Client = Cast<AMM_LobbyBeaconClient>(NewClientActor))
-		{
-			Client->Client_OnLobbyUpdated(LobbyInfo);
-		}
+		UpdateClientLobbyInfo(LobbyInfo);
 	}
 	else
 	{
@@ -103,6 +114,18 @@ void AMM_LobbyBeaconHostObject::DisconnectAllClients()
 		if (IsValid(Client))
 		{
 			DisconnectClient(Client);
+		}
+	}
+}
+
+void AMM_LobbyBeaconHostObject::UpdateClientLobbyInfo(FCustomLobbyInformation NewLobbyInfo)
+{
+	/* Update the lobby information for all connected clients. */
+	for (AOnlineBeaconClient* Client : ClientActors)
+	{
+		if (AMM_LobbyBeaconClient* LobbyClient = Cast<AMM_LobbyBeaconClient>(Client))
+		{
+			LobbyClient->Client_OnLobbyUpdated(LobbyInfo);
 		}
 	}
 }

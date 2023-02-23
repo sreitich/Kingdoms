@@ -8,9 +8,9 @@
 #include "LobbyBeaconHost.h"
 #include "MM_LobbyBeaconHostObject.generated.h"
 
-/**
- * 
- */
+/* Called when the host updates the lobby information. */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHostLobbyUpdated, FCustomLobbyInformation, UpdatedLobbyInfo);
+
 UCLASS()
 class KINGDOMS_API AMM_LobbyBeaconHostObject : public ALobbyBeaconHost
 {
@@ -34,6 +34,9 @@ public:
 /* Protected functions. */
 protected:
 
+	/* Called when this actor is spawned. */
+	virtual void BeginPlay() override;
+
 	/* Called when a beacon client is connected to this beacon host object. */
 	virtual void OnClientConnected(AOnlineBeaconClient* NewClientActor, UNetConnection* ClientConnection) override;
 
@@ -50,6 +53,8 @@ protected:
 		/* Disconnects all clients currently connected to this lobby. */
 		void DisconnectAllClients();
 
+	void UpdateClientLobbyInfo(FCustomLobbyInformation NewLobbyInfo);
+
 
 /* Protected variables. */
 protected:
@@ -57,5 +62,9 @@ protected:
 	/* The settings and information of this custom lobby. */
 	UPROPERTY(EditDefaultsOnly, Category="Lobby Information")
 	FCustomLobbyInformation LobbyInfo = FCustomLobbyInformation();
+
+	/* OnHostLobbyUpdated delegate. */
+	UPROPERTY(BlueprintAssignable)
+	FHostLobbyUpdated FOnHostLobbyUpdated;
 
 };
