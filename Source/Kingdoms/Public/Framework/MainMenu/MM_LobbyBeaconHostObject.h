@@ -53,6 +53,7 @@ protected:
 		/* Disconnects all clients currently connected to this lobby. */
 		void DisconnectAllClients();
 
+	/* Replicates the given lobby information to all connected clients. */
 	void UpdateClientLobbyInfo(FCustomLobbyInformation NewLobbyInfo);
 
 

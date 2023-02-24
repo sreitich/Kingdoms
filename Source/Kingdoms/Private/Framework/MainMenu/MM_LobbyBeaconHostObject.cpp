@@ -51,14 +51,20 @@ void AMM_LobbyBeaconHostObject::OnClientConnected(AOnlineBeaconClient* NewClient
 		// This will be changed to the player's actual name later.
 		/* Add the connected player to the list of player names to display. */
 		FString PlayerName = FString("Player ");
-		PlayerName.Append(FString::FromInt(LobbyInfo.PlayerNames.Num()));
+		const uint8 PlayerIndex = LobbyInfo.PlayerNames.Num();
+		PlayerName.Append(FString::FromInt(PlayerIndex));
 		LobbyInfo.PlayerNames.Add(PlayerName);
+
+		/* Set the new client's player index. */
+		if (AMM_LobbyBeaconClient* Client = Cast<AMM_LobbyBeaconClient>(NewClientActor))
+			Client->SetPlayerIndex(PlayerIndex);
+
 		/* Update the displayed lobby info for the host locally. */
 		FOnHostLobbyUpdated.Broadcast(LobbyInfo);
-
 		/* Update all connected clients' lobby info. */
-		UE_LOG(LogTemp, Error, TEXT("HOST: Host beacon connected to client."));
 		UpdateClientLobbyInfo(LobbyInfo);
+
+		UE_LOG(LogTemp, Error, TEXT("HOST: Host beacon connected to clients."));
 	}
 	else
 	{
@@ -69,6 +75,32 @@ void AMM_LobbyBeaconHostObject::OnClientConnected(AOnlineBeaconClient* NewClient
 void AMM_LobbyBeaconHostObject::NotifyClientDisconnected(AOnlineBeaconClient* LeavingClientActor)
 {
 	Super::NotifyClientDisconnected(LeavingClientActor);
+
+	/* Get every client whose player index is after the leaving client's index and decrement their indices. This allows
+	 * the list of player names to maintain accurate indices of each player's name. */
+	if (AMM_LobbyBeaconClient* LeavingClient = Cast<AMM_LobbyBeaconClient>(LeavingClientActor))
+	{
+		uint8 LeavingPlayerIndex = LeavingClient->GetPlayerIndex();
+
+		for (AOnlineBeaconClient* ClientActor : ClientActors)
+        {
+        	if (AMM_LobbyBeaconClient* Client = Cast<AMM_LobbyBeaconClient>(ClientActor))
+        	{
+        		if (Client->GetPlayerIndex() > LeavingPlayerIndex)
+        		{
+        			Client->SetPlayerIndex(Client->GetPlayerIndex() - 1);
+        		}
+        	}
+        }
+
+		/* Remove the disconnected client from the player list. */
+		LobbyInfo.PlayerNames.RemoveAt(LeavingPlayerIndex);
+	}
+
+	/* Update the displayed lobby info for the host locally. */
+	FOnHostLobbyUpdated.Broadcast(LobbyInfo);
+	/* Update all connected clients' lobby info. */
+	UpdateClientLobbyInfo(LobbyInfo);
 
 	UE_LOG(LogTemp, Error, TEXT("HOST: Client has disconnected."))
 }

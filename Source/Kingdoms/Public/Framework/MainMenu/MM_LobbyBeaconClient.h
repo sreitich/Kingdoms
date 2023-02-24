@@ -36,6 +36,12 @@ public:
 	UFUNCTION(Client, Reliable)
 	void Client_OnLobbyUpdated(FCustomLobbyInformation NewLobbyInfo);
 
+	/* Getter for PlayerIndex. */
+	FORCEINLINE uint8 GetPlayerIndex() const { return PlayerIndex; }
+
+	/* Setter for PlayerIndex. */
+	FORCEINLINE void SetPlayerIndex(uint8 NewPlayerIndex) { PlayerIndex = NewPlayerIndex; };
+
 
 /* Protected functions. */
 protected:
@@ -75,5 +81,8 @@ protected:
 	 * ready to update the lobby information for the first time. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Lobby Information")
 	FCustomLobbyInformation LocalLobbyInfo = FCustomLobbyInformation();
+
+	/* The player's index in the lobby it is currently connected to. */
+	uint8 PlayerIndex;
 
 };
