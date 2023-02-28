@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "4.27",
+	"EngineAssociation": "{ACE9808F-49DE-A9BC-A139-D08AD7C93117}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -24,7 +24,7 @@
 		},
 		{
 			"Name": "RestartEditor",
-			"Enabled": true,
+			"Enabled": false,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/a00eb1e478ae4a8fb655aa22f9125b07"
 		},
 		{
