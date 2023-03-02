@@ -15,7 +15,11 @@
 #include "KingdomsGameInstance.generated.h"
 
 /* Called when the online friends interface finishes an attempt to send a game invitation to another player. */
-DECLARE_MULTICAST_DELEGATE_OneParam(FInvitationSentDelegate, const FUniqueNetId& /* The player receiving the invitation. */);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInvitationSentDelegate, FSteamFriend /* The player receiving the invitation. */, InviteReceiver);
+/* Called when the online friends interface finishes an attempt to accept a game invitation from another player. */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInvitationAcceptedDelegate, FSteamFriend /* The player who sent the invitation. */, InviteSender);
+/* Called when the online friends interface finishes an attempt to reject a game invitation from another player. */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInvitationRejectedDelegate, FSteamFriend /* The player who sent the invitation. */, InviteSender);
 
 UCLASS()
 class KINGDOMS_API UKingdomsGameInstance : public UGameInstance
@@ -54,7 +58,10 @@ public:
 	/* Sends a game invitation to the given player. Blueprint wrapper for SendInviteToPlayer. */
 	UFUNCTION(BlueprintCallable, Category="Steam|Friends")
 		void B_SendInviteToPlay(FSteamFriend FriendToInvite);
-	
+
+	/* Attempts to accept or reject an invitation from another player. */
+	UFUNCTION(BlueprintCallable, Category="Steam|Friends")
+		void ReplyToInviteFromPlayer(FSteamFriend FriendToReplyTo, bool bAccept);
 
 
 /* Public variables. */
@@ -90,11 +97,17 @@ protected:
 	/* Sends the connected players to the correct map. */
 	void OnStartSessionComplete(FName SessionName, bool bWasSuccessful);
 
-		/* Tells the player that an invite was successfully sent to a player. */
-		void OnSendInviteComplete(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& FriendId, const FString& ListName, const FString& ErrorString);
+	/* Tells the player that an invite was successfully sent to a player. */
+	void OnSendInviteComplete(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& FriendId, const FString& ListName, const FString& ErrorString);
 
 	/* Creates an invitation pop-up for the player to accept a received invitation. */
 	void OnInviteReceived(const FUniqueNetId& UserId, const FUniqueNetId& FriendId);
+
+	/* Attempts to join the lobby of the player who sent the invitation, if successful. */
+	void OnAcceptInviteComplete(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& FriendId, const FString& ListName, const FString& ErrorStr);
+
+	/* Communicates to the sender and the receiver that the invitation was rejected. */
+	void OnRejectInviteComplete(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& FriendId, const FString& ListName, const FString& ErrorStr);
 
 
 /* Protected variables. */
@@ -127,8 +140,32 @@ protected:
 	FOnSendInviteComplete OnSendInviteCompleteDelegate;
 
 		/* Triggered when the online friends interface successfully sends an invite to another player. */
+		UPROPERTY(BlueprintAssignable)
 		FInvitationSentDelegate OnSendInvitationSuccessDelegate;
 
 		/* Triggered when the online friends interface fails to send an invite to another player. */
+		UPROPERTY(BlueprintAssignable)
 		FInvitationSentDelegate OnSendInvitationFailureDelegate;
+
+
+	/* Triggered when the online friends interface finishes attempting to accept an invite from another player. */
+	FOnAcceptInviteComplete OnAcceptInviteCompleteDelegate;
+
+		/* Triggered when the online friends interface successfully accepts an invitation from another player. */
+		UPROPERTY(BlueprintAssignable)
+		FInvitationAcceptedDelegate OnAcceptInvitationSuccessDelegate;
+
+		/* Triggered when the online friends interface fails to accept an invitation from another player. */
+		UPROPERTY(BlueprintAssignable)
+		FInvitationAcceptedDelegate OnAcceptInvitationFailureDelegate;
+
+
+		/* Triggered when the online friends interface successfully rejects an invitation from another player. */
+		UPROPERTY(BlueprintAssignable)
+		FInvitationRejectedDelegate OnRejectInvitationSuccessDelegate;
+
+		/* Triggered when the online friends interface fails to reject an invitation from another player. */
+		UPROPERTY(BlueprintAssignable)
+		FInvitationRejectedDelegate OnRejectInvitationFailureDelegate;
+
 };

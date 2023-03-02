@@ -17,6 +17,8 @@ UKingdomsGameInstance::UKingdomsGameInstance()
 {
 	/* Bind OnSendInviteComplete to be called when the OnSendInviteCompleteDelegate delegate fires. */
 	OnSendInviteCompleteDelegate.BindUObject(this, &UKingdomsGameInstance::OnSendInviteComplete);
+	/* Bind OnAcceptInviteComplete to be called when the OnAcceptInviteCompleteDelegate delegate fires. */
+	OnAcceptInviteCompleteDelegate.BindUObject(this, &UKingdomsGameInstance::OnAcceptInviteComplete);
 }
 
 void UKingdomsGameInstance::CreatePublicServer()
@@ -122,7 +124,8 @@ void UKingdomsGameInstance::SendInviteToPlayer(const FUniqueNetId& PlayerToInvit
 	/* If the friends interface is valid, send an invite to the target player. */
 	if (FriendsInterface.IsValid())
 	{
-		FriendsInterface->SendInvite(0, PlayerToInvite, EFriendsLists::ToString(EFriendsLists::Default), OnSendInviteCompleteDelegate);
+		FriendsInterface->SendInvite(0, PlayerToInvite, EFriendsLists::ToString(EFriendsLists::Default),
+		                             OnSendInviteCompleteDelegate);
 	}
 }
 
@@ -131,6 +134,20 @@ void UKingdomsGameInstance::B_SendInviteToPlay(FSteamFriend FriendToInvite)
 	/* Unique net IDs are only exposed in C++, so we need to use a wrapper to get the friend's ID to send the
 	 * invitation to. */
 	SendInviteToPlayer(*FriendToInvite.UniqueNetID);
+}
+
+void UKingdomsGameInstance::ReplyToInviteFromPlayer(FSteamFriend FriendToReplyTo, bool bAccept)
+{
+	/* Ensure the friends interface is valid. */
+	if (FriendsInterface.IsValid())
+	{
+		/* Attempt to accept the invitation if requested. */
+		if (bAccept)
+			FriendsInterface->AcceptInvite(0, *FriendToReplyTo.UniqueNetID, EFriendsLists::ToString(EFriendsLists::Default), OnAcceptInviteCompleteDelegate);
+		/* Attempt to reject the invitation if requested. */
+		else
+			FriendsInterface->RejectInvite(0, *FriendToReplyTo.UniqueNetID, EFriendsLists::ToString(EFriendsLists::Default));
+	}
 }
 
 void UKingdomsGameInstance::Init()
@@ -148,53 +165,66 @@ void UKingdomsGameInstance::Init()
 		if (SessionInterface.IsValid())
 		{
 			/* Bind the functions for asynchronous events. */
-			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UKingdomsGameInstance::OnCreateSessionComplete);
-			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UKingdomsGameInstance::OnFindSessionComplete);
-			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UKingdomsGameInstance::OnJoinSessionComplete);
-			SessionInterface->OnRegisterPlayersCompleteDelegates.AddUObject(this, &UKingdomsGameInstance::OnRegisterPlayersComplete);
-			SessionInterface->OnStartSessionCompleteDelegates.AddUObject(this, &UKingdomsGameInstance::OnStartSessionComplete);
+			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(
+				this, &UKingdomsGameInstance::OnCreateSessionComplete);
+			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(
+				this, &UKingdomsGameInstance::OnFindSessionComplete);
+			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(
+				this, &UKingdomsGameInstance::OnJoinSessionComplete);
+			SessionInterface->OnRegisterPlayersCompleteDelegates.AddUObject(
+				this, &UKingdomsGameInstance::OnRegisterPlayersComplete);
+			SessionInterface->OnStartSessionCompleteDelegates.AddUObject(
+				this, &UKingdomsGameInstance::OnStartSessionComplete);
 		}
-		
+
 		/* Try to retrieve the friends interface from the online subsystem. */
 		FriendsInterface = OnlineSubsystem->GetFriendsInterface();
 		if (FriendsInterface.IsValid())
 		{
 			/* Bind the functions for asynchronous events. */
 			FriendsInterface->OnInviteReceivedDelegates.AddUObject(this, &UKingdomsGameInstance::OnInviteReceived);
+			FriendsInterface->OnRejectInviteCompleteDelegates->AddUObject(this, &UKingdomsGameInstance::OnRejectInviteComplete);
 		}
 	}
 
 	/* If a save slot exists for unlocked pieces... */
-	if (UnlockedPieces_SaveGame && UGameplayStatics::DoesSaveGameExist(UnlockedPieces_SaveGame->SaveSlotName, UnlockedPieces_SaveGame->UserIndex))
+	if (UnlockedPieces_SaveGame && UGameplayStatics::DoesSaveGameExist(UnlockedPieces_SaveGame->SaveSlotName,
+	                                                                   UnlockedPieces_SaveGame->UserIndex))
 	{
 		/* Load the save slot into the save game object. */
-		UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(UGameplayStatics::LoadGameFromSlot(UnlockedPieces_SaveGame->SaveSlotName, UnlockedPieces_SaveGame->UserIndex));
+		UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(
+			UGameplayStatics::LoadGameFromSlot(UnlockedPieces_SaveGame->SaveSlotName,
+			                                   UnlockedPieces_SaveGame->UserIndex));
 	}
 	/* If a save slot hasn't yet been created for unlocked pieces... */
 	else
 	{
 		/* Create a new save slot and load it into the save game object. */
-		UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(UGameplayStatics::CreateSaveGameObject(UUnlockedPieces_SaveGame::StaticClass()));
+		UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(
+			UGameplayStatics::CreateSaveGameObject(UUnlockedPieces_SaveGame::StaticClass()));
 	}
-	
+
 	/* If a save slot exists for army presets... */
-	if (ArmyPresets_SaveGame && UGameplayStatics::DoesSaveGameExist(ArmyPresets_SaveGame->SaveSlotName, ArmyPresets_SaveGame->UserIndex))
+	if (ArmyPresets_SaveGame && UGameplayStatics::DoesSaveGameExist(ArmyPresets_SaveGame->SaveSlotName,
+	                                                                ArmyPresets_SaveGame->UserIndex))
 	{
 		/* Load the save slot into the save game object. */
-		ArmyPresets_SaveGame = Cast<UArmyPresets_SaveGame>(UGameplayStatics::LoadGameFromSlot(ArmyPresets_SaveGame->SaveSlotName, ArmyPresets_SaveGame->UserIndex));
+		ArmyPresets_SaveGame = Cast<UArmyPresets_SaveGame>(
+			UGameplayStatics::LoadGameFromSlot(ArmyPresets_SaveGame->SaveSlotName, ArmyPresets_SaveGame->UserIndex));
 	}
 	/* If a save slot hasn't yet been created for army presets... */
 	else
 	{
 		/* Create a new save slot and load it into the save game object. */
-		ArmyPresets_SaveGame = Cast<UArmyPresets_SaveGame>(UGameplayStatics::CreateSaveGameObject(UArmyPresets_SaveGame::StaticClass()));
+		ArmyPresets_SaveGame = Cast<UArmyPresets_SaveGame>(
+			UGameplayStatics::CreateSaveGameObject(UArmyPresets_SaveGame::StaticClass()));
 	}
 }
 
 void UKingdomsGameInstance::OnCreateSessionComplete(FName SessionName, bool bSucceeded)
 {
 	UE_LOG(LogTemp, Error, TEXT("Created session."));
-	
+
 	/* When we successfully create a session, save the name of the session and travel to a new main menu map as the
 	 * listen server. */
 	if (bSucceeded)
@@ -257,8 +287,7 @@ void UKingdomsGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSess
 	}
 }
 
-void UKingdomsGameInstance::OnRegisterPlayersComplete(FName SessionName, const TArray<FUniqueNetIdRef>& PlayerId,
-	bool bWasSuccessful)
+void UKingdomsGameInstance::OnRegisterPlayersComplete(FName SessionName, const TArray<FUniqueNetIdRef>& PlayerId, bool bWasSuccessful)
 {
 	// /* Get a pointer to the session that the player registered to. */
 	// const FNamedOnlineSession* CurrentSession = SessionInterface->GetNamedSession(SessionName);
@@ -295,15 +324,22 @@ void UKingdomsGameInstance::OnStartSessionComplete(FName SessionName, bool bWasS
 	UE_LOG(LogTemp, Error, TEXT("Started the session."));
 }
 
-void UKingdomsGameInstance::OnSendInviteComplete(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& FriendId,
-	const FString& ListName, const FString& ErrorString)
+void UKingdomsGameInstance::OnSendInviteComplete(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& FriendId, const FString& ListName, const FString& ErrorString)
 {
 	UE_LOG(LogTemp, Error, TEXT("Invitation sent to %s"), *FriendId.ToString());
-	/* Broadcast whether or not the invitation to the given player was successfully sent. */
-	if (bWasSuccessful)
-		OnSendInvitationSuccessDelegate.Broadcast(FriendId);
-	else
-		OnSendInvitationFailureDelegate.Broadcast(FriendId);
+	/* Ensure the friends interface is valid. */
+	if (FriendsInterface.IsValid())
+	{
+		/* Get the friend whom we're sending an invitation to from their net ID. */
+		TSharedPtr<FOnlineFriend> Friend = FriendsInterface->GetFriend(0, FriendId, EFriendsLists::ToString(EFriendsLists::Default));
+		FSteamFriend SteamFriend = FSteamFriend(Friend);
+	
+		/* Broadcast whether or not the invitation to the given player was successfully sent. */
+		if (bWasSuccessful)
+			OnSendInvitationSuccessDelegate.Broadcast(Friend);
+		else
+			OnSendInvitationFailureDelegate.Broadcast(Friend);
+	}
 }
 
 void UKingdomsGameInstance::OnInviteReceived(const FUniqueNetId& UserId, const FUniqueNetId& FriendId)
@@ -321,5 +357,41 @@ void UKingdomsGameInstance::OnInviteReceived(const FUniqueNetId& UserId, const F
 				HUDPtr->CreateInvitationPopUpWidget(false, Friend);
 			}
 		}
+	}
+}
+
+void UKingdomsGameInstance::OnAcceptInviteComplete(int32 LocalUserNum, bool bWasSuccessful,
+	const FUniqueNetId& FriendId, const FString& ListName, const FString& ErrorStr)
+{
+	/* Ensure the friends interface is valid. */
+	if (FriendsInterface.IsValid())
+	{
+		/* Get the friend whose invitation we're accepting from their net ID. */
+		TSharedPtr<FOnlineFriend> Friend = FriendsInterface->GetFriend(0, FriendId, EFriendsLists::ToString(EFriendsLists::Default));
+		FSteamFriend SteamFriend = FSteamFriend(Friend);
+
+		/* Broadcast the result of the invitation acceptance attempt. */
+		if (bWasSuccessful)
+			OnAcceptInvitationSuccessDelegate.Broadcast(Friend);
+		else
+			OnAcceptInvitationFailureDelegate.Broadcast(Friend);
+	}
+}
+
+void UKingdomsGameInstance::OnRejectInviteComplete(int32 LocalUserNum, bool bWasSuccessful,
+	const FUniqueNetId& FriendId, const FString& ListName, const FString& ErrorStr)
+{
+	/* Ensure the friends interface is valid. */
+	if (FriendsInterface.IsValid())
+	{
+		/* Get the friend whose invitation we're rejecting from their net ID. */
+		TSharedPtr<FOnlineFriend> Friend = FriendsInterface->GetFriend(0, FriendId, EFriendsLists::ToString(EFriendsLists::Default));
+		FSteamFriend SteamFriend = FSteamFriend(Friend);
+	
+		/* Broadcast the result of the invitation rejection attempt. */
+		if (bWasSuccessful)
+			OnRejectInvitationSuccessDelegate.Broadcast(Friend);
+		else
+			OnRejectInvitationFailureDelegate.Broadcast(Friend);
 	}
 }

@@ -4,6 +4,7 @@
 #include "BlueprintFunctionLibraries/SteamFriendsFunctionLibrary.h"
 
 #include "steam/steam_api.h"
+#include "steam/steam_api_common.h"
 
 
 UTexture2D* USteamFriendsFunctionLibrary::GetSteamFriendAvatar(const FSteamFriend SteamFriend, ESteamFriendAsyncResultSwitch& Result, ESteamAvatarSize AvatarSize /*= ESteamAvatarSize::E_SteamMedium*/)
@@ -104,7 +105,7 @@ void USteamFriendsFunctionLibrary::GetSteamFriendGame(const FSteamFriend SteamFr
 		// If InGame and the GameID is actually valid, try to get the AppName
 		if (bIsInGame && GameInfo.m_gameID.IsValid())
 		{
-			char* NameBuffer = new char[1024];
+			char NameBuffer[1024];
 			int NameLength = SteamAppList()->GetAppName(GameInfo.m_gameID.AppID(), NameBuffer, 1024);
 
 			// If the app name was found, convert it into a String.
