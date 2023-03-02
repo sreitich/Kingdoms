@@ -10,7 +10,8 @@
 #include "Net/OnlineBlueprintCallProxyBase.h"
 #include "GetSteamFriendsCallProxyBase.generated.h"
 
-/* Called when the online friends interface finishes an attempt to retrieve the local player's friends list. */
+/* Called when the online friends interface finishes an attempt to retrieve the local player's friends list to tell
+ * whether or not it was successful. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGetSteamFriendsDelegate, const TArray<FSteamFriend>&, Results);
 
 /* Blueprint node for asynchronously retrieving the local player's friends list from Steam. */

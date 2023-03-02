@@ -48,18 +48,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category="Steam | Friends")
 	FString StatusString;
 
-	/* Whether the player is currently online. */
-	UPROPERTY(BlueprintReadOnly, Category="Steam | Friends")
-	bool bIsOnline;
-
-	/* Whether the player is currently playing any game. */
-	UPROPERTY(BlueprintReadOnly, Category="Steam | Friends")
-	bool bIsPlaying;
-
-	/* Whether the player is currently playing this game. */
-	UPROPERTY(BlueprintReadOnly, Category="Steam | Friends")
-	bool bIsPlayingThisGame;
-
 	/* Whether the player's current game is joinable. */
 	UPROPERTY(BlueprintReadOnly, Category="Steam | Friends")
 	bool bIsJoinable;
@@ -74,6 +62,30 @@ public:
 	/* The player's unique net ID. */
 	TSharedPtr<const FUniqueNetId> UniqueNetID;
 
+	FSteamFriend() = default;
+
+	/* Convert the built-in Steam friend structure into our custom Steam friend structure. */
+	FSteamFriend(TSharedPtr<FOnlineFriend> Friend)
+	{
+		FOnlineUserPresence Presence = Friend->GetPresence();
+
+		DisplayName = Friend->GetDisplayName();
+		RealName = Friend->GetRealName();
+		StatusString = Presence.Status.StatusStr;
+		bHasVoiceSupport = Presence.bHasVoiceSupport;
+		PresenceState = (EOnlinePresenceState::Type) (int32) Presence.Status.State;
+		UniqueNetID = Friend->GetUserId();
+
+		if (Presence.bIsPlayingThisGame)
+			Status = ESteamFriendStatus::E_PlayingSameGame;
+		else if (Presence.bIsPlaying)
+			Status = ESteamFriendStatus::E_InGame;
+		else if (Presence.bIsOnline)
+			Status = ESteamFriendStatus::E_Online;
+		else
+			Status = ESteamFriendStatus::E_Offline;
+	}
+
 	/** @return whether the given friend should be listed below this friend. */
 	bool operator<(const FSteamFriend& Other) const
 	{
@@ -85,6 +97,12 @@ public:
 
 		/* Friends with the same status are listed in alphabetical order. */
 		return DisplayName.ToLower() < Other.DisplayName.ToLower() ? true : false;
+	}
+
+	/* @return Whether the given Steam friend has the same unique net ID as this friend. */
+	bool operator==(const FSteamFriend& Other) const
+	{
+		return UniqueNetID == Other.UniqueNetID;
 	}
 };
 
@@ -151,4 +169,7 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Steam|Friends")
 		static TArray<FSteamFriend> SortSteamFriends(TArray<FSteamFriend> SteamFriends);
+
+	UFUNCTION(BlueprintPure, meta=(DisplayName = "== (Steam Friend)", CompactNodeTitle = "==", Keywords = "equal equals equality = =="), Category = "Math|Steam")
+		static bool TestEquality_SteamFriend(FSteamFriend A, FSteamFriend B) { return A == B; }
 };

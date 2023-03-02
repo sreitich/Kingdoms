@@ -3,6 +3,7 @@
 
 #include "Framework/KingdomsGameInstance.h"
 
+#include "BlueprintFunctionLibraries/SteamFriendsFunctionLibrary.h"
 #include "SaveGames/UnlockedPieces_SaveGame.h"
 #include "SaveGames/ArmyPresets_SaveGame.h"
 
@@ -14,6 +15,8 @@
 
 UKingdomsGameInstance::UKingdomsGameInstance()
 {
+	/* Bind OnSendInviteComplete to be called when the OnSendInviteCompleteDelegate delegate fires. */
+	OnSendInviteCompleteDelegate.BindUObject(this, &UKingdomsGameInstance::OnSendInviteComplete);
 }
 
 void UKingdomsGameInstance::CreatePublicServer()
@@ -114,6 +117,22 @@ void UKingdomsGameInstance::GetCurrentSessionInfo(bool& bInSession, bool& bIsHos
 	bIsHost = false;
 }
 
+void UKingdomsGameInstance::SendInviteToPlayer(const FUniqueNetId& PlayerToInvite)
+{
+	/* If the friends interface is valid, send an invite to the target player. */
+	if (FriendsInterface.IsValid())
+	{
+		FriendsInterface->SendInvite(0, PlayerToInvite, EFriendsLists::ToString(EFriendsLists::Default), OnSendInviteCompleteDelegate);
+	}
+}
+
+void UKingdomsGameInstance::B_SendInviteToPlay(FSteamFriend FriendToInvite)
+{
+	/* Unique net IDs are only exposed in C++, so we need to use a wrapper to get the friend's ID to send the
+	 * invitation to. */
+	SendInviteToPlayer(*FriendToInvite.UniqueNetID);
+}
+
 void UKingdomsGameInstance::Init()
 {
 	Super::Init();
@@ -124,7 +143,7 @@ void UKingdomsGameInstance::Init()
 	/* Bind our delegates to our game sessions' events. */
 	if (OnlineSubsystem)
 	{
-		/* Try to retrieve our session interface from the online subsystem. */
+		/* Try to retrieve the session interface from the online subsystem. */
 		SessionInterface = OnlineSubsystem->GetSessionInterface();
 		if (SessionInterface.IsValid())
 		{
@@ -134,6 +153,14 @@ void UKingdomsGameInstance::Init()
 			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UKingdomsGameInstance::OnJoinSessionComplete);
 			SessionInterface->OnRegisterPlayersCompleteDelegates.AddUObject(this, &UKingdomsGameInstance::OnRegisterPlayersComplete);
 			SessionInterface->OnStartSessionCompleteDelegates.AddUObject(this, &UKingdomsGameInstance::OnStartSessionComplete);
+		}
+		
+		/* Try to retrieve the friends interface from the online subsystem. */
+		FriendsInterface = OnlineSubsystem->GetFriendsInterface();
+		if (FriendsInterface.IsValid())
+		{
+			/* Bind the functions for asynchronous events. */
+			FriendsInterface->OnInviteReceivedDelegates.AddUObject(this, &UKingdomsGameInstance::OnInviteReceived);
 		}
 	}
 
@@ -266,4 +293,33 @@ void UKingdomsGameInstance::OnRegisterPlayersComplete(FName SessionName, const T
 void UKingdomsGameInstance::OnStartSessionComplete(FName SessionName, bool bWasSuccessful)
 {
 	UE_LOG(LogTemp, Error, TEXT("Started the session."));
+}
+
+void UKingdomsGameInstance::OnSendInviteComplete(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& FriendId,
+	const FString& ListName, const FString& ErrorString)
+{
+	UE_LOG(LogTemp, Error, TEXT("Invitation sent to %s"), *FriendId.ToString());
+	/* Broadcast whether or not the invitation to the given player was successfully sent. */
+	if (bWasSuccessful)
+		OnSendInvitationSuccessDelegate.Broadcast(FriendId);
+	else
+		OnSendInvitationFailureDelegate.Broadcast(FriendId);
+}
+
+void UKingdomsGameInstance::OnInviteReceived(const FUniqueNetId& UserId, const FUniqueNetId& FriendId)
+{
+	if (FriendsInterface.IsValid())
+	{
+		TSharedPtr<FOnlineFriend> Sender = FriendsInterface->GetFriend(0, FriendId, EFriendsLists::ToString(EFriendsLists::Default));
+		if (Sender.IsValid())
+		{
+			FSteamFriend Friend(Sender);
+
+			AMM_HUD* HUDPtr = Cast<AMM_HUD>(GetFirstLocalPlayerController(GetWorld())->GetHUD());
+			if (IsValid(HUDPtr))
+			{
+				HUDPtr->CreateInvitationPopUpWidget(false, Friend);
+			}
+		}
+	}
 }

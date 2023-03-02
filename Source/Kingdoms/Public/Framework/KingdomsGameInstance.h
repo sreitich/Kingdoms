@@ -2,15 +2,20 @@
 
 #pragma once
 
+#include "BlueprintFunctionLibraries/SteamFriendsFunctionLibrary.h"
 #include "UserDefinedData/Match_UserDefinedData.h"
 
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
+#include "Interfaces/OnlineFriendsInterface.h"
 #include "Interfaces/OnlineSessionInterface.h"
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "KingdomsGameInstance.generated.h"
+
+/* Called when the online friends interface finishes an attempt to send a game invitation to another player. */
+DECLARE_MULTICAST_DELEGATE_OneParam(FInvitationSentDelegate, const FUniqueNetId& /* The player receiving the invitation. */);
 
 UCLASS()
 class KINGDOMS_API UKingdomsGameInstance : public UGameInstance
@@ -42,6 +47,14 @@ public:
 	/* Provides whether or not the local player is in a session and if they are the host of that session. */
 	UFUNCTION()
 	void GetCurrentSessionInfo(bool& bInSession, bool& bIsHost) const;
+
+	/* Sends a game invitation to the given player. */
+	void SendInviteToPlayer(const FUniqueNetId& PlayerToInvite);
+
+	/* Sends a game invitation to the given player. Blueprint wrapper for SendInviteToPlayer. */
+	UFUNCTION(BlueprintCallable, Category="Steam|Friends")
+		void B_SendInviteToPlay(FSteamFriend FriendToInvite);
+	
 
 
 /* Public variables. */
@@ -77,18 +90,27 @@ protected:
 	/* Sends the connected players to the correct map. */
 	void OnStartSessionComplete(FName SessionName, bool bWasSuccessful);
 
+		/* Tells the player that an invite was successfully sent to a player. */
+		void OnSendInviteComplete(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& FriendId, const FString& ListName, const FString& ErrorString);
+
+	/* Creates an invitation pop-up for the player to accept a received invitation. */
+	void OnInviteReceived(const FUniqueNetId& UserId, const FUniqueNetId& FriendId);
+
 
 /* Protected variables. */
 protected:
 
-	/* Persistent pointer to the game instance's online subsystem. */
+	/* Persistent pointer to the local online subsystem accessor. */
 	IOnlineSubsystem* OnlineSubsystem;
 
 	/* Persistent pointer to the object used to search for sessions. */
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 
-	/* Persistent pointer to the object used to use the online subsystem's sessions interface.  */
+	/* Persistent pointer to the local online subsystem's sessions interface accessor.  */
 	IOnlineSessionPtr SessionInterface;
+
+	/* Persistent pointer to the local friends interface accessor. */
+	IOnlineFriendsPtr FriendsInterface;
 
 	/* The name of the session that this player is currently in, if they are in one. */
 	FName CurrentSessionName;
@@ -96,4 +118,17 @@ protected:
 	/* The name of the lobby that this player is currently in, if they are in one. */
 	FName CurrentLobbyName;
 
+
+/* Protected delegates. */
+protected:
+
+	/* Triggered when the online friends interface has finished attempting to send an invite to another
+	 * player. */
+	FOnSendInviteComplete OnSendInviteCompleteDelegate;
+
+		/* Triggered when the online friends interface successfully sends an invite to another player. */
+		FInvitationSentDelegate OnSendInvitationSuccessDelegate;
+
+		/* Triggered when the online friends interface fails to send an invite to another player. */
+		FInvitationSentDelegate OnSendInvitationFailureDelegate;
 };

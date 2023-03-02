@@ -2,13 +2,16 @@
 
 #pragma once
 
+#include "BlueprintFunctionLibraries/SteamFriendsFunctionLibrary.h"
 #include "UserDefinedData/Menu_UserDefinedData.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
 #include "MM_HUD.generated.h"
 
+class UGetSteamFriendsCallProxyBase;
 class UMM_ArmyMenuWidget;
+class UMM_FriendInvitationPopUp;
 class UMM_LobbyMenuWidget;
 class UMM_MainMenuWidget;
 class UMM_MapSelectionWidget;
@@ -89,6 +92,10 @@ public:
 		UFUNCTION(Category="Queue Timer Widget")
 		void HUD_FoundOpponent();
 
+	/* Creates or destroys an invitation pop-up widget. */
+	UFUNCTION(BlueprintImplementableEvent, Category="Invitation Pop-Up Widget")
+	void CreateInvitationPopUpWidget(bool bDestroy, FSteamFriend Friend);
+
 
 /* Protected functions. */
 protected:
@@ -135,7 +142,7 @@ protected:
 
 	UPROPERTY()
 	UMM_MatchmakingStartPopUp* MatchmakingStartPopUpWidget;
-	
+
 	UPROPERTY()
 	UMM_QueueTimer* QueueTimerWidget;
 
@@ -169,6 +176,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
 	TSubclassOf<UUserWidget> StoreWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
+	TSubclassOf<UUserWidget> InvitationPopUpClass;
 	
 
 };

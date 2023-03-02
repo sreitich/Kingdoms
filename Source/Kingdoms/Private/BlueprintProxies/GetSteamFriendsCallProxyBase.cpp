@@ -67,34 +67,16 @@ void UGetSteamFriendsCallProxyBase::OnGetSteamFriendsComplete(int32 LocalUserNum
 			TArray<TSharedRef<FOnlineFriend>> FriendList;
 			FriendsInterface->GetFriendsList(LocalUserNum, ListName, OUT FriendList);
 
-			/* Retrieve the information of every friend in the friends list. The default FOnlineFriend class isn't
-			 * reflected in blueprints, so we need to save its information into our custom FSteamFriend structure. */
+			/* Retrieve the information of every friend in the friends list. */
 			for (TSharedRef<FOnlineFriend> Friend : FriendList)
 			{
-				FOnlineUserPresence Presence = Friend->GetPresence();
+				UE_LOG(LogTemp, Error, TEXT("%s's ID: %s"), *Friend->GetDisplayName(), *Friend->GetUserId()->ToString());
+				
+				/* The default FOnlineFriend class isn't reflected in blueprints, so we need to save its information
+				 * into our custom FSteamFriend structure. */
+				FSteamFriend SteamFriend(Friend);
 
-				FSteamFriend SteamFriend;
-
-				SteamFriend.DisplayName = Friend->GetDisplayName();
-				SteamFriend.RealName = Friend->GetRealName();
-				SteamFriend.StatusString = Presence.Status.StatusStr;
-				SteamFriend.bIsOnline = Presence.bIsOnline;
-				SteamFriend.bIsPlaying = Presence.bIsPlaying;
-				SteamFriend.bIsPlayingThisGame = Presence.bIsPlayingThisGame;
-				SteamFriend.bIsJoinable = Presence.bIsJoinable;
-				SteamFriend.bHasVoiceSupport = Presence.bHasVoiceSupport;
-				SteamFriend.PresenceState = (EOnlinePresenceState::Type) (int32) Presence.Status.State;
-				SteamFriend.UniqueNetID = Friend->GetUserId();
-
-				if (Presence.bIsPlayingThisGame)
-					SteamFriend.Status = ESteamFriendStatus::E_PlayingSameGame;
-				else if (Presence.bIsPlaying)
-					SteamFriend.Status = ESteamFriendStatus::E_InGame;
-				else if (Presence.bIsOnline)
-					SteamFriend.Status = ESteamFriendStatus::E_Online;
-				else
-					SteamFriend.Status = ESteamFriendStatus::E_Offline;
-
+				/* Add the new Steam friend to our returned array. */
 				SteamFriends.Add(SteamFriend);
 			}
 
