@@ -8,6 +8,7 @@
 
 #include "Engine/World.h"
 #include "Interfaces/OnlineExternalUIInterface.h"
+#include "Interfaces/OnlineFriendsInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "UserInterface/MainMenu/MM_HUD.h"
 
@@ -113,20 +114,6 @@ void UKingdomsGameInstance::GetCurrentSessionInfo(bool& bInSession, bool& bIsHos
 	bIsHost = false;
 }
 
-void UKingdomsGameInstance::ShowFriendsUI()
-{
-	/* If there is a valid online subsystem and the player is currently in a lobby, display the subsystem's external
-	 * friends UI. */
-	if (OnlineSubsystem/* && CurrentLobbyName != ""*/)
-	{
-		if (IOnlineExternalUIPtr ExternalUIPtr = OnlineSubsystem->GetExternalUIInterface())
-		{
-			// ExternalUIPtr->ShowInviteUI(0, CurrentLobbyName);
-			ExternalUIPtr->ShowInviteUI(0, CurrentSessionName);
-		}
-	}
-}
-
 void UKingdomsGameInstance::Init()
 {
 	Super::Init();
@@ -141,7 +128,7 @@ void UKingdomsGameInstance::Init()
 		SessionInterface = OnlineSubsystem->GetSessionInterface();
 		if (SessionInterface.IsValid())
 		{
-			/* Bind our functions for when a session is created, found, and joined. */
+			/* Bind the functions for asynchronous events. */
 			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UKingdomsGameInstance::OnCreateSessionComplete);
 			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UKingdomsGameInstance::OnFindSessionComplete);
 			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UKingdomsGameInstance::OnJoinSessionComplete);

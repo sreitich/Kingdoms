@@ -12,9 +12,6 @@
 #include "Engine/GameInstance.h"
 #include "KingdomsGameInstance.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class KINGDOMS_API UKingdomsGameInstance : public UGameInstance
 {
@@ -45,10 +42,6 @@ public:
 	/* Provides whether or not the local player is in a session and if they are the host of that session. */
 	UFUNCTION()
 	void GetCurrentSessionInfo(bool& bInSession, bool& bIsHost) const;
-
-	/* Opens the subsystem's external friends interface. */
-	UFUNCTION()
-	void ShowFriendsUI();
 
 
 /* Public variables. */
@@ -94,7 +87,7 @@ protected:
 	/* Persistent pointer to the object used to search for sessions. */
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 
-	/* Persistent pointer to the object used to interface with the online subsystem's sessions.  */
+	/* Persistent pointer to the object used to use the online subsystem's sessions interface.  */
 	IOnlineSessionPtr SessionInterface;
 
 	/* The name of the session that this player is currently in, if they are in one. */
@@ -102,5 +95,5 @@ protected:
 
 	/* The name of the lobby that this player is currently in, if they are in one. */
 	FName CurrentLobbyName;
-	
+
 };

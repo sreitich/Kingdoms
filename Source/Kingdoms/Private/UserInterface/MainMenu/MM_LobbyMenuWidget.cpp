@@ -35,15 +35,6 @@ void UMM_LobbyMenuWidget::OnDeactivatedAnimEnd()
 	HUDPtr->CreateLobbyMenuWidget(true);
 }
 
-void UMM_LobbyMenuWidget::OpenInviteUI()
-{
-	/* Display the subsystem's external friends UI via the game instance. */
-	if (UKingdomsGameInstance* GameInstancePtr = GetGameInstance<UKingdomsGameInstance>())
-	{
-		GameInstancePtr->ShowFriendsUI();
-	}
-}
-
 void UMM_LobbyMenuWidget::OpenMapSelection()
 {
 	/* To navigate to the map selection menu, queue the menu, which will deactivate this menu and transition to the new

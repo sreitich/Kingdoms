@@ -28,14 +28,6 @@
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/a00eb1e478ae4a8fb655aa22f9125b07"
 		},
 		{
-			"Name": "OnlineSubsystemSteam",
-			"Enabled": true
-		},
-		{
-			"Name": "OnlineFramework",
-			"Enabled": true
-		},
-		{
 			"Name": "SteamVR",
 			"Enabled": false,
 			"SupportedTargetPlatforms": [
@@ -43,6 +35,14 @@
 				"Win64",
 				"Linux"
 			]
+		},
+		{
+			"Name": "OnlineFramework",
+			"Enabled": true
+		},
+		{
+			"Name": "OnlineSubsystemSteam",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [

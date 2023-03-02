@@ -37,11 +37,6 @@ protected:
 	UFUNCTION()
 	void OnDeactivatedAnimEnd();
 
-	/* Displays a list of the player's friends to invite to the current lobby. Called when the player clicks "invite
-	 * friends." */
-	UFUNCTION(BlueprintCallable)
-	void OpenInviteUI();
-
 	/* Transitions to the map selection menu. Called when the player clicks to change the selected map. */
 	UFUNCTION(BlueprintCallable)
 	void OpenMapSelection();
