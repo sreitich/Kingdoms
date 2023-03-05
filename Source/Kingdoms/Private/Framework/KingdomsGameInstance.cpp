@@ -124,13 +124,13 @@ void UKingdomsGameInstance::SendInviteToPlayer(const FUniqueNetId& PlayerToInvit
 	/* If the friends interface is valid, send an invite to the target player. */
 	if (FriendsInterface.IsValid())
 	{
-		FriendsInterface->SendInvite(0, PlayerToInvite, EFriendsLists::ToString(EFriendsLists::Default),
-		                             OnSendInviteCompleteDelegate);
+		FriendsInterface->SendInvite(0, PlayerToInvite, EFriendsLists::ToString(EFriendsLists::Default), OnSendInviteCompleteDelegate);
 	}
 }
 
 void UKingdomsGameInstance::B_SendInviteToPlay(FSteamFriend FriendToInvite)
 {
+	UE_LOG(LogTemp, Error, TEXT("1"));
 	/* Unique net IDs are only exposed in C++, so we need to use a wrapper to get the friend's ID to send the
 	 * invitation to. */
 	SendInviteToPlayer(*FriendToInvite.UniqueNetID);
@@ -326,19 +326,28 @@ void UKingdomsGameInstance::OnStartSessionComplete(FName SessionName, bool bWasS
 
 void UKingdomsGameInstance::OnSendInviteComplete(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& FriendId, const FString& ListName, const FString& ErrorString)
 {
-	UE_LOG(LogTemp, Error, TEXT("Invitation sent to %s"), *FriendId.ToString());
+	UE_LOG(LogTemp, Error, TEXT("4"));
+
 	/* Ensure the friends interface is valid. */
 	if (FriendsInterface.IsValid())
 	{
+		UE_LOG(LogTemp, Error, TEXT("5"));
+
 		/* Get the friend whom we're sending an invitation to from their net ID. */
 		TSharedPtr<FOnlineFriend> Friend = FriendsInterface->GetFriend(0, FriendId, EFriendsLists::ToString(EFriendsLists::Default));
 		FSteamFriend SteamFriend = FSteamFriend(Friend);
 	
 		/* Broadcast whether or not the invitation to the given player was successfully sent. */
 		if (bWasSuccessful)
+		{
 			OnSendInvitationSuccessDelegate.Broadcast(Friend);
+			UE_LOG(LogTemp, Error, TEXT("6a"));
+		}
 		else
+		{
 			OnSendInvitationFailureDelegate.Broadcast(Friend);
+			UE_LOG(LogTemp, Error, TEXT("6b"));
+		}
 	}
 }
 
