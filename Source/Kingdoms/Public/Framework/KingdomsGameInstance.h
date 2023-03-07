@@ -14,6 +14,11 @@
 #include "Engine/GameInstance.h"
 #include "KingdomsGameInstance.generated.h"
 
+/* Called when the online friends interface successfully retrieves and reads the local player's friends list. */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReadFriendsListSuccess, TArray<FSteamFriend>, FriendsList);
+/* Called when the online friends interface fails to retrieve and/or read the local player's friends list. */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReadFriendsListFail, TArray<FSteamFriend>, FriendsList);
+
 /* Called when the online friends interface finishes an attempt to send a game invitation to another player. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInvitationSentDelegate, FSteamFriend /* The player receiving the invitation. */, InviteReceiver);
 /* Called when the online friends interface finishes an attempt to accept a game invitation from another player. */
@@ -51,6 +56,10 @@ public:
 	/* Provides whether or not the local player is in a session and if they are the host of that session. */
 	UFUNCTION()
 	void GetCurrentSessionInfo(bool& bInSession, bool& bIsHost) const;
+
+	/* Tries to retrieve the local player's friends list, triggering OnReadFriendsListCompleteDelegate when complete. */
+	UFUNCTION(BlueprintCallable, Category="Steam|Friends")
+	void ReadSteamFriendsList();
 
 	/* Sends a game invitation to the given player. */
 	void SendInviteToPlayer(const FUniqueNetId& PlayerToInvite);
@@ -97,6 +106,10 @@ protected:
 	/* Sends the connected players to the correct map. */
 	void OnStartSessionComplete(FName SessionName, bool bWasSuccessful);
 
+	/* Gets the friends list and triggers the corresponding FOnReadFriendsList delegate depending on whether it
+	 * succeeded or failed. */
+	void OnReadFriendsListComplete(int32 LocalUserNum, bool bWasSuccessful, const FString& ListName, const FString& ErrorStr);
+
 	/* Tells the player that an invite was successfully sent to a player. */
 	void OnSendInviteComplete(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& FriendId, const FString& ListName, const FString& ErrorString);
 
@@ -135,6 +148,16 @@ protected:
 /* Protected delegates. */
 protected:
 
+	/* Triggered when the online friends interface has finished attempting to retrieve the most recent version of the
+	 * local player's friends list. */
+	FOnReadFriendsListComplete OnReadFriendsListCompleteDelegate;
+
+		/* Triggered when the online friends interface successfully reads the local player's friends list. */
+		FOnReadFriendsListSuccess OnReadFriendsListSuccessDelegate;
+
+		/* Triggered when the online friends interface fails to read the local player's friends list. */
+		FOnReadFriendsListFail OnReadFriendsListFailDelegate;
+	
 	/* Triggered when the online friends interface has finished attempting to send an invite to another
 	 * player. */
 	FOnSendInviteComplete OnSendInviteCompleteDelegate;

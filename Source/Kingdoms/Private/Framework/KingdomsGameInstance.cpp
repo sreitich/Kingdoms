@@ -13,8 +13,13 @@
 #include "Kismet/GameplayStatics.h"
 #include "UserInterface/MainMenu/MM_HUD.h"
 
+/* We are always going to be retrieving the default friends list. */
+#define DEFAULT_FRIENDS_LIST EFriendsLists::ToString(EFriendsLists::Default)
+
 UKingdomsGameInstance::UKingdomsGameInstance()
 {
+	/* Bind OnReadFriendsListComplete to be called when the OnReadFriendsListCompleteDelegate delegate fires. */
+	OnReadFriendsListCompleteDelegate.BindUObject(this, &UKingdomsGameInstance::OnReadFriendsListComplete);
 	/* Bind OnSendInviteComplete to be called when the OnSendInviteCompleteDelegate delegate fires. */
 	OnSendInviteCompleteDelegate.BindUObject(this, &UKingdomsGameInstance::OnSendInviteComplete);
 	/* Bind OnAcceptInviteComplete to be called when the OnAcceptInviteCompleteDelegate delegate fires. */
@@ -119,13 +124,22 @@ void UKingdomsGameInstance::GetCurrentSessionInfo(bool& bInSession, bool& bIsHos
 	bIsHost = false;
 }
 
+void UKingdomsGameInstance::ReadSteamFriendsList()
+{
+	/* Attempt to asynchronously read the local player's friends list if the friends interface is valid. */
+	if (FriendsInterface.IsValid())
+	{
+		/* OnReadFriendsListCompleteDelegate is fired when this process finishes, regardless of its success. */
+		FriendsInterface->ReadFriendsList(0, DEFAULT_FRIENDS_LIST, OnReadFriendsListCompleteDelegate);
+	}
+}
+
 void UKingdomsGameInstance::SendInviteToPlayer(const FUniqueNetId& PlayerToInvite)
 {
 	/* If the friends interface is valid, send an invite to the target player. */
 	if (FriendsInterface.IsValid())
 	{
-		FriendsInterface->SendInvite(0, PlayerToInvite, EFriendsLists::ToString(EFriendsLists::Default),
-		                             OnSendInviteCompleteDelegate);
+		FriendsInterface->SendInvite(0, PlayerToInvite, DEFAULT_FRIENDS_LIST, OnSendInviteCompleteDelegate);
 	}
 }
 
@@ -143,10 +157,10 @@ void UKingdomsGameInstance::ReplyToInviteFromPlayer(FSteamFriend FriendToReplyTo
 	{
 		/* Attempt to accept the invitation if requested. */
 		if (bAccept)
-			FriendsInterface->AcceptInvite(0, *FriendToReplyTo.UniqueNetID, EFriendsLists::ToString(EFriendsLists::Default), OnAcceptInviteCompleteDelegate);
+			FriendsInterface->AcceptInvite(0, *FriendToReplyTo.UniqueNetID, DEFAULT_FRIENDS_LIST, OnAcceptInviteCompleteDelegate);
 		/* Attempt to reject the invitation if requested. */
 		else
-			FriendsInterface->RejectInvite(0, *FriendToReplyTo.UniqueNetID, EFriendsLists::ToString(EFriendsLists::Default));
+			FriendsInterface->RejectInvite(0, *FriendToReplyTo.UniqueNetID, DEFAULT_FRIENDS_LIST);
 	}
 }
 
@@ -324,14 +338,46 @@ void UKingdomsGameInstance::OnStartSessionComplete(FName SessionName, bool bWasS
 	UE_LOG(LogTemp, Error, TEXT("Started the session."));
 }
 
+void UKingdomsGameInstance::OnReadFriendsListComplete(int32 LocalUserNum, bool bWasSuccessful, const FString& ListName, const FString& ErrorStr)
+{
+	/* If the friends list could be read, broadcast that is was successfully read, passing the list of friends as an
+	 * array of FSteamFriend structures. */
+	if (bWasSuccessful)
+	{
+		if (FriendsInterface.IsValid())
+		{
+			/* Get the friends list. */
+			TArray<TSharedRef<FOnlineFriend>> OnlineFriends;
+			FriendsInterface->GetFriendsList(0, ListName, OnlineFriends);
+
+			/* Convert every friend in the list into an FSteamFriend. */
+			TArray<FSteamFriend> FriendsList = TArray<FSteamFriend>();
+			for (TSharedRef<FOnlineFriend> Friend : OnlineFriends)
+			{
+				FSteamFriend SteamFriend = FSteamFriend(Friend);
+				FriendsList.Add(SteamFriend);
+			}
+
+			/* Broadcast that the list was successfully read, passing in the list as our new array of FSteamFriends. */
+			OnReadFriendsListSuccessDelegate.Broadcast(FriendsList);
+		}
+	}
+	/* If the friends list could not be read, broadcast that it failed to be read, passing an empty array. */
+	else
+	{
+		TArray<FSteamFriend> FriendsList = TArray<FSteamFriend>();
+		OnReadFriendsListFailDelegate.Broadcast(FriendsList);
+	}
+}
+
 void UKingdomsGameInstance::OnSendInviteComplete(int32 LocalUserNum, bool bWasSuccessful, const FUniqueNetId& FriendId, const FString& ListName, const FString& ErrorString)
 {
-	UE_LOG(LogTemp, Error, TEXT("Invitation sent to %s"), *FriendId.ToString());
+	UE_LOG(LogTemp, Error, TEXT("Invitation sent to %s, and result was %i"), *FriendId.ToString(), bWasSuccessful);
 	/* Ensure the friends interface is valid. */
 	if (FriendsInterface.IsValid())
 	{
 		/* Get the friend whom we're sending an invitation to from their net ID. */
-		TSharedPtr<FOnlineFriend> Friend = FriendsInterface->GetFriend(0, FriendId, EFriendsLists::ToString(EFriendsLists::Default));
+		TSharedPtr<FOnlineFriend> Friend = FriendsInterface->GetFriend(0, FriendId, ListName);
 		FSteamFriend SteamFriend = FSteamFriend(Friend);
 	
 		/* Broadcast whether or not the invitation to the given player was successfully sent. */
@@ -346,7 +392,7 @@ void UKingdomsGameInstance::OnInviteReceived(const FUniqueNetId& UserId, const F
 {
 	if (FriendsInterface.IsValid())
 	{
-		TSharedPtr<FOnlineFriend> Sender = FriendsInterface->GetFriend(0, FriendId, EFriendsLists::ToString(EFriendsLists::Default));
+		TSharedPtr<FOnlineFriend> Sender = FriendsInterface->GetFriend(0, FriendId, DEFAULT_FRIENDS_LIST);
 		if (Sender.IsValid())
 		{
 			FSteamFriend Friend(Sender);
@@ -367,7 +413,7 @@ void UKingdomsGameInstance::OnAcceptInviteComplete(int32 LocalUserNum, bool bWas
 	if (FriendsInterface.IsValid())
 	{
 		/* Get the friend whose invitation we're accepting from their net ID. */
-		TSharedPtr<FOnlineFriend> Friend = FriendsInterface->GetFriend(0, FriendId, EFriendsLists::ToString(EFriendsLists::Default));
+		TSharedPtr<FOnlineFriend> Friend = FriendsInterface->GetFriend(0, FriendId, ListName);
 		FSteamFriend SteamFriend = FSteamFriend(Friend);
 
 		/* Broadcast the result of the invitation acceptance attempt. */
@@ -385,7 +431,7 @@ void UKingdomsGameInstance::OnRejectInviteComplete(int32 LocalUserNum, bool bWas
 	if (FriendsInterface.IsValid())
 	{
 		/* Get the friend whose invitation we're rejecting from their net ID. */
-		TSharedPtr<FOnlineFriend> Friend = FriendsInterface->GetFriend(0, FriendId, EFriendsLists::ToString(EFriendsLists::Default));
+		TSharedPtr<FOnlineFriend> Friend = FriendsInterface->GetFriend(0, FriendId, ListName);
 		FSteamFriend SteamFriend = FSteamFriend(Friend);
 	
 		/* Broadcast the result of the invitation rejection attempt. */
