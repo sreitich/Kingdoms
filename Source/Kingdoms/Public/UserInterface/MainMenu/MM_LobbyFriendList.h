@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "BlueprintFunctionLibraries/SteamFriendsFunctionLibrary.h"
+
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "MM_LobbyFriendList.generated.h"
@@ -18,4 +20,8 @@ public:
 
 	/* Called when this widget is created. */
 	virtual void NativeConstruct() override;
+
+	/* Creates and displays a friends list entry for every given friend. */
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Steam|Friends")
+	void PopulateFriendsList(const TArray<FSteamFriend>& FriendsList);
 };

@@ -12,6 +12,7 @@
 #include "Interfaces/OnlineFriendsInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "UserInterface/MainMenu/MM_HUD.h"
+#include "steam/steam_api.h"
 
 /* We are always going to be retrieving the default friends list. */
 #define DEFAULT_FRIENDS_LIST EFriendsLists::ToString(EFriendsLists::Default)
@@ -136,11 +137,43 @@ void UKingdomsGameInstance::ReadSteamFriendsList()
 
 void UKingdomsGameInstance::SendInviteToPlayer(const FUniqueNetId& PlayerToInvite)
 {
-	/* If the friends interface is valid, send an invite to the target player. */
-	if (FriendsInterface.IsValid())
+	if (SteamAPI_Init())
 	{
-		FriendsInterface->SendInvite(0, PlayerToInvite, DEFAULT_FRIENDS_LIST, OnSendInviteCompleteDelegate);
+		uint64 FriendID = *((uint64*)PlayerToInvite.GetBytes());
+		UNetConnection* LocalNetConnection = GetFirstLocalPlayerController(GetWorld())->GetNetConnection();
+		if (IsValid(LocalNetConnection))
+		{
+			FString RemoteAddress = LocalNetConnection->RemoteAddressToString();
+			// const char* ConnectionString = TCHAR_TO_ANSI(*RemoteAddress);
+			if (FriendID != 0)
+			{
+				UE_LOG(LogTemp, Error, TEXT("FriendID: %i"), FriendID);
+			}
+
+			// if (IsValid(LocalNetConnection) && !LocalNetConnection->RemoteAddressToString().IsEmpty())
+			// {
+			// 	UE_LOG(LogTemp, Error, TEXT("Remote address: %s"), *LocalNetConnection->RemoteAddressToString());
+			// }
+			
+			// if (ConnectionString)
+			// {
+			// 	UE_LOG(LogTemp, Error, TEXT("Connection string: %s"), *ConnectionString);
+			// }
+			// UE_LOG(LogTemp, Error, TEXT("FriendID: %i, remote address: %s, connection string: %s"), FriendID, *RemoteAddress, *ConnectionString);
+			// bool bSuccess = SteamFriends()->InviteUserToGame(FriendID, ConnectionString);
+			// UE_LOG(LogTemp, Error, TEXT("%s"), *(bSuccess ? "Successfuly sent invite" : "Failed to send invite"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed."));
+		}
 	}
+	
+	/* If the friends interface is valid, send an invite to the target player. */
+	// if (FriendsInterface.IsValid())
+	// {
+	// 	FriendsInterface->SendInvite(0, PlayerToInvite, DEFAULT_FRIENDS_LIST, OnSendInviteCompleteDelegate);
+	// }
 }
 
 void UKingdomsGameInstance::B_SendInviteToPlay(FSteamFriend FriendToInvite)
@@ -357,6 +390,9 @@ void UKingdomsGameInstance::OnReadFriendsListComplete(int32 LocalUserNum, bool b
 				FSteamFriend SteamFriend = FSteamFriend(Friend);
 				FriendsList.Add(SteamFriend);
 			}
+
+			/* Sort the friends list. */
+			FriendsList.Sort();
 
 			/* Broadcast that the list was successfully read, passing in the list as our new array of FSteamFriends. */
 			OnReadFriendsListSuccessDelegate.Broadcast(FriendsList);

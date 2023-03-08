@@ -15,9 +15,9 @@
 #include "KingdomsGameInstance.generated.h"
 
 /* Called when the online friends interface successfully retrieves and reads the local player's friends list. */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReadFriendsListSuccess, TArray<FSteamFriend>, FriendsList);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReadFriendsListSuccess, const TArray<FSteamFriend>&, FriendsList);
 /* Called when the online friends interface fails to retrieve and/or read the local player's friends list. */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReadFriendsListFail, TArray<FSteamFriend>, FriendsList);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnReadFriendsListFail, const TArray<FSteamFriend>&, FriendsList);
 
 /* Called when the online friends interface finishes an attempt to send a game invitation to another player. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInvitationSentDelegate, FSteamFriend /* The player receiving the invitation. */, InviteReceiver);
@@ -153,9 +153,11 @@ protected:
 	FOnReadFriendsListComplete OnReadFriendsListCompleteDelegate;
 
 		/* Triggered when the online friends interface successfully reads the local player's friends list. */
+		UPROPERTY(BlueprintAssignable, Category="Steam|Friends")
 		FOnReadFriendsListSuccess OnReadFriendsListSuccessDelegate;
 
 		/* Triggered when the online friends interface fails to read the local player's friends list. */
+		UPROPERTY(BlueprintAssignable, Category="Steam|Friends")
 		FOnReadFriendsListFail OnReadFriendsListFailDelegate;
 	
 	/* Triggered when the online friends interface has finished attempting to send an invite to another

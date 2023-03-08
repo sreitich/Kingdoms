@@ -23,8 +23,8 @@ public:
 	virtual void NativeConstruct() override;
 
 
-/* Public variables. */
-public:
+/* Protected variables. */
+protected:
 
 	/* The Steam friend that this widget represents. */
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, meta=(ExposeOnSpawn="true"), Category="Steam|Friends")

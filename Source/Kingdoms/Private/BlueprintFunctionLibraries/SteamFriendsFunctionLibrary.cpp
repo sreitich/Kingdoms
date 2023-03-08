@@ -4,7 +4,6 @@
 #include "BlueprintFunctionLibraries/SteamFriendsFunctionLibrary.h"
 
 #include "steam/steam_api.h"
-#include "steam/steam_api_common.h"
 
 
 UTexture2D* USteamFriendsFunctionLibrary::GetSteamFriendAvatar(const FSteamFriend SteamFriend, ESteamFriendAsyncResultSwitch& Result, ESteamAvatarSize AvatarSize /*= ESteamAvatarSize::E_SteamMedium*/)
