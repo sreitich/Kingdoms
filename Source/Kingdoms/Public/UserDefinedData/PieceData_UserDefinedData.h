@@ -12,12 +12,13 @@
 UENUM(BlueprintType)
 enum EPieceClass
 {
-	E_Soldier		UMETA(DisplayName="Soldier"),
-	E_Mage			UMETA(DisplayName="Mage"),
-	E_Paladin		UMETA(DisplayName="Paladin"),
-	E_Rogue			UMETA(DisplayName="Rogue"),
-	E_Engineer		UMETA(DisplayName="Engineer"),
-	E_Commander		UMETA(DisplayName="Commander")
+	E_Soldier			UMETA(DisplayName="Soldier"),
+	E_Mage				UMETA(DisplayName="Mage"),
+	E_Paladin			UMETA(DisplayName="Paladin"),
+	E_Rogue				UMETA(DisplayName="Rogue"),
+	E_Engineer			UMETA(DisplayName="Engineer"),
+	E_Commander			UMETA(DisplayName="Commander"),
+	E_DebugPieceClass	UMETA(DisplayName="Debug Piece Class")
 };
 
 /* Rarities of pieces. */
