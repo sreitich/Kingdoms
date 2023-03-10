@@ -140,40 +140,20 @@ void UKingdomsGameInstance::SendInviteToPlayer(const FUniqueNetId& PlayerToInvit
 	if (SteamAPI_Init())
 	{
 		uint64 FriendID = *((uint64*)PlayerToInvite.GetBytes());
-		UNetConnection* LocalNetConnection = GetFirstLocalPlayerController(GetWorld())->GetNetConnection();
-		if (IsValid(LocalNetConnection))
-		{
-			FString RemoteAddress = LocalNetConnection->RemoteAddressToString();
-			// const char* ConnectionString = TCHAR_TO_ANSI(*RemoteAddress);
-			if (FriendID != 0)
-			{
-				UE_LOG(LogTemp, Error, TEXT("FriendID: %i"), FriendID);
-			}
+		const char* ConnectionString = TCHAR_TO_ANSI(*FString());
 
-			// if (IsValid(LocalNetConnection) && !LocalNetConnection->RemoteAddressToString().IsEmpty())
-			// {
-			// 	UE_LOG(LogTemp, Error, TEXT("Remote address: %s"), *LocalNetConnection->RemoteAddressToString());
-			// }
-			
-			// if (ConnectionString)
-			// {
-			// 	UE_LOG(LogTemp, Error, TEXT("Connection string: %s"), *ConnectionString);
-			// }
-			// UE_LOG(LogTemp, Error, TEXT("FriendID: %i, remote address: %s, connection string: %s"), FriendID, *RemoteAddress, *ConnectionString);
-			// bool bSuccess = SteamFriends()->InviteUserToGame(FriendID, ConnectionString);
-			// UE_LOG(LogTemp, Error, TEXT("%s"), *(bSuccess ? "Successfuly sent invite" : "Failed to send invite"));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Failed."));
-		}
+		UE_LOG(LogTemp, Error, TEXT("FriendID: %i"), FriendID);
+
+		UE_LOG(LogTemp, Error, TEXT("Public address: %s"), *ConnectionString);
+
+		// if (ConnectionString)
+		// {
+		// 	UE_LOG(LogTemp, Error, TEXT("Connection string: %s"), *ConnectionString);
+		// }
+		// UE_LOG(LogTemp, Error, TEXT("FriendID: %i, address: %s, connection string: %s"), FriendID, *Address, *ConnectionString);
+		// bool bSuccess = SteamFriends()->InviteUserToGame(FriendID, ConnectionString);
+		// UE_LOG(LogTemp, Error, TEXT("%s"), *(bSuccess ? "Successfuly sent invite" : "Failed to send invite"));
 	}
-	
-	/* If the friends interface is valid, send an invite to the target player. */
-	// if (FriendsInterface.IsValid())
-	// {
-	// 	FriendsInterface->SendInvite(0, PlayerToInvite, DEFAULT_FRIENDS_LIST, OnSendInviteCompleteDelegate);
-	// }
 }
 
 void UKingdomsGameInstance::B_SendInviteToPlay(FSteamFriend FriendToInvite)

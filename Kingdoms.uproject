@@ -23,11 +23,6 @@
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/f138ff0ffa434737bb687bbdcb79ad98"
 		},
 		{
-			"Name": "RestartEditor",
-			"Enabled": false,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/a00eb1e478ae4a8fb655aa22f9125b07"
-		},
-		{
 			"Name": "SteamVR",
 			"Enabled": false,
 			"SupportedTargetPlatforms": [
@@ -41,11 +36,30 @@
 			"Enabled": true
 		},
 		{
+			"Name": "OnlineSubsystem",
+			"Enabled": true
+		},
+		{
+			"Name": "OnlineSubsystemUtils",
+			"Enabled": true
+		},
+		{
 			"Name": "OnlineSubsystemSteam",
+			"Enabled": true
+		},
+		{
+			"Name": "OnlineSubsystemNull",
+			"Enabled": true
+		},
+		{
+			"Name": "SteamSockets",
 			"Enabled": true
 		}
 	],
-	"TargetPlatforms": [
-		"WindowsNoEditor"
+	"TargetPlatforms": 
+	[
+		"WindowsNoEditor",
+		"Win32",
+		"Win64"
 	]
 }
