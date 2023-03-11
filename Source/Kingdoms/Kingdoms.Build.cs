@@ -18,7 +18,6 @@ public class Kingdoms : ModuleRules
 				"MediaAssets",
 				"OnlineSubsystem",
 				"OnlineSubsystemUtils",
-				"SteamSockets",
 				"Steamworks"
 			});
 
