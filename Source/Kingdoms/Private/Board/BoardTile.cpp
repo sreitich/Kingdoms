@@ -197,21 +197,18 @@ void ABoardTile::UpdateReticle(bool bReveal, bool bYellow)
 
 bool ABoardTile::IsAdjacentTo(bool bDiagonal, const ABoardTile* Other) const
 {
-	/* Store this tile and the given tile's coordinates in variables for readability. */
-	const int ThisX = Coordinates.X, ThisY = Coordinates.Y;
-	const int OtherX = Other->Coordinates.X, OtherY = Other->Coordinates.Y;
-
 	/* If the tile is at a valid lateral location, return true. */
 	if
 	(
 		/* 1 forward */
-		(ThisY == OtherY + 1 && ThisX == OtherX) ||
+		CheckTilePosition(Other, 1, 0) ||
 		/* 1 backward */
-		(ThisY == OtherY - 1 && ThisX == OtherX) ||
+		CheckTilePosition(Other, -1, 0) ||
 		/* 1 right */
-		(ThisY == OtherY && ThisX == OtherX + 1) ||
+		CheckTilePosition(Other, 0, 1) ||
 		/* 1 left */
-		(ThisY == OtherY && ThisX == OtherX - 1))
+		CheckTilePosition(Other, 0, -1)
+	)
 	{
 		return true;
 	}
@@ -220,13 +217,14 @@ bool ABoardTile::IsAdjacentTo(bool bDiagonal, const ABoardTile* Other) const
 	if (bDiagonal &&
 	(
 		/* 1 forward, 1 right */
-		(ThisY == OtherY + 1 && ThisX == OtherX + 1) ||
+		CheckTilePosition(Other, 1, 1) ||
 		/* 1 forward, 1 left */
-		(ThisY == OtherY + 1 && ThisX == OtherX - 1) ||
+		CheckTilePosition(Other, 1, -1) ||
 		/* 1 backward, 1 right */
-		(ThisY == OtherY - 1 && ThisX == OtherX + 1) ||
+		CheckTilePosition(Other, -1, 1) ||
 		/* 1 backward, 1 left */
-		(ThisY == OtherY - 1 && ThisX == OtherX - 1)))
+		CheckTilePosition(Other, -1, -1)
+	))
 	{
 		return true;
 	}
@@ -235,7 +233,7 @@ bool ABoardTile::IsAdjacentTo(bool bDiagonal, const ABoardTile* Other) const
 	return false;
 }
 
-bool ABoardTile::CheckTilePosition(const ABoardTile* Other, int Forward, int Right)
+bool ABoardTile::CheckTilePosition(const ABoardTile* Other, int Forward, int Right) const
 {
 	bool bFacingForward;
 	

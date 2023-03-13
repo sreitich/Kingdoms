@@ -21,31 +21,27 @@ bool AGuardian::TileIsInMoveRange(ABoardTile* Tile)
 	/* Make sure that a valid tile was passed. */
 	if (IsValid(Tile))
 	{
-		/* Store the given tile and current tile's coordinates in variables for readability. */
-		const int NewX = Tile->Coordinates.X, NewY = Tile->Coordinates.Y;
-		const int OldX = CurrentTile->Coordinates.X, OldY = CurrentTile->Coordinates.Y;
-	
 		/* Test if the tile's coordinates match with any of this piece's move patterns.
 		 * The Guardian can move in any diagonal direction, up to 2 tiles. */
 		if
 		(
 			/* Forward 1, right 1. */
-			(NewX == OldX + 1 && NewY == OldY + 1) ||
+			CurrentTile->CheckTilePosition(Tile, 1, 1) ||
 			/* Forward 1, left 1. */
-			(NewX == OldX - 1 && NewY == OldY + 1) ||
+			CurrentTile->CheckTilePosition(Tile, 1, -1) ||
 			/* Backward 1, right 1. */
-			(NewX == OldX + 1 && NewY == OldY - 1) ||
+			CurrentTile->CheckTilePosition(Tile, -1, 1) ||
 			/* Backward 1, left 1. */
-			(NewX == OldX - 1 && NewY == OldY - 1) ||
+			CurrentTile->CheckTilePosition(Tile, -1, -1) ||
 
 			/* Forward 2, right 2. */
-			(NewX == OldX + 2 && NewY == OldY + 2) ||
+			CurrentTile->CheckTilePosition(Tile, 2, 2) ||
 			/* Forward 2, left 2. */
-			(NewX == OldX - 2 && NewY == OldY + 2) ||
+			CurrentTile->CheckTilePosition(Tile, 2, -2) ||
 			/* Backward 2, right 2. */
-			(NewX == OldX + 2 && NewY == OldY - 2) ||
+			CurrentTile->CheckTilePosition(Tile, -2, 2) ||
 			/* Backward 2, left 2. */
-			(NewX == OldX - 2 && NewY == OldY - 2)
+			CurrentTile->CheckTilePosition(Tile, -2, -2)
 		)
 		{
 			return true;
@@ -124,39 +120,35 @@ TArray<ABoardTile*> AGuardian::GetActiveAbilityRange()
 	/* Get the board manager's array of every tile on the board. */
 	for (ABoardTile* Tile : GetWorld()->GetGameState<AMatch_GameStateBase>()->BoardManager->AllTiles)
 	{
-		/* Store the given tile and current tile's coordinates in variables for readability. */
-		const int NewX = Tile->Coordinates.X, NewY = Tile->Coordinates.Y;
-		const int OldX = CurrentTile->Coordinates.X, OldY = CurrentTile->Coordinates.Y;
-		
 		/* If the tile is at a valid location. */
 		if
 		(
 			/* 1 forward */
-			(NewY == OldY + 1 && NewX == OldX) ||
+			CurrentTile->CheckTilePosition(Tile, 1, 0) ||
 			/* 1 backward */
-			(NewY == OldY - 1 && NewX == OldX) ||
+			CurrentTile->CheckTilePosition(Tile, -1, 0) ||
 			/* 1 right */
-			(NewY == OldY && NewX == OldX + 1) ||
+			CurrentTile->CheckTilePosition(Tile, 0, 1) ||
 			/* 1 left */
-			(NewY == OldY && NewX == OldX - 1) ||
+			CurrentTile->CheckTilePosition(Tile, 0, -1) ||
 				
 			/* 1 forward, 1 right */
-			(NewY == OldY + 1 && NewX == OldX + 1) ||
+			CurrentTile->CheckTilePosition(Tile, 1, 1) ||
 			/* 1 forward, 1 left */
-			(NewY == OldY + 1 && NewX == OldX - 1) ||
+			CurrentTile->CheckTilePosition(Tile, 1, -1) ||
 			/* 1 backward, 1 right */
-			(NewY == OldY - 1 && NewX == OldX + 1) ||
+			CurrentTile->CheckTilePosition(Tile, -1, 1) ||
 			/* 1 backward, 1 left */
-			(NewY == OldY - 1 && NewX == OldX - 1) ||
+			CurrentTile->CheckTilePosition(Tile, -1, -1) ||
 
 			/* 2 forward */
-			(NewY == OldY + 2 && NewX == OldX) ||
+			CurrentTile->CheckTilePosition(Tile, 2, 0) ||
 			/* 2 backward */
-			(NewY == OldY - 2 && NewX == OldX) ||
+			CurrentTile->CheckTilePosition(Tile, -2, 0) ||
 			/* 2 right */
-			(NewY == OldY && NewX == OldX + 2) ||
+			CurrentTile->CheckTilePosition(Tile, 0, 2) ||
 			/* 2 left */
-			(NewY == OldY && NewX == OldX - 2)
+			CurrentTile->CheckTilePosition(Tile, 0, -2)
 		)
 		{
 			TilesInRange.Add(Tile);

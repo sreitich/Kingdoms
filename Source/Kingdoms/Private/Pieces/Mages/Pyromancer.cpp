@@ -21,30 +21,26 @@ bool APyromancer::TileIsInMoveRange(ABoardTile* Tile)
 	/* Make sure that a valid tile was passed. */
 	if (IsValid(Tile))
 	{
-		/* Store the given tile and current tile's coordinates in variables for readability. */
-		const int NewX = Tile->Coordinates.X, NewY = Tile->Coordinates.Y;
-		const int OldX = CurrentTile->Coordinates.X, OldY = CurrentTile->Coordinates.Y;
-	
 		/* Test if the tile's coordinates match with any of this piece's move patterns. */
 		if
 		(
 			/* Forward 1 */
-			(NewX == OldX && NewY == OldY + 1) ||
+			CurrentTile->CheckTilePosition(Tile, 1, 0) ||
 			/* Backward 1 */
-			(NewX == OldX && NewY == OldY - 1) ||
+			CurrentTile->CheckTilePosition(Tile, -1, 0) ||
 
 			/* Right 1 */
-			(NewX == OldX + 1 && NewY == OldY) ||
+			CurrentTile->CheckTilePosition(Tile, 0, 1) ||
 			/* Left 1 */
-			(NewX == OldX - 1 && NewY == OldY) ||
+			CurrentTile->CheckTilePosition(Tile, 0, -1) ||
 			/* Right 2 */
-			(NewX == OldX + 2 && NewY == OldY) ||
+			CurrentTile->CheckTilePosition(Tile, 0, 2) ||
 			/* Left 2 */
-			(NewX == OldX - 2 && NewY == OldY) ||
+			CurrentTile->CheckTilePosition(Tile, 0, -2) ||
 			/* Right 3 */
-			(NewX == OldX + 3 && NewY == OldY) ||
+			CurrentTile->CheckTilePosition(Tile, 0, 3) ||
 			/* Left 3 */
-			(NewX == OldX - 3 && NewY == OldY)
+			CurrentTile->CheckTilePosition(Tile, 0, -3)
 		)
 		{
 			return true;
@@ -148,66 +144,62 @@ TArray<ABoardTile*> APyromancer::GetActiveAbilityRange()
 	/* Get the board manager's array of every tile on the board. */
 	for (ABoardTile* Tile : GetWorld()->GetGameState<AMatch_GameStateBase>()->BoardManager->AllTiles)
 	{
-		/* Store the given tile and current tile's coordinates in variables for readability. */
-		const int NewX = Tile->Coordinates.X, NewY = Tile->Coordinates.Y;
-		const int OldX = CurrentTile->Coordinates.X, OldY = CurrentTile->Coordinates.Y;
-		
 		/* If the tile is at a valid location. */
 		if
 		(
 			/* 1 forward */
-			(NewY == OldY + 1 && NewX == OldX) ||
+			CurrentTile->CheckTilePosition(Tile, 1, 0) ||
 			/* 1 backward */
-			(NewY == OldY - 1 && NewX == OldX) ||
+			CurrentTile->CheckTilePosition(Tile, -1, 0) ||
 			/* 1 right */
-			(NewY == OldY && NewX == OldX + 1) ||
+			CurrentTile->CheckTilePosition(Tile, 0, 1) ||
 			/* 1 left */
-			(NewY == OldY && NewX == OldX - 1) ||
+			CurrentTile->CheckTilePosition(Tile, 0, -1) ||
 				
 			/* 1 forward, 1 right */
-			(NewY == OldY + 1 && NewX == OldX + 1) ||
+			CurrentTile->CheckTilePosition(Tile, 1, 1) ||
 			/* 1 forward, 1 left */
-			(NewY == OldY + 1 && NewX == OldX - 1) ||
+			CurrentTile->CheckTilePosition(Tile, 1, -1) ||
 			/* 1 backward, 1 right */
-			(NewY == OldY - 1 && NewX == OldX + 1) ||
+			CurrentTile->CheckTilePosition(Tile, -1, 1) ||
 			/* 1 backward, 1 left */
-			(NewY == OldY - 1 && NewX == OldX - 1) ||
+			CurrentTile->CheckTilePosition(Tile, -1, -1) ||
 
 			/* 1 forward, 2 right */
-			(NewY == OldY + 1 && NewX == OldX + 2) ||
+			CurrentTile->CheckTilePosition(Tile, 1, 2) ||
 			/* 1 forward, 2 left */
-			(NewY == OldY + 1 && NewX == OldX - 2) ||
+			CurrentTile->CheckTilePosition(Tile, 1, -2) ||
 			/* 1 backward, 2 right */
-			(NewY == OldY - 1 && NewX == OldX + 2) ||
+			CurrentTile->CheckTilePosition(Tile, -1, 2) ||
 			/* 1 backward, 2 left */
-			(NewY == OldY - 1 && NewX == OldX - 2) ||
+			CurrentTile->CheckTilePosition(Tile, -1, -2) ||
 
 			/* 2 forward */
-			(NewY == OldY + 2 && NewX == OldX) ||
+			CurrentTile->CheckTilePosition(Tile, 2, 0) ||
 			/* 2 backward */
-			(NewY == OldY - 2 && NewX == OldX) ||
+			CurrentTile->CheckTilePosition(Tile, -2, 0) ||
 			/* 2 right */
-			(NewY == OldY && NewX == OldX + 2) ||
+			CurrentTile->CheckTilePosition(Tile, 0, 2) ||
 			/* 2 left */
-			(NewY == OldY && NewX == OldX - 2) ||
+			CurrentTile->CheckTilePosition(Tile, 0, -2) ||
 
 			/* 2 forward, 1 right */
-			(NewY == OldY + 2 && NewX == OldX + 1) ||
+			CurrentTile->CheckTilePosition(Tile, 2, 1) ||
 			/* 2 forward, 1 left */
-			(NewY == OldY + 2 && NewX == OldX - 1) ||
+			CurrentTile->CheckTilePosition(Tile, 2, -1) ||
 			/* 2 backward, 1 right */
-			(NewY == OldY - 2 && NewX == OldX + 1) ||
+			CurrentTile->CheckTilePosition(Tile, -2, 1) ||
 			/* 2 backward, 1 left */
-			(NewY == OldY - 2 && NewX == OldX - 1) ||
+			CurrentTile->CheckTilePosition(Tile, -2, -1) ||
 
 			/* 3 forward */
-			(NewY == OldY + 3 && NewX == OldX) ||
+			CurrentTile->CheckTilePosition(Tile, 3, 0) ||
 			/* 3 backward */
-			(NewY == OldY - 3 && NewX == OldX) ||
+			CurrentTile->CheckTilePosition(Tile, -3, 0) ||
 			/* 3 right */
-			(NewY == OldY && NewX == OldX + 3) ||
+			CurrentTile->CheckTilePosition(Tile, 0, 3) ||
 			/* 3 left */
-			(NewY == OldY && NewX == OldX - 3)
+			CurrentTile->CheckTilePosition(Tile, 0, -3)
 		)
 		{
 			TilesInRange.Add(Tile);
