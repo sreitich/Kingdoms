@@ -72,7 +72,7 @@ void APyromancer::OnActiveClicked()
 			const FAttackPreviewInfo AttackPreviewInfo =
 			{
 				this,
-				__nullptr,
+				nullptr,
 				GetCurrentStrength() + StrengthBuffValue,
 				GetCurrentArmor(),
 				0,

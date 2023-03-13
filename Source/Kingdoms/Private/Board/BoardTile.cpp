@@ -235,6 +235,53 @@ bool ABoardTile::IsAdjacentTo(bool bDiagonal, const ABoardTile* Other) const
 	return false;
 }
 
+bool ABoardTile::CheckTilePosition(const ABoardTile* Other, int Forward, int Right)
+{
+	bool bFacingForward;
+	
+	/* Check which way this tile's occupying piece is facing forward or backward (i.e. belongs to player 1 or 2). This
+	 * ensures that the coordinates are relative to each player. E.g. backwards for one player is forwards for the
+	 * other. */
+	if (IsValid(OccupyingPiece))
+	{
+		if (FVector::DotProduct(GetActorRotation().Vector(), OccupyingPiece->GetActorRotation().Vector()) >= 0.0f)
+		{
+			bFacingForward = true;
+		}
+		else
+		{
+			bFacingForward = false;
+		}
+	}
+	/* If this tile is empty, then assume that the piece is facing forward. */
+	else
+	{
+		bFacingForward = true;
+	}
+
+	/* Check the coordinates relative to the occupying piece's owning player. */
+	if (bFacingForward)
+	{
+		if (Other->Coordinates.Y == Coordinates.Y + Forward &&
+			Other->Coordinates.X == Coordinates.X + Right
+			)
+		{
+			return true;
+		}
+	}
+	else
+	{
+		if (Other->Coordinates.Y == Coordinates.Y - Forward &&
+			Other->Coordinates.X == Coordinates.X - Right
+			)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void ABoardTile::SetOccupyingPiece_Implementation(AParentPiece* NewOccupyingPiece)
 {
 	/* Make sure that the new occupying piece is valid or a null pointer to reset it. */

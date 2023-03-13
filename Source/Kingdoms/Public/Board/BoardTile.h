@@ -71,6 +71,11 @@ public:
 	UFUNCTION(BlueprintPure, Category="Board Tile")
 	bool IsAdjacentTo(bool bDiagonal, const ABoardTile* Other) const;
 
+	/* Returns true if the given tile is Forward units ahead of and Right units to the right of this tile, relative to
+	 * this tile's occupying piece's owning player. */
+	UFUNCTION(BlueprintPure, Category="Board Tile")
+	bool CheckTilePosition(const ABoardTile* Other, int Forward, int Right);
+
 
 /* Public variables. */
 public:
