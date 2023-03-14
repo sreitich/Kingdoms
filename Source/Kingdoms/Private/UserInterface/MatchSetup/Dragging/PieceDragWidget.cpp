@@ -16,6 +16,7 @@
 #include "Framework/Match/Match_GameStateBase.h"
 #include "Framework/Match/Match_PlayerState.h"
 #include "Kismet/GameplayStatics.h"
+#include "UserInterface/MatchSetup/MatchSetup_UnplacedPieceWidget.h"
 
 #define OUT
 
@@ -25,8 +26,8 @@ void UPieceDragWidget::InitializeWidget(bool bSpawnPiece)
 	if (bSpawnPiece)
 	{
 		/* Hide this widget with an animation. */
-		PlayAnimation(TransitionToPieceAnim, 0.0f, 1, EUMGSequencePlayMode::Forward, 1.0f, false);
-		
+		UnplacedPieceWidget->PlayAnimation(UnplacedPieceWidget->TransitionToPieceAnim, 0.0f, 1, EUMGSequencePlayMode::Forward, 1.0f, false);
+
 		/* The location and rotation to spawn this widget's corresponding piece at. */
 		FVector PieceSpawnLocation = FVector(0.0f, 0.0f, 165.0f);
 		FRotator PieceSpawnRotation = FRotator(0.0f, 0.0f, 0.0f);
@@ -89,7 +90,7 @@ void UPieceDragWidget::NativeConstruct()
 	FinishedDelegate.BindDynamic(this, &UPieceDragWidget::TransitionAnimFinished);
 	
 	/* Bind a function to hide this widget when the transition animation finishes playing. */
-	BindToAnimationFinished(TransitionToPieceAnim, FinishedDelegate);
+	BindToAnimationFinished(UnplacedPieceWidget->TransitionToPieceAnim, FinishedDelegate);
 }
 
 void UPieceDragWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)

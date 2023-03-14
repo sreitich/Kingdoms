@@ -88,10 +88,6 @@ protected:
 	
 	/* Enables binding a function to when an animation finishes. */
 	FWidgetAnimationDynamicEvent FinishedDelegate;
-	
-	/* Shrinks the widget and disappears before the card's piece appears. */
-	UPROPERTY(Transient, meta=(BindWidgetAnim))
-	UWidgetAnimation* TransitionToPieceAnim;
 
 	/* The height of board tiles on this level. */
 	UPROPERTY()

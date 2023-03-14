@@ -33,6 +33,14 @@ public:
 
 	/* ID of the piece that this widget represents. */
 	FString PieceID;
+	
+
+/* Public animations. */
+public:
+
+	/* Shrinks the widget and disappears before the card's piece appears. */
+	UPROPERTY(Transient, meta=(BindWidgetAnim))
+	UWidgetAnimation* TransitionToPieceAnim;
 
 
 /* Protected functions. */
@@ -63,8 +71,8 @@ protected:
 	TSubclassOf<UPieceDragWidget> PieceDragWidgetClass;
 
 
-/* Protected widgets. */
-protected:
+/* Public widgets. */
+public:
 
 	/* The displayed name of the piece that this widget represents. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
