@@ -17,7 +17,8 @@ class KINGDOMS_API AAssassin : public AParentPiece
 /* Public functions. */
 public:
 
-	/* Returns all valid tiles that this piece can currently move to. Checks for validity. */
+	/* Returns all valid tiles that this piece can currently move to. Needs to be overridden because this piece doesn't
+	 * need to check for path validity because of its passive ability. */
 	virtual TArray<ABoardTile*> GetValidMoveTiles() override;
 
 	/* Tests if the given tile's coordinates match any of this piece's movement patterns. */

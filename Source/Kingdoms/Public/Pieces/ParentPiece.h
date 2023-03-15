@@ -456,10 +456,17 @@ protected:
 	UFUNCTION()
 	void OnRep_ActiveUses();
 
+	
 	/* Called when this piece finishes moving to a new tile. Overridden by pieces that require code to be executed upon
 	 * moving to a new tile. */
 	UFUNCTION(BlueprintCallable)
 	virtual void OnMoveToTileCompleted();
+
+	/* Called in OnRep_TemporaryModifiers when this piece's modifiers change to execute any piece-specific code related
+	 * to modifiers. This function is only called by the server. This has no default implementation and is overridden by
+	 * pieces that utilize it. */
+	UFUNCTION()
+	virtual void OnModifierAddedOrRemoved(FModifier Modifier, bool bRemoved);
 
 
 /* Protected accessors and modifiers. */

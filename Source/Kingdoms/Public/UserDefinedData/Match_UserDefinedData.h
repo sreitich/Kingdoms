@@ -187,7 +187,8 @@ struct FModifier
 {
 	GENERATED_BODY()
 
-	/* Assigned to ModifiedStat. */
+	/* DEPRECATED: Use StrengthChange and ArmorChange instead.
+	 * Assigned to ModifiedStat. */
 	static const int Armor = 0;
 	static const int Strength = 1;
 
@@ -226,7 +227,7 @@ struct FModifier
 
 	/* The remaining turn duration of the modifier. */
 	UPROPERTY(BlueprintReadWrite)
-	int RemainingDuration = false;
+	int RemainingDuration = 0;
 
 	/* Tracks if this modifier's strength modification pop-up has been played yet. Set this to true to avoid playing strength pop-ups. */
 	UPROPERTY(BlueprintReadWrite)

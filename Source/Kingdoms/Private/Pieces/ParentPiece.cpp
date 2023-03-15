@@ -556,6 +556,9 @@ void AParentPiece::OnRep_TemporaryModifiers(TArray<FModifier> OldTemporaryModifi
 				/* Manually call the OnRep on the server. */
 				OnRep_CurrentArmor();
 			}
+
+			/* Execute any piece-specific logic that gets called whenever a modifier is added or removed. */
+			OnModifierAddedOrRemoved(NewModifier, false);
 		}
 		/* A modifier was removed. */
 		else if (TemporaryModifiers.Num() < OldTemporaryModifiers.Num())
@@ -578,6 +581,9 @@ void AParentPiece::OnRep_TemporaryModifiers(TArray<FModifier> OldTemporaryModifi
 				/* Manually call the OnRep on the server. */
 				OnRep_CurrentArmor();
 			}
+
+			/* Execute any piece-specific logic that gets called whenever a modifier is added or removed. */
+			OnModifierAddedOrRemoved(RemovedModifier, true);
 		}
 	}
 }
@@ -879,6 +885,11 @@ void AParentPiece::OnRep_ActiveUses()
 void AParentPiece::OnMoveToTileCompleted()
 {
 	/* Piece finished moving to a new tile. */
+}
+
+void AParentPiece::OnModifierAddedOrRemoved(FModifier Modifier, bool bRemoved)
+{
+	/* No default implementation. */
 }
 
 void AParentPiece::Server_SetCurrentTile_Implementation(ABoardTile* NewTile)
