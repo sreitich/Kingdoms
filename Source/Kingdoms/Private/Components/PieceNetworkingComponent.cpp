@@ -36,25 +36,42 @@ void UPieceNetworkingComponent::Server_AddModifier_Implementation(AParentPiece* 
 	/* Get the target piece's current temporary modifiers. */
 	TArray<FModifier>& TemporaryModifiers = PieceToModify->GetTemporaryModifiers();
 	
-	/* Check if this modifier is already applied. */
-	int RepeatIndex = -1;
+	/* Check if this modifier instance or a modifier of this type is already applied. */
+	int RepeatedInstanceIndex = -1;
+	int RepeatedTypeIndex = -1;
 	for (int i = 0; i < TemporaryModifiers.Num(); i++)
 	{
 		if (TemporaryModifiers[i] == NewModifier)
 		{
-			RepeatIndex = i;
-			break;
+			RepeatedInstanceIndex = i;
+		}
+		else if (TemporaryModifiers[i].equalTo(NewModifier))
+		{
+			RepeatedTypeIndex = i;
 		}
 	}
 
-	/* If this modifier is already applied, reset its duration and stack the values together. */
-	if (RepeatIndex != -1)
+	/* If this exact modifier instance is already applied, don't apply it again. */
+	if (RepeatedInstanceIndex != -1)
 	{
-		TemporaryModifiers[RepeatIndex].RemainingDuration = NewModifier.RemainingDuration;
-		TemporaryModifiers[RepeatIndex].StrengthChange += NewModifier.StrengthChange;
-		TemporaryModifiers[RepeatIndex].ArmorChange += NewModifier.ArmorChange;
+		return;
 	}
-	/* If this modifier isn't already applied, apply it. */
+	/* If this type of modifier is already applied and can stack, reset its duration and stack the values together. */
+	else if (RepeatedTypeIndex != -1 && NewModifier.bCanStack)
+	{
+		TemporaryModifiers[RepeatedTypeIndex].RemainingDuration = NewModifier.RemainingDuration;
+		TemporaryModifiers[RepeatedTypeIndex].StrengthChange += NewModifier.StrengthChange;
+		TemporaryModifiers[RepeatedTypeIndex].ArmorChange += NewModifier.ArmorChange;
+	}
+	/* If this type of modifier is already applied but can't stack, make a new instance of the modifier. */
+	else if (RepeatedTypeIndex != -1 && !NewModifier.bCanStack)
+	{
+		const TArray<FModifier> OldTemporaryModifiers = TemporaryModifiers;
+		TemporaryModifiers.Add(NewModifier);
+		/* Manually call the OnRep for the server. */
+		PieceToModify->OnRep_TemporaryModifiers(OldTemporaryModifiers);
+	}
+	/* If this type of modifier isn't already applied, apply it. */
 	else
 	{
 		const TArray<FModifier> OldTemporaryModifiers = TemporaryModifiers;

@@ -95,7 +95,6 @@ void UPieceDragWidget::NativeConstruct()
 
 void UPieceDragWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	UE_LOG(LogTemp, Error, TEXT("I'm still here"));
 	/* Try to destroy this widget if it is pending destruction and is safe to destroy. */
 	if (bPendingDestroy)
 	{

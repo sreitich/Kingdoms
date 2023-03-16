@@ -5,6 +5,8 @@
 #include "UserDefinedData/PieceData_UserDefinedData.h"
 
 #include "CoreMinimal.h"
+#include "Kismet/KismetStringLibrary.h"
+#include "Misc/DateTime.h"
 
 #include "Match_UserDefinedData.generated.h"
 
@@ -237,12 +239,51 @@ struct FModifier
 	UPROPERTY(BlueprintReadWrite)
 	bool bArmPopUpPlayed = true;
 
-	/* Two modifiers are equal if they have the same source actor, source ability, and alignment to the target. */
-	bool operator==(const FModifier &Other) const
+	/* Determines whether or not this modifier can stack with other modifiers of the same type. */
+	UPROPERTY(BlueprintReadWrite)
+	bool bCanStack = true;
+
+
+private:
+	/* This ID is used to track individual instances of modifiers, differentiating modifiers with the same source,
+	 * ability, and target. */
+	int32 ModifierID;
+
+
+public:
+
+	/* Default constructor gives this modifier its unique ID. Every piece's ID is set to a concatenation of the current
+	 * time, so no IDs will ever be repeated. */
+	FModifier()
+	{
+		const FDateTime Time = FDateTime::Now();
+		ModifierID = UKismetStringLibrary::Conv_StringToInt
+			(
+				FString::FromInt(Time.GetYear()) +
+				FString::FromInt(Time.GetMonth()) +
+				FString::FromInt(Time.GetDay()) +
+				FString::FromInt(Time.GetMillisecond())
+			);
+	}
+
+	/* Returns whether two modifiers are of the same type (same source actor, source ability, and alignment to the
+	 * target). */
+	bool equalTo(const FModifier &Other) const
 	{
 		return
 			SourceActor == Other.SourceActor &&
 			SourceAbilityName == Other.SourceAbilityName &&
 			SourceAlignmentToTarget == Other.SourceAlignmentToTarget;
+	}
+
+	/* Two modifiers are actually equal if they have the same ID. */
+	bool operator==(const FModifier &Other) const
+	{
+		return ModifierID == Other.ModifierID;
+	}
+
+	bool operator!=(const FModifier &Other) const
+	{
+		return ModifierID != Other.ModifierID;
 	}
 };

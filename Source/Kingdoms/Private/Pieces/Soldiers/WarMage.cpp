@@ -66,9 +66,10 @@ void AWarMage::OnModifierAddedOrRemoved(FModifier Modifier, bool bRemoved)
 					BonusModifier.StrengthChange = 1;
 				if (Modifier.ArmorChange > 0)
 					BonusModifier.ArmorChange = 1;
-				BonusModifier.RemainingDuration = Modifier.RemainingDuration;
+				BonusModifier.RemainingDuration = Modifier.RemainingDuration - 1;
 				BonusModifier.bStrPopUpPlayed = BonusModifier.StrengthChange == 0;
 				BonusModifier.bArmPopUpPlayed = BonusModifier.ArmorChange == 0;
+				BonusModifier.bCanStack = false;
 
 				/* Add new modifier to this piece. */
 				if (AMatch_PlayerPawn* PlayerPawnPtr = Cast<AMatch_PlayerPawn>(GetInstigator()))

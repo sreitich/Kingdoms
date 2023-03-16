@@ -184,20 +184,17 @@ void ARecruit::UpdatePassiveModifier(bool bTriggerPopUp)
 		/* Add a new passive ability modifier depending on how many recruits are now adjacent to this one. */
 		if (AdjacentRecruits.Num() > 0)
 		{
-			const FModifier ModifierToAdd =
-			{
-				this,
-				E_Friendly,
-				PieceData->PieceName,
-				PieceData->PassiveName,
-				FModifier::Strength,
-				AdjacentRecruits.Num() * PassiveStrengthBuffPerPiece,
-				AdjacentRecruits.Num() * PassiveArmorBuffPerPiece,
-				true,
-				-1,
-				false,
-				false
-			};
+			FModifier ModifierToAdd = FModifier();
+			ModifierToAdd.SourceActor = this;
+			ModifierToAdd.SourceAlignmentToTarget = E_Friendly;
+			ModifierToAdd.SourceName = PieceData->PieceName;
+			ModifierToAdd.SourceAbilityName = PieceData->PassiveName;
+			ModifierToAdd.EffectedStat = FModifier::Strength;
+			ModifierToAdd.StrengthChange = AdjacentRecruits.Num() * PassiveStrengthBuffPerPiece;
+			ModifierToAdd.ArmorChange = AdjacentRecruits.Num() * PassiveArmorBuffPerPiece;
+			ModifierToAdd.RemainingDuration = -1;
+			ModifierToAdd.bStrPopUpPlayed = false;
+			ModifierToAdd.bArmPopUpPlayed = false;
 
 			Cast<AMatch_PlayerPawn>(GetInstigator())->GetPieceNetworkingComponent()->Server_AddModifier(this, ModifierToAdd, bTriggerPopUp);
 		}
