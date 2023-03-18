@@ -60,7 +60,7 @@ void AGuardian::OnActiveClicked()
 	if (!ActiveAbilityConfirmationWidget)
 	{
 		/* Create an instance of this piece's active ability confirmation widget. */
-		ActiveAbilityConfirmationWidget = CreateWidget<UGuardian_ActiveConfirmation>(Cast<APlayerController>(GetInstigator()->GetController()), ActiveAbilityConfirmationClass, FName("Guardian Active Ability Confirmation Widget"));
+		ActiveAbilityConfirmationWidget = CreateWidget<UGuardian_ActiveConfirmation>(Cast<APlayerController>(GetInstigator()->GetController()), ActiveAbilityConfirmationClass, FName(GetName() + " Active Ability Confirmation Widget"));
 
 		/* Update the active ability confirmation widget and add it to the viewport if it was created successfully. */
 		if (ActiveAbilityConfirmationWidget)

@@ -97,7 +97,7 @@ void UPieceNetworkingComponent::Server_RemoveModifier_Implementation(AParentPiec
 	// 	NewValue = FMath::Clamp(TargetPiece->GetCurrentArmor() - ModifierToRemove.ArmorChange, 0, 20);
 
 
-	/* Some pieces' abilities that have lasting effects (i.e. modifiers) need to execute code when that effect ends. */
+	/* Some pieces' abilities that have lasting effects (e.g. modifiers) need to execute code when that effect ends. */
 	const TArray<AActor*> Targets = { TargetPiece };
 	if (AParentPiece* Piece = Cast<AParentPiece>(ModifierToRemove.SourceActor))
 		Piece->OnAbilityEffectEnded(Targets);

@@ -64,7 +64,7 @@ public:
 
 
 /* Protected functions. */
-// protected:
+protected:
 
 	/* Executes blueprint implementation of active ability. */
 	UFUNCTION(BlueprintImplementableEvent)

@@ -12,11 +12,11 @@ UArmyPresets_SaveGame::UArmyPresets_SaveGame()
 	/* Initialize five empty army presets. */
 	ArmyPresets.Init(FArmyPresetStruct(), 5);
 	
-	/* 1 war mage, 1 paladin, 1 assassin, and 1 king. */
+	/* 1 war mage, 1 paladin, 1 cryomancer, and 1 king. */
 	ArmyPresets[0].ArmyName = TEXT("Starting Army");
 	ArmyPresets[0].Pieces.Add(TEXT("S-03"));
 	ArmyPresets[0].Pieces.Add(TEXT("P-01"));
-	ArmyPresets[0].Pieces.Add(TEXT("R-01"));
+	ArmyPresets[0].Pieces.Add(TEXT("M-02"));
 	ArmyPresets[0].Pieces.Add(TEXT("C-01"));
 
 	/* 3 academy recruits. */
