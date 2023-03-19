@@ -59,6 +59,7 @@ enum EAttackBillboardPopUpTexture
 	E_DeadlockIndicator 	UMETA(DisplayName="Deadlock Indicator")
 };
 
+/* The possible outcomes of any kind of attack. */
 UENUM(BlueprintType)
 enum EAttackResult
 {
@@ -183,7 +184,7 @@ struct FCameraInterpolationInfo
 	bool bReverse = false;
 };
 
-/* Information used to modify a piece's statistics as a result of an ability or effect. */
+/* Information used to modify a piece's statistics as a result of an ability or map effect. */
 USTRUCT(BlueprintType)
 struct FModifier
 {

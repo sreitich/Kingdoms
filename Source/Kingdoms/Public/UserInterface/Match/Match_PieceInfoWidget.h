@@ -137,18 +137,18 @@ protected:
 	UFUNCTION()
 	void OnMoveClicked();
 
-	/* Call's the piece's implemented ability function. */
-	UFUNCTION()
-	void OnUseActiveClicked();
-
-
 	/* Highlights the current piece's movement pattern. */
 	UFUNCTION()
-	void OnMovePatternHovered();
+	void OnDisabledMoveHovered();
 
 	/* Unhighlights the current piece's movement pattern. */
 	UFUNCTION()
-	void OnMovePatternUnhovered();
+	void OnDisabledMoveUnhovered();
+
+
+	/* Call's the piece's implemented ability function. */
+	UFUNCTION()
+	void OnUseActiveClicked();
 
 
 /* Public widgets. */
@@ -327,7 +327,7 @@ protected:
 	/* Overlays the disabled "move" button to highlight a friendly piece's movement pattern when hovered over. Only
 	 * used when it is the player's turn. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* FriendlyMovePatternButton;
+	UButton* DisabledMoveButton;
 
 	/* Button that prompts a piece to use its active ability when clicked. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))

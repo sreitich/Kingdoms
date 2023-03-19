@@ -14,8 +14,6 @@ class URichTextBlock;
 
 class UDataTable;
 
-struct FModifier;
-
 /**
  * 
  */
@@ -57,6 +55,7 @@ protected:
 /* Protected variables. */
 protected:
 
+	/* The list containing this modifier entry. */
 	UPROPERTY()
 	UMatch_ModifierList* ParentModifierList;
 

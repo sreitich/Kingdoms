@@ -24,23 +24,23 @@ bool APyromancer::TileIsInMoveRange(ABoardTile* Tile)
 		/* Test if the tile's coordinates match with any of this piece's move patterns. */
 		if
 		(
-			/* Forward 1 */
-			CurrentTile->CheckTilePosition(Tile, 1, 0) ||
-			/* Backward 1 */
-			CurrentTile->CheckTilePosition(Tile, -1, 0) ||
-
 			/* Right 1 */
 			CurrentTile->CheckTilePosition(Tile, 0, 1) ||
 			/* Left 1 */
 			CurrentTile->CheckTilePosition(Tile, 0, -1) ||
-			/* Right 2 */
-			CurrentTile->CheckTilePosition(Tile, 0, 2) ||
-			/* Left 2 */
-			CurrentTile->CheckTilePosition(Tile, 0, -2) ||
-			/* Right 3 */
-			CurrentTile->CheckTilePosition(Tile, 0, 3) ||
-			/* Left 3 */
-			CurrentTile->CheckTilePosition(Tile, 0, -3)
+
+			/* Forward 1 */
+			CurrentTile->CheckTilePosition(Tile, 1, 0) ||
+			/* Backward 1 */
+			CurrentTile->CheckTilePosition(Tile, -1, 0) ||
+			/* Forward 2 */
+			CurrentTile->CheckTilePosition(Tile, 2, 0) ||
+			/* Backward 2 */
+			CurrentTile->CheckTilePosition(Tile, 2, 0) ||
+			/* Forward 3 */
+			CurrentTile->CheckTilePosition(Tile, 3, 0) ||
+			/* Backward 3 */
+			CurrentTile->CheckTilePosition(Tile, -3, 0)
 		)
 		{
 			return true;

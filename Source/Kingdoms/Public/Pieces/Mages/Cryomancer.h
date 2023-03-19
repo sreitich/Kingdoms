@@ -17,6 +17,9 @@ class KINGDOMS_API ACryomancer : public AParentPiece
 /* Public functions. */
 public:
 
+	/* Replicates variables. */
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	/* Tests if the given tile's coordinates match any of this piece's movement patterns.. */
 	virtual bool TileIsInMoveRange(ABoardTile* Tile) override;
 
@@ -46,7 +49,20 @@ public:
 /* Public variables. */
 public:
 
-	/* How long this ability's freeze lasts for. */
+	/* Used to maintain a valid reference to the ability target while the ability sequence plays, after the player's
+	 * target has been reset. */
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere, Category="Active Ability")
+	AParentPiece* ActiveAbilityTarget;
+
+	/* The strength modification value of the Cryomancer's active ability modifier.. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Active Ability")
+	int FrostboltStrengthChange = -1;
+
+	/* The armor modification value of the Cryomancer's active ability modifier.. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Active Ability")
+	int FrostboltArmorChange = -1;
+	
+	/* How long the Cryomancer's active ability lasts for. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Active Ability")
 	int FrostboltFreezeDuration = 2;
 

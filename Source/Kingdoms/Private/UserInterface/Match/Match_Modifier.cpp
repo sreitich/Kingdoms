@@ -13,7 +13,6 @@
 #include "Components/Button.h"
 #include "Components/RichTextBlock.h"
 
-
 void UMatch_Modifier::UpdateDisplayedModifier(UMatch_ModifierList* InParentModifierList, FModifier NewModifier, bool bAlignedLeft)
 {
 	/* Save this modifier widget's parent modifier list widget. */
@@ -88,11 +87,11 @@ void UMatch_Modifier::UpdateDisplayedModifier(UMatch_ModifierList* InParentModif
 
 
 	/* Remaining duration. Only display if piece has a definite duration. */
-	if (!NewModifier.bIndefiniteDuration)
+	if (!ModifierInfo.bIndefiniteDuration)
 	{
-		if (NewModifier.RemainingDuration > 1)
+		if (ModifierInfo.RemainingDuration > 1)
 		{
-			NewModifierText += "<Duration>(</><DurationCount>" + FString::FromInt(NewModifier.RemainingDuration) + "</><Duration> turns remaining)</>";
+			NewModifierText += "<Duration>(</><DurationCount>" + FString::FromInt(ModifierInfo.RemainingDuration) + "</><Duration> turns remaining)</>";
 		}
 		else
 		{
@@ -152,7 +151,7 @@ void UMatch_Modifier::HighlightSource(bool bRemoveHighlight) const
 	if (AParentPiece* SourcePiece = Cast<AParentPiece>(ModifierInfo.SourceActor))
 	{
 		/* Set the brightness that the piece's highlight will be set to. */
-		float Brightness = 0.0f;
+		float Brightness;
 
 		/* If the piece is being highlighted. */
 		if (!bRemoveHighlight)

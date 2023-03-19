@@ -41,11 +41,13 @@ void UMatch_PieceInfoWidget::NativeConstruct()
     MoveButton->OnClicked.AddDynamic(this, &UMatch_PieceInfoWidget::OnMoveClicked);
     ActiveButton->OnClicked.AddDynamic(this, &UMatch_PieceInfoWidget::OnUseActiveClicked);
 
-    /* Bind the "move pattern" buttons to highlight and unhighlight the piece's movement pattern. */
-    FriendlyMovePatternButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnMovePatternHovered);
-    FriendlyMovePatternButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnMovePatternUnhovered);
-    MovePatternButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnMovePatternHovered);
-    MovePatternButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnMovePatternUnhovered);
+    /* Bind the disabled move button to highlight and unhighlight the piece's movement pattern. */
+    DisabledMoveButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnDisabledMoveHovered);
+    DisabledMoveButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnDisabledMoveUnhovered);
+
+    /* Bind the "move pattern" button to highlight and unhighlight the piece's movement pattern. */
+    MovePatternButton->OnHovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnDisabledMoveHovered);
+    MovePatternButton->OnUnhovered.AddDynamic(this, &UMatch_PieceInfoWidget::OnDisabledMoveUnhovered);
 
     /* Bind the OpeningAnimFinished and ClosingAnimFinished functions to their respective delegates. */
     OpenFinishedDelegate.BindDynamic(this, &UMatch_PieceInfoWidget::OpeningAnimFinished);
@@ -435,19 +437,20 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
             {
                 /* Reveal the move button. */
                 MoveButton->SetVisibility(ESlateVisibility::Visible);
+
                 /* If the player can't use a move action, disable the move button and enable the friendly move pattern
                  * button on top to let the player continue to preview their movement pattern. */
                 if (GetOwningPlayerState<AMatch_PlayerState>()->GetMoveActionUsed())
                 {
                     MoveButton->SetIsEnabled(false);
-                    FriendlyMovePatternButton->SetVisibility(ESlateVisibility::Visible);
+                    DisabledMoveButton->SetVisibility(ESlateVisibility::Visible);
                 }
                 /* If the player can use a move action, enable the move button and disable the friendly move pattern
                  * button. */
                 else
                 {
                     MoveButton->SetIsEnabled(true);
-                    FriendlyMovePatternButton->SetVisibility(ESlateVisibility::Collapsed);
+                    DisabledMoveButton->SetVisibility(ESlateVisibility::Collapsed);
                 }
             }
             /* Hide the move button if the player cannot currently use actions for this piece. This is when the player
@@ -456,7 +459,7 @@ bool UMatch_PieceInfoWidget::UpdatePieceInfoWidget(AParentPiece* NewPiece, EAlig
             {
                 /* Hide the move button and friendly move pattern button. */
                 MoveButton->SetVisibility(ESlateVisibility::Collapsed);
-                FriendlyMovePatternButton->SetVisibility(ESlateVisibility::Collapsed);
+                DisabledMoveButton->SetVisibility(ESlateVisibility::Collapsed);
 
                 /* Reveal the move pattern button. */
                 MovePatternButton->SetVisibility(ESlateVisibility::Visible);
@@ -713,6 +716,35 @@ void UMatch_PieceInfoWidget::OnMoveClicked()
     }
 }
 
+void UMatch_PieceInfoWidget::OnDisabledMoveHovered()
+{
+    /* Make sure that there's a valid displayed piece. */
+    if (IsValid(DisplayedPiece))
+    {
+        /* Set a new highlight for every tile that this piece can move to. */
+        for (ABoardTile* Tile : DisplayedPiece->GetValidMoveTiles())
+        {
+            /* Highlight the tile relative to the alignment of the piece targeting it, the tile's piece's alignment, and
+             * the tile's occupancy. */
+            Tile->HighlightTarget(DisplayedPiece->GetLocalAlignment() == E_Friendly);
+        }
+    }
+}
+
+void UMatch_PieceInfoWidget::OnDisabledMoveUnhovered()
+{
+    /* Make sure that there's a valid displayed piece. */
+    if (IsValid(DisplayedPiece))
+    {
+        /* Remove the highlight from every tile that this piece can move to. */
+        for (ABoardTile* Tile : DisplayedPiece->GetValidMoveTiles())
+        {
+            /* Remove the tile's highlight. */
+            Tile->RemoveTargetHighlight();
+        }
+    }
+}
+
 void UMatch_PieceInfoWidget::OnUseActiveClicked()
 {
     /* Safety check. Ensure that the player is in the correct state to be taking actions. */
@@ -737,34 +769,5 @@ void UMatch_PieceInfoWidget::OnUseActiveClicked()
     else
     {
         RefreshWidget();
-    }
-}
-
-void UMatch_PieceInfoWidget::OnMovePatternHovered()
-{
-    /* Make sure that there's a valid displayed piece. */
-    if (IsValid(DisplayedPiece))
-    {
-        /* Set a new highlight for every tile that this piece can move to. */
-        for (ABoardTile* Tile : DisplayedPiece->GetValidMoveTiles())
-        {
-            /* Highlight the tile relative to the alignment of the piece targeting it, the tile's piece's alignment, and
-             * the tile's occupancy. */
-            Tile->HighlightTarget(DisplayedPiece->GetLocalAlignment() == E_Friendly);
-        }
-    }
-}
-
-void UMatch_PieceInfoWidget::OnMovePatternUnhovered()
-{
-    /* Make sure that there's a valid displayed piece. */
-    if (IsValid(DisplayedPiece))
-    {
-        /* Remove the highlight from every tile that this piece can move to. */
-        for (ABoardTile* Tile : DisplayedPiece->GetValidMoveTiles())
-        {
-            /* Remove the tile's highlight. */
-            Tile->RemoveTargetHighlight();
-        }
     }
 }

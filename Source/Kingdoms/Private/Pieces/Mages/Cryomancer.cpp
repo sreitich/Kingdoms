@@ -8,6 +8,14 @@
 #include "Framework/Match/Match_GameStateBase.h"
 #include "UserInterface/Match/ActiveAbilityConfirmations/Mages/Cryomancer/Match_CryoActiveConfirmation.h"
 
+void ACryomancer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	/* Replicate these variables. */
+	DOREPLIFETIME(ACryomancer, ActiveAbilityTarget);
+}
+
 bool ACryomancer::TileIsInMoveRange(ABoardTile* Tile)
 {
 	/* Make sure that a valid tile was passed. */
