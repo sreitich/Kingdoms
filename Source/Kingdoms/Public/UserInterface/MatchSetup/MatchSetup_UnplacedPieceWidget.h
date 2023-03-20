@@ -46,9 +46,6 @@ public:
 /* Protected functions. */
 protected:
 
-	/* Called when the game starts or when created. */
-	virtual void NativeConstruct() override;
-
 	/* Called when the mouse button was pressed on this widget. */
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
@@ -71,8 +68,8 @@ protected:
 	TSubclassOf<UPieceDragWidget> PieceDragWidgetClass;
 
 
-/* Public widgets. */
-public:
+/* Protected widgets. */
+protected:
 
 	/* The displayed name of the piece that this widget represents. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))

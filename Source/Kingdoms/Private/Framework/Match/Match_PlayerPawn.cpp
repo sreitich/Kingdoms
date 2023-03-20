@@ -522,11 +522,11 @@ void AMatch_PlayerPawn::Interact_Released()
 	/* If a piece is currently being dragged... */
 	if (bIsDraggingPiece)
 	{
-		/* Remove the PieceDragWidget widget from its parent, triggering its NativeDestruct function */
-		// PieceDragWidget->RemoveFromParent();
+		/* Remove the PieceDragWidget widget from its parent, triggering its NativeDestruct function. */
+		PieceDragWidget->RemoveFromParent();
 
-		/* Wait for the widget to finish spawning its piece before destroying it. */
-		PieceDragWidget->bPendingDestroy = true;
+		/* We should no longer be dragging the piece. */
+		bIsDraggingPiece = false;
 	}
 }
 

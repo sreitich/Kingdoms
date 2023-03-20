@@ -26,9 +26,9 @@ public:
 	UFUNCTION()
 	void LoadArmy(FArmyPresetStruct ArmyToLoad);
 
-	/* Plays the HideCards animation to hide all remaining cards off-screen. */
+	/* Plays the RevealCards or HideCards animations to reveal or hide all remaining cards. */
 	UFUNCTION()
-	void PlayHideCardsAnim(bool bReverse);
+	void PlayRevealCardsAnim(bool bHide);
 
 	/* Enables the ReadyButton if all of the player's pieces have been placed. */
 	UFUNCTION()

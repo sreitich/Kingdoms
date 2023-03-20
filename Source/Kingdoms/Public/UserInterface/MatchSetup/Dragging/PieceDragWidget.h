@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "PieceDragWidget.generated.h"
 
+class ABoardTile;
 class AParentPiece;
 class UUserWidget;
 
@@ -80,7 +81,7 @@ private:
 
 	/* Returns the closest unoccupied tile to the given location. */
 	UFUNCTION()
-	AActor* GetClosestOpenTile(const FVector& CloseToLocation) const;
+	ABoardTile* GetClosestOpenTile(const FVector& CloseToLocation) const;
 
 
 /* Protected variables. */
@@ -95,6 +96,6 @@ protected:
 
 	/* The current board tile that the dragged piece was placed onto. Used when updating the piece's position. */
 	UPROPERTY()
-	AActor* CurrentTile;
+	ABoardTile* CurrentTile;
 
 };

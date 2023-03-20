@@ -54,10 +54,14 @@
 		{
 			"Name": "SteamSockets",
 			"Enabled": true
+		},
+		{
+			"Name": "SteamCore",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/5300c1dc33f74524bcad23bdeb9b2196"
 		}
 	],
-	"TargetPlatforms": 
-	[
+	"TargetPlatforms": [
 		"WindowsNoEditor",
 		"Win32",
 		"Win64"

@@ -36,15 +36,8 @@ void UMatchSetup_UnplacedPieceWidget::UpdateUnplacedPieceWidget(FString NewPiece
 	}
 }
 
-void UMatchSetup_UnplacedPieceWidget::NativeConstruct()
-{
-	Super::NativeConstruct();
-}
-
 FReply UMatchSetup_UnplacedPieceWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-
 	/* Store the result of the drag detection as a reply. */
 	FEventReply Reply = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
 
@@ -54,8 +47,6 @@ FReply UMatchSetup_UnplacedPieceWidget::NativeOnMouseButtonDown(const FGeometry&
 
 void UMatchSetup_UnplacedPieceWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
-	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-	
 	/* If the piece drag widget class has been set. */
 	if (PieceDragWidgetClass)
 	{
@@ -79,7 +70,7 @@ void UMatchSetup_UnplacedPieceWidget::NativeOnDragDetected(const FGeometry& InGe
 		/* Anchor the widget's location to the mouse position. */
         PieceDragObject->Pivot = EDragPivot::MouseDown;
 		/* Store a reference to this widget so it can be moved when the visual is dropped. */
-		PieceDragObject->Payload = this;
+		// PieceDragObject->Payload = this;
 
 		/* Hide the original widget so that it looks like the new widget is actually this widget being dragged. */
 		SetVisibility(ESlateVisibility::Hidden);

@@ -11,14 +11,14 @@
 
 void UMatchSetup_PlacePieces::LoadArmy(FArmyPresetStruct ArmyToLoad)
 {
-    /* For every piece in the army... */
-	for (int ii = 0; ii < ArmyToLoad.Pieces.Num(); ii++)
+    /* Add every piece in the army to the list of unplaced pieces. For every piece in the army... */
+	for (int i = 0; i < ArmyToLoad.Pieces.Num(); i++)
 	{
 		/* If the unplaced piece widget class has been set... */
 		if (IsValid(MatchSetup_UnplacedPieceWidgetClass))
 		{
 			/* Create an unplaced piece widget for this piece. The widget's name is the piece's ID followed by its index in the army. */
-			UMatchSetup_UnplacedPieceWidget* UnplacedPieceWidget = CreateWidget<UMatchSetup_UnplacedPieceWidget>(GetOwningPlayer(), MatchSetup_UnplacedPieceWidgetClass, FName(ArmyToLoad.Pieces[ii] + " - " + FString::FromInt(ii)));
+			UMatchSetup_UnplacedPieceWidget* UnplacedPieceWidget = CreateWidget<UMatchSetup_UnplacedPieceWidget>(GetOwningPlayer(), MatchSetup_UnplacedPieceWidgetClass, FName(ArmyToLoad.Pieces[i] + " - " + FString::FromInt(i)));
 
 			/* If the widget was successfully created... */
 			if (UnplacedPieceWidget)
@@ -27,7 +27,7 @@ void UMatchSetup_PlacePieces::LoadArmy(FArmyPresetStruct ArmyToLoad)
 				PiecesBox->AddChild(UnplacedPieceWidget);
 
 				/* Tell the unplaced piece widget which piece it represents and update its information. */
-				UnplacedPieceWidget->UpdateUnplacedPieceWidget(ArmyToLoad.Pieces[ii]);
+				UnplacedPieceWidget->UpdateUnplacedPieceWidget(ArmyToLoad.Pieces[i]);
 
 				/* Add padding between each widget. */
 				UnplacedPieceWidget->SetPadding(FMargin(15.0f, 0.0f));
@@ -36,18 +36,32 @@ void UMatchSetup_PlacePieces::LoadArmy(FArmyPresetStruct ArmyToLoad)
 	}
 }
 
-void UMatchSetup_PlacePieces::PlayHideCardsAnim(bool bReverse)
+void UMatchSetup_PlacePieces::PlayRevealCardsAnim(bool bHide)
 {
-	/* Play the HideCards animation to hide all remaining cards off-screen. */
-	PlayAnimation
-	(
-		HideCardsAnim,
-		0.0f,
-		1,
-		bReverse ? EUMGSequencePlayMode::Reverse : EUMGSequencePlayMode::Forward,
-		1.0f,
-		false
-	);
+	/* Hide all cards if requested. */
+	if (bHide)
+	{
+		SetVisibility(ESlateVisibility::HitTestInvisible);
+
+		PlayAnimationForward
+		(
+			HideCardsAnim,
+			1.0f,
+			false
+		);
+	}
+	/* Reveal all cards if requested. */
+	else
+	{
+		SetVisibility(ESlateVisibility::Visible);
+
+		PlayAnimationReverse
+		(
+			HideCardsAnim,
+			1.0f,
+			false
+		);
+	}
 }
 
 void UMatchSetup_PlacePieces::CheckAllPiecesPlaced() const

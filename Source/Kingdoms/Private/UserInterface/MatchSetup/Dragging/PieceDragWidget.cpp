@@ -3,6 +3,7 @@
 
 #include "UserInterface/MatchSetup/Dragging/PieceDragWidget.h"
 
+#include "DrawDebugHelpers.h"
 #include "Board/BoardTile.h"
 #include "Components/ServerCommunicationComponent.h"
 #include "Framework/Match/Match_PlayerController.h"
@@ -63,7 +64,7 @@ void UPieceDragWidget::InitializeWidget(bool bSpawnPiece)
 
 		/* Get a board tile and get the universal height of tiles on this level. */
 		const AActor* BoardTile = UGameplayStatics::GetActorOfClass(GetWorld(), ABoardTile::StaticClass());
-		BoardTileHeight = BoardTile->GetActorLocation().Z;
+		BoardTileHeight = BoardTile->GetActorLocation().Z + 165.0f;
 	}
 	/* If this widget's piece has already been spawned, then the piece just needs to be moved, and no new actors need to be spawned. */
 	else
@@ -75,10 +76,10 @@ void UPieceDragWidget::InitializeWidget(bool bSpawnPiece)
 
 	/* Get the PlacePieces widget and hide the remaining cards so they don't block any board tiles. */
 	TArray<UUserWidget*> PlacePiecesWidgets;
-	UWidgetBlueprintLibrary::GetAllWidgetsOfClass(GetWorld(), OUT PlacePiecesWidgets, UMatchSetup_PlacePieces::StaticClass(), true);
+	UWidgetBlueprintLibrary::GetAllWidgetsOfClass(GetWorld(), OUT PlacePiecesWidgets, UMatchSetup_PlacePieces::StaticClass(), false);
 	if (PlacePiecesWidgets.Num() > 0)
 	{
-		Cast<UMatchSetup_PlacePieces>(PlacePiecesWidgets[0])->PlayHideCardsAnim(false);
+		Cast<UMatchSetup_PlacePieces>(PlacePiecesWidgets[0])->PlayRevealCardsAnim(true);
 	}
 }
 
@@ -102,30 +103,29 @@ void UPieceDragWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 	}
 	else
 	{
-		/* If the piece has been spawned yet, which it always should be... */
+		/* If the piece has been spawned, which it always should be... */
 		if (IsValid(SpawnedPiece))
 		{
 			/* Perform a line trace for board tiles */
 			FHitResult HitResult = TraceFromMouse();
+
+			/* Get the new tile to drag this piece to. This could be a tile that the player is hovered over, or the closest open one to the player's mouse. */
+			ABoardTile* NewTile = HitResult.bBlockingHit ? Cast<ABoardTile>(HitResult.GetActor()) : GetClosestOpenTile(HitResult.ImpactPoint);
 			
-			/* If the trace hit a board tile... */
-			if (HitResult.bBlockingHit)
+			/* If the tile is empty, snap the piece to 165 units above the hit tile. If the tile already has a piece and isn't the dragged piece's current tile, don't move the dragged piece. */
+			if (!IsValid(NewTile->GetOccupyingPiece()))
 			{
-				/* If the tile is empty, snap the piece to 165 units above the hit tile. If the tile already has a piece and isn't the dragged piece's current tile, don't move the dragged piece. */
-				if (!IsValid(Cast<ABoardTile>(HitResult.GetActor())->GetOccupyingPiece()) || SpawnedPiece->GetCurrentTile() == HitResult.GetActor())
+				/* Snap the spawned piece to 165 units above the hit tile. */
+				SpawnedPiece->SetActorLocation(NewTile->GetActorLocation() + FVector(0.0f, 0.0f, 165.0f));
+
+				/* Set this piece's new board tile. */
+				CurrentTile = NewTile;
+
+				/* If the tile actually needs to be updated. */
+				if (SpawnedPiece->GetCurrentTile() != CurrentTile)
 				{
-					/* Snap the spawned piece to 165 units above the hit tile. */
-					SpawnedPiece->SetActorLocation(HitResult.GetActor()->GetActorLocation() + FVector(0.0f, 0.0f, 165.0f));
-
-					/* Set this piece's new board tile. */
-					CurrentTile = HitResult.GetActor();
-
-					/* If the tile actually needs to be updated. */
-					if (SpawnedPiece->GetCurrentTile() != CurrentTile)
-					{
-						/* Update the dragged piece's position on the server and its new tile. */
-						GetOwningPlayer<AMatch_PlayerController>()->GetServerCommunicationComponent()->UpdatePiecePosition_Server(SpawnedPiece, CurrentTile);
-					}
+					/* Update the dragged piece's position on the server and its new tile. */
+					GetOwningPlayer<AMatch_PlayerController>()->GetServerCommunicationComponent()->UpdatePiecePosition_Server(SpawnedPiece, CurrentTile);
 				}
 			}
 		}
@@ -150,17 +150,15 @@ void UPieceDragWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 
 void UPieceDragWidget::NativeDestruct()
 {
-	Super::NativeDestruct();
-
 	/* The server needs this widget's data to spawn the piece, so it can't be destroyed before the server finished spawning the piece. */
 	if (IsValid(SpawnedPiece))
 	{
 		/* Get the PlacePieces widget and return the remaining cards to the screen. */
 		TArray<UUserWidget*> PlacePiecesWidgets;
-		UWidgetBlueprintLibrary::GetAllWidgetsOfClass(GetWorld(), OUT PlacePiecesWidgets, UMatchSetup_PlacePieces::StaticClass(), true);
+		UWidgetBlueprintLibrary::GetAllWidgetsOfClass(GetWorld(), OUT PlacePiecesWidgets, UMatchSetup_PlacePieces::StaticClass(), false);
 		if (PlacePiecesWidgets.Num() > 0)
 		{
-			Cast<UMatchSetup_PlacePieces>(PlacePiecesWidgets[0])->PlayHideCardsAnim(true);
+			Cast<UMatchSetup_PlacePieces>(PlacePiecesWidgets[0])->PlayRevealCardsAnim(false);
 		}
 
 		/* If the original widget that this widget represents was set, then it was created by an unplaced piece widget that needs to call the following additional logic when destroyed. */
@@ -185,6 +183,9 @@ void UPieceDragWidget::NativeDestruct()
 		{
 			GetOwningPlayer<AMatch_PlayerController>()->GetServerCommunicationComponent()->UpdatePiecePosition_Server(SpawnedPiece, CurrentTile);
 		}
+
+		/* Finally destroy the widget. */
+		Super::NativeDestruct();
 	}
 	else
 	{
@@ -238,30 +239,30 @@ FHitResult UPieceDragWidget::TraceFromMouse() const
 	return HitResult;
 }
 
-AActor* UPieceDragWidget::GetClosestOpenTile(const FVector& CloseToLocation) const
+ABoardTile* UPieceDragWidget::GetClosestOpenTile(const FVector& CloseToLocation) const
 {
 	/* Get every board tile. */
 	TArray<AActor*> AllTiles;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABoardTile::StaticClass(), OUT AllTiles);
-	
+
 	/* Get the closest tile to the given location */
 	float DistanceToClosestTile = FVector::Distance(AllTiles[0]->GetActorLocation(), CloseToLocation);
 	AActor* ClosestTile = AllTiles[0];
-		
+
 	for (AActor* Tile : AllTiles)
 	{
-		/* Also make sure that this tile isn't occupied. */
-		if (FVector::Distance(Tile->GetActorLocation(), CloseToLocation) < DistanceToClosestTile && !IsValid(Cast<ABoardTile>(Tile)->GetOccupyingPiece()))
+		/* Also make sure that this tile isn't occupied (unless by this piece). */
+		if (FVector::Distance(Tile->GetActorLocation(), CloseToLocation) < DistanceToClosestTile && (SpawnedPiece->GetCurrentTile() == Tile || !Cast<ABoardTile>(Tile)->GetOccupyingPiece()))
 		{
 			DistanceToClosestTile = FVector::Distance(Tile->GetActorLocation(), CloseToLocation);
 			ClosestTile = Tile;
 		}
 	}
 
-	/* Return the the closest board tile if one was found. */
-	if (IsValid(ClosestTile))
+	/* Return the closest tile (cast to the board tile class) if one was found. */
+	if (IsValid(ClosestTile) && Cast<ABoardTile>(ClosestTile))
 	{
-		return ClosestTile;
+		return Cast<ABoardTile>(ClosestTile);
 	}
 
 	return nullptr;
