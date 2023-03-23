@@ -110,7 +110,12 @@ void AMatch_GameStateBase::Server_SwitchTurn_Implementation(AMatch_PlayerState* 
             /* Decrement the modifier durations and ability cooldowns for the player whose turn just ended. */
             Server_DecrementModifierDurations(CurrentPlayer);
             Server_DecrementAbilityCooldowns(CurrentPlayer);
-            
+
+            /* Call the OnTurnStart function on every piece owned by the player who is starting their turn. */
+            if (AMatch_PlayerPawn* PlayerPawnPtr = Cast<AMatch_PlayerPawn>(NewPlayer->GetPawn()))
+            {
+                Server_CallPiecesTurnStart(PlayerPawnPtr);
+            }
 
             /* Start the next player's turn by resetting their turn timer and allowing them to start selecting a piece. */
             TurnTime = 0.0f;
@@ -182,6 +187,26 @@ void AMatch_GameStateBase::BeginPlay()
 
 void AMatch_GameStateBase::OnRep_CurrentMatchStatus()
 {
+}
+
+void AMatch_GameStateBase::Server_CallPiecesTurnStart_Implementation(AMatch_PlayerPawn* OwningPlayerPawn)
+{
+    /* Get every piece in the game. */
+    TArray<AActor*> Pieces;
+    UGameplayStatics::GetAllActorsOfClass(this, AParentPiece::StaticClass(), OUT Pieces);
+
+    /* Iterate through every piece, checking if it's owned by the given player. */
+    for (AActor* Piece : Pieces)
+    {
+        if (Piece->GetInstigator() == OwningPlayerPawn)
+        {
+            if (AParentPiece* CastPiece = Cast<AParentPiece>(Piece))
+            {
+                /* If the piece is owned by the given player, call OnTurnStart on it. */
+                CastPiece->OnTurnStart();
+            }
+        }
+    }
 }
 
 void AMatch_GameStateBase::Multicast_RevealAllPieces_Implementation()

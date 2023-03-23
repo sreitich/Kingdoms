@@ -147,15 +147,6 @@ void AParentPiece::PlayPiecePopUp(float Duration, bool bReverse)
 void AParentPiece::InterpolatePieceRotation(ABoardTile* NewTile, FRotator OriginalRot, FRotator TargetRot,
 	bool bMoveWhenFinished, bool bResetStateWhenFinished)
 {
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Error, TEXT("Rotation requested on server."));
-		
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Rotation requested on client."));
-	}
 	/* Set the parameters needed for the piece rotation timeline. */
 	RotationNewTile = NewTile;
 	OriginalRotationRot = OriginalRot;
@@ -289,6 +280,11 @@ void AParentPiece::OnGameStart()
 {
 	/* Not all pieces require code when the game starts.. */
 	// UE_LOG(LogTemp, Error, TEXT("OnGameStart called on a piece that does not implement OnGameStart."));
+}
+
+void AParentPiece::OnTurnStart()
+{
+	// No default implementation.
 }
 
 TArray<ABoardTile*> AParentPiece::GetValidMoveTiles()

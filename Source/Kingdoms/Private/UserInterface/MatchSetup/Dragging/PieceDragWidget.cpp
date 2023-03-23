@@ -252,7 +252,9 @@ ABoardTile* UPieceDragWidget::GetClosestOpenTile(const FVector& CloseToLocation)
 	for (AActor* Tile : AllTiles)
 	{
 		/* Also make sure that this tile isn't occupied (unless by this piece). */
-		if (FVector::Distance(Tile->GetActorLocation(), CloseToLocation) < DistanceToClosestTile && (SpawnedPiece->GetCurrentTile() == Tile || !Cast<ABoardTile>(Tile)->GetOccupyingPiece()))
+		if (FVector::Distance(Tile->GetActorLocation(), CloseToLocation) < DistanceToClosestTile &&
+			(IsValid(SpawnedPiece) && SpawnedPiece->GetCurrentTile() == Tile ||
+				!Cast<ABoardTile>(Tile)->GetOccupyingPiece()))
 		{
 			DistanceToClosestTile = FVector::Distance(Tile->GetActorLocation(), CloseToLocation);
 			ClosestTile = Tile;

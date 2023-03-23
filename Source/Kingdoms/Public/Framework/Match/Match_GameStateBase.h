@@ -9,6 +9,7 @@
 #include "Match_GameStateBase.generated.h"
 
 class ABoardManager;
+class AMatch_PlayerPawn;
 class AMatch_PlayerState;
 
 /**
@@ -109,6 +110,10 @@ protected:
 	/* Decrements any active cooldowns for pieces owned by the given player. */
 	UFUNCTION(Server, Reliable)
 	void Server_DecrementAbilityCooldowns(AMatch_PlayerState* OwningPlayer);
+
+	/* Calls the OnTurnStart function on every piece owned by the given player. */
+	UFUNCTION(Server, Reliable)
+	void Server_CallPiecesTurnStart(AMatch_PlayerPawn* OwningPlayerPawn);
 
 
 /* Protected variables */

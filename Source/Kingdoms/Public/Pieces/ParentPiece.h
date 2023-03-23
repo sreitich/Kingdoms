@@ -98,6 +98,11 @@ public:
 	UFUNCTION(Category="Piece Initialization")
 	virtual void OnGameStart();
 
+	/* Called when this piece's owning player's turn starts. Overridden by pieces that require code to be executed at
+	 * the beginning of each turn. */
+	UFUNCTION(Category="Turns")
+	virtual void OnTurnStart();
+
 
 	/* Returns all valid tiles that this piece can currently move to. Checks for validity. Overridden by each piece. */
 	UFUNCTION(BlueprintPure, Category="Movement")
