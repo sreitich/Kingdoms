@@ -32,6 +32,9 @@ void UMM_QueueTimer::NativeConstruct()
 	/* Bind the "cancel" button to destroy the player's current session. */
 	CancelButton->OnClicked.AddDynamic(this, &UMM_QueueTimer::OnCancelClicked);
 
+	/* Reset the timer. */
+	TimerText->SetText(FText::FromString("0:00"));
+
 	/* Play the activation animation. */
 	PlayAnimationForward(OnActivatedAnim, 1.0f, false);
 
@@ -41,11 +44,13 @@ void UMM_QueueTimer::NativeConstruct()
 
 void UMM_QueueTimer::OnCancelClicked()
 {
-	/* Leave the server while in the matchmaking state, so that it doesn't think that the player quit a match. */
-	if (UKingdomsGameInstance* GameInstancePtr = Cast<UKingdomsGameInstance>(UGameplayStatics::GetGameInstance(GetOwningPlayer())))
-	{
-		GameInstancePtr->LeaveServer(E_Matchmaking);
-	}
+	// /* Leave the server while in the matchmaking state, so that it doesn't think that the player quit a match. */
+	// if (UKingdomsGameInstance* GameInstancePtr = Cast<UKingdomsGameInstance>(UGameplayStatics::GetGameInstance(GetOwningPlayer())))
+	// {
+	// 	GameInstancePtr->LeaveServer(E_Matchmaking);
+	// }
+
+	BP_OnCancelClicked();
 }
 
 FString UMM_QueueTimer::FormatTime(int TotalSeconds) const

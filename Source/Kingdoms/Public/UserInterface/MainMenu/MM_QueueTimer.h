@@ -40,6 +40,10 @@ protected:
 	UFUNCTION()
 	void OnCancelClicked();
 
+		/* SteamCore implementation of OnCancelClicked. */
+		UFUNCTION(BlueprintImplementableEvent)
+		void BP_OnCancelClicked();
+
 
 /* Protected widgets. */
 protected:

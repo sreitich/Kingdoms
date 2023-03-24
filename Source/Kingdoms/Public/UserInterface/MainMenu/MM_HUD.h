@@ -84,12 +84,12 @@ public:
 	void CreateMatchmakingStartPopUpWidget();
 
 	/* Creates a queue timer widget. */
-	UFUNCTION(Category="Queue Timer Widget")
+	UFUNCTION(BlueprintCallable, Category="Queue Timer Widget")
 	void CreateQueueTimerWidget(bool bDestroy);
 
 		/* Called when an opponent is found, preventing the player from "cancelling" matchmaking until they enter their
 		 * game. Wrapper function for queue timer widget's FoundOpponent function. */
-		UFUNCTION(Category="Queue Timer Widget")
+		UFUNCTION(BlueprintCallable, Category="Queue Timer Widget")
 		void HUD_FoundOpponent();
 
 	/* Creates or destroys an invitation pop-up widget. */
