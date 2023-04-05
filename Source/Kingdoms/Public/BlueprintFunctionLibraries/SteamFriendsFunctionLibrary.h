@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Interfaces/OnlinePresenceInterface.h"
+#include "SteamCore/SteamTypes.h"
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
@@ -159,6 +160,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Steam|Friends", meta = (ExpandEnumAsExecs = "Result"))
 		static void GetSteamFriendGame(const FSteamFriend SteamFriend, ESteamFriendAsyncResultSwitch& Result, FString& GameName);
 
+	/**
+	 *	Gets the Steam-displayed name of the given Steam app.
+	 *
+	 *	@param		GameID		The Steam game ID of the game to get the name of.
+	 *	@param		Result		Result Enum used for Execs.
+	 *	@param		GameName	The game name.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Steam | Friends", meta = (ExpandEnumAsExecs = "Result"))
+		static void GetSteamGameName(FSteamGameID GameID, ESteamFriendAsyncResultSwitch& Result, FString& GameName);
 
 	/**
 	 *	Sorts the given array of Steam friends. Lists players playing the same game, then players playing any game,

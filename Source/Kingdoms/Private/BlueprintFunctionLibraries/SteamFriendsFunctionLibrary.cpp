@@ -4,7 +4,7 @@
 #include "BlueprintFunctionLibraries/SteamFriendsFunctionLibrary.h"
 
 #include "steam/steam_api.h"
-
+// #include "SteamCoreWeb/Public/Apps/WebApps.h"
 
 UTexture2D* USteamFriendsFunctionLibrary::GetSteamFriendAvatar(const FSteamFriend SteamFriend, ESteamFriendAsyncResultSwitch& Result, ESteamAvatarSize AvatarSize /*= ESteamAvatarSize::E_SteamMedium*/)
 {
@@ -117,6 +117,38 @@ void USteamFriendsFunctionLibrary::GetSteamFriendGame(const FSteamFriend SteamFr
 			return;
 		}
 	}
+
+	Result = ESteamFriendAsyncResultSwitch::OnFailure;
+}
+
+void USteamFriendsFunctionLibrary::GetSteamGameName(FSteamGameID GameID, ESteamFriendAsyncResultSwitch& Result, FString& GameName)
+{
+	if (!GameID.IsValid())
+	{
+		Result = ESteamFriendAsyncResultSwitch::OnFailure;
+		return;
+	}
+
+	// Initialize the Steam API.
+	if (SteamAPI_Init())
+	{
+		CGameID Value = CGameID(GameID.GetValue());
+
+		UE_LOG(LogTemp, Error, TEXT("App ID: %i"), Value.AppID());
+
+		// Create a buffer to store the app's name.
+		char NameBuffer[1024];
+ 		int NameLength = SteamAppList()->GetAppName(Value.AppID(), NameBuffer, 1024);
+
+ 		// If the app was found, return it as a string.
+ 		if (NameLength != -1)
+ 		{
+ 			GameName = FString(UTF8_TO_TCHAR(NameBuffer));
+ 		}
+
+		Result = ESteamFriendAsyncResultSwitch::OnSuccess;
+		return;
+ 	}
 
 	Result = ESteamFriendAsyncResultSwitch::OnFailure;
 }

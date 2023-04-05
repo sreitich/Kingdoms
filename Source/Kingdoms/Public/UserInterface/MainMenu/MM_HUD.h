@@ -40,7 +40,7 @@ public:
 
 	/* Deactivates the current menu and queues the next menu. When the current menu is deactivated, it will call
 	 * ChangeMenus(). */
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void QueueMenuChange(EMenuScreen NewMenu);
 
 	/* Setter for QueuedMenu. */
