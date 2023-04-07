@@ -24,16 +24,26 @@ enum EMenuScreen
 
 /* The settings and information for a custom game lobby. */
 USTRUCT(BlueprintType)
-struct FCustomLobbyInformation
+struct FCustomLobbyData
 {
 	GENERATED_BODY()
 
 	/* The currently selected map. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Custom Lobby Info")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Custom Lobby Data")
 	UMapData* Map = nullptr;
 
 	// Replace this with a custom struct of player information once we know what player info we want to display in the lobby.
 	/* The displayed names of all connected players. */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Custom Lobby Info")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Custom Lobby Data")
 	TArray<FString> PlayerNames = TArray<FString>();
+};
+
+USTRUCT(BlueprintType)
+struct FCustomLobbyDataKeys
+{
+	GENERATED_BODY()
+
+	/* The key used to retrieve a lobby's map. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Custom Lobby Data")
+	FString Map_Key = "Map";
 };

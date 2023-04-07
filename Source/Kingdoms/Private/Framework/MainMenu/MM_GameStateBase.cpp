@@ -3,7 +3,7 @@
 
 #include "Framework/MainMenu/MM_GameStateBase.h"
 
-void AMM_GameStateBase::SetCustomGameSettings(FCustomLobbyInformation NewCustomGameSettings)
+void AMM_GameStateBase::SetCustomGameSettings(FCustomLobbyData NewCustomGameSettings)
 {
 	/* Update the local player's custom game settings. */
 	CustomGameSettings = NewCustomGameSettings;

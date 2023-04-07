@@ -20,7 +20,7 @@ AMM_LobbyBeaconHostObject::AMM_LobbyBeaconHostObject()
 	LobbyStateClass = AMM_LobbyBeaconState::StaticClass();
 }
 
-void AMM_LobbyBeaconHostObject::UpdateLobbyInfo(FCustomLobbyInformation NewLobbyInfo)
+void AMM_LobbyBeaconHostObject::UpdateLobbyInfo(FCustomLobbyData NewLobbyInfo)
 {
 	LobbyInfo.Map = NewLobbyInfo.Map;
 	/* Don't update the player list from blueprints. */
@@ -150,7 +150,7 @@ void AMM_LobbyBeaconHostObject::DisconnectAllClients()
 	}
 }
 
-void AMM_LobbyBeaconHostObject::UpdateClientLobbyInfo(FCustomLobbyInformation NewLobbyInfo)
+void AMM_LobbyBeaconHostObject::UpdateClientLobbyInfo(FCustomLobbyData NewLobbyInfo)
 {
 	/* Update the lobby information for all connected clients. */
 	for (AOnlineBeaconClient* Client : ClientActors)

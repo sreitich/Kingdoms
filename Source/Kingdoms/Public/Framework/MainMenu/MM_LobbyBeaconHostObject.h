@@ -9,7 +9,7 @@
 #include "MM_LobbyBeaconHostObject.generated.h"
 
 /* Called when the host updates the lobby information. */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHostLobbyUpdated, FCustomLobbyInformation, UpdatedLobbyInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHostLobbyUpdated, FCustomLobbyData, UpdatedLobbyInfo);
 
 UCLASS()
 class KINGDOMS_API AMM_LobbyBeaconHostObject : public ALobbyBeaconHost
@@ -24,11 +24,11 @@ public:
 
 	/* Local getter for LobbyInfo. */
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE FCustomLobbyInformation GetLobbyInfo() const { return LobbyInfo; }
+	FORCEINLINE FCustomLobbyData GetLobbyInfo() const { return LobbyInfo; }
 
 	/* Setter for LobbyInfo. This does not affect the player names. */
 	UFUNCTION(BlueprintCallable)
-	void UpdateLobbyInfo(FCustomLobbyInformation NewLobbyInfo);
+	void UpdateLobbyInfo(FCustomLobbyData NewLobbyInfo);
 
 
 /* Protected functions. */
@@ -54,7 +54,7 @@ protected:
 		void DisconnectAllClients();
 
 	/* Replicates the given lobby information to all connected clients. */
-	void UpdateClientLobbyInfo(FCustomLobbyInformation NewLobbyInfo);
+	void UpdateClientLobbyInfo(FCustomLobbyData NewLobbyInfo);
 
 
 /* Protected variables. */
@@ -62,7 +62,7 @@ protected:
 
 	/* The settings and information of this custom lobby. */
 	UPROPERTY(EditDefaultsOnly, Category="Lobby Information")
-	FCustomLobbyInformation LobbyInfo = FCustomLobbyInformation();
+	FCustomLobbyData LobbyInfo = FCustomLobbyData();
 
 	/* OnHostLobbyUpdated delegate. */
 	UPROPERTY(BlueprintAssignable)

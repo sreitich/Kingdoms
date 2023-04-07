@@ -15,7 +15,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FConnectSuccess, bool, bConnectionSu
 /* Fires when a client is disconnected by a host. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDisconnected);
 /* Fires when the lobby's information changes. */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLobbyUpdated, FCustomLobbyInformation, UpdatedLobbyInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLobbyUpdated, FCustomLobbyData, UpdatedLobbyInfo);
 
 UCLASS()
 class KINGDOMS_API AMM_LobbyBeaconClient : public ALobbyBeaconClient
@@ -34,7 +34,7 @@ public:
 
 	/* Called when the lobby information is changed to update the client's information. */
 	UFUNCTION(Client, Reliable)
-	void Client_OnLobbyUpdated(FCustomLobbyInformation NewLobbyInfo);
+	void Client_OnLobbyUpdated(FCustomLobbyData NewLobbyInfo);
 
 	/* Getter for PlayerIndex. */
 	FORCEINLINE uint8 GetPlayerIndex() const { return PlayerIndex; }
@@ -80,7 +80,7 @@ protected:
 	 * of connection, since the client has no way of telling the server when it has navigated to the lobby menu and is
 	 * ready to update the lobby information for the first time. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Lobby Information")
-	FCustomLobbyInformation LocalLobbyInfo = FCustomLobbyInformation();
+	FCustomLobbyData LocalLobbyInfo = FCustomLobbyData();
 
 	/* The player's index in the lobby it is currently connected to. */
 	uint8 PlayerIndex;

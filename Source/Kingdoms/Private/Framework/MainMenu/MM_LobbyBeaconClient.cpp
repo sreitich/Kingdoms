@@ -15,7 +15,7 @@ void AMM_LobbyBeaconClient::Client_OnDisconnected_Implementation()
 	FOnDisconnected.Broadcast();
 }
 
-void AMM_LobbyBeaconClient::Client_OnLobbyUpdated_Implementation(FCustomLobbyInformation NewLobbyInfo)
+void AMM_LobbyBeaconClient::Client_OnLobbyUpdated_Implementation(FCustomLobbyData NewLobbyInfo)
 {
 	LocalLobbyInfo = NewLobbyInfo;
 	FOnLobbyUpdated.Broadcast(NewLobbyInfo);
