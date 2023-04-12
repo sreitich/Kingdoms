@@ -11,6 +11,7 @@
 
 class UGetSteamFriendsCallProxyBase;
 class UMM_ArmyMenuWidget;
+class UMM_CollectionMenuWidget;
 class UMM_FriendInvitationPopUp;
 class UMM_LobbyMenuWidget;
 class UMM_MainMenuWidget;
@@ -71,6 +72,9 @@ public:
 		UFUNCTION(Category="Main Menu Widgets")
 		void CreateArmyMenuWidget(bool bDestroy);
 
+			UFUNCTION(Category="Main Menu Widgets")
+			void CreateCollectionMenu(bool bDestroy);
+
 		/* Creates or destroys the store widget. */
 		UFUNCTION(Category="Main Menu Widgets")
 		void CreateStoreWidget(bool bDestroy);
@@ -123,6 +127,9 @@ protected:
 	UMM_ArmyMenuWidget* ArmyMenuWidget;
 
 	UPROPERTY()
+	UMM_CollectionMenuWidget* CollectionMenuWidget;
+
+	UPROPERTY()
 	UMM_LobbyMenuWidget* LobbyMenuWidget;
 
 	UPROPERTY()
@@ -152,6 +159,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
 	TSubclassOf<UUserWidget> ArmyMenuWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
+	TSubclassOf<UUserWidget> CollectionMenuWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
 	TSubclassOf<UUserWidget> LobbyMenuWidgetClass;

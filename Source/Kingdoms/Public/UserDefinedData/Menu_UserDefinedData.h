@@ -12,14 +12,15 @@
 UENUM(BlueprintType)
 enum EMenuScreen
 {
-	E_ArmyMenu		UMETA(DisplayName="Army Menu"),
-	E_LobbyMenu		UMETA(DisplayName="Lobby Menu"),
-	E_MainMenu		UMETA(DisplayName="Main Menu"),
-	E_MapSelection	UMETA(DisplayName="Map Selection Menu"),
-	E_OptionsScreen	UMETA(DisplayName="Options Screen"),
-	E_PlayMenu		UMETA(DisplayName="Play Menu"),
-	E_StoreScreen	UMETA(DisplayName="Store Screen"),
-	E_MenuDebug		UMETA(DisplayName="Menu Debug")
+	E_ArmyMenu			UMETA(DisplayName="Army Menu"),
+	E_CollectionMenu	UMETA(DisplayName="Collection Menu"),
+	E_LobbyMenu			UMETA(DisplayName="Lobby Menu"),
+	E_MainMenu			UMETA(DisplayName="Main Menu"),
+	E_MapSelection		UMETA(DisplayName="Map Selection Menu"),
+	E_OptionsScreen		UMETA(DisplayName="Options Screen"),
+	E_PlayMenu			UMETA(DisplayName="Play Menu"),
+	E_StoreScreen		UMETA(DisplayName="Store Screen"),
+	E_MenuDebug			UMETA(DisplayName="Menu Debug")
 };
 
 /* The settings and information for a custom game lobby. */

@@ -6,6 +6,7 @@
 #include "Interfaces/MenuTransitionInterface.h"
 #include "UserDefinedData/Menu_UserDefinedData.h"
 #include "UserInterface/MainMenu/MM_ArmyMenuWidget.h"
+#include "UserInterface/MainMenu/MM_CollectionMenuWidget.h"
 #include "UserInterface/MainMenu/MM_LobbyMenuWidget.h"
 #include "UserInterface/MainMenu/MM_MainMenuWidget.h"
 #include "UserInterface/MainMenu/MM_MapSelectionWidget.h"
@@ -45,6 +46,9 @@ void AMM_HUD::ChangeMenus()
 	{
 		case E_ArmyMenu:
 			CreateArmyMenuWidget(false);
+			break;
+		case E_CollectionMenu:
+			CreateCollectionMenu(false);
 			break;
 		case E_LobbyMenu:
 			CreateLobbyMenuWidget(false);
@@ -236,6 +240,40 @@ void AMM_HUD::CreateArmyMenuWidget(bool bDestroy)
 		{
 			ArmyMenuWidget->RemoveFromParent();
 			ArmyMenuWidget = nullptr;
+		}
+	}
+}
+
+void AMM_HUD::CreateCollectionMenu(bool bDestroy)
+{
+	/* Create a collection menu widget if requested. */
+	if (!bDestroy)
+	{
+		if (CollectionMenuWidgetClass)
+		{
+			/* Create the widget. */
+			CollectionMenuWidget = CreateWidget<UMM_CollectionMenuWidget>(GetOwningPlayerController(), CollectionMenuWidgetClass, FName("Collection Menu Widget"));
+
+			/* Add the collection menu widget to the player's viewport if it was successfully created. */
+			if (IsValid(CollectionMenuWidget))
+			{
+				CollectionMenuWidget->AddToViewport(0);
+				CurrentMenu = CollectionMenuWidget;
+			}
+			/* If there was a problem creating the widget, return to the main menu. */
+			else
+			{
+				QueueMenuChange(E_MainMenu);
+			}
+		}
+	}
+	/* Destroy the collection menu widget if requested. */
+	else
+	{
+		if (IsValid(CollectionMenuWidget))
+		{
+			CollectionMenuWidget->RemoveFromParent();
+			CollectionMenuWidget = nullptr;
 		}
 	}
 }

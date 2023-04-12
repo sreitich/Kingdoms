@@ -6,7 +6,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "MM_ArmyMenuWidget.generated.h"
+#include "MM_CollectionMenuWidget.generated.h"
 
 class UButton;
 
@@ -14,7 +14,7 @@ class UButton;
  * 
  */
 UCLASS()
-class KINGDOMS_API UMM_ArmyMenuWidget : public UUserWidget, public IMenuTransitionInterface
+class KINGDOMS_API UMM_CollectionMenuWidget : public UUserWidget, public IMenuTransitionInterface
 {
 	GENERATED_BODY()
 
@@ -37,21 +37,13 @@ protected:
 	void OnDeactivatedAnimEnd();
 
 
-	/* Transitions to the collection menu widget. */
-	UFUNCTION()
-	void OnCollectionClicked();
-
-	/* Returns to the main menu. */
+	/* Plays the deactivation animation animation, which deactivates this widget when it finishes playing. */
 	UFUNCTION()
 	void OnBackClicked();
 
 
 /* Protected widgets. */
 protected:
-
-	/* Navigates to the collection menu. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
-	UButton* CollectionButton;
 
 	/* Returns the user to the main menu. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
