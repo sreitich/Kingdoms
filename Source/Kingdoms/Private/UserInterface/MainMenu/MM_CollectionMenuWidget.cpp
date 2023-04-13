@@ -1,11 +1,15 @@
 // Copyright Change Studios, LLC 2023.
 
 
+#include "UserDefinedData/Match_UserDefinedData.h"
 #include "UserInterface/MainMenu/MM_CollectionMenuWidget.h"
-
 #include "UserInterface/MainMenu/MM_HUD.h"
+#include "UserInterface/MainMenu/PieceCollectionListing.h"
 
 #include "Components/Button.h"
+#include "Components/UniformGridPanel.h"
+#include "Components/UniformGridSlot.h"
+#include "Engine/DataTable.h"
 
 void UMM_CollectionMenuWidget::DeactivateWidget()
 {
@@ -27,6 +31,46 @@ void UMM_CollectionMenuWidget::NativeConstruct()
 	FWidgetAnimationDynamicEvent AnimBinding = FWidgetAnimationDynamicEvent();
 	AnimBinding.BindDynamic(this, &UMM_CollectionMenuWidget::OnDeactivatedAnimEnd);
 	BindToAnimationFinished(OnDeactivatedAnim, AnimBinding);
+
+	/* Ensure the piece data table has been set. */
+	if (PieceDataTable)
+	{
+		/* Iterate through every listing (i.e. every piece) and add a piece listing widget for it. */
+		for (const FName PieceID : PieceDataTable->GetRowNames())
+		{
+			/* Get the piece's data. */
+			static const FString ContextString(TEXT("Piece Data Struct"));
+			const FPieceDataStruct* PieceData = PieceDataTable->FindRow<FPieceDataStruct>(PieceID, ContextString, true);
+
+			/* Ensure the piece data was successfully retrieved. */
+			if (PieceData)
+			{
+				/* Create a new piece listing widget, update its represented piece, and add it to the grid. */
+				UPieceCollectionListing* NewListing = CreateWidget<UPieceCollectionListing>(GetOwningPlayer(), PieceListingClass, FName(*(PieceData->PieceName + " Piece Listing")));
+				NewListing->UpdatePieceCollectionListing(*PieceData, FMath::RandBool());
+				PieceListingGrid->AddChild(NewListing);
+
+				/* Place the new widget into the correct grid position. */
+				if (UUniformGridSlot* NewListingSlot = Cast<UUniformGridSlot>(NewListing->Slot))
+				{
+					const int CardIndex = PieceListingGrid->GetChildrenCount() - 1;
+					const int Row = CardIndex / 5;
+					const int Column = CardIndex % 5;
+
+					NewListingSlot->SetRow(Row);
+					NewListingSlot->SetColumn(Column);
+				}
+			}
+		}
+	}
+}
+
+void UMM_CollectionMenuWidget::NativeDestruct()
+{
+	/* Remove all of the piece listings when destroying this widget. */
+	PieceListingGrid->ClearChildren();
+
+	Super::NativeDestruct();
 }
 
 void UMM_CollectionMenuWidget::OnDeactivatedAnimEnd()

@@ -75,11 +75,13 @@ struct FPieceDataStruct : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Code")
 	TSubclassOf<class AParentPiece> ClassRef = nullptr;
 
-	/* The photo used on a piece's card when placing pieces before a match. */
+	/* The photo used when this piece appears as a card. This is used when placing pieces before a match or when listing
+	 * the pieces in the collection menu. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Photos")
 	UTexture2D* PieceCardPortrait = nullptr;
 
-	/* The photo displayed when a piece is viewed in a match. */
+	/* The photo used when this piece appears in an informational context. This is used when a piece's info is viewed in
+	 * a match or in the collection menu. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Photos")
 	UTexture2D* PieceInfoPhoto = nullptr;
 

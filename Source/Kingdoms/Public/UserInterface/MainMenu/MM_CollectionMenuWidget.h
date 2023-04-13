@@ -9,6 +9,11 @@
 #include "MM_CollectionMenuWidget.generated.h"
 
 class UButton;
+class UUniformGridPanel;
+
+class UDataTable;
+
+class UPieceCollectionListing;
 
 /**
  * 
@@ -32,6 +37,9 @@ protected:
 	/* Called when this widget is created. */
 	virtual void NativeConstruct() override;
 
+	/* Called when this widget is destroyed to clear its children. */
+	virtual void NativeDestruct() override;
+
 	/* Called when the deactivation animation finishes playing to destroy this widget. */
 	UFUNCTION()
 	void OnDeactivatedAnimEnd();
@@ -42,8 +50,24 @@ protected:
 	void OnBackClicked();
 
 
+/* Protected variables. */
+protected:
+
+	/* The game's standard piece data table. */
+	UPROPERTY(EditDefaultsOnly, Category="Piece Listings")
+	UDataTable* PieceDataTable;
+
+	/* The piece listing widget to spawn. */
+	UPROPERTY(EditDefaultsOnly, Category="Piece Listings")
+	TSubclassOf<UPieceCollectionListing> PieceListingClass;
+
+
 /* Protected widgets. */
 protected:
+
+	/* Contains the list of pieces. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UUniformGridPanel* PieceListingGrid;
 
 	/* Returns the user to the main menu. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
