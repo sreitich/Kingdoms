@@ -11,8 +11,10 @@
 #include "Interfaces/OnlineExternalUIInterface.h"
 #include "Interfaces/OnlineFriendsInterface.h"
 #include "Kismet/GameplayStatics.h"
-#include "UserInterface/MainMenu/MM_HUD.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "steam/steam_api.h"
+#include "SteamCore/SteamUtilities.h"
+#include "UserInterface/MainMenu/MM_HUD.h"
 
 /* We are always going to be retrieving the default friends list. */
 #define DEFAULT_FRIENDS_LIST EFriendsLists::ToString(EFriendsLists::Default)
@@ -25,6 +27,10 @@ UKingdomsGameInstance::UKingdomsGameInstance()
 	OnSendInviteCompleteDelegate.BindUObject(this, &UKingdomsGameInstance::OnSendInviteComplete);
 	/* Bind OnAcceptInviteComplete to be called when the OnAcceptInviteCompleteDelegate delegate fires. */
 	OnAcceptInviteCompleteDelegate.BindUObject(this, &UKingdomsGameInstance::OnAcceptInviteComplete);
+}
+
+bool UKingdomsGameInstance::UploadSaveGameToSteam(FString SaveGameSlotName, USaveGame* SaveGameToUpload)
+{
 }
 
 void UKingdomsGameInstance::CreatePublicServer()
@@ -214,37 +220,47 @@ void UKingdomsGameInstance::Init()
 		}
 	}
 
-	/* If a save slot exists for unlocked pieces... */
-	if (UnlockedPieces_SaveGame && UGameplayStatics::DoesSaveGameExist(UnlockedPieces_SaveGame->SaveSlotName,
-	                                                                   UnlockedPieces_SaveGame->UserIndex))
-	{
-		/* Load the save slot into the save game object. */
-		UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(
-			UGameplayStatics::LoadGameFromSlot(UnlockedPieces_SaveGame->SaveSlotName,
-			                                   UnlockedPieces_SaveGame->UserIndex));
-	}
-	/* If a save slot hasn't yet been created for unlocked pieces... */
-	else
-	{
-		/* Create a new save slot and load it into the save game object. */
-		UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(
-			UGameplayStatics::CreateSaveGameObject(UUnlockedPieces_SaveGame::StaticClass()));
-	}
 
-	/* If a save slot exists for army presets... */
-	if (ArmyPresets_SaveGame && UGameplayStatics::DoesSaveGameExist(ArmyPresets_SaveGame->SaveSlotName,
-	                                                                ArmyPresets_SaveGame->UserIndex))
+	/* If there is an unlocked pieces save game file on the Steam cloud, load it.  */
+
+	/* Retrieve the Steam remote storage interface accessor. */
+	SteamRemoteStorageInterface = SteamRemoteStorage();
+
+	/* Dynamically get this save game's file name. */
+	const char* UnlockedPiecesSaveFileName = TCHAR_TO_UTF8(*(UUnlockedPieces_SaveGame::GetSaveSlotName() + ".sav"));
+
+	/* Check if the file exists on the Steam cloud. */
+	if (SteamRemoteStorageInterface->FileExists(UnlockedPiecesSaveFileName))
 	{
-		/* Load the save slot into the save game object. */
-		ArmyPresets_SaveGame = Cast<UArmyPresets_SaveGame>(
-			UGameplayStatics::LoadGameFromSlot(ArmyPresets_SaveGame->SaveSlotName, ArmyPresets_SaveGame->UserIndex));
+		/* Create a buffer to load the data into using the file's size. */
+		const int32 FileSize = SteamRemoteStorageInterface->GetFileSize(UnlockedPiecesSaveFileName);
+		uint8 FileDataBuffer[FileSize];
+
+		/* Load the file's data into the buffer. */
+		if (SteamRemoteStorageInterface->FileRead(UnlockedPiecesSaveFileName, FileDataBuffer, FileSize))
+		{
+			/* Get the local path of the save file to write the Steam cloud data into. */
+			const FString FilePath = UKismetSystemLibrary::GetProjectSavedDirectory() + "SaveGames/" + UnlockedPiecesSaveFileName;
+
+			/* Convert the buffer's data into a TArray to use WriteBytesToFile. */
+			TArray<uint8> FileDataArr;
+			FileDataArr.Append(FileDataBuffer, FileSize);
+
+			/* Write the Steam cloud data into the local save file. */
+			const bool bWriteSuccessful = USteamUtilities::WriteBytesToFile(true, FilePath, FileDataArr);
+
+			/* If the file was written successfully and a save game file exists, load it. */
+			if (bWriteSuccessful && UGameplayStatics::DoesSaveGameExist(UUnlockedPieces_SaveGame::GetSaveSlotName(), 0))
+			{
+				UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(UGameplayStatics::LoadGameFromSlot(UUnlockedPieces_SaveGame::GetSaveSlotName(), 0));
+			}
+		}
 	}
-	/* If a save slot hasn't yet been created for army presets... */
+	/* If the save game file does not exist on the Steam cloud, it hasn't been uploaded yet. Try to get and upload the
+	 * local save game file if it exists. If not, create one and upload it. */
 	else
 	{
-		/* Create a new save slot and load it into the save game object. */
-		ArmyPresets_SaveGame = Cast<UArmyPresets_SaveGame>(
-			UGameplayStatics::CreateSaveGameObject(UArmyPresets_SaveGame::StaticClass()));
+		
 	}
 }
 

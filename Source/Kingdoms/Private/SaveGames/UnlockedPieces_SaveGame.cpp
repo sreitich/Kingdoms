@@ -5,15 +5,6 @@
 
 UUnlockedPieces_SaveGame::UUnlockedPieces_SaveGame()
 {
-	/* These variables are used to store and load this save. */
-	SaveSlotName = TEXT("UnlockedPiecesSaveSlot");
-	UserIndex = 0;
-	
-	/* Parent piece. */
-	UnlockedPieces.Add(TEXT("0-00"));
-	/* Play-testing mage. */
-	UnlockedPieces.Add(TEXT("0-01"));
-	/* Play-testing paladin. */
-	UnlockedPieces.Add(TEXT("0-02"));
-	
+	/* The knight, guardian, pyromancer, assassin, and king are the starting pieces. */
+	UnlockedPieces = { "S-01", "P-01", "M-01", "R-01", "C-01" };
 }

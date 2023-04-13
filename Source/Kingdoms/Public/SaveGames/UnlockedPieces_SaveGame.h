@@ -19,21 +19,24 @@ public:
 
 	/* Default constructor. */
 	UUnlockedPieces_SaveGame();
-	
 
-/* Public variables. */
+	/* Getter for this save game's slot name. */
+	UFUNCTION(BlueprintPure, Category="Unlocked Pieces")
+	static FString GetSaveSlotName() { return SaveSlotName; }
+
+
+/* Public variables. */	
 public:
 
-    /* Info used when storing and loading this save. */
-    UPROPERTY(VisibleAnywhere, Category="Save File Info")
-    FString SaveSlotName;
- 
-    UPROPERTY(VisibleAnywhere, Category="Save File Info")
-	int UserIndex;
-    
-
 	/* Array containing the IDs of each piece that this player has unlocked. */
-	UPROPERTY(VisibleAnywhere, Category="Unlocked Pieces")
+	UPROPERTY(BlueprintReadWrite, Category="Unlocked Pieces")
 	TArray<FString> UnlockedPieces;
-	
+
+
+/* Private variables. */
+private:
+
+	/* Info used when storing and loading this save. */
+	const static FString SaveSlotName = TEXT("UnlockedPiecesSaveSlot");;
+
 };

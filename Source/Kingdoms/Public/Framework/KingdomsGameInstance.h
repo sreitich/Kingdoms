@@ -26,6 +26,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInvitationAcceptedDelegate, FSteamF
 /* Called when the online friends interface finishes an attempt to reject a game invitation from another player. */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInvitationRejectedDelegate, FSteamFriend /* The player who sent the invitation. */, InviteSender);
 
+class UArmyPresets_SaveGame;
+class UUnlockedPieces_SaveGame;
+class USaveGame;
+
 UCLASS()
 class KINGDOMS_API UKingdomsGameInstance : public UGameInstance
 {
@@ -36,6 +40,11 @@ public:
 
 	/* Default constructor. */
 	UKingdomsGameInstance();
+
+	/* Uploads the given save game to the Steam cloud. SaveGameSlotName is the name of the save game's local slot,
+	 * not the file name/path. */
+	UFUNCTION(BlueprintCallable)
+	bool UploadSaveGameToSteam(FString SaveGameSlotName, USaveGame* SaveGameToUpload);
 
 	/* Creates a new public session that anyone can join via matchmaking. */
 	UFUNCTION()
@@ -77,11 +86,11 @@ public:
 public:
 
 	/* References to save game objects to use when saving and loading. */
-	UPROPERTY()
-	class UUnlockedPieces_SaveGame* UnlockedPieces_SaveGame;
+	UPROPERTY(BlueprintReadWrite, Category = "Save Games")
+	UUnlockedPieces_SaveGame* UnlockedPieces_SaveGame;
 
-	UPROPERTY()
-	class UArmyPresets_SaveGame* ArmyPresets_SaveGame;
+	UPROPERTY(BlueprintReadWrite, Category = "Save Games")
+	UArmyPresets_SaveGame* ArmyPresets_SaveGame;
 
 
 /* Protected functions. */
@@ -137,6 +146,9 @@ protected:
 
 	/* Persistent pointer to the local friends interface accessor. */
 	IOnlineFriendsPtr FriendsInterface;
+
+	/* Persistent pointer to the Steam remote storage interface accessor. */
+	ISteamRemoteStorage* SteamRemoteStorageInterface;
 
 	/* The name of the session that this player is currently in, if they are in one. */
 	FName CurrentSessionName;
