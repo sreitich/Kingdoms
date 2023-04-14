@@ -22,7 +22,7 @@ public:
 
 	/* Getter for this save game's slot name. */
 	UFUNCTION(BlueprintPure, Category="Unlocked Pieces")
-	static FString GetSaveSlotName() { return SaveSlotName; }
+	static FString GetSaveSlotName();
 
 
 /* Public variables. */	
@@ -37,6 +37,6 @@ public:
 private:
 
 	/* Info used when storing and loading this save. */
-	const static FString SaveSlotName = TEXT("UnlockedPiecesSaveSlot");;
+	static const FString SaveSlotName;
 
 };

@@ -41,10 +41,9 @@ public:
 	/* Default constructor. */
 	UKingdomsGameInstance();
 
-	/* Uploads the given save game to the Steam cloud. SaveGameSlotName is the name of the save game's local slot,
-	 * not the file name/path. */
+	/* Uploads the given save game slot to the Steam cloud. Returns false if the given save game is empty. */
 	UFUNCTION(BlueprintCallable)
-	bool UploadSaveGameToSteam(FString SaveGameSlotName, USaveGame* SaveGameToUpload);
+	bool UploadSaveGameToSteam(FString SaveGameSlotName);
 
 	/* Creates a new public session that anyone can join via matchmaking. */
 	UFUNCTION()
