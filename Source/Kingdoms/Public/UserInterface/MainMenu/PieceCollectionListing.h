@@ -32,7 +32,7 @@ public:
 protected:
 
 	/* The name of the piece that this widget represents. */
-	UPROPERTY(VisibleAnywhere, Category="Piece Data")
+	UPROPERTY(BlueprintReadOnly, Category="Piece Data")
 	FString RepresentedPieceName;
 
 

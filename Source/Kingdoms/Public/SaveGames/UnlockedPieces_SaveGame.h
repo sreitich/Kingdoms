@@ -22,19 +22,28 @@ public:
 
 	/* Getter for this save game's slot name. */
 	UFUNCTION(BlueprintPure, Category="Unlocked Pieces")
-	static FString GetSaveSlotName();
+	static FString GetUnlockedPiecesSaveSlotName();
 
 
-/* Public variables. */	
-public:
+	/* Getter for UnlockedPieces array. */
+	UFUNCTION(BlueprintPure, Category="Unlocked Pieces")
+	TArray<FString> GetUnlockedPieces() const { return UnlockedPieces; }
 
-	/* Array containing the IDs of each piece that this player has unlocked. */
-	UPROPERTY(BlueprintReadWrite, Category="Unlocked Pieces")
-	TArray<FString> UnlockedPieces;
+	/* Adds the given ID to the array of unlocked pieces, if it isn't already there. */
+	UFUNCTION(BlueprintCallable, Category="Unlocked Pieces")
+	void UnlockPiece(FString PieceIDToUnlock);
+
+	/* Removes the given ID from the array of unlocked pieces, if it's there. */
+	UFUNCTION(BlueprintCallable, Category="Unlocked Pieces")
+	void LockPiece(FString PieceIDToLock);
 
 
 /* Private variables. */
 private:
+
+	/* Array containing the IDs of each piece that this player has unlocked. */
+	UPROPERTY()
+	TArray<FString> UnlockedPieces;
 
 	/* Info used when storing and loading this save. */
 	static const FString SaveSlotName;

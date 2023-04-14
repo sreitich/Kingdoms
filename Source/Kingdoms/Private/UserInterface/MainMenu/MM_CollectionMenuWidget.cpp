@@ -3,6 +3,7 @@
 
 #include "UserInterface/MainMenu/MM_CollectionMenuWidget.h"
 
+#include "SaveGames/UnlockedPieces_SaveGame.h"
 #include "UserDefinedData/Match_UserDefinedData.h"
 #include "UserInterface/MainMenu/MM_HUD.h"
 #include "UserInterface/MainMenu/PieceCollectionListing.h"
@@ -11,6 +12,7 @@
 #include "Components/UniformGridPanel.h"
 #include "Components/UniformGridSlot.h"
 #include "Engine/DataTable.h"
+#include "Kismet/GameplayStatics.h"
 
 void UMM_CollectionMenuWidget::DeactivateWidget()
 {
@@ -21,6 +23,19 @@ void UMM_CollectionMenuWidget::DeactivateWidget()
 void UMM_CollectionMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+
+	/* Load the save game for unlocked pieces to display which pieces the player has unlocked. */
+	UUnlockedPieces_SaveGame* UnlockedPiecesSave = nullptr;
+	if (UGameplayStatics::DoesSaveGameExist(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName(), 0))
+	{
+		UnlockedPiecesSave = Cast<UUnlockedPieces_SaveGame>(UGameplayStatics::LoadGameFromSlot(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName(), 0));
+	}
+	else
+	{
+		/* TODO: Display a "problem retrieving pieces" error message. */
+	}
+
 
 	/* Bind the "back" button to deactivate this widget. */
 	BackButton->OnClicked.AddDynamic(this, &UMM_CollectionMenuWidget::OnBackClicked);
@@ -33,8 +48,8 @@ void UMM_CollectionMenuWidget::NativeConstruct()
 	AnimBinding.BindDynamic(this, &UMM_CollectionMenuWidget::OnDeactivatedAnimEnd);
 	BindToAnimationFinished(OnDeactivatedAnim, AnimBinding);
 
-	/* Ensure the piece data table has been set. */
-	if (PieceDataTable)
+	/* Ensure the unlocked pieces save game was loaded and that the piece data table has been set. */
+	if (IsValid(UnlockedPiecesSave) && PieceDataTable)
 	{
 		/* Iterate through every listing (i.e. every piece) and add a piece listing widget for it. */
 		for (const FName PieceID : PieceDataTable->GetRowNames())
@@ -48,7 +63,7 @@ void UMM_CollectionMenuWidget::NativeConstruct()
 			{
 				/* Create a new piece listing widget, update its represented piece, and add it to the grid. */
 				UPieceCollectionListing* NewListing = CreateWidget<UPieceCollectionListing>(GetOwningPlayer(), PieceListingClass, FName(*(PieceData->PieceName + " Piece Listing")));
-				NewListing->UpdatePieceCollectionListing(*PieceData, FMath::RandBool());
+				NewListing->UpdatePieceCollectionListing(*PieceData, UnlockedPiecesSave->GetUnlockedPieces().Contains(PieceID.ToString()));
 				PieceListingGrid->AddChild(NewListing);
 
 				/* Place the new widget into the correct grid position. */

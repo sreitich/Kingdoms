@@ -249,7 +249,7 @@ void UKingdomsGameInstance::Init()
 	if (SteamRemoteStorageInterface)
 	{
 		/* Dynamically get this save game's file name. */
-		const char* UnlockedPiecesSaveFileName = TCHAR_TO_UTF8(*(UUnlockedPieces_SaveGame::GetSaveSlotName() + ".sav"));
+		const char* UnlockedPiecesSaveFileName = TCHAR_TO_UTF8(*(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName() + ".sav"));
 
 		/* Check if the file exists on the Steam cloud. */
 		if (SteamRemoteStorageInterface->FileExists(UnlockedPiecesSaveFileName))
@@ -272,9 +272,9 @@ void UKingdomsGameInstance::Init()
 				const bool bWriteSuccessful = USteamUtilities::WriteBytesToFile(true, FilePath, FileDataArr);
 
 				/* If the file was written successfully and a save game file exists, load it. */
-				if (bWriteSuccessful && UGameplayStatics::DoesSaveGameExist(UUnlockedPieces_SaveGame::GetSaveSlotName(), 0))
+				if (bWriteSuccessful && UGameplayStatics::DoesSaveGameExist(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName(), 0))
 				{
-					UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(UGameplayStatics::LoadGameFromSlot(UUnlockedPieces_SaveGame::GetSaveSlotName(), 0));
+					UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(UGameplayStatics::LoadGameFromSlot(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName(), 0));
 				}
 			}
 		}
@@ -283,15 +283,15 @@ void UKingdomsGameInstance::Init()
 		else
 		{
 			/* If the save slot exists, try to get it and upload it to the Steam cloud. */
-			if (UGameplayStatics::DoesSaveGameExist(UUnlockedPieces_SaveGame::GetSaveSlotName(), 0))
+			if (UGameplayStatics::DoesSaveGameExist(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName(), 0))
 			{
 				/* Load the save game. */
-				UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(UGameplayStatics::LoadGameFromSlot(UUnlockedPieces_SaveGame::GetSaveSlotName(), 0));
+				UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(UGameplayStatics::LoadGameFromSlot(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName(), 0));
 
 				/* Upload the save game to the Steam cloud. */
 				if (UnlockedPieces_SaveGame)
 				{
-					UploadSaveGameToSteam(UUnlockedPieces_SaveGame::GetSaveSlotName());
+					UploadSaveGameToSteam(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName());
 				}
 			}
 			/* If a save slot does not exist, it hasn't been created locally either. Create it, save it, and upload it to the Steam cloud. */
@@ -303,9 +303,9 @@ void UKingdomsGameInstance::Init()
 				/* Save the save game locally and upload it to the Steam cloud. */
 				if (UnlockedPieces_SaveGame)
 				{
-					UGameplayStatics::SaveGameToSlot(UnlockedPieces_SaveGame, UUnlockedPieces_SaveGame::GetSaveSlotName(), 0);
+					UGameplayStatics::SaveGameToSlot(UnlockedPieces_SaveGame, UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName(), 0);
 
-					UploadSaveGameToSteam(UUnlockedPieces_SaveGame::GetSaveSlotName());
+					UploadSaveGameToSteam(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName());
 				}
 			}
 		}
