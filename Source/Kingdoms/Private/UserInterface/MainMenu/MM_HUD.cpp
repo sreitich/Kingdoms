@@ -278,6 +278,10 @@ void AMM_HUD::CreateCollectionMenu(bool bDestroy)
 	}
 }
 
+void AMM_HUD::CreateCollectionPieceInfoPopUp(bool bDestroy)
+{
+}
+
 void AMM_HUD::CreateStoreWidget(bool bDestroy)
 {
 	/* Create a store widget if requested. */

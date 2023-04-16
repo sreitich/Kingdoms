@@ -75,6 +75,11 @@ public:
 			UFUNCTION(Category="Main Menu Widgets")
 			void CreateCollectionMenu(bool bDestroy);
 
+				/* Greys out or reveals the collection menu and creates or destroys a piece information pop-up info in
+				 * the collection menu. */
+				UFUNCTION(Category="Main Menu Widgets")
+				void CreateCollectionPieceInfoPopUp(bool bDestroy);
+
 		/* Creates or destroys the store widget. */
 		UFUNCTION(Category="Main Menu Widgets")
 		void CreateStoreWidget(bool bDestroy);

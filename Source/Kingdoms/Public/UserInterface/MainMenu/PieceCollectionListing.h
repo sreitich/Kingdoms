@@ -28,12 +28,22 @@ public:
 	void UpdatePieceCollectionListing(FPieceDataStruct NewPieceData, bool bOwned);
 
 
+/* Protected functions. */
+protected:
+
+	/* Default constructor. */
+	void NativeConstruct() override;
+
+	/* Calls the HUD to create a pop-up with this piece's information. */
+	void CreateCollectionPieceInfoPopUp();
+
+
 /* Protected variables. */
 protected:
 
-	/* The name of the piece that this widget represents. */
+	/* The data of the piece that this widget represents. */
 	UPROPERTY(BlueprintReadOnly, Category="Piece Data")
-	FString RepresentedPieceName;
+	FPieceDataStruct RepresentedPieceData;
 
 
 /* Protected widgets. */
