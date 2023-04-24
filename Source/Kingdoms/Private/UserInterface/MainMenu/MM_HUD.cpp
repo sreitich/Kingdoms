@@ -7,6 +7,7 @@
 #include "UserDefinedData/Menu_UserDefinedData.h"
 #include "UserInterface/MainMenu/MM_ArmyMenuWidget.h"
 #include "UserInterface/MainMenu/MM_CollectionMenuWidget.h"
+#include "UserInterface/MainMenu/MM_CollectionInfoPopUpWidget.h"
 #include "UserInterface/MainMenu/MM_LobbyMenuWidget.h"
 #include "UserInterface/MainMenu/MM_MainMenuWidget.h"
 #include "UserInterface/MainMenu/MM_MapSelectionWidget.h"
@@ -278,8 +279,38 @@ void AMM_HUD::CreateCollectionMenu(bool bDestroy)
 	}
 }
 
-void AMM_HUD::CreateCollectionPieceInfoPopUp(bool bDestroy)
+void AMM_HUD::CreateCollectionPieceInfoPopUp(bool bDestroy, FPieceDataStruct NewPieceData)
 {
+	/* Create a collection piece info widget if requested. */
+	if (!bDestroy)
+	{
+		if (CollectionInfoPopUpWidgetClass)
+		{
+			/* Create the widget. */
+			CollectionInfoPopUpWidget = CreateWidget<UMM_CollectionInfoPopUpWidget>(GetOwningPlayerController(), CollectionInfoPopUpWidgetClass, FName("Collection Piece Info Pop Up Widget"));
+
+			/* Update the collection piece info widget's displayed information and add it to the player's viewport if it was successfully created. */
+			if (IsValid(CollectionInfoPopUpWidget))
+			{
+				CollectionInfoPopUpWidget->UpdateAndActivatePopUp(NewPieceData);
+				CollectionInfoPopUpWidget->AddToViewport(1);
+			}
+			/* If there was a problem creating the widget, return to the main menu. */
+			else
+			{
+				QueueMenuChange(E_MainMenu);
+			}
+		}
+	}
+	/* Destroy the collection piece info widget if requested. */
+	else
+	{
+		if (IsValid(CollectionInfoPopUpWidget))
+		{
+			CollectionInfoPopUpWidget->RemoveFromParent();
+			CollectionInfoPopUpWidget = nullptr;
+		}
+	}
 }
 
 void AMM_HUD::CreateStoreWidget(bool bDestroy)

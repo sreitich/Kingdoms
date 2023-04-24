@@ -9,6 +9,7 @@
 
 #include "Components/TextBlock.h"
 #include "UserInterface/MainMenu/MM_CollectionInfoPopUpWidget.h"
+#include "UserInterface/MainMenu/MM_HUD.h"
 
 void UPieceCollectionListing::UpdatePieceCollectionListing(FPieceDataStruct NewPieceData, bool bOwned)
 {
@@ -39,5 +40,6 @@ void UPieceCollectionListing::NativeConstruct()
 
 void UPieceCollectionListing::CreateCollectionPieceInfoPopUp()
 {
-
+	// Create a collection piece info pop-up of the piece that this widget represents.
+	GetOwningPlayer()->GetHUD<AMM_HUD>()->CreateCollectionPieceInfoPopUp(false, RepresentedPieceData);
 }

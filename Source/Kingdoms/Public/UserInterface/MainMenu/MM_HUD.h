@@ -4,6 +4,7 @@
 
 #include "BlueprintFunctionLibraries/SteamFriendsFunctionLibrary.h"
 #include "UserDefinedData/Menu_UserDefinedData.h"
+#include "UserDefinedData/Match_UserDefinedData.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
@@ -12,6 +13,7 @@
 class UGetSteamFriendsCallProxyBase;
 class UMM_ArmyMenuWidget;
 class UMM_CollectionMenuWidget;
+class UMM_CollectionInfoPopUpWidget;
 class UMM_FriendInvitationPopUp;
 class UMM_LobbyMenuWidget;
 class UMM_MainMenuWidget;
@@ -75,10 +77,10 @@ public:
 			UFUNCTION(Category="Main Menu Widgets")
 			void CreateCollectionMenu(bool bDestroy);
 
-				/* Greys out or reveals the collection menu and creates or destroys a piece information pop-up info in
-				 * the collection menu. */
+				/* Greys out or reveals the collection menu, creates or destroys a piece information pop-up info in
+				 * the collection menu, and updates the pop-up info with the given piece data. */
 				UFUNCTION(Category="Main Menu Widgets")
-				void CreateCollectionPieceInfoPopUp(bool bDestroy);
+				void CreateCollectionPieceInfoPopUp(bool bDestroy, FPieceDataStruct NewPieceData);
 
 		/* Creates or destroys the store widget. */
 		UFUNCTION(Category="Main Menu Widgets")
@@ -135,6 +137,9 @@ protected:
 	UMM_CollectionMenuWidget* CollectionMenuWidget;
 
 	UPROPERTY()
+	UMM_CollectionInfoPopUpWidget* CollectionInfoPopUpWidget;
+
+	UPROPERTY()
 	UMM_LobbyMenuWidget* LobbyMenuWidget;
 
 	UPROPERTY()
@@ -167,6 +172,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
 	TSubclassOf<UUserWidget> CollectionMenuWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
+	TSubclassOf<UUserWidget> CollectionInfoPopUpWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget Class Types")
 	TSubclassOf<UUserWidget> LobbyMenuWidgetClass;

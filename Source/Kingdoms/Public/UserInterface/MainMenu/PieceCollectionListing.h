@@ -32,9 +32,10 @@ public:
 protected:
 
 	/* Default constructor. */
-	void NativeConstruct() override;
+	virtual void NativeConstruct() override;
 
 	/* Calls the HUD to create a pop-up with this piece's information. */
+	UFUNCTION()
 	void CreateCollectionPieceInfoPopUp();
 
 
