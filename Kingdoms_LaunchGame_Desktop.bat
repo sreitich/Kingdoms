@@ -1,1 +1,1 @@
-"C:\Game Development\UE Source\UE-4.27\Engine\Binaries\Win64\UE4Editor.exe" "C:\Game Development\UE Projects\Kingdoms\Kingdoms\Kingdoms.uproject" -game -ResX=960 -ResY=540 -WinX=0 -WinY=20 -log
+"C:\Game Development\UE Source\UE-4.27\Engine\Binaries\Win64\UE4Editor.exe" "C:\Game Development\Projects\Change Studios\Order\Kingdoms\Kingdoms.uproject" -game -ResX=960 -ResY=540 -WinX=0 -WinY=20 -log

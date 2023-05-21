@@ -24,7 +24,7 @@ void UMatch_PyroActiveConfirmation::DestroyWidget(bool bReset)
 	{
 		for (ABoardTile* Tile : PendingFriendlyPiece->GetActiveAbilityRange())
 		{
-			Tile->UpdateEmissiveHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
+			Tile->UpdateHighlight(false, Tile->DefaultHighlightPlayRate, Tile->EmissiveHighlight->GetLightColor());
 		}
 	}
 

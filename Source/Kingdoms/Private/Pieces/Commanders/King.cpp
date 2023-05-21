@@ -61,7 +61,7 @@ void AKing::OnActiveClicked()
 
 			/* Highlight each tile. */
 			ABoardTile* Tile = Piece->GetCurrentTile();
-			Tile->UpdateEmissiveHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_Friendly);
+			Tile->UpdateHighlight(true, Tile->DefaultHighlightPlayRate, Tile->Highlight_Friendly);
 		}
 	}
 

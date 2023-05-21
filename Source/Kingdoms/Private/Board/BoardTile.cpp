@@ -34,6 +34,10 @@ ABoardTile::ABoardTile()
 	Checker->SetupAttachment(Body);
 	Checker->SetIsReplicated(false);
 
+	TileMarker = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMarker"));
+	TileMarker->SetupAttachment(Body);
+	TileMarker->SetIsReplicated(false);
+
 	Highlight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Highlight"));
 	Highlight->SetupAttachment(Body);
 	Highlight->SetIsReplicated(false);
@@ -82,6 +86,10 @@ void ABoardTile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/* Create a dynamic material for the highlight mesh, allowing the material's parameters to be changed during runtime. */
+	HighlightMaterial = UMaterialInstanceDynamic::Create(Highlight->GetMaterial(0), this);
+	Highlight->SetMaterial(0, HighlightMaterial);
+
 	/* Create a dynamic material for the reticle mesh, allowing the material's parameters to be changed during runtime. */
 	ReticleMaterial = UMaterialInstanceDynamic::Create(Reticle->GetMaterial(0), this);
 	Reticle->SetMaterial(0, ReticleMaterial);
@@ -108,6 +116,11 @@ void ABoardTile::OnBeginCursorOver(UPrimitiveComponent* Component)
 	{
 		if (const AMatch_PlayerState* LocalPlayerState = Cast<AMatch_PlayerState>(UGameplayStatics::GetPlayerPawn(this, 0)->GetPlayerState()))
 		{
+			/* Get whether the highlight is currently visible or not. */
+			float Brightness;
+			HighlightMaterial->GetScalarParameterValue(FHashedMaterialParameterInfo(NameToScriptName(FName("Brightness"))), Brightness);
+			const bool bVisible = Brightness > 0.0f;
+			
 			switch (LocalPlayerState->GetCurrentPlayerStatus())
 			{
 
@@ -131,14 +144,14 @@ void ABoardTile::OnBeginCursorOver(UPrimitiveComponent* Component)
 			/* When the player is selecting a movement destination, display a green reticle when hovering over a valid
 			 * destination and a yellow reticle over all other tiles. */
 			case E_SelectingTarget_Move:
-				/* This tile is only valid if its emissive highlight is currently visible. */
-				UpdateReticle(true, !EmissiveHighlight->IsVisible());
+				/* This tile is only valid if its highlight is currently visible. */
+				UpdateReticle(true, !bVisible);
 
 			/* When a player is selecting a target for an active ability, display a green reticle when hovering over a
 			 * valid target tile or piece and a yellow reticle over all other tiles. */
 			case E_SelectingTarget_ActiveAbility:
-				/* This tile is only valid if its emissive highlight is currently visible. */
-				UpdateReticle(true, !EmissiveHighlight->IsVisible());
+				/* This tile is only valid if its highlight is currently visible. */
+				UpdateReticle(true, !bVisible);
 
 			/* If the player is in any other state, don't display a reticle. */
 			default:
@@ -165,23 +178,26 @@ void ABoardTile::HighlightTarget(bool bTargetedByFriendly)
 	{
 		/* If this tile is being targeted by a friendly piece, then highlight the tile relative to the local player. */
 		if (bTargetedByFriendly)
-			UpdateEmissiveHighlight(true, DefaultHighlightPlayRate, GetOccupyingPiece()->GetLocalAlignment() == E_Friendly ? Highlight_Friendly : Highlight_Enemy);
+			UpdateHighlight(true, DefaultHighlightPlayRate, GetOccupyingPiece()->GetLocalAlignment() == E_Friendly ? Highlight_Friendly : Highlight_Enemy);
 		/* If this tile is being targeted by an enemy piece, then highlight the tile relative to the local player's
 		 * opponent. */
 		else
-			UpdateEmissiveHighlight(true, DefaultHighlightPlayRate, GetOccupyingPiece()->GetLocalAlignment() == E_Hostile ? Highlight_Friendly : Highlight_Enemy);
+			UpdateHighlight(true, DefaultHighlightPlayRate, GetOccupyingPiece()->GetLocalAlignment() == E_Hostile ? Highlight_Friendly : Highlight_Enemy);
 	}
 	/* If this tile is empty, highlight it as unoccupied. */
 	else
 	{
-		UpdateEmissiveHighlight(true, DefaultHighlightPlayRate, Highlight_ValidUnoccupiedTile);
+		UpdateHighlight(true, DefaultHighlightPlayRate, Highlight_ValidUnoccupiedTile);
 	}
 }
 
 void ABoardTile::RemoveTargetHighlight()
 {
 	/* Hide this tile's highlight. */
-	UpdateEmissiveHighlight(false, DefaultHighlightPlayRate, EmissiveHighlight->GetLightColor());
+	FLinearColor Color;
+	const FHashedMaterialParameterInfo Info = FHashedMaterialParameterInfo(NameToScriptName(FName("Color")));
+	HighlightMaterial->GetVectorParameterValue(Info, Color);
+	UpdateHighlight(false, DefaultHighlightPlayRate, Color);
 }
 
 void ABoardTile::UpdateReticle(bool bReveal, bool bYellow)

@@ -65,7 +65,7 @@ public:
 
 	/* Enables/disables the emissive highlight, interpolating its brightness to glow the given color. */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category="Board Tile")
-	void UpdateEmissiveHighlight(bool bReveal, float PlayRate, FLinearColor Color);
+	void UpdateHighlight(bool bReveal, float PlayRate, FLinearColor Color);
 
 	/* Returns whether or not this tile is laterally (or diagonally) adjacent to the given tile. */
 	UFUNCTION(BlueprintPure, Category="Board Tile")
@@ -128,11 +128,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* Test;
 
-	/* A monochromatic plane covering the tile to give the board a checkered appearance. */
+	/* DEPRECATED: A monochromatic plane covering the tile to give the board a checkered appearance. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* Checker;
 
 	/* Crosshairs differentiating each tile. */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
+	UStaticMeshComponent* TileMarker;
+
+	/* Emissive highlight indicating the state of the tile. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* Highlight;
 
@@ -140,7 +144,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* Reticle;
 
-	/* The emissive highlight that indicates the occupied piece and valid tiles when moving or attacking. */
+	/* DEPRECATED: The emissive highlight that indicates the occupied piece and valid tiles when moving or attacking. */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	URectLightComponent* EmissiveHighlight;
 
@@ -178,6 +182,10 @@ protected:
 	/* Pointer to the piece currently on this tile. */
 	UPROPERTY(Replicated, VisibleAnywhere, Category="Board Tile")
 	AParentPiece* OccupyingPiece;
+
+	/* This is the highlight mesh's material, used to change the material's parameters at runtime (i.e. the color and brightness). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Board Tile")
+	UMaterialInstanceDynamic* HighlightMaterial;
 
 	/* This is the reticle mesh's material, used to change the material's parameters at runtime (usually the reticle color). */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Board Tile")

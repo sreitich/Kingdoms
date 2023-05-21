@@ -178,6 +178,6 @@ void UMatch_Modifier::HighlightSource(bool bRemoveHighlight) const
 	/* If the actor responsible for this modifier is a tile, highlight it or remove the highlight. */
 	else if (ABoardTile* SourceTile = Cast<ABoardTile>(ModifierInfo.SourceActor))
 	{
-		SourceTile->UpdateEmissiveHighlight(!bRemoveHighlight, 1.0f, SourceTile->Highlight_ValidUnoccupiedTile);
+		SourceTile->UpdateHighlight(!bRemoveHighlight, 1.0f, SourceTile->Highlight_ValidUnoccupiedTile);
 	}
 }

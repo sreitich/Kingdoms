@@ -608,7 +608,7 @@ void UMatch_PieceInfoWidget::OnActiveHovered()
         /* Highlight invalid targets within range with an invalid highlight. */
         else
         {
-            TileInRange->UpdateEmissiveHighlight(true, TileInRange->DefaultHighlightPlayRate, TileInRange->Highlight_InvalidTile);
+            TileInRange->UpdateHighlight(true, TileInRange->DefaultHighlightPlayRate, TileInRange->Highlight_InvalidTile);
         }
     }
 }
@@ -645,7 +645,7 @@ void UMatch_PieceInfoWidget::OnPassiveHovered()
         /* Highlight invalid targets within range with an invalid highlight. */
         else
         {
-            TileInRange->UpdateEmissiveHighlight(true, TileInRange->DefaultHighlightPlayRate, TileInRange->Highlight_InvalidTile);
+            TileInRange->UpdateHighlight(true, TileInRange->DefaultHighlightPlayRate, TileInRange->Highlight_InvalidTile);
         }
     }
 }
