@@ -3,12 +3,10 @@
 
 #include "SaveGames/ArmyPresets_SaveGame.h"
 
+const FString UArmyPresets_SaveGame::SaveSlotName = "ArmyPresetsSaveSlot";
+
 UArmyPresets_SaveGame::UArmyPresets_SaveGame()
 {
-	/* These variables are used to store and load this save. */
-	SaveSlotName = TEXT("ArmyPresetsSaveSlot");
-	UserIndex = 0;
-
 	/* Initialize five empty army presets. */
 	ArmyPresets.Init(FArmyPresetStruct(), 5);
 	
@@ -39,4 +37,14 @@ UArmyPresets_SaveGame::UArmyPresets_SaveGame()
 	ArmyPresets[2].Pieces.Add(TEXT("P-01"));
 	// ArmyPresets[2].Pieces.Add(TEXT("R-01"));
 	ArmyPresets[2].Pieces.Add(TEXT("C-01"));
+}
+
+FString UArmyPresets_SaveGame::GetArmyPresetsSaveSlotName()
+{
+	return SaveSlotName;
+}
+
+void UArmyPresets_SaveGame::SaveArmyPreset(uint8 SlotIndex, FArmyPresetStruct NewArmy)
+{
+	ArmyPresets[SlotIndex] = NewArmy;
 }

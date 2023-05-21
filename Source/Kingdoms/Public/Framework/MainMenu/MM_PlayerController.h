@@ -37,7 +37,11 @@ public:
 	/* A reference to this player's client beacon, if they are connected to a custom lobby as a client. */
 	UPROPERTY(BlueprintReadWrite, Category="Custom Lobby")
 	AMM_LobbyBeaconClient* CustomLobbyClientBeacon;
-	
+
+	/* Used to track which army preset the player currently has selected. This is stored here to save this data when
+	 * switching between menus. */
+	UPROPERTY(BlueprintReadOnly)
+	uint8 SelectedArmyPreset;
 
 
 /* Protected functions. */

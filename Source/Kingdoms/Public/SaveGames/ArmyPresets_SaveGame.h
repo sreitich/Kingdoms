@@ -22,19 +22,26 @@ public:
 	/* Default constructor. */
 	UArmyPresets_SaveGame();
 
+	/* Getter for this save game's slot name. */
+	UFUNCTION(BlueprintPure, Category="Army Presets")
+	static FString GetArmyPresetsSaveSlotName();
 
-/* Public variables. */
-public:
+	/* Getter for ArmyPresets array. */
+	UFUNCTION(BlueprintPure, Category="Army Presets")
+	TArray<FArmyPresetStruct> GetArmyPresets() const { return ArmyPresets; }
 
-    /* Info used when storing and loading this save. */
-    UPROPERTY(VisibleAnywhere, Category="Save File Info")
-    FString SaveSlotName;
- 
-    UPROPERTY(VisibleAnywhere, Category="Save File Info")
-    int UserIndex;
+	/* Sets the given saved preset to the given army preset. */
+	UFUNCTION(BlueprintCallable, Category="Army Presets")
+	void SaveArmyPreset(uint8 SlotIndex, FArmyPresetStruct NewArmy);
+
+
+/* Private variables. */
+private:
 
 	/* Player-created army presets, containing a list of piece IDs for the army's composition. */
 	UPROPERTY(VisibleAnywhere, Category="Army Presets")
 	TArray<FArmyPresetStruct> ArmyPresets;
 
+	/* Info used when storing and loading this save. */
+	static const FString SaveSlotName;
 };

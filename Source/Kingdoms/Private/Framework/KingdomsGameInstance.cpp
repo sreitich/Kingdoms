@@ -243,26 +243,33 @@ void UKingdomsGameInstance::Init()
 	/* Retrieve the Steam remote storage interface accessor. */
 	SteamRemoteStorageInterface = SteamRemoteStorage();
 
-	/* If there is an unlocked pieces save game file on the Steam cloud, load it. If not, try to get, load, and upload
-	 * the local one. If there is not a local save game file, create one, load it, save it, and upload it to the Steam
-	 * cloud. */
+	/* Set up all save games. */
+	SetUpSaveGame<UUnlockedPieces_SaveGame>(Cast<USaveGame*>(&UnlockedPieces_SaveGame), UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName());
+	SetUpSaveGame<UArmyPresets_SaveGame>(Cast<USaveGame*>(&ArmyPresets_SaveGame), UArmyPresets_SaveGame::GetArmyPresetsSaveSlotName());
+}
+
+template<class T>
+void UKingdomsGameInstance::SetUpSaveGame(USaveGame** SaveGameReference, FString SlotName)
+{
+	/* If there is a save game file on the Steam cloud, load it. If not, try to get, load, and upload the local one. If
+	 * there is not a local save game file, create one, load it, save it, and upload it to the Steam cloud. */
 	if (SteamRemoteStorageInterface)
 	{
 		/* Dynamically get this save game's file name. */
-		const char* UnlockedPiecesSaveFileName = TCHAR_TO_UTF8(*(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName() + ".sav"));
+		const char* SaveFileName = TCHAR_TO_UTF8(*(SlotName + ".sav"));
 
 		/* Check if the file exists on the Steam cloud. */
-		if (SteamRemoteStorageInterface->FileExists(UnlockedPiecesSaveFileName))
+		if (SteamRemoteStorageInterface->FileExists(SaveFileName))
 		{
 			/* Create a buffer to load the data into using the file's size. */
-			const int FileSize = SteamRemoteStorageInterface->GetFileSize(UnlockedPiecesSaveFileName);
+			const int FileSize = SteamRemoteStorageInterface->GetFileSize(SaveFileName);
 			uint8* FileDataBuffer = new uint8[FileSize];
 
 			/* Load the file's data into the buffer. */
-			if (SteamRemoteStorageInterface->FileRead(UnlockedPiecesSaveFileName, FileDataBuffer, FileSize))
+			if (SteamRemoteStorageInterface->FileRead(SaveFileName, FileDataBuffer, FileSize))
 			{
 				/* Get the local path of the save file to write the Steam cloud data into. */
-				const FString FilePath = UKismetSystemLibrary::GetProjectSavedDirectory() + "SaveGames/" + UnlockedPiecesSaveFileName;
+				const FString FilePath = UKismetSystemLibrary::GetProjectSavedDirectory() + "SaveGames/" + SaveFileName;
 
 				/* Convert the buffer's data into a TArray to use WriteBytesToFile. */
 				TArray<uint8> FileDataArr;
@@ -272,45 +279,45 @@ void UKingdomsGameInstance::Init()
 				const bool bWriteSuccessful = USteamUtilities::WriteBytesToFile(true, FilePath, FileDataArr);
 
 				/* If the file was written successfully and a save game file exists, load it. */
-				if (bWriteSuccessful && UGameplayStatics::DoesSaveGameExist(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName(), 0))
+				if (bWriteSuccessful && UGameplayStatics::DoesSaveGameExist(SlotName, 0))
 				{
-					UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(UGameplayStatics::LoadGameFromSlot(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName(), 0));
+					*SaveGameReference = UGameplayStatics::LoadGameFromSlot(SlotName, 0);
 				}
 			}
 		}
-		/* If the save game file does not exist on the Steam cloud, it hasn't been uploaded yet. Try to get and upload the
-		 * local save game file if it exists. If not, create one and upload it. */
+		/* If the save game file does not exist on the Steam cloud, it hasn't been uploaded yet. Try to get and upload
+		 * the local save game file if it exists. If not, create one and upload it. */
 		else
 		{
 			/* If the save slot exists, try to get it and upload it to the Steam cloud. */
-			if (UGameplayStatics::DoesSaveGameExist(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName(), 0))
+			if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
 			{
 				/* Load the save game. */
-				UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(UGameplayStatics::LoadGameFromSlot(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName(), 0));
+				*SaveGameReference = UGameplayStatics::LoadGameFromSlot(SlotName, 0);
 
 				/* Upload the save game to the Steam cloud. */
-				if (UnlockedPieces_SaveGame)
+				if (SaveGameReference)
 				{
-					UploadSaveGameToSteam(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName());
+					UploadSaveGameToSteam(SlotName);
 				}
 			}
-			/* If a save slot does not exist, it hasn't been created locally either. Create it, save it, and upload it to the Steam cloud. */
+			/* If a save slot does not exist, it hasn't been created locally either. Create it, save it, and upload it
+			 * to the Steam cloud. */
 			else
 			{
 				/* Create a new save file and load it. */
-				UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(UGameplayStatics::CreateSaveGameObject(UUnlockedPieces_SaveGame::StaticClass()));
+				SaveGameReference = UGameplayStatics::CreateSaveGameObject(T);
 
 				/* Save the save game locally and upload it to the Steam cloud. */
-				if (UnlockedPieces_SaveGame)
+				if (SaveGameReference)
 				{
-					UGameplayStatics::SaveGameToSlot(UnlockedPieces_SaveGame, UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName(), 0);
+					UGameplayStatics::SaveGameToSlot(*SaveGameReference, SlotName, 0);
 
-					UploadSaveGameToSteam(UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName());
+					UploadSaveGameToSteam(SlotName);
 				}
 			}
 		}
 	}
-	
 }
 
 void UKingdomsGameInstance::OnCreateSessionComplete(FName SessionName, bool bSucceeded)
