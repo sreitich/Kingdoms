@@ -99,8 +99,7 @@ protected:
 	virtual void Init() override;
 
 	/* Sets up the given save game's information. */
-	template<class T>
-	void SetUpSaveGame(USaveGame** SaveGameReference, FString SlotName);
+	USaveGame* SetUpSaveGame(TSubclassOf<USaveGame> SaveGameClass, FString SlotName);
 
 	/* Called when an attempt to start a new game session has ended. */
 	virtual void OnCreateSessionComplete(FName SessionName, bool bSucceeded);

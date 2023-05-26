@@ -244,13 +244,14 @@ void UKingdomsGameInstance::Init()
 	SteamRemoteStorageInterface = SteamRemoteStorage();
 
 	/* Set up all save games. */
-	SetUpSaveGame<UUnlockedPieces_SaveGame>(Cast<USaveGame*>(&UnlockedPieces_SaveGame), UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName());
-	SetUpSaveGame<UArmyPresets_SaveGame>(Cast<USaveGame*>(&ArmyPresets_SaveGame), UArmyPresets_SaveGame::GetArmyPresetsSaveSlotName());
+	UnlockedPieces_SaveGame = Cast<UUnlockedPieces_SaveGame>(SetUpSaveGame(UUnlockedPieces_SaveGame::StaticClass(), UUnlockedPieces_SaveGame::GetUnlockedPiecesSaveSlotName()));
+	ArmyPresets_SaveGame = Cast<UArmyPresets_SaveGame>(SetUpSaveGame(UArmyPresets_SaveGame::StaticClass(), UArmyPresets_SaveGame::GetArmyPresetsSaveSlotName()));
 }
 
-template<class T>
-void UKingdomsGameInstance::SetUpSaveGame(USaveGame** SaveGameReference, FString SlotName)
+USaveGame* UKingdomsGameInstance::SetUpSaveGame(TSubclassOf<USaveGame> SaveGameClass, FString SlotName)
 {
+	USaveGame* ReturnedSaveGame = nullptr;
+
 	/* If there is a save game file on the Steam cloud, load it. If not, try to get, load, and upload the local one. If
 	 * there is not a local save game file, create one, load it, save it, and upload it to the Steam cloud. */
 	if (SteamRemoteStorageInterface)
@@ -281,7 +282,7 @@ void UKingdomsGameInstance::SetUpSaveGame(USaveGame** SaveGameReference, FString
 				/* If the file was written successfully and a save game file exists, load it. */
 				if (bWriteSuccessful && UGameplayStatics::DoesSaveGameExist(SlotName, 0))
 				{
-					*SaveGameReference = UGameplayStatics::LoadGameFromSlot(SlotName, 0);
+					ReturnedSaveGame = UGameplayStatics::LoadGameFromSlot(SlotName, 0);
 				}
 			}
 		}
@@ -293,10 +294,10 @@ void UKingdomsGameInstance::SetUpSaveGame(USaveGame** SaveGameReference, FString
 			if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
 			{
 				/* Load the save game. */
-				*SaveGameReference = UGameplayStatics::LoadGameFromSlot(SlotName, 0);
+				ReturnedSaveGame = UGameplayStatics::LoadGameFromSlot(SlotName, 0);
 
 				/* Upload the save game to the Steam cloud. */
-				if (SaveGameReference)
+				if (ReturnedSaveGame)
 				{
 					UploadSaveGameToSteam(SlotName);
 				}
@@ -306,18 +307,20 @@ void UKingdomsGameInstance::SetUpSaveGame(USaveGame** SaveGameReference, FString
 			else
 			{
 				/* Create a new save file and load it. */
-				SaveGameReference = UGameplayStatics::CreateSaveGameObject(T);
+				ReturnedSaveGame = UGameplayStatics::CreateSaveGameObject(SaveGameClass);
 
 				/* Save the save game locally and upload it to the Steam cloud. */
-				if (SaveGameReference)
+				if (ReturnedSaveGame)
 				{
-					UGameplayStatics::SaveGameToSlot(*SaveGameReference, SlotName, 0);
+					UGameplayStatics::SaveGameToSlot(ReturnedSaveGame, SlotName, 0);
 
 					UploadSaveGameToSteam(SlotName);
 				}
 			}
 		}
 	}
+
+	return ReturnedSaveGame;
 }
 
 void UKingdomsGameInstance::OnCreateSessionComplete(FName SessionName, bool bSucceeded)

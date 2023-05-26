@@ -6,6 +6,14 @@
 #include "UserInterface/MainMenu/MM_HUD.h"
 
 #include "Components/Button.h"
+#include "Components/ButtonSlot.h"
+#include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
+#include "Framework/KingdomsGameInstance.h"
+#include "Kismet/GameplayStatics.h"
+#include "SaveGames/ArmyPresets_SaveGame.h"
+#include "UserDefinedData/SaveGameData_UserDefinedData.h"
+#include "UserInterface/MainMenu/MM_ArmyPresetPreview.h"
 
 void UMM_ArmyMenuWidget::DeactivateWidget()
 {
@@ -16,6 +24,44 @@ void UMM_ArmyMenuWidget::DeactivateWidget()
 void UMM_ArmyMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+
+
+	TArray<FArmyPresetStruct> ArmyPresets = Cast<UKingdomsGameInstance>(UGameplayStatics::GetGameInstance(GetOwningPlayer()))->ArmyPresets_SaveGame->GetArmyPresets();
+	TArray<FArmyPresetStruct> ValidArmyPresets = TArray<FArmyPresetStruct>();
+
+	// Get all of the army presets that have been created (so they have at least one piece).
+	for (FArmyPresetStruct Preset : ArmyPresets)
+	{
+		if (Preset.Pieces.Num() > 0)
+		{
+			ValidArmyPresets.Add(Preset);
+		}
+	}
+
+	// For every army preset that has been created, add a preview that can be used to navigate to it.
+	for (int PresetIndex = 0; PresetIndex < ValidArmyPresets.Num(); PresetIndex++)
+	{
+		UMM_ArmyPresetPreview* ArmyPresetPreviewWidget = CreateWidget<UMM_ArmyPresetPreview>(GetOwningPlayer(), ArmyPresetClass, FName(ValidArmyPresets[PresetIndex].ArmyName + " Army Preset Widget"));
+		if (ArmyPresetPreviewWidget)
+		{
+			ArmyPresetPreviewWidget->UpdateArmyPresetPreview(PresetIndex);
+			ArmyPresetBox->AddChild(ArmyPresetPreviewWidget);
+		}
+	}
+
+	// If the player still has army preset slots left, add a button to allow them to make a new one.
+	const bool bHasSlots = ValidArmyPresets.Num() < MaxPresets;
+	NewPresetButton->SetIsEnabled(bHasSlots);
+	NewPresetButton->SetVisibility(bHasSlots ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+	ArmyPresetBox->AddChild(NewPresetButton);
+	UHorizontalBoxSlot* PresetButtonSlot = CastChecked<UHorizontalBoxSlot>(NewPresetButton->Slot);
+	if (PresetButtonSlot)
+	{
+		PresetButtonSlot->SetPadding(FMargin(15.0f, 0.0f));
+	}
+
+
 
 	/* Bind the "collection" button to navigate to the collection menu. */
 	CollectionButton->OnClicked.AddDynamic(this, &UMM_ArmyMenuWidget::OnCollectionClicked);

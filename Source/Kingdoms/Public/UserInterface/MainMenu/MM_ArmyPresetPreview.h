@@ -7,6 +7,7 @@
 #include "MM_ArmyPresetPreview.generated.h"
 
 class UButton;
+class UDataTable;
 class UImage;
 class UTextBlock;
 
@@ -31,6 +32,13 @@ public:
 	/* The index of which slot this preset is saved in. */
 	UPROPERTY(BlueprintReadOnly)
 	uint8 PresetSlot = 0;
+
+/* Protected variables. */
+protected:
+
+	/* A reference to the piece data table. */
+	UPROPERTY(EditDefaultsOnly)
+	UDataTable* PieceDataTable;
 
 /* Protected function. */
 protected:

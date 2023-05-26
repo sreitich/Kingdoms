@@ -9,6 +9,8 @@
 #include "MM_ArmyMenuWidget.generated.h"
 
 class UButton;
+class UHorizontalBox;
+class UMM_ArmyPresetPreview;
 
 /**
  * 
@@ -46,12 +48,32 @@ protected:
 	void OnBackClicked();
 
 
+/* Protected variables. */
+protected:
+
+	/* The maximum number of army presets players are allowed to have. */
+	UPROPERTY(EditDefaultsOnly)
+	int MaxPresets = 5;
+
+	/* The class to list army presets with. */
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UMM_ArmyPresetPreview> ArmyPresetClass;
+
+
 /* Protected widgets. */
 protected:
 
 	/* Navigates to the collection menu. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
 	UButton* CollectionButton;
+
+	/* The displayed list of army presets. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UHorizontalBox* ArmyPresetBox;
+
+	/* Allows the player to create a new army preset if they have available slots. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
+	UButton* NewPresetButton;
 
 	/* Returns the user to the main menu. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(BindWidget))
